@@ -98,9 +98,7 @@ Słowo jednoliterowe `a \in \Sigma`
     \node [state,accepting] (a) [right=of s] {};
     \path [->] (s) edge node [above] {a} (a);
 
-
-RE `\to` NFA
-------------
+----
 
 Suma mnogościowa języków `X` i `Y`
 ''''''''''''''''''''''''''''''''''
@@ -139,9 +137,7 @@ Konkatencja języków `X` i `Y`
     \path [->] (a1) edge node [above] {$\varepsilon$} (s2);
     \path [->] (a2) edge node [above] {$\varepsilon$} (a);
 
-
-RE `\to` NFA
-------------
+----
 
 Operator Kleeny`ego dla języka `X`
 ''''''''''''''''''''''''''''''''''
@@ -179,15 +175,61 @@ gdy `T'` jest zbiorem stanów osiągalnych z `T`
 po dowolnie wielu krawędziach o etykiecie `\varepsilon`
 i dokładnie jednej krawędzi o etykiecie `a`.
 
+----
+
+W praktyce nie konstruuje się pełnego zbioru stanów `2^S`,
+lecz dokłada jedynie stany osiągalne ze startowego.
+
+Iteracyjna determinizacja NFA
+'''''''''''''''''''''''''''''
+.. raw:: algorithm
+
+    \STATE $S' = \{S_I\}$ (nowy zbiór stanów)
+    \STATE $Q = \{S_I\}$ (kolejna stanów do przetworzenia)
+    \WHILE{$Q \neq \emptyset$}
+        \STATE $T =$ wyjmij stan z $Q$
+        \FOR{each $a \in \Sigma$}
+            \STATE wyznacz $T'$ z definicji $\delta'(T,a,T')$
+            \IF{$T' \notin S'$}
+                \STATE dodaj $T'$ do $S'$ i $Q$
+            \ENDIF
+        \ENDFOR
+    \ENDWHILE
+
 
 Minimalizacja DFA
 -----------------
 
-Automat o najmniejszej liczbie stanów równoważny danemu można skonstruować algorytmem Hopcrofta
-[Hopcroft, 1971].
+    Relacja równoważności stanów
+    ''''''''''''''''''''''''''''
 
-Algorytm Hopcrofta
-''''''''''''''''''
+    Stany `s` i `t` są równoważne (`s \equiv t`),
+    gdy dla wszystkich `w \in \Sigma^*` zachodzi
+
+    .. math::
+
+        \delta(s,w) \in S_A \iff \delta(t,w) \in S_A
+
+Łatwo sprawdzić, że `\equiv` jest istotnie relacją równoważności,
+oraz, że
+
+.. math::
+    
+    s \equiv t \implies \delta(s,a) \equiv \delta(t,a),
+
+a zatem całe klasy równoważności można zastąpić pojedynczymi stanami,
+nie zmieniając języka rozpoznawanego przez automat.
+
+----
+
+Automat o najmniejszej liczbie stanów równoważny danemu można skonstruować:
+
+-   usuwając stany nieosiągalne ze startowego
+    (niepotrzebne po iteracyjnej konstrukcji NFA `\to` DFA)
+-   sklejając klasy równoważności stanów
+
+Łączenie stanów równoważnych [Hopcroft, 1971]
+'''''''''''''''''''''''''''''''''''''''''''''
 .. raw:: algorithm
 
     \STATE $P = \{S_A, S-S_A\}$ (struktura partition refinement)
@@ -209,9 +251,7 @@ Algorytm Hopcrofta
         \ENDFOR
     \ENDWHILE
 
-
-Minimalizacja DFA
------------------
+----
 
 Struktura **partition refinement** utrzymuje podział `P` początkowego uniwersum na podzbiory.
 Dostarcza ona pojedynczą operację ``refine(X)``,
@@ -228,4 +268,142 @@ wykonują ``refine(X)`` w czasie `O(|X|)` i wymagają:
     (np. przez dwukierunkowe listy wiązane),
 -   szybkiego znajdowania zbioru, do którego należy dany element
     (np. przez dodatkowe wskaźniki).
+
+
+Alternatywna konstrukcja RE `\to` DFA
+-------------------------------------
+
+Załóżmy, że mamy DFA `(S, \{s_0\}, S_A, \delta)`
+rozpoznający język `L \subseteq \Sigma^*`.
+
+Dla dowolnego stanu `s \in S` możemy zdefiniować język
+
+`L_s := \{ w \in \Sigma^*: \delta(s,w) \in S_A \}`.
+
+    Spostrzeżenie
+    '''''''''''''
+
+    -   dla każdego `s` język `L_s` jest regularny,
+    -   `L_{s_0} = L`.
+
+Można to wykorzystać do konstrukcji DFA dla zadanego wyrażenia regularnego,
+identyfikując każdy stan `s` z wyrażeniem opisującym `L_s`.
+
+----
+
+    Pochodna języka regularnego
+    '''''''''''''''''''''''''''
+
+    **Pochodną** języka regularnego `L \subseteq \Sigma^*`
+    **względem** symbolu `a \in \Sigma`
+    nazywamy zbiór
+
+    .. math::
+
+        L^{(a)} := \{ aw: w \in L \}
+
+
+Rozważmy dwa stany `s, t \in S`, połączone krawędzią `(s,a,t) \in \delta`.
+Mamy wówczas
+
+.. math::
+
+    L_t = \{ v: \delta(t,v) \in S_A \}
+        = \{ w: \delta(s,aw) \in S_A \}
+        = \{ aw: w \in L_s \}
+        = L_s^{(a)},
+
+a zatem następnik stanu `s` po krawędzi `a` możemy wyznaczyć
+znajdując wyrażenie opisujące pochodną `L_s^{(a)}`.
+
+----
+
+Wyrażenie dla pochodnej języka nazywamy **pochodną wyrażenia**
+i obliczamy rekurencyjnie ze względu na jego strukturę:
+
+-   `\emptyset^{(a)} = \emptyset`,
+-   `a^{(a)} = \{\varepsilon\} = \emptyset^*`,
+-   `a^{(b)} = \emptyset` jeżeli `b \neq a`,
+-   `(X \cup Y)^{(a)} = X^{(a)} \cup Y^{(a)}`,
+-   `(XY)^{(a)} = X^{(a)}Y` jeżeli `\varepsilon \notin X`,
+-   `(XY)^{(a)} = X^{(a)}Y \cup Y^{(a)}` jeżeli `\varepsilon \in X`,
+-   `(X^*)^{(a)} = X^{(a)}X^*`.
+
+Jeżeli zezwolimy na operacje przecięcia i dopełnienia
+(bardzo przydatne w praktyce),
+potrzebujemy dodatkowo:
+
+-   `(X \cap Y)^{(a)} = X^{(a)} \cap Y^{(a)}`,
+-   `(\neg X)^{(a)} = \neg X^{(a)}`.
+
+----
+
+Pozostaje problem wykrywania, czy stan opisywany przez nowe wyrażenie
+powinien zostać sklejony z jakimś już istniejącym.
+Możliwości:
+
+-   sklejamy tylko stany o *syntaktycznie* identycznych wyrażeniach
+    `\implies` automat może nie być skończony
+-   sklejamy stany o wyrażeniach równoważnych (opisujących ten sam język)
+    `\implies` otrzymujemy automat minimalny,
+    ale test równoważności jest trudny
+    (złożoność nieelementarna jeśli zezwalamy na przecięcie i dopełnienie),
+-   sklejamy stany o wyrażeniach **syntaktycznie pseudorównoważnych**
+    [Brzozowski, 1964]:
+
+    -   `X \cup X \sim X`
+    -   `X \cup Y \sim Y \cup X`
+    -   `(X \cup Y) \cup Z \sim X \cup (Y \cup Z)`
+    -   (analogiczne reguły dla `\cap`)
+
+    `\implies` otrzymamy automat skończony (duży w praktyce).
+
+----
+
+Jeżeli wzbogacimy pseudorównoważność syntaktyczną o:
+
+-   `\emptyset \cup X \sim X`,
+-   `\neg\emptyset \cup X \sim \neg\emptyset`,
+-   (analogiczne reguły dla `\cap`),
+-   `(XY)Z \sim X(YZ)`,
+-   `\emptyset X \sim X \emptyset \sim \emptyset`,
+-   `\varepsilon X \sim X \varepsilon \sim X`,
+-   `X^{**} \sim X^*`,
+-   `\varepsilon^* \sim \emptyset^* = \varepsilon`,
+-   `\neg(\neg X) \sim X`,
+
+otrzymamy automat skończony i w praktyce niewielki
+(często nawet minimalny) [Owens, Reppy, Turon, 2009].
+
+
+Konstrukcja lexera
+------------------
+
+Lexer działa w następujący sposób:
+
+-   uruchamia NFA/DFA dla sumy języków poszczególnych kategorii tokenów
+    (odróżniając indywidualne stany akceptujące),
+-   zapamiętuje ostatnią pozycję `p` wystąpienia stanu akceptującego,
+-   po dotarciu do stanu martwego cofa się do `p`,
+    generuje pojedynczy token i zaczyna pracę od nowa.
+
+Typowe strategie implementracji:
+
+-   tablica przejść automatu, stały kod sterujący
+-   przejścia ujęte przez control flow lexera
+
+----
+
+Konflikty pomiędzy kategoriami tokenów:
+
+-   występują, gdy przecięcie języków różnych kategorii jest niepuste
+-   częsty przypadek: identyfikatory vs. słowa kluczowe
+
+Typowe rozwiązania:
+
+-   priorytetyzacja kategorii;
+-   zabraniamy,
+    słowa kluczowe odfiltrowujemy spośród identyfikatorów poza lexerem;
+-   lexer zwraca *wszystkie* możliwe kategorie tokenu,
+    odróżniamy w fazie analizy składniowej.
 
