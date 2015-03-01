@@ -1,0 +1,10 @@
+__pycache__
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.vrb
+*.tex
+*.pdf
