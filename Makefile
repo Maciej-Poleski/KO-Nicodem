@@ -4,6 +4,9 @@ PDF := $(patsubst %.rst,%.pdf,${RST})
 
 all : ${PDF}
 
+publish : ${PDF}
+	scp $^ sphinx:/afs/matinf.uj.edu.pl/common/tcs/gherman/ko/wyklad/
+
 ${PDF} : %.pdf : %.tex
 	pdflatex $*
 	pdflatex $*
@@ -11,4 +14,4 @@ ${PDF} : %.pdf : %.tex
 ${TEX} : %.tex : %.rst filter.py header.tex
 	pandoc $< -t beamer --latex-engine pdflatex --filter filter.py -H header.tex -o $@
 
-.PHONY : all
+.PHONY : all publish
