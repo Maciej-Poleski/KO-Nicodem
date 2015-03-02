@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nicodem.Source", "Nicodem.Source", "{BDE96647-252C-4DAB-AE41-A02F7214C647}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Source", "Source\Source.csproj", "{6078FFE3-28C8-4169-831D-E1D1AAFDD72F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nicodem.Lexer", "Nicodem.Lexer", "{07C86C89-DB08-4630-9589-5AA6987FAD25}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6078FFE3-28C8-4169-831D-E1D1AAFDD72F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6078FFE3-28C8-4169-831D-E1D1AAFDD72F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6078FFE3-28C8-4169-831D-E1D1AAFDD72F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6078FFE3-28C8-4169-831D-E1D1AAFDD72F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6078FFE3-28C8-4169-831D-E1D1AAFDD72F} = {BDE96647-252C-4DAB-AE41-A02F7214C647}
+	EndGlobalSection
+EndGlobal
