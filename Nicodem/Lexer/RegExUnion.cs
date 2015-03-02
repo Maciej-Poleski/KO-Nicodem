@@ -2,8 +2,11 @@
 {
 	internal class RegExUnion : RegEx
 	{
-		internal RegExUnion ()
+		internal RegEx[] Regexes { private set; get; }
+
+		internal RegExUnion ( params RegEx[] regexes )
 		{
+			this.Regexes = regexes;
 		}
 
 		public override int CompareTo (RegEx other)

@@ -2,11 +2,11 @@
 {
 	internal class RegExConcat : RegEx
 	{
-		private readonly RegEx[] regexes;
+		internal RegEx[] Regexes { private set; get; }
 
 		internal RegExConcat ( params RegEx[] regexes )
 		{
-			this.regexes = regexes;
+			this.Regexes = regexes;
 		}
 
 		public override int CompareTo (RegEx other)

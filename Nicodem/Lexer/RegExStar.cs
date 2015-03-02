@@ -2,8 +2,11 @@
 {
 	internal class RegExStar : RegEx
 	{
-		internal RegExStar ()
+		internal RegEx Regex { private set; get; }
+
+		internal RegExStar ( RegEx regex )
 		{
+			this.Regex = regex;
 		}
 
 		public override int CompareTo (RegEx other)

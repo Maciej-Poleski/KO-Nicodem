@@ -2,8 +2,11 @@
 {
 	internal class RegExIntersection : RegEx
 	{
-		internal RegExIntersection ()
+		internal RegEx[] Regexes { private set; get; }
+
+		internal RegExIntersection ( params RegEx[] regexes )
 		{
+			this.Regexes = regexes;
 		}
 
 		public override int CompareTo (RegEx other)

@@ -2,8 +2,11 @@
 {
 	internal class RegExComplement : RegEx
 	{
-		internal RegExComplement ()
+		internal RegEx Regex { private set; get; }
+
+		internal RegExComplement ( RegEx regex )
 		{
+			this.Regex = regex;
 		}
 
 		public override int CompareTo (RegEx other)
