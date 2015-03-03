@@ -12,6 +12,6 @@ ${PDF} : %.pdf : %.tex
 	pdflatex $*
 
 ${TEX} : %.tex : %.rst filter.py header.tex
-	pandoc $< -t beamer --latex-engine pdflatex --filter filter.py -H header.tex -o $@
+	pandoc $< -t beamer --latex-engine pdflatex --filter ./filter.py -H header.tex -o $@
 
 .PHONY : all publish
