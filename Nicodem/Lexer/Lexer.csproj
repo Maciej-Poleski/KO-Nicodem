@@ -40,6 +40,7 @@
     <Compile Include="RegExStar.cs" />
     <Compile Include="RegExComplement.cs" />
     <Compile Include="RegExFactory.cs" />
+    <Compile Include="RegExEpsilon.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
