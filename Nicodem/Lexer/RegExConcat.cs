@@ -1,8 +1,8 @@
 ﻿namespace Nicodem.Lexer
 {
-	internal class RegExConcat : RegEx
+	public class RegExConcat : RegEx
 	{
-		internal RegEx[] Regexes { private set; get; }
+		public RegEx[] Regexes { private set; get; }
 
 		internal RegExConcat ( params RegEx[] regexes )
 		{

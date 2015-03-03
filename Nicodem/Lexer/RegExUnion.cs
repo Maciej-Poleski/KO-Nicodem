@@ -1,8 +1,8 @@
 ﻿namespace Nicodem.Lexer
 {
-	internal class RegExUnion : RegEx
+	public class RegExUnion : RegEx
 	{
-		internal RegEx[] Regexes { private set; get; }
+		public RegEx[] Regexes { private set; get; }
 
 		internal RegExUnion ( params RegEx[] regexes )
 		{
@@ -11,7 +11,7 @@
 
 		public override int CompareTo (RegEx other)
 		{
-			//TODO(pmikos)
+			//TODO(?)
 			throw new System.NotImplementedException ();
 		}
 	}

@@ -1,22 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Nicodem.Lexer
 {
 	public static class RegExFactory
 	{
+		/// <summary>
+		/// RegEx representing empty language.
+		/// </summary>
 		public static RegEx Empty() 
 		{
-			// TODO(pmikos)
-			throw new NotImplementedException ();
+			// empty = sum {}
+			return Union ();
 		}
 
+		/// <summary>
+		/// RegEx representing whole universe (sigma star).
+		/// </summary>
+		public static RegEx All()
+		{
+			// universe = intersect {}
+			return Intersection ();
+		}
+
+		/// <summary>
+		/// RegEx representing range of elements [c, end)
+		/// </summary>
+		/// <param name="c">begin of the range</param>
 		public static RegEx Range( char c )
 		{
 			return new RegExRange (c);
 		}
-
+		//TODO
+		/// <summary>
+		/// RegEx representing union of RegExes.
+		/// Properties:
+		/// {} ~ empty language
+		/// {X} ~ X
+		/// {X,X} ~ {X}
+		/// {X,Y} ~ {Y,X}
+		/// </summary>
+		/// <param name="regexes">set of regexes</param>
 		public static RegEx Union( params RegEx[] regexes )
 		{
 			// build list of all regexes
@@ -38,7 +62,16 @@ namespace Nicodem.Lexer
 			// {X} -> X
 			return distinct.Length == 1 ? distinct [0] : new RegExUnion (distinct);
 		}
-
+		//TODO
+		/// <summary>
+		/// RegEx representing intersection of RegExes.
+		/// Properties:
+		/// {} ~ universe
+		/// {X} ~ X
+		/// {X,X} ~ {X}
+		/// {X,Y} ~ {Y,X}
+		/// </summary>
+		/// <param name="regexes">set of regexes</param>
 		public static RegEx Intersection( params RegEx[] regexes )
 		{
 			// build list of all regexes
@@ -60,7 +93,15 @@ namespace Nicodem.Lexer
 			// {X} -> X
 			return distinct.Length == 1 ? distinct [0] : new RegExIntersection (distinct);
 		}
-
+		//TODO
+		/// <summary>
+		/// RegEx representing concatenation of RegExes.
+		/// Properties:
+		/// (XY)Z ~ X(YZ)
+		/// emptyX ~ Xempty ~ empty
+		/// epsiX ~ Xepsi ~ X
+		/// </summary>
+		/// <param name="regexes">set of regexes</param>
 		public static RegEx Concat( params RegEx[] regexes )
 		{
 			// build list of all regexes
@@ -78,21 +119,30 @@ namespace Nicodem.Lexer
 			// (XY)Z ~ X(YZ)
 			return new RegExConcat (list.ToArray ());
 		}
-
+		//TODO
+		/// <summary>
+		/// RegEx representing Kleene star of RegExes.
+		/// Properties:
+		/// X** = X*
+		/// epsi* ~ empty* ~ epsi
+		/// </summary>
+		/// <param name="regex">RegEx to be starred</param>
 		public static RegEx Star( RegEx regex )
 		{
 			// X** ~ X*
-			if (regex is RegExStar)
-				return regex;
+			return regex is RegExStar ? regex : new RegExStar (regex);
 
-			return new RegExStar (regex);
 		}
 
+		/// <summary>
+		/// Properties:
+		/// ~~X ~ X
+		/// </summary>
+		/// <param name="regex"></param>
 		public static RegEx Complement( RegEx regex )
 		{
-			var rcomp = regex as RegExComplement;
-
 			// ~~X ~ X
+			var rcomp = regex as RegExComplement;
 			return rcomp != null ? rcomp.Regex : new RegExComplement (regex);
 
 		}

@@ -1,8 +1,8 @@
 ﻿namespace Nicodem.Lexer
 {
-	internal class RegExRange : RegEx
+	public class RegExRange : RegEx
 	{
-		internal char Character { private set; get; }
+		public char Character { private set; get; }
 
 		internal RegExRange ( char c )
 		{

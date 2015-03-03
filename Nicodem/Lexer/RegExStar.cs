@@ -1,8 +1,8 @@
 ﻿namespace Nicodem.Lexer
 {
-	internal class RegExStar : RegEx
+	public class RegExStar : RegEx
 	{
-		internal RegEx Regex { private set; get; }
+		public RegEx Regex { private set; get; }
 
 		internal RegExStar ( RegEx regex )
 		{

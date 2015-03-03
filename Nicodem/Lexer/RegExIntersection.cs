@@ -1,8 +1,8 @@
 ﻿namespace Nicodem.Lexer
 {
-	internal class RegExIntersection : RegEx
+	public class RegExIntersection : RegEx
 	{
-		internal RegEx[] Regexes { private set; get; }
+		public RegEx[] Regexes { private set; get; }
 
 		internal RegExIntersection ( params RegEx[] regexes )
 		{

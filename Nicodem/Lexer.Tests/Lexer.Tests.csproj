@@ -41,4 +41,10 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lexer\Lexer.csproj">
+      <Project>{3A107436-1EC7-48E3-BF42-5E5E50C259E7}</Project>
+      <Name>Lexer</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>
