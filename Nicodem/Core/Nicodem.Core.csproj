@@ -4,7 +4,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{5E967501-0A63-4196-A29B-B8B148785048}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <RootNamespace>Nicodem.Core</RootNamespace>
     <AssemblyName>Nicodem.Core</AssemblyName>
   </PropertyGroup>
@@ -27,4 +27,7 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="DoubleLinkedList.cs" />
+  </ItemGroup>
 </Project>
