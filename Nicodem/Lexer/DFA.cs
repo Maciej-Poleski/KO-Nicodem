@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Nicodem.Lexer
 {
-    class DFA
+    class DFA : IDFA
     {
-        DFAState start{get;}
+        public DFAState Start{get;}
     }
 }

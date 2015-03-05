@@ -33,6 +33,8 @@
   <ItemGroup>
     <Compile Include="DFA.cs" />
     <Compile Include="DFAState.cs" />
+    <Compile Include="IDFA.cs" />
+    <Compile Include="Lexer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegEx.cs" />
     <Compile Include="RegExRange.cs" />
@@ -49,6 +51,10 @@
     <ProjectReference Include="..\Core\Nicodem.Core.csproj">
       <Project>{5E967501-0A63-4196-A29B-B8B148785048}</Project>
       <Name>Nicodem.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Source\Source.csproj">
+      <Project>{6078FFE3-28C8-4169-831D-E1D1AAFDD72F}</Project>
+      <Name>Source</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

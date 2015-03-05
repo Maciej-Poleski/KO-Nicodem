@@ -1,6 +1,6 @@
 ﻿namespace Nicodem.Source
 {
-    internal class Fragment
+    public class Fragment
     {
         private IOrigin origin;
 
