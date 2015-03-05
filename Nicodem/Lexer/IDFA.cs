@@ -1,7 +1,7 @@
 ﻿namespace Nicodem.Lexer
 {
-    internal interface IDFA
+    internal interface IDfa<T> where T : IDfaState<T> 
     {
-        DFAState Start { get; }
+        T Start { get; }
     }
 }
