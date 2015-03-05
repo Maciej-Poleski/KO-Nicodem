@@ -8,6 +8,6 @@ namespace Nicodem.Lexer
 {
     class DFA
     {
-        DFAState start{get;};
+        DFAState start{get;}
     }
 }
