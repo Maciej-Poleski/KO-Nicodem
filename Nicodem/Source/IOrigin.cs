@@ -1,6 +1,6 @@
 ﻿namespace Nicodem.Source
 {
-    interface IOrigin
+    public interface IOrigin
     {
         Location begin { get; set;}
         IOriginReader GetReader();

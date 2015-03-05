@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Nicodem.Lexer
 {
-    class DFAState
+    class DFAState : IDfaState<DFAState>
     {
-        uint Accepting {get;}
-        KeyValuePair<char,DFAState>[] Transitions;
+        public uint Accepting {get;}
+        public KeyValuePair<char, DFAState>[] Transitions { get; }
     }
 }

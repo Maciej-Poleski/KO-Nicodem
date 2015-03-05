@@ -6,8 +6,13 @@ using System.Threading.Tasks;
 
 namespace Nicodem.Lexer
 {
-    class DFA
+    class DFA : IDfa<DFAState>
     {
-        DFAState start{get;}
+        public DFA(RegEx regEx, uint acceptingStateMarker)
+        {
+            throw new NotImplementedException();
+        }
+
+        public DFAState Start{get;}
     }
 }

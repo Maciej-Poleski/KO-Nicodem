@@ -33,6 +33,9 @@
   <ItemGroup>
     <Compile Include="DFA.cs" />
     <Compile Include="DFAState.cs" />
+    <Compile Include="DfaUtils.cs" />
+    <Compile Include="IDfaState.cs" />
+    <Compile Include="Lexer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegEx.cs" />
     <Compile Include="RegExRange.cs" />
@@ -43,12 +46,17 @@
     <Compile Include="RegExComplement.cs" />
     <Compile Include="RegExFactory.cs" />
     <Compile Include="RegExEpsilon.cs" />
+    <Compile Include="IDFA.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\Core\Nicodem.Core.csproj">
+    <ProjectReference Include="..\Source\Source.csproj">
+      <Project>{6078FFE3-28C8-4169-831D-E1D1AAFDD72F}</Project>
+      <Name>Source</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core\Core.csproj">
       <Project>{5E967501-0A63-4196-A29B-B8B148785048}</Project>
-      <Name>Nicodem.Core</Name>
+      <Name>Core</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
