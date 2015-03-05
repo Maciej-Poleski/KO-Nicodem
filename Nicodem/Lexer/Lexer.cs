@@ -60,7 +60,7 @@ namespace Nicodem.Lexer
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        private IEnumerable<Tuple<Fragment, IEnumerable<int>>> Process(IOrigin source)
+        public IEnumerable<Tuple<Fragment, IEnumerable<int>>> Process(IOrigin source)
         {
             throw new NotImplementedException();
         }
@@ -169,28 +169,28 @@ namespace Nicodem.Lexer
                 return category;
             }
         }
-    }
 
-    internal class ProductDfaState : IDfaState<ProductDfaState>
-    {
-        public uint Accepting { get; internal set; }
-        public KeyValuePair<char, ProductDfaState>[] Transitions { get; internal set; }
-
-        internal static ProductDfaState MakeDeadState()
+        private class ProductDfaState : IDfaState<ProductDfaState>
         {
-            var result = new ProductDfaState {Accepting = 0};
-            result.Transitions = new[] {new KeyValuePair<char, ProductDfaState>('\0', result)};
-            return result;
+            public uint Accepting { get; internal set; }
+            public KeyValuePair<char, ProductDfaState>[] Transitions { get; internal set; }
+
+            internal static ProductDfaState MakeDeadState()
+            {
+                var result = new ProductDfaState {Accepting = 0};
+                result.Transitions = new[] {new KeyValuePair<char, ProductDfaState>('\0', result)};
+                return result;
+            }
         }
-    }
 
-    internal struct ProductDfa : IDfa<ProductDfaState>
-    {
-        public ProductDfaState Start { get; internal set; }
-
-        internal static ProductDfa MakeEmptyLanguageDfa()
+        private struct ProductDfa : IDfa<ProductDfaState>
         {
-            return new ProductDfa {Start = ProductDfaState.MakeDeadState()};
+            public ProductDfaState Start { get; internal set; }
+
+            internal static ProductDfa MakeEmptyLanguageDfa()
+            {
+                return new ProductDfa {Start = ProductDfaState.MakeDeadState()};
+            }
         }
     }
 }
