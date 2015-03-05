@@ -49,6 +49,11 @@ namespace Nicodem.Core
 			return head == null;
 		}
 
+		public int Count
+		{
+			get { return positions.Count; }
+		}
+
 		public void Add (T elem)
 		{
 			Node<T> newNode = new Node<T> (elem);

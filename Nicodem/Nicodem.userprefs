@@ -1,8 +1,11 @@
 ﻿<Properties StartupItem="Source/Source.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Core/DoubleLindedList.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Lexer/DFA.cs">
     <Files>
-      <File FileName="Core/DoubleLindedList.cs" Line="7" Column="13" />
+      <File FileName="Core/PartitionRefinement.cs" Line="1" Column="1" />
+      <File FileName="Core/Core.Tests/PartitionRefinementTests.cs" Line="8" Column="8" />
+      <File FileName="Lexer/DFA.cs" Line="18" Column="18" />
+      <File FileName="Lexer.Tests/RegExFactoryTests.cs" Line="3" Column="3" NotebookId="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
