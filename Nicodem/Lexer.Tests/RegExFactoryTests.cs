@@ -147,10 +147,20 @@ namespace Lexer.Tests
 			Assert.Equals (0, empty.CompareTo (concat2));
 		}
 
+		// concat(epsi, X) = concat(X, epsi) = X
 		[Test]
 		public void Test_Concat_Epsi()
 		{
-			//TODO(pmikos)
+			var epsi = RegExFactory.Epsilon ();
+			var regex = RegExFactory.Range ('a');
+
+			var concat1 = RegExFactory.Concat (epsi, regex);
+			var concat2 = RegExFactory.Concat (regex, epsi);
+
+			Assert.IsTrue (concat1 is RegExRange);
+			Assert.IsTrue (concat2 is RegExRange);
+			Assert.Equals (0, regex.CompareTo (concat1));
+			Assert.Equals (0, regex.CompareTo (concat2));
 		}
 
 		#endregion
@@ -172,7 +182,16 @@ namespace Lexer.Tests
 		[Test]
 		public void Test_Star_Empty()
 		{
-			//TODO(pmikos)
+			var epsi = RegExFactory.Epsilon ();
+			var empty = RegExFactory.Empty ();
+
+			var star_epsi = RegExFactory.Star (epsi);
+			var star_empty = RegExFactory.Star (empty);
+
+			Assert.IsTrue (star_empty is RegExEpsilon);
+			Assert.IsTrue (star_epsi is RegExEpsilon);
+			Assert.Equals (0, epsi.CompareTo (star_epsi));
+			Assert.Equals (0, epsi.CompareTo (star_empty));
 		}
 
 		#endregion

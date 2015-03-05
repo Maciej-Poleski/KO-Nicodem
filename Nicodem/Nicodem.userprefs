@@ -1,9 +1,8 @@
 ﻿<Properties StartupItem="Source/Source.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Lexer.Tests/RegExFactoryTests.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Core/DoubleLindedList.cs">
     <Files>
-      <File FileName="Lexer/RegExFactory.cs" Line="1" Column="1" />
-      <File FileName="Lexer.Tests/RegExFactoryTests.cs" Line="6" Column="6" />
+      <File FileName="Core/DoubleLindedList.cs" Line="7" Column="13" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
