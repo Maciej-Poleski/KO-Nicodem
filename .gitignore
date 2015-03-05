@@ -26,3 +26,6 @@ TestResult.xml
 Version.cs
 Version.h
 Version.cpp
+/Nicodem/packages
+/Nicodem/*.userprefs
+/Nicodem/*.suo
