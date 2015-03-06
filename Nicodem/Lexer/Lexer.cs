@@ -15,7 +15,7 @@ namespace Nicodem.Lexer
         private readonly Dictionary<uint, Tuple<uint, uint>> _decompressionMapping =
             new Dictionary<uint, Tuple<uint, uint>>();
 
-        private DFA _dfa;
+        private readonly DFA _dfa;
         private uint _nextCategory;
 
         public Lexer(RegEx[] regexCategories)
@@ -58,15 +58,72 @@ namespace Nicodem.Lexer
         /// <summary>
         ///     Może klient mógłby określić jaki chce typ enumeratora...
         /// </summary>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public IEnumerable<Tuple<TFragment, IEnumerable<int>>> Process<TOrigin, TMemento, TLocation, TFragment>(
-            TOrigin source)
+        /// <param name="sourceOrigin"></param>
+        /// <returns>
+        ///     Lista tokenów powiązanych z informacją o kategoriach do których dany token należy. Lista składa się z tokenów
+        ///     najdłuższego prefiksu źródła, którego udało się sparsować.
+        /// </returns>
+        public TokenizerResult<TOrigin, TMemento, TLocation, TFragment> Process<TOrigin, TMemento, TLocation, TFragment>
+            (
+            TOrigin sourceOrigin)
             where TOrigin : IOrigin<TOrigin, TMemento, TLocation, TFragment>
             where TLocation : ILocation<TOrigin, TMemento, TLocation, TFragment>
             where TFragment : IFragment<TOrigin, TMemento, TLocation, TFragment>
         {
+            var result = new List<Tuple<TFragment, IEnumerable<int>>>();
+            var sourceReader = sourceOrigin.GetReader();
+            var lastAcceptedLocation = sourceReader.CurrentLocation;
+            for (;;)
+            {
+                var succeed = false;
+                var dfaState = _dfa.Start;
+                var lastAcceptedDfaState = dfaState;
+                TMemento lastAcceptingReaderState;
+                if (dfaState.IsAccepting())
+                {
+                    lastAcceptingReaderState = sourceReader.MakeMemento();
+                    succeed = true;
+                    // Potencjalnie dopuszcza zapętlenie przez akceptowanie pustych słów jeżeli takie istnieją w języku
+                }
+                else
+                {
+                    lastAcceptingReaderState = default(TMemento);
+                }
+                while (!dfaState.IsDead() && sourceReader.MoveNext())
+                {
+                    var c = sourceReader.CurrentCharacter;
+                    dfaState = FindTransition(dfaState.Transitions, c);
+                    if (dfaState.IsAccepting())
+                    {
+                        lastAcceptingReaderState = sourceReader.MakeMemento();
+                        lastAcceptedDfaState = dfaState;
+                    }
+                }
+                if (succeed)
+                {
+                    sourceReader.Rollback(lastAcceptingReaderState);
+                    dfaState = lastAcceptedDfaState;
+                    var currentLocation = sourceReader.CurrentLocation;
+                    var currentFrame = currentLocation.Origin.MakeFragment(lastAcceptedLocation, currentLocation);
+                    result.Add(new Tuple<TFragment, IEnumerable<int>>(currentFrame, getCategoriesFromState(dfaState)));
+                    lastAcceptedLocation = currentLocation;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            return new TokenizerResult<TOrigin, TMemento, TLocation, TFragment>(result, lastAcceptedLocation);
+        }
+
+        private IEnumerable<int> getCategoriesFromState<T>(T dfaState) where T : IDfaState<T>
+        {
             throw new NotImplementedException();
+        }
+
+        private T FindTransition<T>(KeyValuePair<char, T>[] transitions, char c) where T : IDfaState<T>
+        {
+            return Array.FindLast(transitions, pair => pair.Key <= c).Value;
         }
 
         private class ProductDfaBuilder<T, U> where T : IDfaState<T> where U : IDfaState<U>
