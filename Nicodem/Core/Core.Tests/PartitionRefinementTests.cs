@@ -1,22 +1,16 @@
 ﻿using System.Collections.Generic;
 using Nicodem.Core;
 using NUnit.Framework;
+using System.Linq;
 
 namespace Core.Tests
 {
 	[TestFixture]
 	public class PartitionRefinementTests
 	{
-		bool ListEquals<T>(List<T> l1, List<T> l2)
+		static bool ListEquals<T>(List<T> l1, List<T> l2)
 		{
-			if (l1.Count == l2.Count) {
-				foreach (T t in l1)
-					if (!l2.Contains (t))
-						return false;
-			}
-			else return false;
-
-			return true;
+			return (l1.Count == l2.Count && !l1.Except (l2).Any ());
 		}
 
 		[Test]

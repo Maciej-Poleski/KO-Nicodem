@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Nicodem.Core
 {
@@ -26,7 +27,7 @@ namespace Nicodem.Core
 
 		public bool HasIntersection ()
 		{
-			return intersection == null;
+			return intersection != null;
 		}
 
 		public void InitIntersection ()
@@ -49,16 +50,16 @@ namespace Nicodem.Core
 	public class PartitionRefinement <T, E> where E : class, ICollection<T>, new()
 	{
 
-		private List<SetPartition<T, E>> partition = new List<SetPartition<T, E>>();
-		private Dictionary<T, SetPartition<T, E>> pointers = new Dictionary<T, SetPartition<T, E>>();
+		private LinkedList<SetPartition<T, E>> partition = new LinkedList<SetPartition<T, E>>();
+		private Dictionary<T, LinkedListNode<SetPartition<T, E>>> pointers = new Dictionary<T, LinkedListNode<SetPartition<T, E>>>();
 
 		public PartitionRefinement (E setElements)
 		{
 			SetPartition<T, E> initialSet = new SetPartition<T, E> (setElements);
-			partition.Add (initialSet);
+			var node = partition.AddLast (initialSet);
 
 			foreach (var el in setElements)
-				pointers [el] = initialSet;
+				pointers [el] = node;
 		}
 
 		// Returns a list of partitions represented by SetPartition<T, E>
@@ -67,30 +68,34 @@ namespace Nicodem.Core
 		// be invalidaded with further actions on the instance of ProductRefinement
 		public List<SetPartition<T, E>> Refine (ICollection<T> elements)
 		{
-			List<SetPartition<T, E>> changes = new List<SetPartition<T, E>> ();
+			List<LinkedListNode<SetPartition<T, E>>> changedNodes = new List<LinkedListNode<SetPartition<T, E>>> ();
 
 			foreach (var el in elements)
-				pointers [el].CloseIntersection ();
+				pointers [el].Value.CloseIntersection ();
 
 			foreach (var el in elements) 
 			{
-				SetPartition<T, E> part = pointers [el];
-				if (part.HasIntersection ()) {
-					part.InitIntersection ();
-					changes.Add (part);
+				var partNode = pointers [el];
+				if (!partNode.Value.HasIntersection ()) {
+					partNode.Value.InitIntersection ();
+					changedNodes.Add (partNode);
 				}
-				part.Intersect (el);
+				partNode.Value.Intersect (el);
 			}
 
-			foreach (SetPartition<T, E> part in changes) {
-				SetPartition<T, E> intersectionPart = new SetPartition<T, E> (part.Intersection);
-				partition.Add (intersectionPart);
-				if (part.Difference.Count == 0)
-					partition.Remove (part);
+			foreach (var partNode in changedNodes) {
+				SetPartition<T, E> intersectionPart = new SetPartition<T, E> (partNode.Value.Intersection);
+				var node = partition.AddLast (intersectionPart);
+				if (!partNode.Value.Difference.Any())
+					partition.Remove (partNode);
 
-				foreach (T el in part.Intersection)
-					pointers [el] = intersectionPart;
+				foreach (T el in partNode.Value.Intersection)
+					pointers [el] = node;
 			}
+
+			List<SetPartition<T, E>> changes = new List<SetPartition<T, E>> ();
+			foreach (var node in changedNodes)
+				changes.Add (node.Value);
 
 			return changes;
 		}
