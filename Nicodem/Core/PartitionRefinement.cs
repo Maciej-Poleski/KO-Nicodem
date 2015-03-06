@@ -7,43 +7,34 @@ namespace Nicodem.Core
 
 	public class SetPartition <T, E> where E : class, ICollection<T>, new()
 	{
-		private E difference, intersection;
+		public E Difference { get; private set; } 
+		public E Intersection { get; private set; } 
 
 		public SetPartition(E difference, E intersection = null)
 		{
-			this.difference = difference;
-			this.intersection = intersection;
-		}
-
-		public E Difference
-		{
-			get { return difference; }
-		}
-
-		public E Intersection
-		{
-			get { return intersection; }
+			this.Difference = difference;
+			this.Intersection = intersection;
 		}
 
 		public bool HasIntersection ()
 		{
-			return intersection != null;
+			return Intersection != null;
 		}
 
 		public void InitIntersection ()
 		{
-			intersection = new E ();
+			Intersection = new E ();
 		}
 
 		public void CloseIntersection ()
 		{
-			intersection = null;
+			Intersection = null;
 		}
 
 		public void Intersect(T el) 
 		{
-			difference.Remove (el);
-			intersection.Add (el);
+			Difference.Remove (el);
+			Intersection.Add (el);
 		}
 	}
 
