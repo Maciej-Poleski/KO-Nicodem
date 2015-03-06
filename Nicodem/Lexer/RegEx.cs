@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Nicodem.Lexer
 {
@@ -11,6 +12,21 @@ namespace Nicodem.Lexer
 			throw new NotImplementedException ();
 		}
 		#endregion
+
+        public virtual bool HasEpsilon()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual IEnumerable<Char> DerivChanges()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual RegEx Derivative(Char c)
+        {
+            throw new NotImplementedException();
+        }
 	}
 }
 
