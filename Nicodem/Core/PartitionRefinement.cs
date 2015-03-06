@@ -44,13 +44,16 @@ namespace Nicodem.Core
 		private LinkedList<SetPartition<T, E>> partition = new LinkedList<SetPartition<T, E>>();
 		private Dictionary<T, LinkedListNode<SetPartition<T, E>>> pointers = new Dictionary<T, LinkedListNode<SetPartition<T, E>>>();
 
-		public PartitionRefinement (E setElements)
+		// list of sets depicting initial partition
+		public PartitionRefinement (IList<E> sets)
 		{
-			SetPartition<T, E> initialSet = new SetPartition<T, E> (setElements);
-			var node = partition.AddLast (initialSet);
+			foreach (var elements in sets) {
+				SetPartition<T, E> newSet = new SetPartition<T, E> (elements);
+				var node = partition.AddLast (newSet);
 
-			foreach (var el in setElements)
-				pointers [el] = node;
+				foreach (var el in elements)
+					pointers [el] = node;
+			}
 		}
 
 		// Returns a list of partitions represented by SetPartition<T, E>

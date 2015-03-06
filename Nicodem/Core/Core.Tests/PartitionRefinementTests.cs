@@ -17,7 +17,7 @@ namespace Core.Tests
 		public void Basic_Partition_Test ()
 		{
 			var input = new List<int> { 1, 2, 3, 4, 5, 6 };
-			var pr = new PartitionRefinement<int, List<int>> (input);
+			var pr = new PartitionRefinement<int, List<int>> (new List<List<int>>{input});
 			Assert.AreEqual (1, pr.Partition.Count);
 
 			var divided = pr.Refine (new List<int> { 1, 2, 3 });
