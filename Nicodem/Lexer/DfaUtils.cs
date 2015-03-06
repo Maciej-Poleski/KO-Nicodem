@@ -14,7 +14,7 @@ namespace Nicodem.Lexer
             // Nie zapomnij o tym, że istnieje potencjalnie wiele
             // rodzajów stanów akcpetujących (rozróżnianych różnymi
             // wartościami własności DFAState.Accepting: 0 - nieakceptujący,
-            // coś innego niż - jakiś rodzaj akceptacji)
+            // coś innego niż 0 - jakiś rodzaj akceptacji)
             throw new NotImplementedException();
         }
 
