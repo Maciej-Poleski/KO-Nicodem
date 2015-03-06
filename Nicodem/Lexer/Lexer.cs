@@ -6,6 +6,12 @@ using Nicodem.Source;
 
 namespace Nicodem.Lexer
 {
+    /// <summary>
+    ///     Odpowiada za podział źródła na fragmenty (tokeny) przy użyciu podanych wyrażeń regularnych.
+    ///     Każde wyrażenie regularne będzie odpowiadać pewnej kategori tokenów (oznaczonej numerem - pozycją wyrażenia
+    ///     regularnego w tablicy przekazanej w konstruktorze <seealso cref="Lexer(RegEx[])" />).
+    ///     Obiekt tej klasy może być wielokrotnie wykorzystany do tokenizacji wielu źródeł.
+    /// </summary>
     public class Lexer
     {
         private readonly uint _atomicCategoryLimit; // i <= _atomicCategoryLimit => i nie wymaga dalszej dekompresji
@@ -19,6 +25,15 @@ namespace Nicodem.Lexer
         private readonly DFA _dfa;
         private uint _nextCategory;
 
+        /// <summary>
+        ///     Tworzy lekser tokenizujący wejście przy użyciu podanych wyrażeń regularnych.
+        /// </summary>
+        /// <param name="regexCategories">
+        ///     Wyrażenia regularne które będą używane do tokenizowania źródeł. Fragmenty dopasowane do
+        ///     <value>regexCategories[i]</value>
+        ///     będą oznaczane kategorią
+        ///     <code>i</code>
+        /// </param>
         public Lexer(RegEx[] regexCategories)
         {
             _atomicCategoryLimit = (uint) regexCategories.Length;
@@ -57,16 +72,21 @@ namespace Nicodem.Lexer
         }
 
         /// <summary>
-        ///     Może klient mógłby określić jaki chce typ enumeratora...
+        ///     Dzieli podane (pojedyńcze) źródło (<seealso cref="IOrigin{TOrigin,TMemento,TLocation,TFragment}" />) na tokeny przy
+        ///     użyciu wyrażeń regularnych dostarczonych do Leksera w konstruktorze. Każdy token będzie miał przypisany zbiór
+        ///     kategori - listę (<see cref="IEnumerable{int}" />) składającą się z indeksów tych elementów tablicy wyrażeń
+        ///     regularnych (podanej w konstruktorze) które zostały dopasowane do danego wyrażenia regularnego.
+        ///     Wynikiem jest ciąg kolejnych tokenów (<see cref="IFragment{TOrigin,TMemento,TLocation,TFragment}" />) na które
+        ///     udało się podzielić źródło. Jeżeli ostatni token (<code>EndLocation</code>) kończy się przed końcem źródła, to
+        ///     znaczy że dalszej jego części nie udało się dopasować do żadnego wyrażenia regularnego.
         /// </summary>
-        /// <param name="sourceOrigin"></param>
+        /// <param name="sourceOrigin">Źródło które będzie tokenizowane</param>
         /// <returns>
-        ///     Lista tokenów powiązanych z informacją o kategoriach do których dany token należy. Lista składa się z tokenów
-        ///     najdłuższego prefiksu źródła, którego udało się sparsować.
+        ///     Lista tokenów powiązanych z informacją o kategoriach do których dany token należy. Lista składa się z najdłuższych
+        ///     tokenów najdłuższego prefiksu źródła, którego udało się sparsować.
         /// </returns>
         public TokenizerResult<TOrigin, TMemento, TLocation, TFragment> Process<TOrigin, TMemento, TLocation, TFragment>
-            (
-            TOrigin sourceOrigin)
+            (TOrigin sourceOrigin)
             where TOrigin : IOrigin<TOrigin, TMemento, TLocation, TFragment>
             where TLocation : ILocation<TOrigin, TMemento, TLocation, TFragment>
             where TFragment : IFragment<TOrigin, TMemento, TLocation, TFragment>
