@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Nicodem.Lexer
 {
@@ -18,27 +19,39 @@ namespace Nicodem.Lexer
             throw new NotImplementedException();
         }
 
-		private static IList<TU> DFS<T, TU> (TU currentState, IList<TU> result) where T : IDfa<TU> where TU : IDfaState<TU>
+		private static SortedSet<TU> DFS<T, TU> (TU currentState, SortedSet<TU> result) where T : IDfa<TU> where TU : IDfaState<TU>
 		{
-			if (result.Contains (currentState) == false)
+			if (!result.Contains (currentState))
 				result.Add (currentState);
 
 			var transitions = currentState.Transitions;
 
 			foreach (var t in transitions) {
-				if (result.Contains (t.Key) == false)
-					result = DFS (t.Key, result);
+				if (!result.Contains (t.Value))
+					result = DFS<T, TU> (t.Value, result);
 			}
 
 			return result;
 		}
 
-		private static IList<TU> prepareStateList<T, TU> (T dfa) where T : IDfa<TU> where TU : IDfaState<TU>
+		private static IList<TU> PrepareStateList<T, TU> (T dfa) where T : IDfa<TU> where TU : IDfaState<TU>
 		{
-			IList<TU> result = new List<TU>();
+			SortedSet<TU> result = new SortedSet<TU>();
 			var startState = dfa.Start;
 
-			return DFS<T, TU> (startState, result);
+			return DFS<T, TU> (startState, result).ToList ();
+		}
+
+		// returns sorted list of characters defining possible transition ranges in the given list of states
+		private static char[] AlphabetRanges<TU> (IList<TU> stateList) where TU : IDfaState<TU>
+		{
+			SortedSet<char> ranges = new SortedSet<char> ();
+			foreach (var st in stateList) {
+				foreach (var transition in st.Transitions)
+					ranges.Add (transition.Key);
+			}
+
+			return ranges.ToArray ();
 		}
     }
 }

@@ -13,6 +13,6 @@ namespace Nicodem.Lexer
             throw new NotImplementedException();
         }
 
-        public DFAState Start{get;}
+		public DFAState Start{ get; private set; }
     }
 }
