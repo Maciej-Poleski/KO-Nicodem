@@ -2,6 +2,7 @@
 using System.Net;
 using System.Collections.Generic;
 using System.Linq;
+using Nicodem.Core;
 
 namespace Nicodem.Lexer
 {
@@ -52,6 +53,51 @@ namespace Nicodem.Lexer
 			}
 
 			return ranges.ToArray ();
+		}
+
+		private static T HopcroftAlgorithm<T, TU> (T dfa) where T : IDfa<TU> where TU : IDfaState<TU>
+		{
+			IList<TU> stateList = PrepareStateList<T, TU> (dfa);
+			char[] alphabet = AlphabetRanges(stateList);
+
+			var stateGroups = new Dictionary<uint, List<TU> > ();
+			var stateMaps = new Dictionary<TU, List<TU> >();
+
+			foreach (var state in stateList) {
+				if(!stateGroups.ContainsKey(state.Accepting))
+					stateGroups[state.Accepting] = new List<TU>();
+
+				stateGroups [state.Accepting].Add (state);
+				stateMaps [state] = stateGroups [state.Accepting];
+			}
+
+			var partition = new PartitionRefinement<TU, List<TU>  > (stateGroups.Values.ToList());
+
+			ISet<List<TU> > queue = new SortedSet<List<TU>>();
+
+			foreach (var set in stateGroups) {
+				if (set.Key != 0)
+					queue.Add (set.Value);
+			}
+
+			while (queue.Count > 0) {
+				var mainSet = queue.First();
+				queue.Remove (mainSet);
+
+				foreach (char c in alphabet)
+				{
+					var prevSet = new List<TU> (); 
+
+					foreach (var state in stateList) {
+						var deltaState = state.Transitions [c].Value;
+						if (stateMaps[deltaState] == mainSet) //??????????
+							prevSet.Add (state); //problem with mapping state - set
+					}
+
+				}
+			}
+
+			return dfa; //need build new DFA
 		}
     }
 }
