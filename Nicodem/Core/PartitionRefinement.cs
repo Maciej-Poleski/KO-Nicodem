@@ -16,25 +16,32 @@ namespace Nicodem.Core
 			this.Intersection = intersection;
 		}
 
-		public bool HasIntersection ()
+		internal bool HasIntersection ()
 		{
 			return Intersection != null;
 		}
 
-		public void InitIntersection ()
+		internal void InitIntersection ()
 		{
 			Intersection = new E ();
 		}
 
-		public void CloseIntersection ()
+		internal void CloseIntersection ()
 		{
 			Intersection = null;
 		}
 
-		public void Intersect(T el) 
+		internal void Intersect(T el) 
 		{
 			Difference.Remove (el);
 			Intersection.Add (el);
+		}
+
+		internal void swap()
+		{
+			E tmp = Difference;
+			Difference = Intersection;
+			Intersection = tmp;
 		}
 	}
 
@@ -80,16 +87,19 @@ namespace Nicodem.Core
 			foreach (var partNode in changedNodes) {
 				SetPartition<T, E> intersectionPart = new SetPartition<T, E> (partNode.Value.Intersection);
 				var node = partition.AddLast (intersectionPart);
-				if (!partNode.Value.Difference.Any())
-					partition.Remove (partNode);
+				if (!partNode.Value.Difference.Any ()) {
+					partNode.Value.swap ();
+				}
 
 				foreach (T el in partNode.Value.Intersection)
 					pointers [el] = node;
 			}
 
 			List<SetPartition<T, E>> changes = new List<SetPartition<T, E>> ();
-			foreach (var node in changedNodes)
-				changes.Add (node.Value);
+			foreach (var node in changedNodes) {
+				if(node.Value.Intersection.Any())
+					changes.Add (node.Value);
+			}
 
 			return changes;
 		}

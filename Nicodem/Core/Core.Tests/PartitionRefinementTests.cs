@@ -35,6 +35,20 @@ namespace Core.Tests
 			Assert.AreEqual (2, divided_3.Count);
 			Assert.AreEqual (6, pr.Partition.Count);
 		}
+
+		[Test]
+		public void Redundant_Partition ()
+		{
+			var input = new List<int> { 1, 2, 3, 4, 5, 6 };
+			var pr = new PartitionRefinement<int, List<int>> (new List<List<int>>{input});
+			Assert.AreEqual (1, pr.Partition.Count);
+
+			var divided = pr.Refine (new List<int> { 1, 2, 3, 4, 5, 6 });
+			Assert.IsFalse (divided.Any ());
+
+			var divided_2 = pr.Refine (new List<int> { 2, 3, 4, 5, 6 });
+			Assert.IsTrue (divided_2.Any ());
+		}
 	}
 }
 
