@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Nicodem.Source;
@@ -97,6 +98,7 @@ namespace Nicodem.Lexer
                     {
                         lastAcceptingReaderState = sourceReader.MakeMemento();
                         lastAcceptedDfaState = dfaState;
+                        succeed = true;
                     }
                 }
                 if (succeed)
@@ -105,7 +107,7 @@ namespace Nicodem.Lexer
                     dfaState = lastAcceptedDfaState;
                     var currentLocation = sourceReader.CurrentLocation;
                     var currentFrame = currentLocation.Origin.MakeFragment(lastAcceptedLocation, currentLocation);
-                    result.Add(new Tuple<TFragment, IEnumerable<int>>(currentFrame, getCategoriesFromState(dfaState)));
+                    result.Add(new Tuple<TFragment, IEnumerable<int>>(currentFrame, GetCategoriesFromState(dfaState)));
                     lastAcceptedLocation = currentLocation;
                 }
                 else
@@ -116,26 +118,102 @@ namespace Nicodem.Lexer
             return new TokenizerResult<TOrigin, TMemento, TLocation, TFragment>(result, lastAcceptedLocation);
         }
 
-        private IEnumerable<int> getCategoriesFromState<T>(T dfaState) where T : IDfaState<T>
+        private IEnumerable<int> GetCategoriesFromState<T>(T dfaState) where T : IDfaState<T>
         {
-            throw new NotImplementedException();
+            return new CategoryEnumerable(this, dfaState.Accepting);
         }
 
-        private T FindTransition<T>(KeyValuePair<char, T>[] transitions, char c) where T : IDfaState<T>
+        private static T FindTransition<T>(KeyValuePair<char, T>[] transitions, char c) where T : IDfaState<T>
         {
             return Array.FindLast(transitions, pair => pair.Key <= c).Value;
         }
 
-        private class ProductDfaBuilder<T, U> where T : IDfaState<T> where U : IDfaState<U>
+        private class CategoryEnumerable : IEnumerable<int>
         {
+            private readonly uint _category;
             private readonly Lexer _lexer;
 
-            private readonly Dictionary<Tuple<T, U>, ProductDfaState> _productionMapping =
-                new Dictionary<Tuple<T, U>, ProductDfaState>();
+            internal CategoryEnumerable(Lexer lexer, uint category)
+            {
+                _lexer = lexer;
+                Debug.Assert(category != 0);
+                _category = category;
+            }
+
+            public IEnumerator<int> GetEnumerator()
+            {
+                return new CategoryEnumerator(_lexer, _category);
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+
+            private class CategoryEnumerator : IEnumerator<int>
+            {
+                private readonly uint _category;
+                private readonly Lexer _lexer;
+                private uint _currentCategory;
+
+                internal CategoryEnumerator(Lexer lexer, uint category)
+                {
+                    _lexer = lexer;
+                    _category = category;
+                }
+
+                public void Dispose()
+                {
+                }
+
+                public bool MoveNext()
+                {
+                    if (_currentCategory == 0)
+                    {
+                        _currentCategory = _category;
+                        return true;
+                    }
+                    if (_currentCategory <= _lexer._atomicCategoryLimit)
+                    {
+                        return false;
+                    }
+                    _currentCategory = _lexer._decompressionMapping[_currentCategory].Item1;
+                    return true;
+                }
+
+                public void Reset()
+                {
+                    _currentCategory = 0;
+                }
+
+                public int Current
+                {
+                    get
+                    {
+                        if (_currentCategory <= _lexer._atomicCategoryLimit)
+                        {
+                            return (int) (_currentCategory - 1);
+                        }
+                        return (int) (_lexer._decompressionMapping[_currentCategory].Item2 - 1);
+                    }
+                }
+
+                object IEnumerator.Current
+                {
+                    get { return Current; }
+                }
+            }
+        }
+
+        private struct ProductDfaBuilder<T, U> where T : IDfaState<T> where U : IDfaState<U>
+        {
+            private readonly Lexer _lexer;
+            private readonly Dictionary<Tuple<T, U>, ProductDfaState> _productionMapping;
 
             public ProductDfaBuilder(Lexer lexer)
             {
                 _lexer = lexer;
+                _productionMapping = new Dictionary<Tuple<T, U>, ProductDfaState>();
             }
 
             public ProductDfa Build(T lastDfaStart, U newDfaStart)
@@ -223,8 +301,12 @@ namespace Nicodem.Lexer
                 {
                     return lastDfaAccepting;
                 }
-                var category = _lexer._nextCategory++;
                 var pack = new Tuple<uint, uint>(lastDfaAccepting, newDfaAccepting);
+                if (_lexer._compressionMapping.ContainsKey(pack))
+                {
+                    return _lexer._compressionMapping[pack];
+                }
+                var category = _lexer._nextCategory++;
                 _lexer._compressionMapping[pack] = category;
                 _lexer._decompressionMapping[category] = pack;
                 return category;
