@@ -39,10 +39,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Fragment.cs" />
+    <Compile Include="IFragment.cs" />
     <Compile Include="IOrigin.cs" />
     <Compile Include="IOriginReader.cs" />
-    <Compile Include="Location.cs" />
+    <Compile Include="ILocation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
