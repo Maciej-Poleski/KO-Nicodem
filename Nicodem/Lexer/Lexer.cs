@@ -60,7 +60,11 @@ namespace Nicodem.Lexer
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public IEnumerable<Tuple<Fragment, IEnumerable<int>>> Process(IOrigin source)
+        public IEnumerable<Tuple<TFragment, IEnumerable<int>>> Process<TOrigin, TMemento, TLocation, TFragment>(
+            TOrigin source)
+            where TOrigin : IOrigin<TOrigin, TMemento, TLocation, TFragment>
+            where TLocation : ILocation<TOrigin, TMemento, TLocation, TFragment>
+            where TFragment : IFragment<TOrigin, TMemento, TLocation, TFragment>
         {
             throw new NotImplementedException();
         }

@@ -1,21 +1,14 @@
 ﻿namespace Nicodem.Source
 {
-    public struct Fragment
+    public interface IFragment<TOrigin, TMemento, TLocation, TFragment>
+        where TOrigin : IOrigin<TOrigin, TMemento, TLocation, TFragment>
+        where TLocation : ILocation<TOrigin, TMemento, TLocation, TFragment>
+        where TFragment : IFragment<TOrigin, TMemento, TLocation, TFragment>
     {
-        public Fragment(IOrigin origin, int beginLineNumber, int beginCharacterInLinePosition, int endLineNumber,
-            int afeterEndCharacterInLinePosition) : this()
-        {
-            Origin = origin;
-            BeginLineNumber = beginLineNumber;
-            BeginCharacterInLinePosition = beginCharacterInLinePosition;
-            EndLineNumber = endLineNumber;
-            AfeterEndCharacterInLinePosition = afeterEndCharacterInLinePosition;
-        }
-
-        public int AfeterEndCharacterInLinePosition { get; private set; }
-        public int EndLineNumber { get; private set; }
-        public int BeginCharacterInLinePosition { get; private set; }
-        public int BeginLineNumber { get; private set; }
-        public IOrigin Origin { get; private set; }
+        int AfeterEndCharacterInLinePosition { get; }
+        int EndLineNumber { get; }
+        int BeginCharacterInLinePosition { get; }
+        int BeginLineNumber { get; }
+        TOrigin Origin { get; }
     }
 }

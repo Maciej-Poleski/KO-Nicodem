@@ -4,17 +4,19 @@
     ///     Implementacja <see cref="IOrigin{T}" /> dostarcza implementacji funkcjonalności związanych z odczytem kodu
     ///     źródłowego poprzez obiekty implementujące ten interfejs.
     /// </summary>
-    /// <typeparam name="T">Typ pamiątki tworzonej przez implementacje tego interfejsu</typeparam>
-    public interface IOriginReader<T>
+    public interface IOriginReader<TOrigin, TMemento, TLocation, TFragment>
+        where TOrigin : IOrigin<TOrigin, TMemento, TLocation, TFragment>
+        where TLocation : ILocation<TOrigin, TMemento, TLocation, TFragment>
+        where TFragment : IFragment<TOrigin, TMemento, TLocation, TFragment>
     {
-        Location CurrentLocation { get; }
+        ILocation<TOrigin, TMemento, TLocation, TFragment> CurrentLocation { get; }
         char CurrentCharacter { get; }
 
         /// <summary>
         ///     Tworzy pamiątke stanu obiektu. Może być później wykorzystana do przywrócenia zapamiętanego stanu.
         /// </summary>
         /// <returns>Dowolny obiekt</returns>
-        T MakeMemento();
+        TMemento MakeMemento();
 
         /// <summary>
         ///     Przywraca stan obiektu do stanu z chwili wywołania funkcji <see cref="MakeMemento" /> które zwróciło obiekt
@@ -23,7 +25,7 @@
         ///     zwróconego przez <see cref="MakeMemento" />.
         /// </summary>
         /// <param name="memento">Obiekt zwrócony przez wcześniejsze wywołanie <see cref="MakeMemento" /></param>
-        void Rollback(T memento);
+        void Rollback(TMemento memento);
 
         bool MoveNext();
     }

@@ -1,16 +1,12 @@
 ﻿namespace Nicodem.Source
 {
-    public struct Location
+    public interface ILocation<TOrigin, TMemento, TLocation, TFragment>
+        where TOrigin : IOrigin<TOrigin, TMemento, TLocation, TFragment>
+        where TLocation : ILocation<TOrigin, TMemento, TLocation, TFragment>
+        where TFragment : IFragment<TOrigin, TMemento, TLocation, TFragment>
     {
-        public Location(IOrigin origin, int characterInLinePosition, int lineNumber) : this()
-        {
-            Origin = origin;
-            CharacterInLinePosition = characterInLinePosition;
-            LineNumber = lineNumber;
-        }
-
-        public IOrigin Origin { get; private set; }
-        public int CharacterInLinePosition { get; private set; }
-        public int LineNumber { get; private set; }
+        TOrigin Origin { get; }
+        int CharacterInLinePosition { get; }
+        int LineNumber { get; }
     }
 }
