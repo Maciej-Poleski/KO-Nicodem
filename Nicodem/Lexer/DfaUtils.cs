@@ -89,7 +89,7 @@ namespace Nicodem.Lexer
 					var prevSet = new List<TU> (); 
 
 					foreach (var state in stateList) {
-						var deltaState = state.Transitions [c].Value;
+						var deltaState = state.Transitions[state.Transitions.GetLowerBound[c]].Value; //or upperbound?
 						if (stateMaps[deltaState] == mainSet) //??????????
 							prevSet.Add (state); //problem with mapping state - set
 					}
