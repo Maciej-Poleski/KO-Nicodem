@@ -300,7 +300,7 @@ identyfikując każdy stan `s` z wyrażeniem opisującym `L_s`.
 
     .. math::
 
-        L^{(a)} := \{ aw: w \in L \}
+        L^{(a)} := \{ w: aw \in L \}
 
 
 Rozważmy dwa stany `s, t \in S`, połączone krawędzią `(s,a,t) \in \delta`.
@@ -308,9 +308,9 @@ Mamy wówczas
 
 .. math::
 
-    L_t = \{ v: \delta(t,v) \in S_A \}
+    L_t = \{ w: \delta(t,w) \in S_A \}
         = \{ w: \delta(s,aw) \in S_A \}
-        = \{ aw: w \in L_s \}
+        = \{ w: aw \in L_s \}
         = L_s^{(a)},
 
 a zatem następnik stanu `s` po krawędzi `a` możemy wyznaczyć
