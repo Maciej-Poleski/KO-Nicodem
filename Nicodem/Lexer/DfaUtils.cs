@@ -61,14 +61,12 @@ namespace Nicodem.Lexer
 			char[] alphabet = AlphabetRanges(stateList);
 
 			var stateGroups = new Dictionary<uint, LinkedList<TU> > ();
-			var stateMaps = new Dictionary<TU, LinkedList<TU> >();
 
 			foreach (var state in stateList) {
 				if(!stateGroups.ContainsKey(state.Accepting))
 					stateGroups[state.Accepting] = new LinkedList<TU>();
 
 				stateGroups [state.Accepting].AddLast (state);
-				stateMaps [state] = stateGroups [state.Accepting];
 			}
 
 			var partition = new PartitionRefinement<TU> (stateGroups.Values.ToList());
@@ -86,13 +84,17 @@ namespace Nicodem.Lexer
 
 				foreach (char c in alphabet)
 				{
-					var prevSet = new List<TU> (); 
+					var prevSet = new LinkedList<TU> (); 
 
 					foreach (var state in stateList) {
-						var deltaState = state.Transitions[state.Transitions.GetLowerBound[c]].Value; //or upperbound?
-						if (stateMaps[deltaState] == mainSet) //??????????
-							prevSet.Add (state); //problem with mapping state - set
+						var deltaState = state.Transitions[Array.BinarySearch(state.Transitions, c)].Value; //or upperbound?
+						if (partition [deltaState] == mainSet)
+							prevSet.AddFirst (state);
 					}
+
+					var setPartition = partition.Refine (prevSet);
+
+					//need interaction with PartitionRefinement (if V e queue then ... else ...)
 
 				}
 			}
