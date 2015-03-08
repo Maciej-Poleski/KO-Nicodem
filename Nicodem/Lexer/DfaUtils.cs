@@ -60,20 +60,20 @@ namespace Nicodem.Lexer
 			IList<TU> stateList = PrepareStateList<T, TU> (dfa);
 			char[] alphabet = AlphabetRanges(stateList);
 
-			var stateGroups = new Dictionary<uint, List<TU> > ();
-			var stateMaps = new Dictionary<TU, List<TU> >();
+			var stateGroups = new Dictionary<uint, LinkedList<TU> > ();
+			var stateMaps = new Dictionary<TU, LinkedList<TU> >();
 
 			foreach (var state in stateList) {
 				if(!stateGroups.ContainsKey(state.Accepting))
-					stateGroups[state.Accepting] = new List<TU>();
+					stateGroups[state.Accepting] = new LinkedList<TU>();
 
-				stateGroups [state.Accepting].Add (state);
+				stateGroups [state.Accepting].AddLast (state);
 				stateMaps [state] = stateGroups [state.Accepting];
 			}
 
-			var partition = new PartitionRefinement<TU, List<TU>  > (stateGroups.Values.ToList());
+			var partition = new PartitionRefinement<TU> (stateGroups.Values.ToList());
 
-			ISet<List<TU> > queue = new SortedSet<List<TU>>();
+			ISet<LinkedList<TU> > queue = new SortedSet<LinkedList<TU>>();
 
 			foreach (var set in stateGroups) {
 				if (set.Key != 0)
