@@ -17,8 +17,7 @@ namespace Nicodem.Lexer
 
 		public override int CompareTo (RegEx other)
 		{
-			//TODO(pmikos)
-			throw new System.NotImplementedException ();
+			throw new NotImplementedException ();
 		}
 
 		public override bool HasEpsilon()

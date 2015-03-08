@@ -5,8 +5,8 @@ namespace Nicodem.Lexer
 {
 	public static class RegExFactory
 	{
-		private static readonly RegEx _regex_empty = Union();
-		private static readonly RegEx _regex_all = Intersection ();
+		private static readonly RegEx _regex_empty = new RegExUnion ();
+		private static readonly RegEx _regex_all = new RegExIntersection ();
 		private static readonly RegEx _regex_epsi = new RegExEpsilon ();
 
 		/// <summary>
