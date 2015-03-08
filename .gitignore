@@ -8,6 +8,7 @@ __pycache__
 *.vrb
 *.tex
 *.pdf
+*.pyc
 
 /build/
 *.suo

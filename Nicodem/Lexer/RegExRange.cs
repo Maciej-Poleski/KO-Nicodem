@@ -1,4 +1,7 @@
-﻿namespace Nicodem.Lexer
+﻿using System;
+using System.Collections.Generic;
+
+namespace Nicodem.Lexer
 {
 	public class RegExRange : RegEx
 	{
@@ -13,6 +16,28 @@
 		{
 			//TODO(pmikos)
 			throw new System.NotImplementedException ();
+		}
+
+		public override bool HasEpsilon()
+		{
+			return false;
+		}
+
+		public override IEnumerable<Char> DerivChanges()
+		{
+			return new char[] { Character };
+		}
+
+		public override RegEx Derivative(Char c)
+		{
+			if (Character <= c)
+			{
+				return RegExFactory.Epsilon();
+			}
+			else
+			{
+				return RegExFactory.Empty();
+			}
 		}
 	}
 }

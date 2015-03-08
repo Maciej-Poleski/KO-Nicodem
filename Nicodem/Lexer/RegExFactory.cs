@@ -42,6 +42,25 @@ namespace Nicodem.Lexer
 		}
 
 		/// <summary>
+		/// RegEx representing the range of elements [c, d)
+		/// </summary>
+		/// <param name="c">beginning of the range</param>
+		/// <param name="d">end of the range</param>
+		public static RegEx Range(char c, char d)
+		{
+			return Intersection(Range(c), Complement(Range(d)));
+		}
+
+		/// <summary>
+		/// RegEx representing the character c
+		/// </summary>
+		/// <param name="c">the character</param> 
+		public static RegEx Character(char c)
+		{
+			return Range(c, (char) (((int) c) + 1));
+		}
+
+		/// <summary>
 		/// RegEx representing union of RegExes.
 		/// Properties:
 		/// {} ~ empty language
