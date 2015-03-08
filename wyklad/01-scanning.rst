@@ -308,7 +308,7 @@ Mamy wówczas
 
 .. math::
 
-    L_t = \{ v: \delta(t,v) \in S_A \}
+    L_t = \{ w: \delta(t,w) \in S_A \}
         = \{ w: \delta(s,aw) \in S_A \}
         = \{ w: aw \in L_s \}
         = L_s^{(a)},
