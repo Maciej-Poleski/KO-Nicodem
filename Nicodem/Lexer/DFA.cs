@@ -28,7 +28,9 @@ namespace Nicodem.Lexer
             if (regEx.HasEpsilon())
                 return new DFAState(accepting, listOfTransitions.ToArray());
 
-            return new DFAState(0, listOfTransitions.ToArray());
+            DFAState new_state = new DFAState(0, listOfTransitions.ToArray());
+            dictionaryOfDfaStates.Add(regEx, new_state);
+            return new_state;
         }
 
         public DFAState Start { get; private set; }
