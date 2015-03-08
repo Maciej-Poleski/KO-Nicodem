@@ -5,13 +5,17 @@ namespace Nicodem.Lexer
 {
 	public static class RegExFactory
 	{
+		private static readonly RegEx _regex_empty = Union();
+		private static readonly RegEx _regex_all = Intersection ();
+		private static readonly RegEx _regex_epsi = new RegExEpsilon ();
+
 		/// <summary>
 		/// RegEx representing empty language.
 		/// </summary>
 		public static RegEx Empty() 
 		{
 			// empty = sum {}
-			return Union ();
+			return _regex_empty;
 		}
 
 		/// <summary>
@@ -20,7 +24,7 @@ namespace Nicodem.Lexer
 		public static RegEx All()
 		{
 			// universe = intersect {}
-			return Intersection ();
+			return _regex_all;
 		}
 
 		/// <summary>
@@ -29,7 +33,7 @@ namespace Nicodem.Lexer
 		/// </summary>
 		public static RegEx Epsilon()
 		{
-			return new RegExEpsilon ();
+			return _regex_epsi;
 		}
 
 		/// <summary>
@@ -73,20 +77,17 @@ namespace Nicodem.Lexer
 		/// <param name="regexes">set of regexes</param>
 		public static RegEx Union( params RegEx[] regexes )
 		{
-			var regex_empty = Empty ();
-			var regex_all = All ();
-
 			// build list of all regexes
 			var list = new LinkedList<RegEx> ();
 			foreach (var regex in regexes)
 			{
 				// check if regex is empty
-				if (0 == regex_empty.CompareTo (regex))
+				if (0 == _regex_empty.CompareTo (regex))
 					continue;
 
 				// check if regex is whole universe
-				if (0 == regex_all.CompareTo (regex))
-					return regex_all;
+				if (0 == _regex_all.CompareTo (regex))
+					return _regex_all;
 
 				// other cases
 				var rconv = regex as RegExUnion;
@@ -118,19 +119,16 @@ namespace Nicodem.Lexer
 		/// <param name="regexes">set of regexes</param>
 		public static RegEx Intersection( params RegEx[] regexes )
 		{
-			var regex_empty = Empty ();
-			var regex_all = All ();
-
 			// build list of all regexes
 			var list = new LinkedList<RegEx> ();
 			foreach (var regex in regexes)
 			{
 				// check if regex is empty
-				if (0 == regex_empty.CompareTo (regex))
-					return regex_empty;
+				if (0 == _regex_empty.CompareTo (regex))
+					return _regex_empty;
 
 				// check if regex is whole universe
-				if (0 == regex_all.CompareTo (regex))
+				if (0 == _regex_all.CompareTo (regex))
 					continue;
 
 				// other cases
@@ -160,19 +158,16 @@ namespace Nicodem.Lexer
 		/// <param name="regexes">set of regexes</param>
 		public static RegEx Concat( params RegEx[] regexes )
 		{
-			var regex_empty = Empty ();
-			var regex_epsi = Epsilon ();
-
 			// build list of all regexes
 			var list = new LinkedList<RegEx> ();
 			foreach (var regex in regexes)
 			{
 				// check if regex is empty
-				if (0 == regex_empty.CompareTo (regex))
-					return regex_empty;
+				if (0 == _regex_empty.CompareTo (regex))
+					return _regex_empty;
 
 				// check if regex is epsi TODO check case {epsi}
-				if (0 == regex_epsi.CompareTo (regex))
+				if (0 == _regex_epsi.CompareTo (regex))
 					continue;
 
 				// other cases
@@ -197,16 +192,12 @@ namespace Nicodem.Lexer
 		/// <param name="regex">RegEx to be starred</param>
 		public static RegEx Star( RegEx regex )
 		{
-			var regex_epsi = Epsilon ();
-			var regex_empty = Empty ();
-
 			// epsi* ~ empty* ~ epsi
-			if (0 == regex_epsi.CompareTo (regex) || 0 == regex_empty.CompareTo (regex))
-				return regex_epsi;
+			if (0 == _regex_epsi.CompareTo (regex) || 0 == _regex_empty.CompareTo (regex))
+				return _regex_epsi;
 
 			// X** ~ X*
 			return regex is RegExStar ? regex : new RegExStar (regex);
-
 		}
 
 		/// <summary>
