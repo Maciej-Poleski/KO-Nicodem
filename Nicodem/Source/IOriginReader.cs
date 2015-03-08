@@ -9,7 +9,7 @@
         where TLocation : ILocation<TOrigin, TMemento, TLocation, TFragment>
         where TFragment : IFragment<TOrigin, TMemento, TLocation, TFragment>
     {
-        ILocation<TOrigin, TMemento, TLocation, TFragment> CurrentLocation { get; }
+        TLocation CurrentLocation { get; }
         char CurrentCharacter { get; }
 
         /// <summary>

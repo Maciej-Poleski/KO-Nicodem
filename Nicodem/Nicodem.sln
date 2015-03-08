@@ -12,6 +12,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lexer", "Lexer\Lexer.csproj", "{3A107436-1EC7-48E3-BF42-5E5E50C259E7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lexer.Tests", "Lexer.Tests\Lexer.Tests.csproj", "{0C9322B9-F087-451E-9726-2FF28313D704}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6078FFE3-28C8-4169-831D-E1D1AAFDD72F} = {6078FFE3-28C8-4169-831D-E1D1AAFDD72F}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nicodem.Core", "Nicodem.Core", "{1F6E3E81-A0E1-4974-8EDC-9E2BEFD01567}"
 EndProject
