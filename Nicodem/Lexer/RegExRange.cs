@@ -9,12 +9,20 @@ namespace Nicodem.Lexer
 
 		internal RegExRange ( char c )
 		{
+			this.TypeId = 1;
 			this.Character = c;
 		}
 
+		// typeid diff if other is not star
+		// c - other.c  otherwise
 		public override int CompareTo (RegEx other)
 		{
-			throw new NotImplementedException ();
+			var diff = TypeId - other.TypeId;
+			if (diff != 0)
+				return diff;
+
+			var range = other as RegExRange;
+			return Character - range.Character;
 		}
 
 		public override bool HasEpsilon()

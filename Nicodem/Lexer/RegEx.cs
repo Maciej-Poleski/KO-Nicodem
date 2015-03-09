@@ -5,6 +5,8 @@ namespace Nicodem.Lexer
 {
 	public abstract class RegEx : IComparable<RegEx>, IEquatable<RegEx>
 	{
+		internal int TypeId { set; get; }
+
 		#region IComparable implementation
 
 		public virtual int CompareTo (RegEx other)
