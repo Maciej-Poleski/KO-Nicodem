@@ -22,7 +22,7 @@ namespace Nicodem.Lexer
         private readonly Dictionary<uint, Tuple<uint, uint>> _decompressionMapping =
             new Dictionary<uint, Tuple<uint, uint>>();
 
-        private readonly DFA _dfa;
+        private readonly RegexDfa _dfa;
         private uint _nextCategory;
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Nicodem.Lexer
                 _dfa = ProductDfa.MakeEmptyLanguageDfa().Minimized<ProductDfa, ProductDfaState>();
                 return;
             }
-            var lastDfa = MakeRegexDfa(regexCategories[0], 1).Minimized<DFA, DFAState>();
+            var lastDfa = MakeRegexDfa(regexCategories[0], 1).Minimized<RegexDfa, DFAState>();
             for (uint i = 1; i < regexCategories.Length; ++i)
             {
                 lastDfa = MakeMinimizedProductDfa(lastDfa, MakeRegexDfa(regexCategories[i], i + 1));
@@ -60,15 +60,15 @@ namespace Nicodem.Lexer
             return new ProductDfaBuilder<TU, UU>(this).Build(lastDfa.Start, newDfa.Start);
         }
 
-        private DFA MakeMinimizedProductDfa(DFA lastDfa, DFA newDfa)
+        private RegexDfa MakeMinimizedProductDfa(RegexDfa lastDfa, RegexDfa newDfa)
         {
-            return MakeProductDfa<DFA, DFAState, DFA, DFAState>(lastDfa, newDfa)
+            return MakeProductDfa<RegexDfa, DFAState, RegexDfa, DFAState>(lastDfa, newDfa)
                 .Minimized<ProductDfa, ProductDfaState>();
         }
 
-        private static DFA MakeRegexDfa(RegEx regex, uint category)
+        private static RegexDfa MakeRegexDfa(RegEx regex, uint category)
         {
-            return new DFA(regex, category);
+            return new RegexDfa(regex, category);
         }
 
         /// <summary>

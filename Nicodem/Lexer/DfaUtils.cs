@@ -5,7 +5,7 @@ namespace Nicodem.Lexer
 {
     internal static class DfaUtils
     {
-        internal static DFA Minimized<T,TU>(this T dfa) where T : IDfa<TU> where TU : IDfaState<TU>
+        internal static RegexDfa Minimized<T,TU>(this T dfa) where T : IDfa<TU> where TU : IDfaState<TU>
         {
             // Funkcja minimalizująca DFA.
             // Można zmienić typ rezultatu z DFA na coś innego,
