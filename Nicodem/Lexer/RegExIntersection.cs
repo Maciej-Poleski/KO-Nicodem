@@ -12,12 +12,28 @@ namespace Nicodem.Lexer
 		internal RegExIntersection ( params RegEx[] regexes )
 		{
 			Debug.Assert(regexes.Length > 0); // set intersection is defined for nonempty sets only
+			this.TypeId = 6;
 			this.Regexes = regexes;
 		}
 
 		public override int CompareTo (RegEx other)
 		{
-			throw new NotImplementedException ();
+			var diff = TypeId - other.TypeId;
+			if (diff != 0)
+				return diff;
+
+			var intersection = other as RegExIntersection;
+			diff = Regexes.Length - intersection.Regexes.Length;
+			if (diff != 0)
+				return diff;
+
+			for (var i = 0; i < Regexes.Length; i++) {
+				diff = Regexes [i].CompareTo (intersection.Regexes [i]);
+				if (diff != 0)
+					return diff;
+			}
+
+			return 0;
 		}
 
 		public override bool HasEpsilon()

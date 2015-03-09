@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Nicodem.Lexer
 {
@@ -77,6 +78,8 @@ namespace Nicodem.Lexer
 		/// <param name="regexes">set of regexes</param>
 		public static RegEx Union( params RegEx[] regexes )
 		{
+			Array.Sort (regexes);
+
 			// build list of all regexes
 			var list = new LinkedList<RegEx> ();
 			foreach (var regex in regexes)
@@ -119,6 +122,8 @@ namespace Nicodem.Lexer
 		/// <param name="regexes">set of regexes</param>
 		public static RegEx Intersection( params RegEx[] regexes )
 		{
+			Array.Sort (regexes);
+
 			// build list of all regexes
 			var list = new LinkedList<RegEx> ();
 			foreach (var regex in regexes)
@@ -180,7 +185,8 @@ namespace Nicodem.Lexer
 			}
 
 			// (XY)Z ~ X(YZ)
-			return new RegExConcat (list.ToArray ());
+			var arr = list.ToArray ();
+			return arr.Length == 1 ? arr[0] : new RegExConcat (arr);
 		}
 
 		/// <summary>

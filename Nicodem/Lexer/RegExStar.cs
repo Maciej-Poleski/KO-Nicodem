@@ -9,12 +9,22 @@ namespace Nicodem.Lexer
 
 		internal RegExStar ( RegEx regex )
 		{
+			this.TypeId = 2;
 			this.Regex = regex;
 		}
 
+		// typeid diff if other is not star
+		// compareTo( Regex, other.Regex )  otherwise
 		public override int CompareTo (RegEx other)
 		{
-			throw new NotImplementedException ();
+			var diff = TypeId - other.TypeId;
+			if (diff != 0) {
+				Console.WriteLine (diff);
+				return diff;
+			}
+
+			var star = other as RegExStar;
+			return Regex.CompareTo (star.Regex);
 		}
 
 		public override bool HasEpsilon()

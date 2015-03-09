@@ -7,11 +7,15 @@ namespace Nicodem.Lexer
 	{
 		internal RegExEpsilon ()
 		{
+			this.TypeId = 0;
 		}
 
+		// 0 if other is RegExEpsilon
+		// a < 0 otherwise
+		// => RegExEpsilon is the 'smallest' one
 		public override int CompareTo (RegEx other)
 		{
-			throw new NotImplementedException ();
+			return TypeId - other.TypeId;
 		}
 
 		public override bool HasEpsilon()
