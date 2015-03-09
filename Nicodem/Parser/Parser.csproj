@@ -33,8 +33,23 @@
       <Project>{3A107436-1EC7-48E3-BF42-5E5E50C259E7}</Project>
       <Name>Lexer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Source\Source.csproj">
+      <Project>{6078FFE3-28C8-4169-831D-E1D1AAFDD72F}</Project>
+      <Name>Source</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IProduction.cs" />
+    <Compile Include="IParseTree.cs" />
+    <Compile Include="Symbol.cs" />
+    <Compile Include="IParser.cs" />
+    <Compile Include="LlParser.cs" />
+    <Compile Include="Grammar.cs" />
+    <Compile Include="ParseBranch.cs" />
+    <Compile Include="ParseLeaf.cs" />
+    <Compile Include="temp_fix.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
   </ItemGroup>
 </Project>
