@@ -7,8 +7,6 @@
         where TFragment : IFragment<TOrigin, TMemento, TLocation, TFragment>
     {
         TOrigin Origin { get; }
-        int CharacterInLinePosition { get; }
-        int LineNumber { get; }
     }
 }
 

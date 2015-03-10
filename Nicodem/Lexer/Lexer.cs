@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Nicodem.Source;
+using Nicodem.Source.Tmp;
 
 namespace Nicodem.Lexer
 {
@@ -136,6 +138,13 @@ namespace Nicodem.Lexer
                 }
             }
             return new TokenizerResult<TOrigin, TMemento, TLocation, TFragment>(result, lastAcceptedLocation);
+        }
+
+        public IEnumerable<Tuple<IFragment, IEnumerable<int>>> Process(IOrigin origin)
+        {
+            var result = Process<BareOrigin, BareLocation, BareLocation, BareFragment>(new BareOrigin(origin));
+            return
+                result.Tokens.Select(tuple => new Tuple<IFragment, IEnumerable<int>>(tuple.Item1.Fragment, tuple.Item2));
         }
 
         private IEnumerable<int> GetCategoriesFromState<T>(T dfaState) where T : IDfaState<T>
@@ -355,5 +364,104 @@ namespace Nicodem.Lexer
                 return new ProductDfa {Start = ProductDfaState.MakeDeadState()};
             }
         }
+
+        #region BareSourceWrappers
+
+        private struct BareOrigin : IOrigin<BareOrigin, BareLocation, BareLocation, BareFragment>
+        {
+            private readonly IOrigin _origin;
+
+            public BareOrigin(IOrigin origin)
+            {
+                _origin = origin;
+            }
+
+            public BareLocation begin
+            {
+                get { return new BareLocation(_origin.Begin); }
+            }
+
+            public IOriginReader<BareOrigin, BareLocation, BareLocation, BareFragment> GetReader()
+            {
+                return new BareOriginReader(_origin.GetReader());
+            }
+
+            public BareFragment MakeFragment(BareLocation from, BareLocation to)
+            {
+                return new BareFragment(_origin.MakeFragment(from._location, to._location));
+            }
+        }
+
+        private struct BareOriginReader : IOriginReader<BareOrigin, BareLocation, BareLocation, BareFragment>
+        {
+            private readonly IOriginReader _originReader;
+
+            public BareOriginReader(IOriginReader originReader)
+            {
+                _originReader = originReader;
+            }
+
+            public BareLocation CurrentLocation
+            {
+                get { return new BareLocation(_originReader.CurrentLocation); }
+            }
+
+            public char CurrentCharacter
+            {
+                get { return _originReader.CurrentCharacter; }
+            }
+
+            public BareLocation MakeMemento()
+            {
+                return CurrentLocation;
+            }
+
+            public void Rollback(BareLocation memento)
+            {
+                _originReader.CurrentLocation = memento._location;
+            }
+
+            public bool MoveNext()
+            {
+                return _originReader.MoveNext();
+            }
+        }
+
+        private struct BareLocation : ILocation<BareOrigin, BareLocation, BareLocation, BareFragment>
+        {
+            internal readonly ILocation _location;
+
+            public BareLocation(ILocation location)
+            {
+                _location = location;
+            }
+
+            public BareOrigin Origin
+            {
+                get { return new BareOrigin(_location.Origin); }
+            }
+        }
+
+        private class BareFragment : IFragment<BareOrigin, BareLocation, BareLocation, BareFragment>
+        {
+            private readonly IFragment _fragment;
+
+            public BareFragment(IFragment fragment)
+            {
+                _fragment = fragment;
+            }
+
+            internal IFragment Fragment
+            {
+                get { return _fragment; }
+            }
+
+            public BareOrigin Origin
+            {
+                get { return new BareOrigin(_fragment.Origin); }
+            }
+        }
+
+        #endregion
     }
 }
