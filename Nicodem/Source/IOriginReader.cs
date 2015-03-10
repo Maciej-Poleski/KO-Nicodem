@@ -4,6 +4,7 @@
     ///     Implementacja <see cref="IOrigin{T}" /> dostarcza implementacji funkcjonalności związanych z odczytem kodu
     ///     źródłowego poprzez obiekty implementujące ten interfejs.
     /// </summary>
+    [System.Obsolete("change of interface, new version in Tmp sub namespace")]
     public interface IOriginReader<TOrigin, TMemento, TLocation, TFragment>
         where TOrigin : IOrigin<TOrigin, TMemento, TLocation, TFragment>
         where TLocation : ILocation<TOrigin, TMemento, TLocation, TFragment>
@@ -27,6 +28,16 @@
         /// <param name="memento">Obiekt zwrócony przez wcześniejsze wywołanie <see cref="MakeMemento" /></param>
         void Rollback(TMemento memento);
 
+        bool MoveNext();
+    }
+}
+
+namespace Nicodem.Source.Tmp
+{
+    public interface IOriginReader
+    {
+        ILocation CurrentLocation { get; set; }
+        char CurrentCharacter { get; }
         bool MoveNext();
     }
 }
