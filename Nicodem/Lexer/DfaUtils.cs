@@ -17,7 +17,7 @@ namespace Nicodem.Lexer
             // rodzajów stanów akcpetujących (rozróżnianych różnymi
             // wartościami własności DFAState.Accepting: 0 - nieakceptujący,
             // coś innego niż 0 - jakiś rodzaj akceptacji)
-            throw new NotImplementedException();
+			return HopcroftAlgorithm<T, TU> (dfa);
         }
 
 		private static SortedSet<TU> DFS<T, TU> (TU currentState, SortedSet<TU> result) where T : IDfa<TU> where TU : IDfaState<TU>
@@ -53,6 +53,46 @@ namespace Nicodem.Lexer
 			}
 
 			return ranges.ToArray ();
+		}
+			
+		private class SimpleState
+		{
+			public Dictionary<char, SimpleState> Edges { get; set; }
+		}
+
+		private static T BuildNewDfa<T, TU> (T dfa, PartitionRefinement<TU> partition, IList<TU> stateList) where T : IDfa<TU> where TU : IDfaState<TU>
+		{
+			var oldToSimpleState = new Dictionary<TU, SimpleState>();
+			var setToState = new Dictionary<LinkedList<TU>, SimpleState>();
+
+			foreach (var oldState in stateList) {
+				var set = partition [oldState];
+
+				if (!setToState.ContainsKey (set)) {
+					setToState [set] = new SimpleState ();
+				}
+
+				oldToSimpleState [oldState] = setToState [set];
+			}
+
+			foreach (var oldState in stateList) {
+				var stateA = oldToSimpleState [oldState];
+
+				foreach(var transtion in oldState.Transitions) {
+					var stateB = oldToSimpleState [transtion.Value];
+
+					if (!stateA.Edges.ContainsKey (transtion.Key))
+						stateA.Edges [transtion.Key] = stateB;
+				}
+			}
+
+			var oldToNewState = new Dictionary<TU, TU> ();
+			foreach (var oldState in stateList) {
+				var set = partition [oldState];
+
+				//.....
+			}
+			return dfa;
 		}
 
 		private static T HopcroftAlgorithm<T, TU> (T dfa) where T : IDfa<TU> where TU : IDfaState<TU>
@@ -92,14 +132,26 @@ namespace Nicodem.Lexer
 							prevSet.AddFirst (state);
 					}
 
-					var setPartition = partition.Refine (prevSet);
+					var setsPartition = partition.Refine (prevSet);
 
-					//need interaction with PartitionRefinement (if V e queue then ... else ...)
+					foreach (var setPartition in setsPartition) {
+						if (queue.Contains (setPartition.Difference)) {
+							queue.Add (setPartition.Intersection);
+						} else {
+							if (setPartition.Difference.Count <= setPartition.Intersection.Count) {
+								queue.Add (setPartition.Difference);
+							} else {
+								queue.Add (setPartition.Intersection);
+							}
+						}
+					}
 
 				}
 			}
 
-			return dfa; //need build new DFA
+			var newDfa = BuildNewDfa<T, TU> (dfa, partition, stateList);
+
+			return newDfa;
 		}
     }
 }
