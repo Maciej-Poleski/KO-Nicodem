@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nicodem.Lexer
 {
-    class DFAState<T> : IDfaState<DFAState<T>,T> where T : IComparable<T>, IEquatable<T>
+	public class DFAState<T> : IDfaState<DFAState<T>,T> where T : IComparable<T>, IEquatable<T>
     {
         public uint Accepting { get; internal set; }
         public KeyValuePair<T, DFAState<T>>[] Transitions { get; internal set; }

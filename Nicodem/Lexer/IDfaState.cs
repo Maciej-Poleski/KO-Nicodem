@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Nicodem.Lexer
 {
-    internal interface IDfaState<TDfaState, TSymbol> where TDfaState : IDfaState<TDfaState, TSymbol>
+	public interface IDfaState<TDfaState, TSymbol> where TDfaState : IDfaState<TDfaState, TSymbol>
         where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
     {
         uint Accepting { get; }
