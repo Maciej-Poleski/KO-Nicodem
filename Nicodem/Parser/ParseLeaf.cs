@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Nicodem.Source.Tmp;
+
 namespace Nicodem.Parser
 {
 	internal class ParseLeaf<TProduction> : IParseTree<TProduction> where TProduction:IProduction

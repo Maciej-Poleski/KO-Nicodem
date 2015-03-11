@@ -47,7 +47,6 @@
     <Compile Include="Grammar.cs" />
     <Compile Include="ParseBranch.cs" />
     <Compile Include="ParseLeaf.cs" />
-    <Compile Include="temp_fix.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

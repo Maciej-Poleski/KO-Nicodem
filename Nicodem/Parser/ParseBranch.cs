@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Nicodem.Source.Tmp;
+
 namespace Nicodem.Parser
 {
 	internal class ParseBranch<TProduction> : IParseTree<TProduction>
