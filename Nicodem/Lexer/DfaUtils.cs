@@ -8,9 +8,9 @@ namespace Nicodem.Lexer
 {
     internal static class DfaUtils
     {
-		internal static TDfa Minimized<TDfa, TDfaState, TSymbol>(this TDfa dfa)
-            where TDfa : IDfa<TDfaState, TSymbol> where TDfaState : IDfaState<TDfaState, TSymbol>
-            where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
+		internal static RegexDfa<TSymbol> Minimized<TDfa, TDfaState, TSymbol>(this TDfa dfa)
+			where TDfa : IDfa<TDfaState, TSymbol> where TDfaState : IDfaState<TDfaState, TSymbol>
+			where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
         {
             // Funkcja minimalizująca DFA.
             // Można zmienić typ rezultatu z DFA na coś innego,
@@ -70,7 +70,7 @@ namespace Nicodem.Lexer
 			public Dictionary<TSymbol, SimpleState<TSymbol> > Edges { get; set; }
 		}
 
-		private static TDfa BuildNewDfa<TDfa, TDfaState, TSymbol> (TDfa dfa, PartitionRefinement<TDfaState> partition, IList<TDfaState> stateList) 
+		private static RegexDfa<TSymbol> BuildNewDfa<TDfa, TDfaState, TSymbol> (TDfa dfa, PartitionRefinement<TDfaState> partition, IList<TDfaState> stateList) 
 			where TDfa : IDfa<TDfaState, TSymbol> 
 			where TDfaState : IDfaState<TDfaState, TSymbol>
 			where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
@@ -105,10 +105,11 @@ namespace Nicodem.Lexer
 
 				//.....
 			}
-			return dfa;
+			//return dfa;
+			return null;
 		}
 
-		private static TDfa HopcroftAlgorithm<TDfa, TDfaState, TSymbol> (TDfa dfa) 
+		private static RegexDfa<TSymbol> HopcroftAlgorithm<TDfa, TDfaState, TSymbol> (TDfa dfa) 
 			where TDfa : IDfa<TDfaState, TSymbol> 
 			where TDfaState : IDfaState<TDfaState, TSymbol>
 			where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
