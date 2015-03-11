@@ -44,7 +44,7 @@ namespace Nicodem.Source.Tmp
         internal readonly StringLocation begin;
         internal readonly String source;
 
-        StringOrigin(String source)
+        public StringOrigin(String source)
         {
             this.begin = new StringLocation(this, -1);
             this.source = source;

@@ -442,7 +442,7 @@ namespace Nicodem.Lexer
             }
         }
 
-        private class BareFragment : IFragment<BareOrigin, BareLocation, BareLocation, BareFragment>
+        private struct BareFragment : IFragment<BareOrigin, BareLocation, BareLocation, BareFragment>
         {
             private readonly IFragment _fragment;
 

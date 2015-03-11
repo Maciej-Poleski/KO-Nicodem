@@ -1,4 +1,6 @@
-﻿using Nicodem.Lexer;
+﻿using System.Linq;
+using Nicodem.Lexer;
+using Nicodem.Source.Tmp;
 using NUnit.Framework;
 
 namespace Lexer.Tests
@@ -9,7 +11,40 @@ namespace Lexer.Tests
         [Test]
         private void LexerEmpty()
         {
-            var lexer = new Nicodem.Lexer.Lexer(new RegEx[0]);
+            foreach (var arr in new[] {new RegEx[0], new[] {RegExFactory.Empty()}  })
+            {
+                var lexer = new Nicodem.Lexer.Lexer(arr);
+                Assert.IsEmpty(lexer.Process(new StringOrigin("")));
+                Assert.IsEmpty(lexer.Process(new StringOrigin(" ")));
+                Assert.IsEmpty(lexer.Process(new StringOrigin("a")));
+                Assert.IsEmpty(lexer.Process(new StringOrigin("asdf")));
+                Assert.IsEmpty(lexer.Process(new StringOrigin(" _\n")));
+                Assert.IsEmpty(lexer.Process(new StringOrigin("*^& GY?'\t\n\t\tlikjd")));
+                Assert.IsEmpty(lexer.Process(new StringOrigin("\\")));
+                Assert.IsEmpty(lexer.Process(new StringOrigin("\\n")));
+            }
+        }
+
+        [Test]
+        private void LexerEpsilon()
+        {
+            var lexer = new Nicodem.Lexer.Lexer(new[] { RegExFactory.Epsilon() });
+            var result = lexer.Process(new StringOrigin("")).ToArray();
+            Assert.Equals(result.Length, 1);
+            Assert.Equals(result[0].Item2.ToArray(), new[] {0});
+            // IFragment.GetString missing?
+            Assert.IsEmpty(lexer.Process(new StringOrigin(" ")));
+            Assert.IsEmpty(lexer.Process(new StringOrigin("a")));
+            Assert.IsEmpty(lexer.Process(new StringOrigin("asdf")));
+            Assert.IsEmpty(lexer.Process(new StringOrigin(" _\n")));
+            Assert.IsEmpty(lexer.Process(new StringOrigin("*^& GY?'\t\n\t\tlikjd")));
+            Assert.IsEmpty(lexer.Process(new StringOrigin("\\")));
+            Assert.IsEmpty(lexer.Process(new StringOrigin("\\n")));
+        }
+
+        private static RegEx MakeCharRangeRegex(char a, char b)
+        {
+            return RegExFactory.Intersection(RegExFactory.Range(a), RegExFactory.Complement(RegExFactory.Range((char) (b + 1))));
         }
     }
 }
