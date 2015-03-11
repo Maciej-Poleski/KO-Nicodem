@@ -5,69 +5,71 @@ using System.Linq;
 
 namespace Nicodem.Lexer
 {
-	public class RegExIntersection : RegEx
-	{
-		public RegEx[] Regexes { private set; get; }
+    public class RegExIntersection<T> : RegEx<T> where T : IComparable<T>, IEquatable<T>
+    {
+        internal static readonly RegExIntersection<T> RegexAll = new RegExIntersection<T>();
 
-		internal RegExIntersection ( params RegEx[] regexes )
-		{
-			Debug.Assert(regexes.Length > 0); // set intersection is defined for nonempty sets only
-			this.TypeId = 6;
-			this.Regexes = regexes;
-		}
+        internal RegExIntersection(params RegEx<T>[] regexes)
+        {
+            Debug.Assert(regexes.Length > 0); // set intersection is defined for nonempty sets only
+            TypeId = 6;
+            Regexes = regexes;
+        }
 
-		public override int CompareTo (RegEx other)
-		{
-			var diff = TypeId - other.TypeId;
-			if (diff != 0)
-				return diff;
+        public RegEx<T>[] Regexes { private set; get; }
 
-			var intersection = other as RegExIntersection;
-			diff = Regexes.Length - intersection.Regexes.Length;
-			if (diff != 0)
-				return diff;
+        public override int CompareTo(RegEx<T> other)
+        {
+            var diff = TypeId - other.TypeId;
+            if (diff != 0)
+                return diff;
 
-			for (var i = 0; i < Regexes.Length; i++) {
-				diff = Regexes [i].CompareTo (intersection.Regexes [i]);
-				if (diff != 0)
-					return diff;
-			}
+            var intersection = other as RegExIntersection<T>;
+            diff = Regexes.Length.CompareTo(intersection.Regexes.Length);
+            if (diff != 0)
+                return diff;
 
-			return 0;
-		}
+            for (var i = 0; i < Regexes.Length; i++)
+            {
+                diff = Regexes[i].CompareTo(intersection.Regexes[i]);
+                if (diff != 0)
+                    return diff;
+            }
 
-		public override bool HasEpsilon()
-		{
-			foreach (var i in Regexes)
-			{
-				if (!i.HasEpsilon())
-				{
-					return false;
-				}
-			}
-			Debug.Assert(Regexes.Length > 0); // set intersection is defined for nonempty sets only
-			return true;
-		}
+            return 0;
+        }
 
-		public override IEnumerable<Char> DerivChanges()
-		{
-			IEnumerable<char> changes = new char[] { };
-			foreach (var i in Regexes)
-			{
-				changes = Enumerable.Union(changes, i.DerivChanges());
-			}
-			return changes;
-		}
+        public override bool HasEpsilon()
+        {
+            foreach (var i in Regexes)
+            {
+                if (!i.HasEpsilon())
+                {
+                    return false;
+                }
+            }
+            Debug.Assert(Regexes.Length > 0); // set intersection is defined for nonempty sets only
+            return true;
+        }
 
-		public override RegEx Derivative(Char c)
-		{
-			var derivatives = new List<RegEx>();
-			foreach (var i in Regexes) 
-			{
-				derivatives.Add(i.Derivative(c));
-			}
-			return RegExFactory.Intersection(derivatives.ToArray());
-		}
-	}
+        public override IEnumerable<T> DerivChanges()
+        {
+            IEnumerable<T> changes = new T[] {};
+            foreach (var i in Regexes)
+            {
+                changes = changes.Union(i.DerivChanges());
+            }
+            return changes;
+        }
+
+        public override RegEx<T> Derivative(T c)
+        {
+            var derivatives = new List<RegEx<T>>();
+            foreach (var i in Regexes)
+            {
+                derivatives.Add(i.Derivative(c));
+            }
+            return RegExFactory.Intersection(derivatives.ToArray());
+        }
+    }
 }
-

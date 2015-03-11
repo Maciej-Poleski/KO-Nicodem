@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Net;
 
 namespace Nicodem.Lexer
 {
     internal static class DfaUtils
     {
-        internal static RegexDfa Minimized<T,TU>(this T dfa) where T : IDfa<TU> where TU : IDfaState<TU>
+        internal static RegexDfa<TSymbol> Minimized<TDfa, TDfaState, TSymbol>(this TDfa dfa)
+            where TDfa : IDfa<TDfaState, TSymbol> where TDfaState : IDfaState<TDfaState, TSymbol>
+            where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
         {
             // Funkcja minimalizująca DFA.
             // Można zmienić typ rezultatu z DFA na coś innego,

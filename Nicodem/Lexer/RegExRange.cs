@@ -3,49 +3,40 @@ using System.Collections.Generic;
 
 namespace Nicodem.Lexer
 {
-	public class RegExRange : RegEx
-	{
-		public char Character { private set; get; }
+    public class RegExRange<T> : RegEx<T> where T : IComparable<T>, IEquatable<T>
+    {
+        internal RegExRange(T c)
+        {
+            TypeId = 1;
+            Character = c;
+        }
 
-		internal RegExRange ( char c )
-		{
-			this.TypeId = 1;
-			this.Character = c;
-		}
+        public T Character { private set; get; }
+        // typeid diff if other is not star
+        // c - other.c  otherwise
+        public override int CompareTo(RegEx<T> other)
+        {
+            var diff = TypeId - other.TypeId;
+            if (diff != 0)
+                return diff;
 
-		// typeid diff if other is not star
-		// c - other.c  otherwise
-		public override int CompareTo (RegEx other)
-		{
-			var diff = TypeId - other.TypeId;
-			if (diff != 0)
-				return diff;
+            var range = other as RegExRange<T>;
+            return Character.CompareTo(range.Character);
+        }
 
-			var range = other as RegExRange;
-			return Character - range.Character;
-		}
+        public override bool HasEpsilon()
+        {
+            return false;
+        }
 
-		public override bool HasEpsilon()
-		{
-			return false;
-		}
+        public override IEnumerable<T> DerivChanges()
+        {
+            return new[] {Character};
+        }
 
-		public override IEnumerable<Char> DerivChanges()
-		{
-			return new char[] { Character };
-		}
-
-		public override RegEx Derivative(Char c)
-		{
-			if (Character <= c)
-			{
-				return RegExFactory.Epsilon();
-			}
-			else
-			{
-				return RegExFactory.Empty();
-			}
-		}
-	}
+        public override RegEx<T> Derivative(T c)
+        {
+            return Character.CompareTo(c) <= 0 ? RegExFactory.Epsilon<T>() : RegExFactory.Empty<T>();
+        }
+    }
 }
-

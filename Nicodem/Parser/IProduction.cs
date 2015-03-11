@@ -6,8 +6,8 @@ namespace Nicodem.Parser
 	public interface IProduction
 	{
 		Symbol Lhs { get; }
-		// TODO: RegEx<Symbol>
-		RegEx Rhs { get; }
+		
+		RegEx<Symbol> Rhs { get; }
 	}
 }
 

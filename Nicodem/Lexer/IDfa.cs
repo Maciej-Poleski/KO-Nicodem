@@ -1,7 +1,10 @@
-﻿namespace Nicodem.Lexer
+﻿using System;
+
+namespace Nicodem.Lexer
 {
-    internal interface IDfa<T> where T : IDfaState<T> 
+    internal interface IDfa<TDfaState, TSymbol> where TDfaState : IDfaState<TDfaState, TSymbol>
+        where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
     {
-        T Start { get; }
+        TDfaState Start { get; }
     }
 }

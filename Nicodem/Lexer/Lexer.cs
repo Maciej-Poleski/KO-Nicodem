@@ -11,7 +11,7 @@ namespace Nicodem.Lexer
     /// <summary>
     ///     Odpowiada za podział źródła na fragmenty (tokeny) przy użyciu podanych wyrażeń regularnych.
     ///     Każde wyrażenie regularne będzie odpowiadać pewnej kategori tokenów (oznaczonej numerem - pozycją wyrażenia
-    ///     regularnego w tablicy przekazanej w konstruktorze <seealso cref="Lexer(RegEx[])" />).
+    ///     regularnego w tablicy przekazanej w konstruktorze <seealso cref="Lexer(RegEx<char>[])" />).
     ///     Obiekt tej klasy może być wielokrotnie wykorzystany do tokenizacji wielu źródeł.
     /// </summary>
     public class Lexer
@@ -24,7 +24,7 @@ namespace Nicodem.Lexer
         private readonly Dictionary<uint, Tuple<uint, uint>> _decompressionMapping =
             new Dictionary<uint, Tuple<uint, uint>>();
 
-        private readonly RegexDfa _dfa;
+        private readonly RegexDfa<char> _dfa;
         private uint _nextCategory;
 
         /// <summary>
@@ -36,16 +36,16 @@ namespace Nicodem.Lexer
         ///     będą oznaczane kategorią
         ///     <code>i</code>
         /// </param>
-        public Lexer(RegEx[] regexCategories)
+        public Lexer(RegEx<char>[] regexCategories)
         {
             _atomicCategoryLimit = (uint) regexCategories.Length;
             _nextCategory = _atomicCategoryLimit + 1;
             if (regexCategories.Length == 0)
             {
-                _dfa = ProductDfa.MakeEmptyLanguageDfa().Minimized<ProductDfa, ProductDfaState>();
+                _dfa = ProductDfa.MakeEmptyLanguageDfa().Minimized<ProductDfa, ProductDfaState, char>();
                 return;
             }
-            var lastDfa = MakeRegexDfa(regexCategories[0], 1).Minimized<RegexDfa, DFAState>();
+            var lastDfa = MakeRegexDfa(regexCategories[0], 1).Minimized<RegexDfa<char>, DFAState<char>, char>();
             for (uint i = 1; i < regexCategories.Length; ++i)
             {
                 lastDfa = MakeMinimizedProductDfa(lastDfa, MakeRegexDfa(regexCategories[i], i + 1));
@@ -54,23 +54,23 @@ namespace Nicodem.Lexer
         }
 
         private ProductDfa MakeProductDfa<T, TU, U, UU>(T lastDfa, U newDfa)
-            where T : IDfa<TU>
-            where TU : IDfaState<TU>
-            where U : IDfa<UU>
-            where UU : IDfaState<UU>
+            where T : IDfa<TU, char>
+            where TU : IDfaState<TU, char>
+            where U : IDfa<UU, char>
+            where UU : IDfaState<UU, char>
         {
             return new ProductDfaBuilder<TU, UU>(this).Build(lastDfa.Start, newDfa.Start);
         }
 
-        private RegexDfa MakeMinimizedProductDfa(RegexDfa lastDfa, RegexDfa newDfa)
+        private RegexDfa<char> MakeMinimizedProductDfa(RegexDfa<char> lastDfa, RegexDfa<char> newDfa)
         {
-            return MakeProductDfa<RegexDfa, DFAState, RegexDfa, DFAState>(lastDfa, newDfa)
-                .Minimized<ProductDfa, ProductDfaState>();
+            return MakeProductDfa<RegexDfa<char>, DFAState<char>, RegexDfa<char>, DFAState<char>>(lastDfa, newDfa)
+                .Minimized<ProductDfa, ProductDfaState, char>();
         }
 
-        private static RegexDfa MakeRegexDfa(RegEx regex, uint category)
+        private static RegexDfa<char> MakeRegexDfa(RegEx<char> regex, uint category)
         {
-            return new RegexDfa(regex, category);
+            return new RegexDfa<char>(regex, category);
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace Nicodem.Lexer
                 var dfaState = _dfa.Start;
                 var lastAcceptedDfaState = dfaState;
                 TMemento lastAcceptingReaderState;
-                if (dfaState.IsAccepting())
+                if (dfaState.IsAccepting<DFAState<char>, char>())
                 {
                     lastAcceptingReaderState = sourceReader.MakeMemento();
                     succeed = true;
@@ -116,7 +116,7 @@ namespace Nicodem.Lexer
                 {
                     var c = sourceReader.CurrentCharacter;
                     dfaState = FindTransition(dfaState.Transitions, c);
-                    if (dfaState.IsAccepting())
+                    if (dfaState.IsAccepting<DFAState<char>, char>())
                     {
                         lastAcceptingReaderState = sourceReader.MakeMemento();
                         lastAcceptedDfaState = dfaState;
@@ -147,12 +147,12 @@ namespace Nicodem.Lexer
                 result.Tokens.Select(tuple => new Tuple<IFragment, IEnumerable<int>>(tuple.Item1.Fragment, tuple.Item2));
         }
 
-        private IEnumerable<int> GetCategoriesFromState<T>(T dfaState) where T : IDfaState<T>
+        private IEnumerable<int> GetCategoriesFromState<T>(T dfaState) where T : IDfaState<T, char>
         {
             return new CategoryEnumerable(this, dfaState.Accepting);
         }
 
-        private static T FindTransition<T>(KeyValuePair<char, T>[] transitions, char c) where T : IDfaState<T>
+        private static T FindTransition<T>(KeyValuePair<char, T>[] transitions, char c) where T : IDfaState<T, char>
         {
             return Array.FindLast(transitions, pair => pair.Key <= c).Value;
         }
@@ -234,7 +234,7 @@ namespace Nicodem.Lexer
             }
         }
 
-        private struct ProductDfaBuilder<T, U> where T : IDfaState<T> where U : IDfaState<U>
+        private struct ProductDfaBuilder<T, U> where T : IDfaState<T, char> where U : IDfaState<U, char>
         {
             private readonly Lexer _lexer;
             private readonly Dictionary<Tuple<T, U>, ProductDfaState> _productionMapping;
@@ -342,7 +342,7 @@ namespace Nicodem.Lexer
             }
         }
 
-        private class ProductDfaState : IDfaState<ProductDfaState>
+        private class ProductDfaState : IDfaState<ProductDfaState, char>
         {
             public uint Accepting { get; internal set; }
             public KeyValuePair<char, ProductDfaState>[] Transitions { get; internal set; }
@@ -355,7 +355,7 @@ namespace Nicodem.Lexer
             }
         }
 
-        private struct ProductDfa : IDfa<ProductDfaState>
+        private struct ProductDfa : IDfa<ProductDfaState, char>
         {
             public ProductDfaState Start { get; internal set; }
 

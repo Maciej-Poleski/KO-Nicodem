@@ -12,8 +12,8 @@ namespace Lexer.Tests
 		[Test]
 		public void Test_Sum_Empty() 
 		{
-			var empty = RegExFactory.Empty ();
-			var empty_sum = RegExFactory.Union ();
+			var empty = RegExFactory.Empty<char> ();
+			var empty_sum = RegExFactory.Union<char> ();
 
 			Assert.AreEqual (0, empty_sum.CompareTo (empty));
 		}
@@ -25,7 +25,7 @@ namespace Lexer.Tests
 			var base_regex = RegExFactory.Range ('a');
 			var sum = RegExFactory.Union (base_regex, base_regex);
 
-			Assert.IsTrue (sum is RegExRange);
+			Assert.IsTrue (sum is RegExRange<char>);
 			Assert.AreEqual (0, sum.CompareTo (base_regex));
 		}
 
@@ -61,8 +61,8 @@ namespace Lexer.Tests
 		[Test]
 		public void Test_Intersection_Empty() 
 		{
-			var all = RegExFactory.All ();
-			var all_intersect = RegExFactory.Intersection ();
+			var all = RegExFactory.All<char> ();
+			var all_intersect = RegExFactory.Intersection<char> ();
 
 			Assert.AreEqual (0, all_intersect.CompareTo (all));
 		}
@@ -74,7 +74,7 @@ namespace Lexer.Tests
 			var base_regex = RegExFactory.Range ('a');
 			var intersection = RegExFactory.Intersection (base_regex, base_regex);
 
-			Assert.IsTrue (intersection is RegExRange);
+			Assert.IsTrue (intersection is RegExRange<char>);
 			Assert.AreEqual (0, intersection.CompareTo (base_regex));
 		}
 
@@ -139,7 +139,7 @@ namespace Lexer.Tests
 		public void Test_Concat_Empty()
 		{
 			var regex = RegExFactory.Range ('a');
-			var empty = RegExFactory.Empty ();
+			var empty = RegExFactory.Empty<char> ();
 			var concat1 = RegExFactory.Concat (empty, regex);
 			var concat2 = RegExFactory.Concat (regex, empty);
 
@@ -151,14 +151,14 @@ namespace Lexer.Tests
 		[Test]
 		public void Test_Concat_Epsi()
 		{
-			var epsi = RegExFactory.Epsilon ();
+			var epsi = RegExFactory.Epsilon<char> ();
 			var regex = RegExFactory.Range ('a');
 
 			var concat1 = RegExFactory.Concat (epsi, regex);
 			var concat2 = RegExFactory.Concat (regex, epsi);
 
-			Assert.IsTrue (concat1 is RegExRange);
-			Assert.IsTrue (concat2 is RegExRange);
+			Assert.IsTrue (concat1 is RegExRange<char>);
+			Assert.IsTrue (concat2 is RegExRange<char>);
 			Assert.AreEqual (0, regex.CompareTo (concat1));
 			Assert.AreEqual (0, regex.CompareTo (concat2));
 		}
@@ -182,14 +182,14 @@ namespace Lexer.Tests
 		[Test]
 		public void Test_Star_Empty()
 		{
-			var epsi = RegExFactory.Epsilon ();
-			var empty = RegExFactory.Empty ();
+			var epsi = RegExFactory.Epsilon<char> ();
+			var empty = RegExFactory.Empty<char> ();
 
 			var star_epsi = RegExFactory.Star (epsi);
 			var star_empty = RegExFactory.Star (empty);
 
-			Assert.IsTrue (star_empty is RegExEpsilon);
-			Assert.IsTrue (star_epsi is RegExEpsilon);
+			Assert.IsTrue (star_empty is RegExEpsilon<char>);
+			Assert.IsTrue (star_epsi is RegExEpsilon<char>);
 			Assert.AreEqual (0, epsi.CompareTo (star_epsi));
 			Assert.AreEqual (0, epsi.CompareTo (star_empty));
 		}
@@ -206,7 +206,7 @@ namespace Lexer.Tests
 			var compl = RegExFactory.Complement (regex);
 			var compl2 = RegExFactory.Complement (compl);
 
-			Assert.IsTrue (compl2 is RegExRange);
+			Assert.IsTrue (compl2 is RegExRange<char>);
 			Assert.AreEqual (0, regex.CompareTo (compl2));
 		}
 

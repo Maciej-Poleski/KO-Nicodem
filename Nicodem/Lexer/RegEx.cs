@@ -3,59 +3,59 @@ using System.Collections.Generic;
 
 namespace Nicodem.Lexer
 {
-	public abstract class RegEx : IComparable<RegEx>, IEquatable<RegEx>
-	{
-		internal int TypeId { set; get; }
+    public abstract class RegEx<T> : IComparable<RegEx<T>>, IEquatable<RegEx<T>>
+        where T : IComparable<T>, IEquatable<T>
+    {
+        internal int TypeId { set; get; }
 
-		#region IComparable implementation
+        #region IComparable implementation
 
-		public virtual int CompareTo (RegEx other)
-		{
-			//Derived classes should override this method
-			throw new NotImplementedException ();
-		}
+        public virtual int CompareTo(RegEx<T> other)
+        {
+            //Derived classes should override this method
+            throw new NotImplementedException();
+        }
 
-		#endregion
+        #endregion
 
-		#region IEquatable implementation
+        #region IEquatable implementation
 
-		public bool Equals (RegEx other)
-		{
-			// should be correlated with compareTo
-			return CompareTo (other) == 0;
-		}
+        public bool Equals(RegEx<T> other)
+        {
+            // should be correlated with compareTo
+            return CompareTo(other) == 0;
+        }
 
-		#endregion
-
-		#region standard methods
-
-		public override bool Equals (object obj)
-		{
-			var regex = obj as RegEx;
-			return regex != null && Equals (regex);
-		}
-
-		public override int GetHashCode ()
-		{
-			return base.GetHashCode ();
-		}
-
-		#endregion
+        #endregion
 
         public virtual bool HasEpsilon()
         {
             throw new NotImplementedException();
         }
 
-        public virtual IEnumerable<Char> DerivChanges()
+        public virtual IEnumerable<T> DerivChanges()
         {
             throw new NotImplementedException();
         }
 
-        public virtual RegEx Derivative(Char c)
+        public virtual RegEx<T> Derivative(T c)
         {
             throw new NotImplementedException();
         }
-	}
+
+        #region standard methods
+
+        public override bool Equals(object obj)
+        {
+            var regex = obj as RegEx<T>;
+            return regex != null && Equals(regex);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        #endregion
+    }
 }
-

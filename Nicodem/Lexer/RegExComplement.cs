@@ -3,42 +3,40 @@ using System.Collections.Generic;
 
 namespace Nicodem.Lexer
 {
-	public class RegExComplement : RegEx
-	{
-		public RegEx Regex { private set; get; }
+    public class RegExComplement<T> : RegEx<T> where T : IComparable<T>, IEquatable<T>
+    {
+        internal RegExComplement(RegEx<T> regex)
+        {
+            TypeId = 3;
+            Regex = regex;
+        }
 
-		internal RegExComplement ( RegEx regex )
-		{
-			this.TypeId = 3;
-			this.Regex = regex;
-		}
+        public RegEx<T> Regex { private set; get; }
+        // typeid diff if other is not complement
+        // compareTo( Regex, other.Regex ) otherwise
+        public override int CompareTo(RegEx<T> other)
+        {
+            var diff = TypeId - other.TypeId;
+            if (diff != 0)
+                return diff;
 
-		// typeid diff if other is not complement
-		// compareTo( Regex, other.Regex ) otherwise
-		public override int CompareTo (RegEx other)
-		{
-			var diff = TypeId - other.TypeId;
-			if (diff != 0)
-				return diff;
+            var complement = other as RegExComplement<T>;
+            return Regex.CompareTo(complement.Regex);
+        }
 
-			var complement = other as RegExComplement;
-			return Regex.CompareTo (complement.Regex);
-		}
+        public override bool HasEpsilon()
+        {
+            return !Regex.HasEpsilon();
+        }
 
-		public override bool HasEpsilon()
-		{
-			return !Regex.HasEpsilon();
-		}
+        public override IEnumerable<T> DerivChanges()
+        {
+            return Regex.DerivChanges();
+        }
 
-		public override IEnumerable<Char> DerivChanges()
-		{
-			return Regex.DerivChanges();
-		}
-
-		public override RegEx Derivative(Char c)
-		{
-			return RegExFactory.Complement(Regex.Derivative(c));
-		}
-	}
+        public override RegEx<T> Derivative(T c)
+        {
+            return RegExFactory.Complement(Regex.Derivative(c));
+        }
+    }
 }
-

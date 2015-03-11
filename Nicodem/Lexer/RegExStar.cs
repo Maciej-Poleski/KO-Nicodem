@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace Nicodem.Lexer
 {
-	public class RegExStar : RegEx
+	public class RegExStar<T> : RegEx<T> where T : IComparable<T>, IEquatable<T>
 	{
-		public RegEx Regex { private set; get; }
+		public RegEx<T> Regex { private set; get; }
 
-		internal RegExStar ( RegEx regex )
+		internal RegExStar ( RegEx<T> regex )
 		{
 			this.TypeId = 2;
 			this.Regex = regex;
@@ -15,7 +15,7 @@ namespace Nicodem.Lexer
 
 		// typeid diff if other is not star
 		// compareTo( Regex, other.Regex )  otherwise
-		public override int CompareTo (RegEx other)
+		public override int CompareTo (RegEx<T> other)
 		{
 			var diff = TypeId - other.TypeId;
 			if (diff != 0) {
@@ -23,7 +23,7 @@ namespace Nicodem.Lexer
 				return diff;
 			}
 
-			var star = other as RegExStar;
+			var star = other as RegExStar<T>;
 			return Regex.CompareTo (star.Regex);
 		}
 
@@ -32,12 +32,12 @@ namespace Nicodem.Lexer
 			return true;
 		}
 
-		public override IEnumerable<Char> DerivChanges()
+		public override IEnumerable<T> DerivChanges()
 		{
 			return Regex.DerivChanges();
 		}
 
-		public override RegEx Derivative(Char c)
+		public override RegEx<T> Derivative(T c)
 		{
 			return RegExFactory.Concat(Regex.Derivative(c), RegExFactory.Star(Regex));
 		}

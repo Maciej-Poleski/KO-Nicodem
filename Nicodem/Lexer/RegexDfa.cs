@@ -1,35 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Nicodem.Lexer
 {
-    class RegexDfa : IDfa<DFAState>
+    internal class RegexDfa<T> : IDfa<DFAState<T>, T> where T : IComparable<T>, IEquatable<T>
     {
-        public RegexDfa(RegEx regEx, uint acceptingStateMarker)
+        private readonly uint accepting;
+
+        private readonly SortedDictionary<RegEx<T>, DFAState<T>> dictionaryOfDfaStates =
+            new SortedDictionary<RegEx<T>, DFAState<T>>();
+
+        public RegexDfa(RegEx<T> regEx, uint acceptingStateMarker)
         {
             accepting = acceptingStateMarker;
             Start = CalculateDfaState(regEx);
         }
 
-        private DFAState CalculateDfaState(RegEx regEx){
-            if(dictionaryOfDfaStates.ContainsKey(regEx))
-                return dictionaryOfDfaStates[regEx];//return this state
+        public DFAState<T> Start { get; private set; }
 
-            DFAState new_state = new DFAState();
+        private DFAState<T> CalculateDfaState(RegEx<T> regEx)
+        {
+            if (dictionaryOfDfaStates.ContainsKey(regEx))
+                return dictionaryOfDfaStates[regEx]; //return this state
+
+            var new_state = new DFAState<T>();
             dictionaryOfDfaStates.Add(regEx, new_state);
-            
-            List<KeyValuePair<char, DFAState>> listOfTransitions = new List<KeyValuePair<char,DFAState>>();
 
-            foreach (char c in regEx.DerivChanges())
+            var listOfTransitions = new List<KeyValuePair<T, DFAState<T>>>();
+
+            foreach (var c in regEx.DerivChanges())
             {
-                RegEx deriv = regEx.Derivative(c);
-                if(deriv == regEx)
-                    listOfTransitions.Add(new KeyValuePair<char,DFAState>(c, null));
+                var deriv = regEx.Derivative(c);
+                if (deriv == regEx)
+                    listOfTransitions.Add(new KeyValuePair<T, DFAState<T>>(c, null));
                 else
-                    listOfTransitions.Add(new KeyValuePair<char, DFAState>(c, CalculateDfaState(regEx.Derivative(c))));
+                    listOfTransitions.Add(new KeyValuePair<T, DFAState<T>>(c, CalculateDfaState(regEx.Derivative(c))));
             }
 
             if (regEx.HasEpsilon())
@@ -41,11 +46,5 @@ namespace Nicodem.Lexer
 
             return new_state;
         }
-
-        public DFAState Start { get; private set; }
-
-        private SortedDictionary<RegEx, DFAState> dictionaryOfDfaStates = new SortedDictionary<RegEx,DFAState>();
-
-        private uint accepting;
     }
 }

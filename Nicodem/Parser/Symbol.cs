@@ -2,7 +2,7 @@
 
 namespace Nicodem.Parser
 {
-	public class Symbol : IComparable<Symbol>
+	public class Symbol : IComparable<Symbol>, IEquatable<Symbol>
 	{
 		public Symbol()
 		{
@@ -12,6 +12,11 @@ namespace Nicodem.Parser
 		{
 			throw new NotImplementedException();
 		}
+
+	    public bool Equals(Symbol other)
+	    {
+	        throw new NotImplementedException();
+	    }
 	}
 }
 

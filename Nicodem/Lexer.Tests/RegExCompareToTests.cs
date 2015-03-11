@@ -9,18 +9,18 @@ namespace Lexer.Tests
 		[Test]
 		public void Test_Epsi_Smallest()
 		{
-			var epsi = RegExFactory.Epsilon ();
+			var epsi = RegExFactory.Epsilon<char> ();
 			var range = RegExFactory.Range ('a');
 			var range2 = RegExFactory.Range ('b');
 
 			Assert.AreEqual (0, epsi.CompareTo (epsi)); // epsi == epsi
-			Assert.AreEqual (0, epsi.CompareTo (RegExFactory.Epsilon())); // epsi == epsi
+			Assert.AreEqual (0, epsi.CompareTo (RegExFactory.Epsilon<char>())); // epsi == epsi
 
 			Assert.IsTrue (epsi.CompareTo (RegExFactory.Range ('a')) < 0); // epsi < RegExRange(...)
 			Assert.IsTrue (epsi.CompareTo (RegExFactory.Range ('a', 'b')) < 0); // epsi < RegexRange(...)
 
-			Assert.IsTrue (epsi.CompareTo (RegExFactory.Empty ()) < 0); // epsi < empty
-			Assert.IsTrue (epsi.CompareTo (RegExFactory.All ()) < 0); // epsi < all
+			Assert.IsTrue (epsi.CompareTo (RegExFactory.Empty<char> ()) < 0); // epsi < empty
+			Assert.IsTrue (epsi.CompareTo (RegExFactory.All<char> ()) < 0); // epsi < all
 
 			Assert.IsTrue (epsi.CompareTo (RegExFactory.Star (range)) < 0); // epsi < star
 			Assert.IsTrue (epsi.CompareTo (RegExFactory.Complement (range)) < 0); // epsi < complement

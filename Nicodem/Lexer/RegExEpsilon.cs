@@ -3,35 +3,36 @@ using System.Collections.Generic;
 
 namespace Nicodem.Lexer
 {
-	public class RegExEpsilon : RegEx
-	{
-		internal RegExEpsilon ()
-		{
-			this.TypeId = 0;
-		}
+    public class RegExEpsilon<T> : RegEx<T> where T : IComparable<T>, IEquatable<T>
+    {
+        internal static readonly RegExEpsilon<T> RegexEpsilon = new RegExEpsilon<T>();
 
-		// 0 if other is RegExEpsilon
-		// a < 0 otherwise
-		// => RegExEpsilon is the 'smallest' one
-		public override int CompareTo (RegEx other)
-		{
-			return TypeId - other.TypeId;
-		}
+        private RegExEpsilon()
+        {
+            TypeId = 0;
+        }
 
-		public override bool HasEpsilon()
-		{
-			return true;
-		}
+        // 0 if other is RegExEpsilon
+        // a < 0 otherwise
+        // => RegExEpsilon is the 'smallest' one
+        public override int CompareTo(RegEx<T> other)
+        {
+            return TypeId - other.TypeId;
+        }
 
-		public override IEnumerable<Char> DerivChanges()
-		{
-			return new char[] { };
-		}
+        public override bool HasEpsilon()
+        {
+            return true;
+        }
 
-		public override RegEx Derivative(Char c)
-		{
-			return RegExFactory.Empty();
-		}
-	}
+        public override IEnumerable<T> DerivChanges()
+        {
+            return new T[] {};
+        }
+
+        public override RegEx<T> Derivative(T c)
+        {
+            return RegExFactory.Empty<T>();
+        }
+    }
 }
-
