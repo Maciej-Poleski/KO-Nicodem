@@ -18,24 +18,33 @@ namespace Nicodem.Lexer
             if(dictionaryOfDfaStates.ContainsKey(regEx))
                 return dictionaryOfDfaStates[regEx];//return this state
 
+            DFAState new_state = new DFAState();
+            dictionaryOfDfaStates.Add(regEx, new_state);
             
             List<KeyValuePair<char, DFAState>> listOfTransitions = new List<KeyValuePair<char,DFAState>>();
 
             foreach (char c in regEx.DerivChanges())
-                listOfTransitions.Add(new KeyValuePair<char,DFAState>(c, CalculateDfaState(regEx.Derivative(c))));
+            {
+                RegEx deriv = regEx.Derivative(c);
+                if(deriv == regEx)
+                    listOfTransitions.Add(new KeyValuePair<char,DFAState>(c, null));
+                else
+                    listOfTransitions.Add(new KeyValuePair<char, DFAState>(c, CalculateDfaState(regEx.Derivative(c))));
+            }
 
-            //If epsilon is in Language this is accepting state
             if (regEx.HasEpsilon())
-                return new DFAState(accepting, listOfTransitions.ToArray());
+                new_state.Accepting = accepting;
+            else
+                new_state.Accepting = 0;
 
-            DFAState new_state = new DFAState(0, listOfTransitions.ToArray());
-            dictionaryOfDfaStates.Add(regEx, new_state);
+            new_state.Transitions = listOfTransitions.ToArray();
+
             return new_state;
         }
 
         public DFAState Start { get; private set; }
 
-        private Dictionary<RegEx, DFAState> dictionaryOfDfaStates = new Dictionary<RegEx,DFAState>();
+        private SortedDictionary<RegEx, DFAState> dictionaryOfDfaStates = new SortedDictionary<RegEx,DFAState>();
 
         private uint accepting;
     }
