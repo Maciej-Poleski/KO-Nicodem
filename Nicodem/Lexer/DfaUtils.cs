@@ -8,7 +8,7 @@ namespace Nicodem.Lexer
 {
     internal static class DfaUtils
     {
-        internal static RegexDfa<TSymbol> Minimized<TDfa, TDfaState, TSymbol>(this TDfa dfa)
+		internal static TDfa Minimized<TDfa, TDfaState, TSymbol>(this TDfa dfa)
             where TDfa : IDfa<TDfaState, TSymbol> where TDfaState : IDfaState<TDfaState, TSymbol>
             where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
         {
@@ -22,7 +22,10 @@ namespace Nicodem.Lexer
 			return HopcroftAlgorithm<TDfa, TDfaState, TSymbol> (dfa);
         }
 
-		private static SortedSet<TDfaState> DFS<TDfa, TDfaState, TSymbol> (TDfaState currentState, SortedSet<TDfaState> result) where TDfa : IDfa<TDfaState, TSymbol> where TDfaState : IDfaState<TDfaState, TSymbol>
+		private static SortedSet<TDfaState> DFS<TDfa, TDfaState, TSymbol> (TDfaState currentState, SortedSet<TDfaState> result) 
+			where TDfa : IDfa<TDfaState, TSymbol> 
+			where TDfaState : IDfaState<TDfaState, TSymbol>
+			where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
 		{
 			if (!result.Contains (currentState))
 				result.Add (currentState);
@@ -37,7 +40,10 @@ namespace Nicodem.Lexer
 			return result;
 		}
 
-		private static IList<TDfaState> PrepareStateList<TDfa, TDfaState, TSymbol> (TDfa dfa) where TDfa : IDfa<TDfaState, TSymbol> where TDfaState : IDfaState<TDfaState, TSymbol>
+		private static IList<TDfaState> PrepareStateList<TDfa, TDfaState, TSymbol> (TDfa dfa) 
+			where TDfa : IDfa<TDfaState, TSymbol> 
+			where TDfaState : IDfaState<TDfaState, TSymbol>
+			where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
 		{
 			SortedSet<TDfaState> result = new SortedSet<TDfaState>();
 			var startState = dfa.Start;
@@ -46,9 +52,11 @@ namespace Nicodem.Lexer
 		}
 
 		// returns sorted list of characters defining possible transition ranges in the given list of states
-		private static char[] AlphabetRanges<TDfaState, TSymbol> (IList<TDfaState> stateList) where TDfaState : IDfaState<TDfaState, TSymbol>
+		private static TSymbol[] AlphabetRanges<TDfaState, TSymbol> (IList<TDfaState> stateList) 
+			where TDfaState : IDfaState<TDfaState, TSymbol>
+			where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
 		{
-			SortedSet<char> ranges = new SortedSet<char> ();
+			SortedSet<TSymbol> ranges = new SortedSet<TSymbol> ();
 			foreach (var st in stateList) {
 				foreach (var transition in st.Transitions)
 					ranges.Add (transition.Key);
@@ -57,21 +65,24 @@ namespace Nicodem.Lexer
 			return ranges.ToArray ();
 		}
 			
-		private class SimpleState
+		private class SimpleState<TSymbol>
 		{
-			public Dictionary<char, SimpleState> Edges { get; set; }
+			public Dictionary<TSymbol, SimpleState<TSymbol> > Edges { get; set; }
 		}
 
-		private static TDfa BuildNewDfa<TDfa, TDfaState, TSymbol> (TDfa dfa, PartitionRefinement<TDfaState> partition, IList<TDfaState> stateList) where TDfa : IDfa<TDfaState, TSymbol> where TDfaState : IDfaState<TDfaState, TSymbol>
+		private static TDfa BuildNewDfa<TDfa, TDfaState, TSymbol> (TDfa dfa, PartitionRefinement<TDfaState> partition, IList<TDfaState> stateList) 
+			where TDfa : IDfa<TDfaState, TSymbol> 
+			where TDfaState : IDfaState<TDfaState, TSymbol>
+			where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
 		{
-			var oldToSimpleState = new Dictionary<TDfaState, SimpleState>();
-			var setToState = new Dictionary<LinkedList<TDfaState>, SimpleState>();
+			var oldToSimpleState = new Dictionary<TDfaState, SimpleState<TSymbol> >();
+			var setToState = new Dictionary<LinkedList<TDfaState>, SimpleState<TSymbol> >();
 
 			foreach (var oldState in stateList) {
 				var set = partition [oldState];
 
 				if (!setToState.ContainsKey (set)) {
-					setToState [set] = new SimpleState ();
+					setToState [set] = new SimpleState<TSymbol> ();
 				}
 
 				oldToSimpleState [oldState] = setToState [set];
@@ -97,10 +108,13 @@ namespace Nicodem.Lexer
 			return dfa;
 		}
 
-		private static TDfa HopcroftAlgorithm<TDfa, TDfaState, TSymbol> (TDfa dfa) where TDfa : IDfa<TDfaState, TSymbol> where TDfaState : IDfaState<TDfaState, TSymbol>
+		private static TDfa HopcroftAlgorithm<TDfa, TDfaState, TSymbol> (TDfa dfa) 
+			where TDfa : IDfa<TDfaState, TSymbol> 
+			where TDfaState : IDfaState<TDfaState, TSymbol>
+			where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
 		{
 			IList<TDfaState> stateList = PrepareStateList<TDfa, TDfaState, TSymbol> (dfa);
-			char[] alphabet = AlphabetRanges(stateList);
+			TSymbol[] alphabet = AlphabetRanges<TDfaState, TSymbol> (stateList);
 
 			var stateGroups = new Dictionary<uint, LinkedList<TDfaState> > ();
 
@@ -124,7 +138,7 @@ namespace Nicodem.Lexer
 				var mainSet = queue.First();
 				queue.Remove (mainSet);
 
-				foreach (char c in alphabet)
+				foreach (TSymbol c in alphabet)
 				{
 					var prevSet = new LinkedList<TDfaState> (); 
 

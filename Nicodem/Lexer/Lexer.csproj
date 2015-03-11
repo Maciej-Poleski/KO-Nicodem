@@ -46,7 +46,7 @@
     <Compile Include="RegExComplement.cs" />
     <Compile Include="RegExFactory.cs" />
     <Compile Include="RegExEpsilon.cs" />
-    <Compile Include="IDFA.cs" />
+    <Compile Include="IDfa.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
