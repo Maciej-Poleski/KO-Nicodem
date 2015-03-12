@@ -55,10 +55,14 @@ namespace Nicodem.Source.Tmp
         }
         public IFragment MakeFragment (ILocation from, ILocation to)
         {
-            if (from.Origin == this && to.Origin == this) {
-                return new FileFragment (this, ((FileLocation) from).streamPos, ((FileLocation) to).streamPos);
+            if (from.Origin == this && to.Origin == this)
+            {
+                return new FileFragment(this, ((FileLocation)from).streamPos, ((FileLocation)to).streamPos);
             }
-            throw new ArgumentException("Invalid origin");
+            else
+            {
+                throw new ArgumentException("Invalid origin");
+            }
         }
         public ILocation Begin {
             get {

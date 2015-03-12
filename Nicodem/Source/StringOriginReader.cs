@@ -31,10 +31,14 @@ namespace Nicodem.Source.Tmp
                 return curLocation;
             }
             set {
-                if (value.Origin == origin) {
-                    curLocation.pos = ((StringLocation) value).pos;
+                if (value.Origin == origin)
+                {
+                    curLocation.pos = ((StringLocation)value).pos;
                 }
-                throw new ArgumentException("Invalid origin");
+                else
+                {
+                    throw new ArgumentException("Invalid origin");
+                }
             }
         }
         public char CurrentCharacter {

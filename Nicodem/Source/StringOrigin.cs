@@ -50,6 +50,11 @@ namespace Nicodem.Source.Tmp
             this.source = source;
         }
 
+        public override string ToString()
+        {
+            return "StringOrigin of: " + source;
+        }
+
         // -------------- IOrigin methods --------------
         public IOriginReader GetReader ()
         {
@@ -57,10 +62,14 @@ namespace Nicodem.Source.Tmp
         }
         public IFragment MakeFragment (ILocation from, ILocation to)
         {
-            if (from.Origin == this && to.Origin == this) {
-                return new StringFragment (this, ((StringLocation) from).pos, ((StringLocation) to).pos);
+            if (from.Origin == this && to.Origin == this)
+            {
+                return new StringFragment(this, ((StringLocation)from).pos, ((StringLocation)to).pos);
             }
-            throw new ArgumentException("Invalid origin");
+            else
+            {
+                throw new ArgumentException("Invalid origin");
+            }
         }
         public ILocation Begin {
             get {

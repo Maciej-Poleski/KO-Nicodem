@@ -34,11 +34,15 @@ namespace Nicodem.Source.Tmp
                 return lastLocation;
             }
             set {
-                if (value.Origin == origin) {
-                    lastLocation.streamPos = ((FileLocation) value).streamPos;
+                if (value.Origin == origin)
+                {
+                    lastLocation.streamPos = ((FileLocation)value).streamPos;
                     reader.BaseStream.Position = lastLocation.streamPos;
                 }
-                throw new ArgumentException("Invalid origin");
+                else
+                {
+                    throw new ArgumentException("Invalid origin");
+                }
             }
         }
         public char CurrentCharacter {
