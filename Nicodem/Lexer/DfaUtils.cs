@@ -19,32 +19,87 @@ namespace Nicodem.Lexer
             // rodzajów stanów akcpetujących (rozróżnianych różnymi
             // wartościami własności DFAState.Accepting: 0 - nieakceptujący,
             // coś innego niż 0 - jakiś rodzaj akceptacji)
-			return new MinimizedDfa<TSymbol>();
-			//return HopcroftAlgorithm<TDfa, TDfaState, TSymbol> (dfa);
+			return HopcroftAlgorithm<TDfa, TDfaState, TSymbol> (dfa);
         }
 				
         internal struct MinimizedDfa<TSymbol> : IDfa<MinimizedDfaState<TSymbol>, TSymbol>
             where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
         {
-            public MinimizedDfaState<TSymbol> Start
-            {
-                get { throw new NotImplementedException(); }
-            }
+			public MinimizedDfaState<TSymbol> Start { get; internal set; }
         }
 
         internal class MinimizedDfaState<TSymbol> : IDfaState<MinimizedDfaState<TSymbol>, TSymbol>
             where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
         {
-            public uint Accepting
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public KeyValuePair<TSymbol, MinimizedDfaState<TSymbol>>[] Transitions
-            {
-                get { throw new NotImplementedException(); }
-            }
+			public uint Accepting { get; internal set; }
+			public KeyValuePair<TSymbol, MinimizedDfaState<TSymbol> >[] Transitions { get; internal set; }
         }
+			
+			
+		private class SimpleState<TSymbol>
+		{
+			public uint Accepting { get; internal set; }
+			internal Dictionary<TSymbol, SimpleState<TSymbol> > Edges { get; set; }
+		}
+
+		private static MinimizedDfa<TSymbol> BuildNewDfa<TDfa, TDfaState, TSymbol> (TDfa dfa, PartitionRefinement<TDfaState> partition, IList<TDfaState> stateList) 
+			where TDfa : IDfa<TDfaState, TSymbol> 
+			where TDfaState : IDfaState<TDfaState, TSymbol>
+			where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
+		{
+			var oldToSimpleState = new Dictionary<TDfaState, SimpleState<TSymbol> >();
+			var setToState = new Dictionary<LinkedList<TDfaState>, SimpleState<TSymbol> >();
+			var simpleStateToMinimizedState = new Dictionary<SimpleState<TSymbol>, MinimizedDfaState<TSymbol> > ();
+
+			foreach (var oldState in stateList) {
+				var set = partition [oldState];
+
+				if (!setToState.ContainsKey (set)) {
+					var newSimpleState = new SimpleState<TSymbol> ();
+					setToState [set] = newSimpleState;
+					simpleStateToMinimizedState [newSimpleState] = new MinimizedDfaState<TSymbol> ();
+
+					newSimpleState.Accepting = oldState.Accepting;
+				}
+
+				oldToSimpleState [oldState] = setToState [set];
+			}
+
+			foreach (var oldState in stateList) {
+				var stateA = oldToSimpleState [oldState];
+
+				foreach(var transtion in oldState.Transitions) {
+					var stateB = oldToSimpleState [transtion.Value];
+
+					if (!stateA.Edges.ContainsKey (transtion.Key))
+						stateA.Edges [transtion.Key] = stateB;
+				}
+			}
+
+
+			foreach (var statePair in simpleStateToMinimizedState) {
+				var simpleState = statePair.Key;
+				var minimizedState = statePair.Value;
+
+				minimizedState.Accepting = simpleState.Accepting;
+
+				var newTransitions = new List<KeyValuePair<TSymbol, MinimizedDfaState<TSymbol> > >();
+
+				foreach (var edge in simpleState.Edges) {
+					var newEdge = new KeyValuePair<TSymbol, MinimizedDfaState<TSymbol> > (edge.Key, simpleStateToMinimizedState[edge.Value]);
+					newTransitions.Add (newEdge);
+				}
+
+				minimizedState.Transitions = newTransitions.ToArray();
+
+			}
+
+			var newMinimizedDfa = new MinimizedDfa<TSymbol>();
+			var startSet = partition [dfa.Start];
+			newMinimizedDfa.Start = simpleStateToMinimizedState [setToState [startSet]];
+
+			return newMinimizedDfa;
+		}
 
 		private static SortedSet<TDfaState> DFS<TDfa, TDfaState, TSymbol> (TDfaState currentState, SortedSet<TDfaState> result) 
 			where TDfa : IDfa<TDfaState, TSymbol> 
@@ -88,52 +143,8 @@ namespace Nicodem.Lexer
 
 			return ranges.ToArray ();
 		}
-			
-		private class SimpleState<TSymbol>
-		{
-			public Dictionary<TSymbol, SimpleState<TSymbol> > Edges { get; set; }
-		}
 
-		private static RegexDfa<TSymbol> BuildNewDfa<TDfa, TDfaState, TSymbol> (TDfa dfa, PartitionRefinement<TDfaState> partition, IList<TDfaState> stateList) 
-			where TDfa : IDfa<TDfaState, TSymbol> 
-			where TDfaState : IDfaState<TDfaState, TSymbol>
-			where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
-		{
-			var oldToSimpleState = new Dictionary<TDfaState, SimpleState<TSymbol> >();
-			var setToState = new Dictionary<LinkedList<TDfaState>, SimpleState<TSymbol> >();
-
-			foreach (var oldState in stateList) {
-				var set = partition [oldState];
-
-				if (!setToState.ContainsKey (set)) {
-					setToState [set] = new SimpleState<TSymbol> ();
-				}
-
-				oldToSimpleState [oldState] = setToState [set];
-			}
-
-			foreach (var oldState in stateList) {
-				var stateA = oldToSimpleState [oldState];
-
-				foreach(var transtion in oldState.Transitions) {
-					var stateB = oldToSimpleState [transtion.Value];
-
-					if (!stateA.Edges.ContainsKey (transtion.Key))
-						stateA.Edges [transtion.Key] = stateB;
-				}
-			}
-
-			var oldToNewState = new Dictionary<TDfaState, TDfaState> ();
-			foreach (var oldState in stateList) {
-				var set = partition [oldState];
-
-				//.....
-			}
-			//return dfa;
-			return null;
-		}
-
-		private static RegexDfa<TSymbol> HopcroftAlgorithm<TDfa, TDfaState, TSymbol> (TDfa dfa) 
+		private static MinimizedDfa<TSymbol> HopcroftAlgorithm<TDfa, TDfaState, TSymbol> (TDfa dfa) 
 			where TDfa : IDfa<TDfaState, TSymbol> 
 			where TDfaState : IDfaState<TDfaState, TSymbol>
 			where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
