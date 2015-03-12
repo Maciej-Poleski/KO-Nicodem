@@ -15,6 +15,12 @@ namespace Nicodem.Parser
 		internal IDictionary<Symbol, ISet<Symbol>> First { get; private set; }
 		internal IDictionary<Symbol, ISet<Symbol>> Follow { get; private set; }
 
+		// returns true if word belongs to the FIRST+ set for given term
+		internal bool InFirstPlus(Symbol term, Symbol word)
+		{
+			return First[term].Contains(word) || (Nullable.Contains(term) && Follow[term].Contains(word));
+		}
+
 		public Grammar()
 		{
 			// Here begins the computation of Automatons and ProductionMarkers.
