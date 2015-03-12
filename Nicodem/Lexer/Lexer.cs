@@ -11,7 +11,7 @@ namespace Nicodem.Lexer
     /// <summary>
     ///     Odpowiada za podział źródła na fragmenty (tokeny) przy użyciu podanych wyrażeń regularnych.
     ///     Każde wyrażenie regularne będzie odpowiadać pewnej kategori tokenów (oznaczonej numerem - pozycją wyrażenia
-    ///     regularnego w tablicy przekazanej w konstruktorze <seealso cref="Lexer(RegEx<char>[])" />).
+    ///     regularnego w tablicy przekazanej w konstruktorze <seealso cref="Lexer(RegEx{char}[])" />).
     ///     Obiekt tej klasy może być wielokrotnie wykorzystany do tokenizacji wielu źródeł.
     /// </summary>
     public class Lexer
@@ -24,7 +24,7 @@ namespace Nicodem.Lexer
         private readonly Dictionary<uint, Tuple<uint, uint>> _decompressionMapping =
             new Dictionary<uint, Tuple<uint, uint>>();
 
-        private readonly RegexDfa<char> _dfa;
+        private readonly DfaUtils.MinimizedDfa<char> _dfa;
         private uint _nextCategory;
 
         /// <summary>
@@ -62,10 +62,14 @@ namespace Nicodem.Lexer
             return new ProductDfaBuilder<TU, UU>(this).Build(lastDfa.Start, newDfa.Start);
         }
 
-        private RegexDfa<char> MakeMinimizedProductDfa(RegexDfa<char> lastDfa, RegexDfa<char> newDfa)
+        private DfaUtils.MinimizedDfa<char> MakeMinimizedProductDfa(DfaUtils.MinimizedDfa<char> lastDfa,
+            RegexDfa<char> newDfa)
         {
-            return MakeProductDfa<RegexDfa<char>, DFAState<char>, RegexDfa<char>, DFAState<char>>(lastDfa, newDfa)
-                .Minimized<ProductDfa, ProductDfaState, char>();
+            return
+                MakeProductDfa
+                    <DfaUtils.MinimizedDfa<char>, DfaUtils.MinimizedDfaState<char>, RegexDfa<char>, DFAState<char>>(
+                        lastDfa, newDfa)
+                    .Minimized<ProductDfa, ProductDfaState, char>();
         }
 
         private static RegexDfa<char> MakeRegexDfa(RegEx<char> regex, uint category)
@@ -102,7 +106,7 @@ namespace Nicodem.Lexer
                 var dfaState = _dfa.Start;
                 var lastAcceptedDfaState = dfaState;
                 TMemento lastAcceptingReaderState;
-                if (dfaState.IsAccepting<DFAState<char>, char>())
+                if (dfaState.IsAccepting<DfaUtils.MinimizedDfaState<char>, char>())
                 {
                     lastAcceptingReaderState = sourceReader.MakeMemento();
                     succeed = true;
@@ -116,7 +120,7 @@ namespace Nicodem.Lexer
                 {
                     var c = sourceReader.CurrentCharacter;
                     dfaState = FindTransition(dfaState.Transitions, c);
-                    if (dfaState.IsAccepting<DFAState<char>, char>())
+                    if (dfaState.IsAccepting<DfaUtils.MinimizedDfaState<char>, char>())
                     {
                         lastAcceptingReaderState = sourceReader.MakeMemento();
                         lastAcceptedDfaState = dfaState;
