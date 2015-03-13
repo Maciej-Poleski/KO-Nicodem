@@ -5,14 +5,16 @@ using Nicodem.Source.Tmp;
 namespace Nicodem.Source.Tests
 {
     [TestFixture]
-    public class StringOriginTests
+    public abstract class GeneralStringOriginTests
     {
+        public abstract IOrigin CreateOriginTest(string source);
+
         // --------- initialization tests ---------
         [Test]
         public void BeginLocationOriginTest()
         {
             string source = "";
-            IOrigin sOrigin = new StringOrigin(source);
+            IOrigin sOrigin = CreateOriginTest(source);
             Assert.AreSame(sOrigin.Begin.Origin, sOrigin);
         }
 
@@ -20,7 +22,7 @@ namespace Nicodem.Source.Tests
         public void GetLocationOriginTest()
         {
             string source = "XyZ";
-            IOrigin sOrigin = new StringOrigin(source);
+            IOrigin sOrigin = CreateOriginTest(source);
             IOriginReader sReader = sOrigin.GetReader();
 
             sReader.MoveNext(); // point to first character
@@ -38,7 +40,7 @@ namespace Nicodem.Source.Tests
         public void EmptySourceTest()
         {
             string source = "";
-            IOrigin sOrigin = new StringOrigin(source);
+            IOrigin sOrigin = CreateOriginTest(source);
             IOriginReader sReader = sOrigin.GetReader();
             Assert.IsFalse(sReader.MoveNext());
         }
@@ -47,7 +49,7 @@ namespace Nicodem.Source.Tests
         public void OneCharacterSourceTest()
         {
             string source = "X";
-            IOrigin sOrigin = new StringOrigin(source);
+            IOrigin sOrigin = CreateOriginTest(source);
             IOriginReader sReader = sOrigin.GetReader();
             Assert.IsTrue(sReader.MoveNext());
             Assert.AreEqual('X', sReader.CurrentCharacter);
@@ -58,7 +60,7 @@ namespace Nicodem.Source.Tests
         public void ReadTheWholeSourceTest()
         {
             string source = "I like reading sources!\nEspecially in tests.";
-            IOrigin sOrigin = new StringOrigin(source);
+            IOrigin sOrigin = CreateOriginTest(source);
             IOriginReader sReader = sOrigin.GetReader();
 
             StringBuilder readString = new StringBuilder();
@@ -73,7 +75,7 @@ namespace Nicodem.Source.Tests
         public void FalseMoveNextCallsTest()
         {
             string source = "I like reading sources!\nEspecially in tests.";
-            IOrigin sOrigin = new StringOrigin(source);
+            IOrigin sOrigin = CreateOriginTest(source);
             IOriginReader sReader = sOrigin.GetReader();
 
             while (sReader.MoveNext());
@@ -91,7 +93,7 @@ namespace Nicodem.Source.Tests
         public void SetBeginLocationTest()
         {
             string source = "XyZ";
-            IOrigin sOrigin = new StringOrigin(source);
+            IOrigin sOrigin = CreateOriginTest(source);
             IOriginReader sReader = sOrigin.GetReader();
             sReader.MoveNext();
             sReader.MoveNext();
@@ -104,7 +106,7 @@ namespace Nicodem.Source.Tests
         public void SetOneLocationTest()
         {
             string source = "XyZ";
-            IOrigin sOrigin = new StringOrigin(source);
+            IOrigin sOrigin = CreateOriginTest(source);
             IOriginReader sReader = sOrigin.GetReader();
             
             sReader.MoveNext(); // point to first character
@@ -117,7 +119,7 @@ namespace Nicodem.Source.Tests
         public void SettingLocationsTest()
         {
             string source = "012";
-            IOrigin sOrigin = new StringOrigin(source);
+            IOrigin sOrigin = CreateOriginTest(source);
             IOriginReader sReader = sOrigin.GetReader();
 
             sReader.MoveNext(); // point to first character
@@ -156,7 +158,7 @@ namespace Nicodem.Source.Tests
         public void InitialReaderLocationTest()
         {
             string source = "";
-            IOrigin sOrigin = new StringOrigin(source);
+            IOrigin sOrigin = CreateOriginTest(source);
             IOriginReader sReader = sOrigin.GetReader();
             Assert.AreEqual(sOrigin.Begin, sReader.CurrentLocation);
         }
@@ -165,7 +167,7 @@ namespace Nicodem.Source.Tests
         public void NotEqualLocationsTest()
         {
             string source = "XXX";
-            IOrigin sOrigin = new StringOrigin(source);
+            IOrigin sOrigin = CreateOriginTest(source);
             IOriginReader sReader = sOrigin.GetReader();
 
             sReader.MoveNext(); // point to first character
@@ -178,7 +180,7 @@ namespace Nicodem.Source.Tests
         public void FalseMoveNextDoesntAffectLocationTest()
         {
             string source = "XXX";
-            IOrigin sOrigin = new StringOrigin(source);
+            IOrigin sOrigin = CreateOriginTest(source);
             IOriginReader sReader = sOrigin.GetReader();
 
             while (sReader.MoveNext()) ; // move to the end of the origin
@@ -187,6 +189,24 @@ namespace Nicodem.Source.Tests
             sReader.MoveNext();
             sReader.MoveNext();
             Assert.AreEqual(endLocation, sReader.CurrentLocation);
+        }
+    }
+
+    [TestFixture]
+    public class StringOriginTests : GeneralStringOriginTests
+    {
+        public override IOrigin CreateOriginTest(string source)
+        {
+            return new StringOrigin(source);
+        }
+    }
+
+    [TestFixture]
+    public class FileOriginTests : GeneralStringOriginTests
+    {
+        public override IOrigin CreateOriginTest(string source)
+        {
+            return new StringOrigin(source);
         }
     }
 }
