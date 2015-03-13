@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Nicodem.Source.Tmp
+namespace Nicodem.Source
 {
     public class FileOriginReader : IOriginReader
     {

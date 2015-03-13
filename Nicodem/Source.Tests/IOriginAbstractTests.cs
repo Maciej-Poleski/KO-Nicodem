@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using System;
 using System.Text;
-using Nicodem.Source.Tmp;
+using Nicodem.Source;
 
 namespace Nicodem.Source.Tests
 {

@@ -1,4 +1,4 @@
-namespace Nicodem.Source.Tmp
+namespace Nicodem.Source
 {
     public struct StringLocation : ILocation
     {

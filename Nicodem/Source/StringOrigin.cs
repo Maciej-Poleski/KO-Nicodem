@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Nicodem.Source.Tmp
+namespace Nicodem.Source
 {
     public class StringOrigin : IOrigin
     {

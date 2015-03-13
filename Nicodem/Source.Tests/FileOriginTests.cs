@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using Nicodem.Source.Tmp;
+using Nicodem.Source;
 
 namespace Nicodem.Source.Tests
 {

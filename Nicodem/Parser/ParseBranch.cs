@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using Nicodem.Source.Tmp;
+using Nicodem.Source;
 
 namespace Nicodem.Parser
 {
