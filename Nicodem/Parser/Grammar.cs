@@ -21,6 +21,11 @@ namespace Nicodem.Parser
 			return First[term].Contains(word) || (Nullable.Contains(term) && Follow[term].Contains(word));
 		}
 
+		internal bool IsTerminal(Symbol term)
+		{
+			return Productions[term].Length == 0;
+		}
+
 		public Grammar()
 		{
 			// Here begins the computation of Automatons and ProductionMarkers.
