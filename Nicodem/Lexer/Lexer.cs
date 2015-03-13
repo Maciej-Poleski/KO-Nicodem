@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using Nicodem.Source;
 using Nicodem.Source.Tmp;
+using Nicodem.Lexer.OriginInterfaces;
 
 namespace Nicodem.Lexer
 {

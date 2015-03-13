@@ -8,6 +8,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Source.Tests", "Source.Tests\Source.Tests.csproj", "{746D247C-6E5D-41D2-88E3-3A51D2DAC0B0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lexer", "Lexer", "{07C86C89-DB08-4630-9589-5AA6987FAD25}"
+	ProjectSection(SolutionItems) = preProject
+		LexerSpecificInterfaces.cs = LexerSpecificInterfaces.cs
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lexer", "Lexer\Lexer.csproj", "{3A107436-1EC7-48E3-BF42-5E5E50C259E7}"
 EndProject

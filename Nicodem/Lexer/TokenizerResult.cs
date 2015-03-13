@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Nicodem.Lexer.OriginInterfaces;
 
-namespace Nicodem.Source
+namespace Nicodem.Lexer
 {
     /// <summary>
     ///     Rezultat pracy Leksera.

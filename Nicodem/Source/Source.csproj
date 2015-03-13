@@ -46,7 +46,6 @@
     <Compile Include="IOriginReader.cs" />
     <Compile Include="ILocation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TokenizerResult.cs" />
     <Compile Include="FileOrigin.cs" />
     <Compile Include="StringOrigin.cs" />
     <Compile Include="StringOriginReader.cs" />
