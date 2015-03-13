@@ -2,7 +2,7 @@ using System;
 
 namespace Nicodem.Lexer.OriginInterfaces
 {
-    [System.Obsolete("change of interface, new version in Tmp sub namespace")]
+    [System.Obsolete("Lexer specific (more flexible) interface")]
     public interface IFragment<TOrigin, TMemento, TLocation, TFragment>
         where TOrigin : IOrigin<TOrigin, TMemento, TLocation, TFragment>
             where TLocation : ILocation<TOrigin, TMemento, TLocation, TFragment>
@@ -11,7 +11,7 @@ namespace Nicodem.Lexer.OriginInterfaces
         TOrigin Origin { get; }
     }
 
-    [System.Obsolete("change of interface, new version in Tmp sub namespace")]
+    [System.Obsolete("Lexer specific (more flexible) interface")]
     public interface ILocation<TOrigin, TMemento, TLocation, TFragment>
         where TOrigin : IOrigin<TOrigin, TMemento, TLocation, TFragment>
             where TLocation : ILocation<TOrigin, TMemento, TLocation, TFragment>
@@ -20,7 +20,7 @@ namespace Nicodem.Lexer.OriginInterfaces
         TOrigin Origin { get; }
     }
 
-    [System.Obsolete("change of interface, new version in Tmp sub namespace")]
+    [System.Obsolete("Lexer specific (more flexible) interface")]
     public interface IOrigin<TOrigin, TMemento, TLocation, TFragment>
         where TOrigin : IOrigin<TOrigin, TMemento, TLocation, TFragment>
             where TLocation : ILocation<TOrigin, TMemento, TLocation, TFragment>
@@ -45,7 +45,7 @@ namespace Nicodem.Lexer.OriginInterfaces
     ///     Implementacja <see cref="IOrigin{T}" /> dostarcza implementacji funkcjonalności związanych z odczytem kodu
     ///     źródłowego poprzez obiekty implementujące ten interfejs.
     /// </summary>
-    [System.Obsolete("change of interface, new version in Tmp sub namespace")]
+    [System.Obsolete("Lexer specific (more flexible) interface")]
     public interface IOriginReader<TOrigin, TMemento, TLocation, TFragment>
         where TOrigin : IOrigin<TOrigin, TMemento, TLocation, TFragment>
             where TLocation : ILocation<TOrigin, TMemento, TLocation, TFragment>
