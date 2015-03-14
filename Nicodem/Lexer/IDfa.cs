@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Nicodem.Lexer
 {
@@ -6,5 +7,6 @@ namespace Nicodem.Lexer
         where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
     {
         TDfaState Start { get; }
+        List<TDfaState> GetAllAcceptingStates();
     }
 }
