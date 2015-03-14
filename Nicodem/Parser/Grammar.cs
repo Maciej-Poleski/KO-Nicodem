@@ -46,6 +46,11 @@ namespace Nicodem.Parser
 			throw new NotImplementedException();
 		}
 
+        internal List<DFAState<Symbol>> GetAllAcceptingStates(IDfa<DFAState<Symbol>, Symbol> automaton)
+        {
+            throw new NotImplementedException();
+        }
+
         internal void ComputeNullable()
         {
             // For productions A -> E startStatesLhs maps start state of automaton of E to A
@@ -62,7 +67,7 @@ namespace Nicodem.Parser
             // at the beginning enqueue all accepting states
             foreach(var dfa in Automatons.Values)
             {
-                foreach(var accstate in dfa.GetAllAcceptingStates())
+                foreach(var accstate in GetAllAcceptingStates(dfa))
                 {
                     queue.Enqueue(accstate);
                 }

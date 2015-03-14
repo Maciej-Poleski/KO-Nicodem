@@ -8,7 +8,6 @@ namespace Nicodem.Lexer
     {
         uint Accepting { get; }
         KeyValuePair<TSymbol, TDfaState>[] Transitions { get; }
-        List<KeyValuePair<TSymbol, TDfaState>> Predecessors { get; }
     }
 
     internal static class Extensions
