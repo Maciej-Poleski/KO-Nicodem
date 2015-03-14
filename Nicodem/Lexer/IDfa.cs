@@ -7,6 +7,5 @@ namespace Nicodem.Lexer
         where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
     {
         TDfaState Start { get; }
-        List<TDfaState> GetAllAcceptingStates();
     }
 }
