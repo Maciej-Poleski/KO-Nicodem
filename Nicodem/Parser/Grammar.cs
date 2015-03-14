@@ -103,6 +103,68 @@ namespace Nicodem.Parser
             }
         }
 
+        // FIRST(A) = { B \in Sigma : A ->* B\beta }
+        private void ComputeFirst()
+        {
+            // preconditions (check if Nullable is already computed)
+            if(Nullable == null)
+                throw new ArgumentNullException("Cannot invoke 'First' method before 'Nullable'");
+
+            // declare local vars
+            var first = new Dictionary<Symbol, ISet<Symbol>>();
+
+            // begin with FIRST(A) := { A } foreach A
+            foreach(var A in Automatons.Keys) {
+                first[A].Add(A);
+            }
+
+            // foreach production A -> E
+            // where A - symbol, E - automata
+            foreach(var symbol in Automatons.Keys) {
+                var automata = Automatons[symbol];
+
+                // perform BFS from automata startstate
+                // using only edges labeled by symbols from nullable set
+                var Q = new Queue<DFAState<Symbol>>();
+                Q.Enqueue(automata.Start);
+
+                while(Q.Count > 0) {
+                    var state = Q.Dequeue();
+
+                    // check all edges
+                    foreach(var transition in state.Transitions) {
+
+                        // add label to FIRST(symbol)
+                        first[symbol].Add(transition.Key);
+
+                        // if label is in NULLABLE set continue BFS using this edge
+                        if(Nullable.Contains(transition.Key))
+                            Q.Enqueue(transition.Value);
+                    }
+                }
+            }
+
+            // B \in FIRST(A) => FIRST(B) <= FIRST(A)
+            var change = true;
+            while(change) {
+                change = false;
+
+                foreach(var A in first.Keys) {
+                    foreach(var B in first[A]) {
+
+                        foreach(var x in first[B]) {
+                            change |= !first[A].Contains(x);
+                            first[A].Add(x);
+                        }
+
+                    }
+                }
+            }
+
+            // set class immutables
+            First = first;
+        }
+
 	}
 }
 
