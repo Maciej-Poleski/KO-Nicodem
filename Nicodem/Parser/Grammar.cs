@@ -26,18 +26,26 @@ namespace Nicodem.Parser
 			return Productions[term].Length == 0;
 		}
 
+        private IDfa<DFAState<Symbol>, Symbol> ProductAutomaton(IDfa<DFAState<Symbol>, Symbol>[] automatons) {
+            // TODO: It is implemented in Lexer but needs to be made public.
+            throw new NotImplementedException();
+        }
+
         public Grammar(IDictionary<Symbol, TProduction[]> productions)
 		{
             Productions = productions;
-			// Here begins the computation of Automatons and ProductionMarkers.
+			// Here we prepare automatons for each symbol.
 			uint productionMarker = 1;
 			foreach (var symbolProductions in Productions)
 			{
-				// TODO(guspiel): create a product DFA for each symbol.
+                List<IDfa<DFAState<Symbol>, Symbol>> automatons = new List<IDfa<DFAState<Symbol>, Symbol>>();
 				foreach (var production in symbolProductions.Value)
 				{
+                    automatons.Add(new RegexDfa<Symbol>(production.Rhs, productionMarker));
+                    WhichProduction[productionMarker] = production;
 					productionMarker++;
 				}
+                Automatons[symbolProductions.Key] = ProductAutomaton(automatons.ToArray());
 			}
 		}
 

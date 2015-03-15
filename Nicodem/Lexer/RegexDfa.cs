@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Nicodem.Lexer
 {
-    internal class RegexDfa<T> : IDfa<DFAState<T>, T> where T : IComparable<T>, IEquatable<T>
+    public class RegexDfa<T> : IDfa<DFAState<T>, T> where T : IComparable<T>, IEquatable<T>
     {
         private readonly uint accepting;
 
