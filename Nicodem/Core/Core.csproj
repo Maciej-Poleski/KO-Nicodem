@@ -7,8 +7,6 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Nicodem.Core</RootNamespace>
     <AssemblyName>Nicodem.Core</AssemblyName>
-    <ProductVersion>12.0.0</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,6 +29,7 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="PartitionRefinement.cs" />
+    <Compile Include="MemoizedInput.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
