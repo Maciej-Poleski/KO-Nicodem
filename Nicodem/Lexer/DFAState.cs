@@ -10,6 +10,7 @@ namespace Nicodem.Lexer
     {
         public uint Accepting { get; internal set; }
         public KeyValuePair<T, DFAState<T>>[] Transitions { get; internal set; }
+        public List<KeyValuePair<T, DFAState<T>>> Predecessors { get; internal set; }
 
         public DFAState()
         {
@@ -19,6 +20,13 @@ namespace Nicodem.Lexer
         {
             Accepting = acceptingStateMaker;
             Transitions = transitions;
+            Predecessors = new List<KeyValuePair<T, DFAState<T>>>();
+
+            foreach(var entry in transitions)
+            {
+                entry.Value.Predecessors.Add(new KeyValuePair<T, DFAState<T>>(entry.Key, this));
+            }
+
         }
     }
 }

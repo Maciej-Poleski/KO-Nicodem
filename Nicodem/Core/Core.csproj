@@ -29,6 +29,7 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="PartitionRefinement.cs" />
+    <Compile Include="MemoizedInput.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

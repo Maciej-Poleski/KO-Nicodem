@@ -37,6 +37,10 @@
       <Project>{6078FFE3-28C8-4169-831D-E1D1AAFDD72F}</Project>
       <Name>Source</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{5E967501-0A63-4196-A29B-B8B148785048}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IProduction.cs" />

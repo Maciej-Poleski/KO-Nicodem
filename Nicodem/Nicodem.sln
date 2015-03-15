@@ -1,20 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-VisualStudioVersion = 12.0.31101.0
-MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{BDE96647-252C-4DAB-AE41-A02F7214C647}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Source", "Source\Source.csproj", "{6078FFE3-28C8-4169-831D-E1D1AAFDD72F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Source.Tests", "Source.Tests\Source.Tests.csproj", "{746D247C-6E5D-41D2-88E3-3A51D2DAC0B0}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lexer", "Lexer", "{07C86C89-DB08-4630-9589-5AA6987FAD25}"
+	ProjectSection(SolutionItems) = preProject
+		LexerSpecificInterfaces.cs = LexerSpecificInterfaces.cs
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lexer", "Lexer\Lexer.csproj", "{3A107436-1EC7-48E3-BF42-5E5E50C259E7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lexer.Tests", "Lexer.Tests\Lexer.Tests.csproj", "{0C9322B9-F087-451E-9726-2FF28313D704}"
-	ProjectSection(ProjectDependencies) = postProject
-		{6078FFE3-28C8-4169-831D-E1D1AAFDD72F} = {6078FFE3-28C8-4169-831D-E1D1AAFDD72F}
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{AE5A0943-F2FE-46FA-AB96-CD5CD1B163E8}"
 	ProjectSection(SolutionItems) = preProject
@@ -63,6 +63,10 @@ Global
 		{6078FFE3-28C8-4169-831D-E1D1AAFDD72F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6078FFE3-28C8-4169-831D-E1D1AAFDD72F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6078FFE3-28C8-4169-831D-E1D1AAFDD72F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{746D247C-6E5D-41D2-88E3-3A51D2DAC0B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{746D247C-6E5D-41D2-88E3-3A51D2DAC0B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{746D247C-6E5D-41D2-88E3-3A51D2DAC0B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{746D247C-6E5D-41D2-88E3-3A51D2DAC0B0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DC9385D6-C37E-441F-8BAA-3B7EAEC2DA39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DC9385D6-C37E-441F-8BAA-3B7EAEC2DA39}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC9385D6-C37E-441F-8BAA-3B7EAEC2DA39}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -70,12 +74,63 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6078FFE3-28C8-4169-831D-E1D1AAFDD72F} = {BDE96647-252C-4DAB-AE41-A02F7214C647}
+		{746D247C-6E5D-41D2-88E3-3A51D2DAC0B0} = {BDE96647-252C-4DAB-AE41-A02F7214C647}
 		{3A107436-1EC7-48E3-BF42-5E5E50C259E7} = {07C86C89-DB08-4630-9589-5AA6987FAD25}
 		{0C9322B9-F087-451E-9726-2FF28313D704} = {07C86C89-DB08-4630-9589-5AA6987FAD25}
 		{DC9385D6-C37E-441F-8BAA-3B7EAEC2DA39} = {F6EABA18-5D24-4AAB-A322-DFF62EA073B2}
 		{3BA2695E-0103-4E64-B9E7-B14CC056C7AC} = {F6EABA18-5D24-4AAB-A322-DFF62EA073B2}
 		{5E967501-0A63-4196-A29B-B8B148785048} = {652F65C3-4194-4751-AB31-9543E6DA2826}
 		{2AFAC738-0F82-474D-A7C1-4DB18D2FF0A9} = {652F65C3-4194-4751-AB31-9543E6DA2826}
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Source\Source.csproj
+		Policies = $0
+		$0.DotNetNamingPolicy = $1
+		$1.DirectoryNamespaceAssociation = None
+		$1.ResourceNamePolicy = FileFormatDefault
+		$0.TextStylePolicy = $2
+		$2.inheritsSet = null
+		$2.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $3
+		$3.ElseIfNewLinePlacement = SameLine
+		$3.BeforeMethodDeclarationParentheses = False
+		$3.BeforeMethodCallParentheses = False
+		$3.BeforeConstructorDeclarationParentheses = False
+		$3.BeforeIndexerDeclarationBracket = False
+		$3.BeforeDelegateDeclarationParentheses = False
+		$3.AfterDelegateDeclarationParameterComma = True
+		$3.NewParentheses = False
+		$3.IfParentheses = False
+		$3.WhileParentheses = False
+		$3.ForParentheses = False
+		$3.ForeachParentheses = False
+		$3.CatchParentheses = False
+		$3.SwitchParentheses = False
+		$3.LockParentheses = False
+		$3.UsingParentheses = False
+		$3.SpacesBeforeBrackets = False
+		$3.inheritsSet = Mono
+		$3.inheritsScope = text/x-csharp
+		$3.scope = text/x-csharp
+		$0.TextStylePolicy = $4
+		$4.FileWidth = 120
+		$4.EolMarker = Unix
+		$4.inheritsSet = VisualStudio
+		$4.inheritsScope = text/plain
+		$4.scope = text/plain
+		$0.TextStylePolicy = $5
+		$5.inheritsSet = null
+		$5.scope = application/config+xml
+		$0.XmlFormattingPolicy = $6
+		$6.inheritsSet = null
+		$6.scope = application/config+xml
+		$0.TextStylePolicy = $7
+		$7.inheritsSet = null
+		$7.scope = application/xml
+		$0.XmlFormattingPolicy = $8
+		$8.inheritsSet = Mono
+		$8.inheritsScope = application/xml
+		$8.scope = application/xml
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

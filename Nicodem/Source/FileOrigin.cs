@@ -1,42 +1,7 @@
 ﻿using System;
 
-namespace Nicodem.Source.Tmp
+namespace Nicodem.Source
 {
-    public struct FileLocation : ILocation
-    {
-        internal readonly FileOrigin origin;
-        internal long streamPos;
-        internal FileLocation(FileOrigin origin, long streamPos){
-            this.origin = origin;
-            this.streamPos = streamPos;
-        }
-        // -------------- ILocation methods --------------
-        public IOrigin Origin {
-            get {
-                return origin;
-            }
-        }
-    }
-
-    public struct FileFragment : IFragment
-    {
-        internal readonly FileOrigin origin;
-        internal readonly long streamBegPos;
-        internal readonly long streamEndPos;
-
-        internal FileFragment(FileOrigin origin, long beg, long end){
-            this.origin = origin;
-            this.streamBegPos = beg;
-            this.streamEndPos = end;
-        }
-        // -------------- IFragment methods --------------
-        public IOrigin Origin {
-            get {
-                return origin;
-            }
-        }
-    }
-
     public class FileOrigin : IOrigin
     {
         internal readonly FileLocation begin;

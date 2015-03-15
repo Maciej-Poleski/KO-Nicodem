@@ -1,6 +1,6 @@
 ﻿using System;
 
-using Nicodem.Source.Tmp;
+using Nicodem.Source;
 
 namespace Nicodem.Parser
 {

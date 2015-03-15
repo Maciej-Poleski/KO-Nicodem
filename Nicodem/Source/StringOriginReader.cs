@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Nicodem.Source.Tmp
+namespace Nicodem.Source
 {
     public class StringOriginReader : IOriginReader
     {

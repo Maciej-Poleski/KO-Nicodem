@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using Nicodem.Lexer;
-using Nicodem.Source.Tmp;
+using Nicodem.Source;
 using NUnit.Framework;
 
 namespace Lexer.Tests
