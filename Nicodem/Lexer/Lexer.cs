@@ -3,8 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Nicodem.Source;
-using Nicodem.Lexer.OriginInterfaces;
+using IFragment = Nicodem.Source.IFragment;
+using ILocation = Nicodem.Source.ILocation;
+using IOriginReader = Nicodem.Source.IOriginReader;
 
 namespace Nicodem.Lexer
 {
@@ -91,7 +92,8 @@ namespace Nicodem.Lexer
         ///     Lista tokenów powiązanych z informacją o kategoriach do których dany token należy. Lista składa się z najdłuższych
         ///     tokenów najdłuższego prefiksu źródła, którego udało się sparsować.
         /// </returns>
-        public TokenizerResult<TOrigin, TMemento, TLocation, TFragment> Process<TOrigin, TMemento, TLocation, TFragment>
+        private TokenizerResult<TOrigin, TMemento, TLocation, TFragment> Process
+            <TOrigin, TMemento, TLocation, TFragment>
             (TOrigin sourceOrigin)
             where TOrigin : IOrigin<TOrigin, TMemento, TLocation, TFragment>
             where TLocation : ILocation<TOrigin, TMemento, TLocation, TFragment>
@@ -144,12 +146,14 @@ namespace Nicodem.Lexer
             return new TokenizerResult<TOrigin, TMemento, TLocation, TFragment>(result, lastAcceptedLocation);
         }
 
-        public IEnumerable<Tuple<IFragment, IEnumerable<int>>> Process(IOrigin origin)
+        public IEnumerable<Tuple<IFragment, IEnumerable<int>>> Process(Source.IOrigin origin)
         {
-            var result = Process<BareOrigin, BareLocation, BareLocation, BareFragment>(new BareOrigin(origin));
+            var result = Process<BareOrigin, ILocation, BareLocation, BareFragment>(new BareOrigin(origin));
             return
                 result.Tokens.Select(tuple => new Tuple<IFragment, IEnumerable<int>>(tuple.Item1.Fragment, tuple.Item2));
         }
+
+        #region CategoryDecompression
 
         private IEnumerable<int> GetCategoriesFromState<T>(T dfaState) where T : IDfaState<T, char>
         {
@@ -237,6 +241,10 @@ namespace Nicodem.Lexer
                 }
             }
         }
+
+        #endregion
+
+        #region ProductDfa
 
         private struct ProductDfaBuilder<T, U> where T : IDfaState<T, char> where U : IDfaState<U, char>
         {
@@ -369,13 +377,15 @@ namespace Nicodem.Lexer
             }
         }
 
+        #endregion
+
         #region BareSourceWrappers
 
-        private struct BareOrigin : IOrigin<BareOrigin, BareLocation, BareLocation, BareFragment>
+        private struct BareOrigin : IOrigin<BareOrigin, ILocation, BareLocation, BareFragment>
         {
-            private readonly IOrigin _origin;
+            private readonly Source.IOrigin _origin;
 
-            public BareOrigin(IOrigin origin)
+            public BareOrigin(Source.IOrigin origin)
             {
                 _origin = origin;
             }
@@ -385,7 +395,7 @@ namespace Nicodem.Lexer
                 get { return new BareLocation(_origin.Begin); }
             }
 
-            public IOriginReader<BareOrigin, BareLocation, BareLocation, BareFragment> GetReader()
+            public IOriginReader<BareOrigin, ILocation, BareLocation, BareFragment> GetReader()
             {
                 return new BareOriginReader(_origin.GetReader());
             }
@@ -396,7 +406,7 @@ namespace Nicodem.Lexer
             }
         }
 
-        private struct BareOriginReader : IOriginReader<BareOrigin, BareLocation, BareLocation, BareFragment>
+        private struct BareOriginReader : IOriginReader<BareOrigin, ILocation, BareLocation, BareFragment>
         {
             private readonly IOriginReader _originReader;
 
@@ -415,14 +425,14 @@ namespace Nicodem.Lexer
                 get { return _originReader.CurrentCharacter; }
             }
 
-            public BareLocation MakeMemento()
+            public ILocation MakeMemento()
             {
-                return CurrentLocation;
+                return _originReader.CurrentLocation;
             }
 
-            public void Rollback(BareLocation memento)
+            public void Rollback(ILocation memento)
             {
-                _originReader.CurrentLocation = memento._location;
+                _originReader.CurrentLocation = memento;
             }
 
             public bool MoveNext()
@@ -431,7 +441,7 @@ namespace Nicodem.Lexer
             }
         }
 
-        private struct BareLocation : ILocation<BareOrigin, BareLocation, BareLocation, BareFragment>
+        private struct BareLocation : ILocation<BareOrigin, ILocation, BareLocation, BareFragment>
         {
             internal readonly ILocation _location;
 
@@ -446,7 +456,7 @@ namespace Nicodem.Lexer
             }
         }
 
-        private struct BareFragment : IFragment<BareOrigin, BareLocation, BareLocation, BareFragment>
+        private struct BareFragment : IFragment<BareOrigin, ILocation, BareLocation, BareFragment>
         {
             private readonly IFragment _fragment;
 
@@ -463,6 +473,122 @@ namespace Nicodem.Lexer
             public BareOrigin Origin
             {
                 get { return new BareOrigin(_fragment.Origin); }
+            }
+        }
+
+        #endregion
+
+        #region BareSourceInterfaces
+
+        private interface IFragment<TOrigin, TMemento, TLocation, TFragment>
+            where TOrigin : IOrigin<TOrigin, TMemento, TLocation, TFragment>
+            where TLocation : ILocation<TOrigin, TMemento, TLocation, TFragment>
+            where TFragment : IFragment<TOrigin, TMemento, TLocation, TFragment>
+        {
+            TOrigin Origin { get; }
+        }
+
+        private interface ILocation<TOrigin, TMemento, TLocation, TFragment>
+            where TOrigin : IOrigin<TOrigin, TMemento, TLocation, TFragment>
+            where TLocation : ILocation<TOrigin, TMemento, TLocation, TFragment>
+            where TFragment : IFragment<TOrigin, TMemento, TLocation, TFragment>
+        {
+            TOrigin Origin { get; }
+        }
+
+        private interface IOrigin<TOrigin, TMemento, TLocation, TFragment>
+            where TOrigin : IOrigin<TOrigin, TMemento, TLocation, TFragment>
+            where TLocation : ILocation<TOrigin, TMemento, TLocation, TFragment>
+            where TFragment : IFragment<TOrigin, TMemento, TLocation, TFragment>
+        {
+            TLocation begin { get; }
+            IOriginReader<TOrigin, TMemento, TLocation, TFragment> GetReader();
+
+            /// <summary>
+            ///     Tworzy fragment reprezentujący przedział od lokacji <paramref name="from" /> do lokacji <paramref name="to" />.
+            ///     <remarks>
+            ///         Obie lokacje powinny odnosić się do tego źródła.
+            ///     </remarks>
+            /// </summary>
+            /// <param name="from">Początek fragmentu</param>
+            /// <param name="to">Koniec fragmentu (znak wskazywany przez tą lokacje powinien NIE być częścią wynikowego fragmentu)</param>
+            /// <returns>Fragment reprezentujący dany przedział</returns>
+            TFragment MakeFragment(TLocation from, TLocation to);
+        }
+
+        /// <summary>
+        ///     Implementacja <see cref="IOrigin{T}" /> dostarcza implementacji funkcjonalności związanych z odczytem kodu
+        ///     źródłowego poprzez obiekty implementujące ten interfejs.
+        /// </summary>
+        private interface IOriginReader<TOrigin, TMemento, TLocation, TFragment>
+            where TOrigin : IOrigin<TOrigin, TMemento, TLocation, TFragment>
+            where TLocation : ILocation<TOrigin, TMemento, TLocation, TFragment>
+            where TFragment : IFragment<TOrigin, TMemento, TLocation, TFragment>
+        {
+            TLocation CurrentLocation { get; }
+            char CurrentCharacter { get; }
+
+            /// <summary>
+            ///     Tworzy pamiątke stanu obiektu. Może być później wykorzystana do przywrócenia zapamiętanego stanu.
+            /// </summary>
+            /// <returns>Dowolny obiekt</returns>
+            TMemento MakeMemento();
+
+            /// <summary>
+            ///     Przywraca stan obiektu do stanu z chwili wywołania funkcji <see cref="MakeMemento" /> które zwróciło obiekt
+            ///     przekazany jako <paramref name="memento" />. Wywołania funkcji <see cref="Rollback" /> będą się odbywać zawsze w
+            ///     odwrotnej kolejności do wywołań <see cref="MakeMemento" /> i nigdy nie pominą w ciągu wywołań żadnego obiektu
+            ///     zwróconego przez <see cref="MakeMemento" />.
+            /// </summary>
+            /// <param name="memento">Obiekt zwrócony przez wcześniejsze wywołanie <see cref="MakeMemento" /></param>
+            void Rollback(TMemento memento);
+
+            bool MoveNext();
+        }
+
+        /// <summary>
+        ///     Rezultat pracy Leksera.
+        /// </summary>
+        /// <typeparam name="TOrigin">Typ użytego źródła</typeparam>
+        /// <typeparam name="TMemento">
+        ///     Typ użytej pamiątki
+        ///     <see cref="IOriginReader{TOrigin,TMemento,TLocation,TFragment}.MakeMemento" />
+        /// </typeparam>
+        /// <typeparam name="TLocation">Typ lokacji</typeparam>
+        /// <typeparam name="TFragment">Typ fragmentu</typeparam>
+        private struct TokenizerResult<TOrigin, TMemento, TLocation, TFragment>
+            where TOrigin : IOrigin<TOrigin, TMemento, TLocation, TFragment>
+            where TLocation : ILocation<TOrigin, TMemento, TLocation, TFragment>
+            where TFragment : IFragment<TOrigin, TMemento, TLocation, TFragment>
+        {
+            private readonly TLocation _endLocation;
+            private readonly IEnumerable<Tuple<TFragment, IEnumerable<int>>> _tokens;
+
+            public TokenizerResult(IEnumerable<Tuple<TFragment, IEnumerable<int>>> tokens, TLocation endLocation)
+            {
+                _tokens = tokens;
+                _endLocation = endLocation;
+            }
+
+            /// <summary>
+            ///     Lista kolejnych tokenów na które udało się podzielić pewien prefiks źródła.
+            /// </summary>
+            /// <value>
+            ///     Każdy fragment oznacza przedział wewnątrz źródła. Jest powiązany z listą kategori (wyrażeń regularnych) do
+            ///     których należy dany przedział
+            /// </value>
+            public IEnumerable<Tuple<TFragment, IEnumerable<int>>> Tokens
+            {
+                get { return _tokens; }
+            }
+
+            /// <summary>
+            ///     Położenie końca ostatniego dopasowanego tokenu ze źródła. Jeżeli nie jest ono końcem źródło - czegoś zaczynając od
+            ///     pozycji <code>EndLocation</code> nie udało się dopasować.
+            /// </summary>
+            public TLocation EndLocation
+            {
+                get { return _endLocation; }
             }
         }
 

@@ -49,8 +49,6 @@
     <Compile Include="RegExFactory.cs" />
     <Compile Include="RegExEpsilon.cs" />
     <Compile Include="IDfa.cs" />
-    <Compile Include="IOriginLexerInterfaces.cs" />
-    <Compile Include="TokenizerResult.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
