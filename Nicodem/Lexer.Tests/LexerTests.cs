@@ -9,7 +9,7 @@ namespace Lexer.Tests
     internal class LexerTests
     {
         [Test]
-        private void LexerEmpty()
+        public void LexerEmpty()
         {
             foreach (var arr in new[] {new RegEx<char>[0], new[] {RegExFactory.Empty<char>()}  })
             {
@@ -26,7 +26,7 @@ namespace Lexer.Tests
         }
 
         [Test]
-        private void LexerEpsilon()
+        public void LexerEpsilon()
         {
             var lexer = new Nicodem.Lexer.Lexer(new[] { RegExFactory.Epsilon<char>() });
             var result = lexer.Process(new StringOrigin("")).ToArray();
