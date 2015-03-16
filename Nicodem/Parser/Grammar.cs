@@ -51,7 +51,34 @@ namespace Nicodem.Parser
 
 		internal bool HasLeftRecursion()
 		{
-			throw new NotImplementedException();
+            //check if is nullable available
+            if (Nullable == null)
+                throw new ArgumentNullException("Can not check left recursion without knowledge about Nullable");
+
+            //two functions on get sybol and check what is more, secondone get symbol and check nullable and go further
+
+            //colors white(0)/gray(1)/black(2)
+            var color = new Dictionary<Symbol, int>();
+
+            foreach (var symbol in Automatons.Keys)
+            {
+                if(color.ContainsKey(symbol))
+                    color[symbol] = 1;
+
+                //go dfs on nullable edge
+
+
+                var automata = Automatons[symbol];
+
+
+                //add every symbol to queue
+                foreach (var transition in automata.Start.Transitions)
+                {
+                    //if state shows two times report left recursion
+                }
+            }
+
+            return false;
 		}
 
         internal List<DFAState<Symbol>> GetAllAcceptingStates(IDfa<DFAState<Symbol>, Symbol> automaton)
