@@ -108,9 +108,50 @@ namespace Nicodem.Parser
             return false;
 		}
 
-        internal List<DFAState<Symbol>> GetAllAcceptingStates(IDfa<DFAState<Symbol>, Symbol> automaton)
+        // Returns the list of all accepting states of an automaton.
+        private List<DFAState<Symbol>> GetAllAcceptingStates(IDfa<DFAState<Symbol>, Symbol> automaton)
         {
-            throw new NotImplementedException();
+            var result = new List<DFAState<Symbol>>();
+            var queue = new Queue<DFAState<Symbol>>();
+            var visited = new HashSet<DFAState<Symbol>>();
+            queue.Enqueue(automaton.Start);
+
+            while(queue.Count > 0) {
+                var state = queue.Dequeue();
+                if(state.Accepting > 0)
+                    result.Add(state);
+                foreach(var kv in state.Transitions) {
+                    var nextState = kv.Value;
+                    if(!visited.Contains(nextState)) {
+                        visited.Add(nextState);
+                        queue.Enqueue(nextState);
+                    }
+                }
+            }
+            return result;
+        }
+
+        // Computes predecessors of states in all the grammar's automatons.
+        private Dictionary<DFAState<Symbol>,List<KeyValuePair<Symbol, DFAState<Symbol>>>> ComputePredecessors()
+        {
+            var predecessors = new Dictionary<DFAState<Symbol>, List<KeyValuePair<Symbol, DFAState<Symbol>>>>();
+            foreach(var dfa in Automatons.Values) {
+                var queue = new Queue<DFAState<Symbol>>();
+                var visited = new HashSet<DFAState<Symbol>>();
+                queue.Enqueue(dfa.Start);
+                while(queue.Count > 0) {
+                    var state = queue.Dequeue();
+                    foreach(var kv in state.Transitions) {
+                        var nextState = kv.Value;
+                        predecessors[nextState].Add(new KeyValuePair<Symbol, DFAState<Symbol>>(kv.Key,state));
+                        if(!visited.Contains(nextState)) {
+                            visited.Add(nextState);
+                            queue.Enqueue(nextState);
+                        }
+                    }
+                }
+            }
+            return predecessors;
         }
 
         internal void ComputeNullable()
@@ -135,6 +176,8 @@ namespace Nicodem.Parser
                 }
             }
 
+            var predecessors = ComputePredecessors();
+
             while(queue.Count > 0)
             {
                 var state = queue.Dequeue();
@@ -155,8 +198,7 @@ namespace Nicodem.Parser
                 } else {
                 // else, get the state's predecessors and enqueue all which have edge
                 // to the state over a nullable symbol. Put the rest into the conditional lists.
-                    var predecessors = state.Predecessors;
-                    foreach(var kv in predecessors)
+                    foreach(var kv in predecessors[state])
                     {
                         if(Nullable.Contains(kv.Key))
                             queue.Enqueue(kv.Value);
