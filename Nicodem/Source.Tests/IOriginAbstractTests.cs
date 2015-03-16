@@ -9,7 +9,6 @@ namespace Nicodem.Source.Tests
     public abstract class IOriginAbstractTests
     {
         public abstract IOrigin CreateOriginTest(string source);
-
         // --------- FIELDS ---------
         private IOrigin iOrigin;
         private IOriginReader iReader;
@@ -76,6 +75,21 @@ namespace Nicodem.Source.Tests
             Assert.AreEqual(source, readString.ToString());
         }
 
+		[Test]
+		public void ReadSourceWithEmptyLinesTest()
+		{
+			string source = "I \n\nlike reading \nsources!\n\n\nEspecially\nin\n tests.";
+			iOrigin = CreateOriginTest(source);
+			iReader = iOrigin.GetReader();
+
+			StringBuilder readString = new StringBuilder();
+			while (iReader.MoveNext())
+			{
+				readString.Append(iReader.CurrentCharacter);
+			}
+			Assert.AreEqual(source, readString.ToString());
+		}
+
         [Test]
         public void FalseMoveNextCallsTest()
         {
@@ -87,9 +101,6 @@ namespace Nicodem.Source.Tests
             Assert.IsFalse(iReader.MoveNext());
             Assert.IsFalse(iReader.MoveNext());
             Assert.IsFalse(iReader.MoveNext());
-
-            // TODO - reading character after false MoveNext should throw an exception
-            System.Console.WriteLine("after MoveNext: " + iReader.CurrentCharacter);
         }
 
         // --------- get/set location tests ---------

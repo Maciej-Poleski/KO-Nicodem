@@ -1,16 +1,26 @@
 ﻿using System;
+using System.IO;
 
 namespace Nicodem.Source
 {
     public class FileOrigin : IOrigin
     {
-        internal readonly FileLocation begin;
+        internal readonly OriginLocation begin;
+		internal readonly OriginLocation end;
         internal readonly String sourcePath;
+        internal readonly string[] sourceLines;
 
         public FileOrigin(String sourcePath)
         {
-            this.begin = FileLocation.BeginLocation(this);
+			this.begin = new OriginLocation(this, new OriginPosition(0,0));
             this.sourcePath = sourcePath;
+            this.sourceLines = File.ReadAllLines(sourcePath,System.Text.Encoding.UTF8);
+			int nLines = sourceLines.Length;
+			if (nLines == 0) {
+				this.end = begin;
+			} else {
+				this.end = new OriginLocation(this, new OriginPosition(nLines-1, sourceLines[nLines-1].Length));
+			}
         }
 
         public override string ToString()
@@ -19,24 +29,24 @@ namespace Nicodem.Source
         }
 
         // -------------- IOrigin methods --------------
-        public IOriginReader GetReader ()
+        public IOriginReader GetReader()
         {
             return new FileOriginReader(this);
         }
-        public IFragment MakeFragment (ILocation from, ILocation to)
+        public IFragment MakeFragment(ILocation from, ILocation to)
         {
             if (from.Origin == this && to.Origin == this)
             {
-                return new FileFragment(this, ((FileLocation)from).streamPos, ((FileLocation)to).streamPos);
+                return new OriginFragment(this, ((OriginLocation)from).pos, ((OriginLocation)to).pos);
             }
             else
             {
                 throw new ArgumentException("Invalid origin");
             }
         }
-        public ILocation Begin {
+		public ILocation Begin {
             get {
-                return begin;
+				return begin;
             }
         }
     }

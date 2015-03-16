@@ -1,58 +1,40 @@
-﻿using System;
-using System.IO;
+using System;
 
 namespace Nicodem.Source
 {
     public class FileOriginReader : IOriginReader
     {
         private FileOrigin origin;
-        private StreamReader reader;
-        private bool beforeBegin; // flag, if reader is positioned before first first character
+        private OriginLocation curLocation;
 
         public FileOriginReader(FileOrigin fileOrigin)
         {
             this.origin = fileOrigin;
-            this.reader = new StreamReader(new FileStream(origin.sourcePath, FileMode.Open), System.Text.Encoding.UTF8);
-            this.beforeBegin = true;
+            this.curLocation = origin.begin;
         }
 
         // -------------- IOriginReader methods --------------
-        public bool MoveNext ()
+        public bool MoveNext()
         {
-            if (beforeBegin)
-            {
-                beforeBegin = false;
+            if(origin.end.Equals(curLocation))
+                return false;
+            if(curLocation.pos.charNumber + 1 <= origin.sourceLines[curLocation.pos.lineNumber].Length) {
+                ++curLocation.pos.charNumber;
+            } else {
+                ++curLocation.pos.lineNumber;
+                curLocation.pos.charNumber = 0;
             }
-            else
-            {
-                reader.Read(); // pass one character
-            }
-            return reader.Peek() != -1;
+            return true;
         }
+
         public ILocation CurrentLocation {
             get {
-                return beforeBegin ? FileLocation.BeginLocation(origin) : new FileLocation(origin, reader.BaseStream.Position);
+                return curLocation;
             }
             set {
                 if (value.Origin == origin)
                 {
-                    FileLocation val = (FileLocation) value;
-                    if (val.IsOriginBegin())
-                    {
-                        System.Console.WriteLine("is begin ----> " + reader.Peek());
-                        reader.BaseStream.Position = 0;
-                        reader.DiscardBufferedData();
-                        System.Console.WriteLine("set to [0] --> " + reader.Peek());
-                        beforeBegin = true;
-                    }
-                    else
-                    {
-                        System.Console.WriteLine("not begin ---> " + reader.Peek());
-                        reader.BaseStream.Position = val.streamPos;
-                        reader.DiscardBufferedData();
-                        System.Console.WriteLine("set to: [" + val.streamPos + "] --> " + reader.Peek());
-                        beforeBegin = false;
-                    }
+                    curLocation.pos = ((OriginLocation)value).pos;
                 }
                 else
                 {
@@ -60,16 +42,20 @@ namespace Nicodem.Source
                 }
             }
         }
+
         public char CurrentCharacter {
             get {
-                return (char) reader.Peek();
+                if(curLocation.pos.charNumber == 0) {
+                    return '\n';
+                }
+                return origin.sourceLines[curLocation.pos.lineNumber][curLocation.pos.charNumber - 1];
             }
         }
 
         // -------------- IDisposable Dispose --------------
         public void Dispose()
         {
-            reader.Dispose();
         }
     }
 }
+
