@@ -49,33 +49,60 @@ namespace Nicodem.Parser
 			}
 		}
 
+        private bool DepthFirstSearchOnSymbol(Symbol symbol, Dictionary<DFAState<Symbol>,int> color)
+        {
+            var automata = Automatons[symbol];
+            return DepthFirstSearchOnState(automata.Start, color);
+        }
+
+        private bool DepthFirstSearchOnState(DFAState<Symbol> state, Dictionary<DFAState<Symbol>, int> color)
+        {
+            
+            //check if is visited or not
+            if (color.ContainsKey(state))
+            {
+                if (color[state] == 1)
+                    return true;
+                else
+                    return false;
+            }
+
+            color[state] = 1;
+
+            foreach (var transition in state.Transitions)
+            {
+                //for nullable keys go on the same automata
+                if (Nullable.Contains(transition.Key))
+                {
+                    if (DepthFirstSearchOnState(transition.Value, color)) 
+                        return true;
+                }
+
+                //for every key go on symbol
+                if (DepthFirstSearchOnSymbol(transition.Key, color)) 
+                    return true;
+            }
+
+            
+            color[state] = 2;
+
+            return false;
+        }
+
 		internal bool HasLeftRecursion()
 		{
             //check if is nullable available
             if (Nullable == null)
                 throw new ArgumentNullException("Can not check left recursion without knowledge about Nullable");
 
-            //two functions on get sybol and check what is more, secondone get symbol and check nullable and go further
+            //color of state white(0)/gray(1)/black(2)
+            var color = new Dictionary<DFAState<Symbol>, int>();
 
-            //colors white(0)/gray(1)/black(2)
-            var color = new Dictionary<Symbol, int>();
-
+            //try to search on every symbol
             foreach (var symbol in Automatons.Keys)
             {
-                if(color.ContainsKey(symbol))
-                    color[symbol] = 1;
-
-                //go dfs on nullable edge
-
-
-                var automata = Automatons[symbol];
-
-
-                //add every symbol to queue
-                foreach (var transition in automata.Start.Transitions)
-                {
-                    //if state shows two times report left recursion
-                }
+                if (DepthFirstSearchOnSymbol(symbol, color))
+                    return true;
             }
 
             return false;
