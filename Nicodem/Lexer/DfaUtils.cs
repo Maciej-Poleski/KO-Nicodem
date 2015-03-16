@@ -39,6 +39,10 @@ namespace Nicodem.Lexer
 		{
 			public uint Accepting { get; internal set; }
 			internal Dictionary<TSymbol, SimpleState<TSymbol>> Edges { get; set; }
+            internal SimpleState() 
+            {
+                Edges = new Dictionary<TSymbol, SimpleState<TSymbol>>();
+            }
 		}
 
 		private static MinimizedDfa<TSymbol> BuildNewDfa<TDfa, TDfaState, TSymbol> (TDfa dfa, PartitionRefinement<TDfaState> partition, IList<TDfaState> stateList) 
@@ -98,7 +102,7 @@ namespace Nicodem.Lexer
 			return newMinimizedDfa;
 		}
 
-		private static SortedSet<TDfaState> DFS<TDfa, TDfaState, TSymbol> (TDfaState currentState, SortedSet<TDfaState> result) 
+        private static HashSet<TDfaState> DFS<TDfa, TDfaState, TSymbol> (TDfaState currentState, HashSet<TDfaState> result) 
 			where TDfa : IDfa<TDfaState, TSymbol> where TDfaState : IDfaState<TDfaState, TSymbol> where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
 		{
 			if (!result.Contains (currentState))
@@ -117,7 +121,7 @@ namespace Nicodem.Lexer
 		private static IList<TDfaState> PrepareStateList<TDfa, TDfaState, TSymbol> (TDfa dfa) 
 			where TDfa : IDfa<TDfaState, TSymbol> where TDfaState : IDfaState<TDfaState, TSymbol> where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
 		{
-			SortedSet<TDfaState> result = new SortedSet<TDfaState>();
+            HashSet<TDfaState> result = new HashSet<TDfaState>();
 			var startState = dfa.Start;
 
 			return DFS<TDfa, TDfaState, TSymbol>(startState, result).ToList ();
