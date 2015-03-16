@@ -6,36 +6,53 @@ namespace Nicodem.Source
     public class FileOriginReader : IOriginReader
     {
         private FileOrigin origin;
-        private FileLocation lastLocation; // location in momet of get/set current location
         private StreamReader reader;
+        private bool beforeBegin; // flag, if reader is positioned before first first character
 
         public FileOriginReader(FileOrigin fileOrigin)
         {
             this.origin = fileOrigin;
-            this.lastLocation = origin.begin; //location is copied here, since it is struct
             this.reader = new StreamReader(new FileStream(origin.sourcePath, FileMode.Open), System.Text.Encoding.UTF8);
+            this.beforeBegin = true;
         }
 
         // -------------- IOriginReader methods --------------
         public bool MoveNext ()
         {
-            // TODO - what about first read?
-            if (reader.EndOfStream)
-                return false;
-            reader.Read();
-            return true;
+            if (beforeBegin)
+            {
+                beforeBegin = false;
+            }
+            else
+            {
+                reader.Read(); // pass one character
+            }
+            return reader.Peek() != -1;
         }
         public ILocation CurrentLocation {
             get {
-                lastLocation.streamPos = reader.BaseStream.Position;
-                // TODO maybe we should copy it before?
-                return lastLocation;
+                return beforeBegin ? FileLocation.BeginLocation(origin) : new FileLocation(origin, reader.BaseStream.Position);
             }
             set {
                 if (value.Origin == origin)
                 {
-                    lastLocation.streamPos = ((FileLocation)value).streamPos;
-                    reader.BaseStream.Position = lastLocation.streamPos;
+                    FileLocation val = (FileLocation) value;
+                    if (val.IsOriginBegin())
+                    {
+                        System.Console.WriteLine("is begin ----> " + reader.Peek());
+                        reader.BaseStream.Position = 0;
+                        reader.DiscardBufferedData();
+                        System.Console.WriteLine("set to [0] --> " + reader.Peek());
+                        beforeBegin = true;
+                    }
+                    else
+                    {
+                        System.Console.WriteLine("not begin ---> " + reader.Peek());
+                        reader.BaseStream.Position = val.streamPos;
+                        reader.DiscardBufferedData();
+                        System.Console.WriteLine("set to: [" + val.streamPos + "] --> " + reader.Peek());
+                        beforeBegin = false;
+                    }
                 }
                 else
                 {
@@ -47,6 +64,12 @@ namespace Nicodem.Source
             get {
                 return (char) reader.Peek();
             }
+        }
+
+        // -------------- IDisposable Dispose --------------
+        public void Dispose()
+        {
+            reader.Dispose();
         }
     }
 }

@@ -25,7 +25,6 @@ namespace Nicodem.Source
         }
         public ILocation CurrentLocation {
             get {
-                // maybe we should copy it before?
                 return curLocation;
             }
             set {
@@ -43,6 +42,11 @@ namespace Nicodem.Source
             get {
                 return origin.source[curLocation.pos];
             }
+        }
+
+        // -------------- IDisposable Dispose --------------
+        public void Dispose()
+        {
         }
     }
 }

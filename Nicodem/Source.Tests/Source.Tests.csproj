@@ -37,9 +37,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Compile Include="StringOriginTests.cs">
-      <DependentUpon>Test.cs</DependentUpon>
-    </Compile>
+    <Compile Include="StringOriginTests.cs" />
     <Compile Include="IOriginAbstractTests.cs" />
     <Compile Include="FileOriginTests.cs" />
   </ItemGroup>

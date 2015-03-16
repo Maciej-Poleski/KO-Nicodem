@@ -1,6 +1,8 @@
-﻿namespace Nicodem.Source
+﻿using System;
+
+namespace Nicodem.Source
 {
-    public interface IOriginReader
+    public interface IOriginReader : IDisposable
     {
         /// <summary>
         ///     ILocation object representing position in IOrigin. Before first call to MoveNext it

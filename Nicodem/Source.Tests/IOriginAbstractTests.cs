@@ -10,30 +10,34 @@ namespace Nicodem.Source.Tests
     {
         public abstract IOrigin CreateOriginTest(string source);
 
+        // --------- FIELDS ---------
+        private IOrigin iOrigin;
+        private IOriginReader iReader;
+
         // --------- initialization tests ---------
         [Test]
         public void BeginLocationOriginTest()
         {
             string source = "";
-            IOrigin sOrigin = CreateOriginTest(source);
-            Assert.AreSame(sOrigin.Begin.Origin, sOrigin);
+            iOrigin = CreateOriginTest(source);
+            Assert.AreSame(iOrigin.Begin.Origin, iOrigin);
         }
 
         [Test]
         public void GetLocationOriginTest()
         {
             string source = "XyZ";
-            IOrigin sOrigin = CreateOriginTest(source);
-            IOriginReader sReader = sOrigin.GetReader();
+            iOrigin = CreateOriginTest(source);
+            iReader = iOrigin.GetReader();
 
-            sReader.MoveNext(); // point to first character
-            ILocation loc1 = sReader.CurrentLocation;
+            iReader.MoveNext(); // point to first character
+            ILocation loc1 = iReader.CurrentLocation;
 
-            sReader.MoveNext();
-            ILocation loc2 = sReader.CurrentLocation;
+            iReader.MoveNext();
+            ILocation loc2 = iReader.CurrentLocation;
 
-            Assert.AreSame(loc1.Origin, sOrigin);
-            Assert.AreSame(loc2.Origin, sOrigin);
+            Assert.AreSame(loc1.Origin, iOrigin);
+            Assert.AreSame(loc2.Origin, iOrigin);
         }
 
         // --------- reading source tests ---------
@@ -41,33 +45,33 @@ namespace Nicodem.Source.Tests
         public void EmptySourceTest()
         {
             string source = "";
-            IOrigin sOrigin = CreateOriginTest(source);
-            IOriginReader sReader = sOrigin.GetReader();
-            Assert.IsFalse(sReader.MoveNext());
+            iOrigin = CreateOriginTest(source);
+            iReader = iOrigin.GetReader();
+            Assert.IsFalse(iReader.MoveNext());
         }
 
         [Test]
         public void OneCharacterSourceTest()
         {
             string source = "X";
-            IOrigin sOrigin = CreateOriginTest(source);
-            IOriginReader sReader = sOrigin.GetReader();
-            Assert.IsTrue(sReader.MoveNext());
-            Assert.AreEqual('X', sReader.CurrentCharacter);
-            Assert.IsFalse(sReader.MoveNext());
+            iOrigin = CreateOriginTest(source);
+            iReader = iOrigin.GetReader();
+            Assert.IsTrue(iReader.MoveNext());
+            Assert.AreEqual('X', iReader.CurrentCharacter);
+            Assert.IsFalse(iReader.MoveNext());
         }
 
         [Test]
         public void ReadTheWholeSourceTest()
         {
             string source = "I like reading sources!\nEspecially in tests.";
-            IOrigin sOrigin = CreateOriginTest(source);
-            IOriginReader sReader = sOrigin.GetReader();
+            iOrigin = CreateOriginTest(source);
+            iReader = iOrigin.GetReader();
 
             StringBuilder readString = new StringBuilder();
-            while (sReader.MoveNext())
+            while (iReader.MoveNext())
             {
-                readString.Append(sReader.CurrentCharacter);
+                readString.Append(iReader.CurrentCharacter);
             }
             Assert.AreEqual(source, readString.ToString());
         }
@@ -76,16 +80,16 @@ namespace Nicodem.Source.Tests
         public void FalseMoveNextCallsTest()
         {
             string source = "I like reading sources!\nEspecially in tests.";
-            IOrigin sOrigin = CreateOriginTest(source);
-            IOriginReader sReader = sOrigin.GetReader();
+            iOrigin = CreateOriginTest(source);
+            iReader = iOrigin.GetReader();
 
-            while (sReader.MoveNext());
-            Assert.IsFalse(sReader.MoveNext());
-            Assert.IsFalse(sReader.MoveNext());
-            Assert.IsFalse(sReader.MoveNext());
+            while (iReader.MoveNext());
+            Assert.IsFalse(iReader.MoveNext());
+            Assert.IsFalse(iReader.MoveNext());
+            Assert.IsFalse(iReader.MoveNext());
 
             // TODO - reading character after false MoveNext should throw an exception
-            System.Console.WriteLine("after MoveNext: " + sReader.CurrentCharacter);
+            System.Console.WriteLine("after MoveNext: " + iReader.CurrentCharacter);
         }
 
         // --------- get/set location tests ---------
@@ -94,62 +98,63 @@ namespace Nicodem.Source.Tests
         public void SetBeginLocationTest()
         {
             string source = "XyZ";
-            IOrigin sOrigin = CreateOriginTest(source);
-            IOriginReader sReader = sOrigin.GetReader();
-            sReader.MoveNext();
-            sReader.MoveNext();
-            sReader.CurrentLocation = sOrigin.Begin; // set reader before first character
-            sReader.MoveNext();
-            Assert.AreEqual('X', sReader.CurrentCharacter);
+            iOrigin = CreateOriginTest(source);
+            iReader = iOrigin.GetReader();
+            iReader.MoveNext();
+            iReader.MoveNext();
+            iReader.CurrentLocation = iOrigin.Begin; // set reader before first character
+            iReader.MoveNext();
+            Assert.AreEqual('X', iReader.CurrentCharacter);
         }
 
         [Test]
         public void SetOneLocationTest()
         {
             string source = "XyZ";
-            IOrigin sOrigin = CreateOriginTest(source);
-            IOriginReader sReader = sOrigin.GetReader();
+            iOrigin = CreateOriginTest(source);
+            iReader = iOrigin.GetReader();
 
-            sReader.MoveNext(); // point to first character
-            ILocation loc1 = sReader.CurrentLocation;
-            sReader.CurrentLocation = loc1;
-            Assert.AreEqual('X', sReader.CurrentCharacter);
+            iReader.MoveNext(); // point to first character
+            Assert.AreEqual('X', iReader.CurrentCharacter);
+            ILocation loc1 = iReader.CurrentLocation;
+            iReader.CurrentLocation = loc1;
+            Assert.AreEqual('X', iReader.CurrentCharacter);
         }
 
         [Test]
         public void SettingLocationsTest()
         {
             string source = "012";
-            IOrigin sOrigin = CreateOriginTest(source);
-            IOriginReader sReader = sOrigin.GetReader();
+            iOrigin = CreateOriginTest(source);
+            iReader = iOrigin.GetReader();
 
-            sReader.MoveNext(); // point to first character
-            char char1 = sReader.CurrentCharacter;
-            ILocation loc1 = sReader.CurrentLocation;
+            iReader.MoveNext(); // point to first character
+            char char1 = iReader.CurrentCharacter;
+            ILocation loc1 = iReader.CurrentLocation;
 
-            sReader.MoveNext(); // second character
-            char char2 = sReader.CurrentCharacter;
-            ILocation loc2 = sReader.CurrentLocation;
+            iReader.MoveNext(); // second character
+            char char2 = iReader.CurrentCharacter;
+            ILocation loc2 = iReader.CurrentLocation;
 
-            sReader.MoveNext(); // third character
-            char char3 = sReader.CurrentCharacter;
-            ILocation loc3 = sReader.CurrentLocation;
+            iReader.MoveNext(); // third character
+            char char3 = iReader.CurrentCharacter;
+            ILocation loc3 = iReader.CurrentLocation;
 
             // check if setting location works
 
-            sReader.CurrentLocation = loc1; // restore first character
-            Assert.AreEqual(char1, sReader.CurrentCharacter);
+            iReader.CurrentLocation = loc1; // restore first character
+            Assert.AreEqual(char1, iReader.CurrentCharacter);
 
-            sReader.MoveNext(); // go to the second
-            Assert.AreEqual(char2, sReader.CurrentCharacter);
+            iReader.MoveNext(); // go to the second
+            Assert.AreEqual(char2, iReader.CurrentCharacter);
 
-            sReader.CurrentLocation = loc3; // restore third
-            Assert.AreEqual(char3, sReader.CurrentCharacter);
+            iReader.CurrentLocation = loc3; // restore third
+            Assert.AreEqual(char3, iReader.CurrentCharacter);
 
-            Assert.IsFalse(sReader.MoveNext());
+            Assert.IsFalse(iReader.MoveNext());
 
-            sReader.CurrentLocation = loc2; // restore second character
-            Assert.AreEqual(char2, sReader.CurrentCharacter);
+            iReader.CurrentLocation = loc2; // restore second character
+            Assert.AreEqual(char2, iReader.CurrentCharacter);
         }
 
         // --------- location equality tests ---------
@@ -159,37 +164,47 @@ namespace Nicodem.Source.Tests
         public void InitialReaderLocationTest()
         {
             string source = "";
-            IOrigin sOrigin = CreateOriginTest(source);
-            IOriginReader sReader = sOrigin.GetReader();
-            Assert.AreEqual(sOrigin.Begin, sReader.CurrentLocation);
+            iOrigin = CreateOriginTest(source);
+            iReader = iOrigin.GetReader();
+            Assert.AreEqual(iOrigin.Begin, iReader.CurrentLocation);
         }
 
         [Test]
         public void NotEqualLocationsTest()
         {
             string source = "XXX";
-            IOrigin sOrigin = CreateOriginTest(source);
-            IOriginReader sReader = sOrigin.GetReader();
+            iOrigin = CreateOriginTest(source);
+            iReader = iOrigin.GetReader();
 
-            sReader.MoveNext(); // point to first character
-            ILocation loc1 = sReader.CurrentLocation;
-            sReader.MoveNext(); // second character
-            Assert.AreNotEqual(loc1, sReader.CurrentLocation);
+            iReader.MoveNext(); // point to first character
+            ILocation loc1 = iReader.CurrentLocation;
+            iReader.MoveNext(); // second character
+            Assert.AreNotEqual(loc1, iReader.CurrentLocation);
         }
 
         [Test]
         public void FalseMoveNextDoesntAffectLocationTest()
         {
             string source = "XXX";
-            IOrigin sOrigin = CreateOriginTest(source);
-            IOriginReader sReader = sOrigin.GetReader();
+            iOrigin = CreateOriginTest(source);
+            iReader = iOrigin.GetReader();
 
-            while (sReader.MoveNext()) ; // move to the end of the origin
+            while (iReader.MoveNext()) ; // move to the end of the origin
 
-            ILocation endLocation = sReader.CurrentLocation;
-            sReader.MoveNext();
-            sReader.MoveNext();
-            Assert.AreEqual(endLocation, sReader.CurrentLocation);
+            ILocation endLocation = iReader.CurrentLocation;
+            iReader.MoveNext();
+            iReader.MoveNext();
+            Assert.AreEqual(endLocation, iReader.CurrentLocation);
+        }
+
+        // --------- tear down method ---------
+        [TearDown]
+        public void DisposeReader()
+        {
+            if (iReader != null)
+            {
+                iReader.Dispose();
+            }
         }
     }
 }

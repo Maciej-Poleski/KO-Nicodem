@@ -7,10 +7,15 @@ namespace Nicodem.Source
         internal readonly FileLocation begin;
         internal readonly String sourcePath;
 
-        FileOrigin(String sourcePath)
+        public FileOrigin(String sourcePath)
         {
-            this.begin = new FileLocation(this, -1);
+            this.begin = FileLocation.BeginLocation(this);
             this.sourcePath = sourcePath;
+        }
+
+        public override string ToString()
+        {
+            return "FileOrigin of: " + sourcePath;
         }
 
         // -------------- IOrigin methods --------------
