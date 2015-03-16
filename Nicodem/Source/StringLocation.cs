@@ -4,10 +4,12 @@ namespace Nicodem.Source
     {
         internal readonly StringOrigin origin;
         internal int pos;
+
         internal StringLocation(StringOrigin origin, int pos){
             this.origin = origin;
             this.pos = pos;
         }
+
         // -------------- ILocation methods --------------
         public IOrigin Origin {
             get {
