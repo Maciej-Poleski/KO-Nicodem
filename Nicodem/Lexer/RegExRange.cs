@@ -5,13 +5,14 @@ namespace Nicodem.Lexer
 {
     public class RegExRange<T> : RegEx<T> where T : IComparable<T>, IEquatable<T>
     {
+        public T Character { private set; get; }
+
         internal RegExRange(T c)
         {
             TypeId = 1;
             Character = c;
         }
 
-        public T Character { private set; get; }
         // typeid diff if other is not star
         // c - other.c  otherwise
         public override int CompareTo(RegEx<T> other)

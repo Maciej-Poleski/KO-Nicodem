@@ -25,8 +25,7 @@ namespace Nicodem.Lexer
             if (diff != 0)
                 return diff;
 
-            for (var i = 0; i < Regexes.Length; i++)
-            {
+            for (var i = 0; i < Regexes.Length; i++) {
                 diff = Regexes[i].CompareTo(concat.Regexes[i]);
                 if (diff != 0)
                     return diff;

@@ -6,7 +6,8 @@ namespace Nicodem.Lexer
 {
     public class RegExUnion<T> : RegEx<T> where T : IComparable<T>, IEquatable<T>
     {
-        internal static readonly RegExUnion<T> RegexEmpty=new RegExUnion<T>(); 
+        internal static readonly RegExUnion<T> RegexEmpty = new RegExUnion<T>(); 
+
         internal RegExUnion(params RegEx<T>[] regexes)
         {
             TypeId = 5;

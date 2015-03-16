@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace Nicodem.Lexer
@@ -11,7 +10,6 @@ namespace Nicodem.Lexer
 
         internal RegExIntersection(params RegEx<T>[] regexes)
         {
-            Debug.Assert(regexes.Length > 0); // set intersection is defined for nonempty sets only
             TypeId = 6;
             Regexes = regexes;
         }
@@ -29,8 +27,7 @@ namespace Nicodem.Lexer
             if (diff != 0)
                 return diff;
 
-            for (var i = 0; i < Regexes.Length; i++)
-            {
+            for (var i = 0; i < Regexes.Length; i++) {
                 diff = Regexes[i].CompareTo(intersection.Regexes[i]);
                 if (diff != 0)
                     return diff;
@@ -48,7 +45,6 @@ namespace Nicodem.Lexer
                     return false;
                 }
             }
-            Debug.Assert(Regexes.Length > 0); // set intersection is defined for nonempty sets only
             return true;
         }
 

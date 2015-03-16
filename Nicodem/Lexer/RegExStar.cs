@@ -18,10 +18,8 @@ namespace Nicodem.Lexer
 		public override int CompareTo (RegEx<T> other)
 		{
 			var diff = TypeId - other.TypeId;
-			if (diff != 0) {
-				Console.WriteLine (diff);
+			if (diff != 0)
 				return diff;
-			}
 
 			var star = other as RegExStar<T>;
 			return Regex.CompareTo (star.Regex);
