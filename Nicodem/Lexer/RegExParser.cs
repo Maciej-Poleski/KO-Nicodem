@@ -10,15 +10,15 @@ namespace Nicodem.Lexer
         }
     }
 
-    public class RegExParser
+    public static class RegExParser
     {
-        private String regEx;
-        private int head;
+        private static String regEx;
+        private static int head;
 
-        public RegEx<char> Parse(String regEx)
+        public static RegEx<char> Parse(String regEx)
         {
-            this.head = 0;
-            this.regEx = regEx;
+            RegExParser.head = 0;
+            RegExParser.regEx = regEx;
 
             var node = ParseUnion();
             if(HasNext())
@@ -26,43 +26,45 @@ namespace Nicodem.Lexer
             return node;
         }
 
-        private char Peek()
+        private static char Peek()
         {
             if(!HasNext()) throw new ParseError();
             return regEx[head++];
         }
 
-        private bool HasNext()
+        private static bool HasNext()
         {
             return (head < regEx.Length);
         }
 
-        private void Accept(String s)
+        private static void Accept(String s)
         {
-            for(int i = 0; i < s.Length; ++i) 
-                if(!HasNext() || !Peek().Equals(s[i]))
-                    throw new ParseError();
+            if(!HasPrefix(s))
+                throw new ParseError();
+            Eat(s.Length);
         }
 
-        private void Eat(int howMany)
+        private static void Eat(int howMany)
         {
             if(head + howMany > regEx.Length) throw new ParseError();
             head += howMany;
         }
 
-        private bool HasPrefix(String s)
+        private static bool HasPrefix(String s)
         {
             if(head + s.Length > regEx.Length) return false;
             return regEx.Substring(head, s.Length).Equals(s);
         }
 
-        private RegEx<char> ParseUnion()
+        private static RegEx<char> ParseUnion()
         {
             var left = ParseConcat();
             if(HasPrefix("\\|"))
             {
                 Eat(2);
+
                 var right = ParseUnion();
+
                 if(right == null)
                     throw new ParseError();
                 return RegExFactory.Union(left, right);
@@ -71,7 +73,7 @@ namespace Nicodem.Lexer
             return left;
         }
 
-        private RegEx<char> ParseConcat()
+        private static RegEx<char> ParseConcat()
         {
             var left = ParseStar();
 
@@ -86,7 +88,7 @@ namespace Nicodem.Lexer
             return left;
         }
 
-        private RegEx<char> ParseStar()
+        private static RegEx<char> ParseStar()
         {
             var left = ParseAtom();
 
@@ -100,7 +102,7 @@ namespace Nicodem.Lexer
             return left;
         }
 
-        private RegEx<char> ParseAtom()
+        private static RegEx<char> ParseAtom()
         {
             if(HasPrefix("\\["))
             {
@@ -109,13 +111,13 @@ namespace Nicodem.Lexer
                 Accept("-");
                 var b = Peek();
                 Accept("\\]");
-                return RegExFactory.Range(a, b);
+                return RegExFactory.Range(a, (char)((int)b + 1));
             }
 
             if(HasNext() && !HasPrefix("\\"))
             {
                 var a = Peek();
-                return RegExFactory.Range(a,(char)((int)a+1));
+                return RegExFactory.Range(a,(char)((int)a + 1));
             }
 
             if(HasPrefix("\\^"))
