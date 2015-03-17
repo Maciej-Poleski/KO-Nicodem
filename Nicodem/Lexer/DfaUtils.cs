@@ -39,6 +39,10 @@ namespace Nicodem.Lexer
 		{
 			public uint Accepting { get; internal set; }
 			internal Dictionary<TSymbol, SimpleState<TSymbol>> Edges { get; set; }
+            internal SimpleState() 
+            {
+                Edges = new Dictionary<TSymbol, SimpleState<TSymbol>>();
+            }
 		}
 
 		private static MinimizedDfa<TSymbol> BuildNewDfa<TDfa, TDfaState, TSymbol> (TDfa dfa, PartitionRefinement<TDfaState> partition, IList<TDfaState> stateList) 
@@ -98,7 +102,7 @@ namespace Nicodem.Lexer
 			return newMinimizedDfa;
 		}
 
-		private static SortedSet<TDfaState> DFS<TDfa, TDfaState, TSymbol> (TDfaState currentState, SortedSet<TDfaState> result) 
+        private static HashSet<TDfaState> DFS<TDfa, TDfaState, TSymbol> (TDfaState currentState, HashSet<TDfaState> result) 
 			where TDfa : IDfa<TDfaState, TSymbol> where TDfaState : IDfaState<TDfaState, TSymbol> where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
 		{
 			if (!result.Contains (currentState))
@@ -117,7 +121,7 @@ namespace Nicodem.Lexer
 		private static IList<TDfaState> PrepareStateList<TDfa, TDfaState, TSymbol> (TDfa dfa) 
 			where TDfa : IDfa<TDfaState, TSymbol> where TDfaState : IDfaState<TDfaState, TSymbol> where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
 		{
-			SortedSet<TDfaState> result = new SortedSet<TDfaState>();
+            HashSet<TDfaState> result = new HashSet<TDfaState>();
 			var startState = dfa.Start;
 
 			return DFS<TDfa, TDfaState, TSymbol>(startState, result).ToList ();
@@ -202,6 +206,41 @@ namespace Nicodem.Lexer
 
         public delegate uint AmbiguityHandler(uint leftState, uint rightState);
 
+        internal class DfaStatesNotNullConcpetCheck<TDfa, TDfaState, TSymbol>
+            where TDfa : IDfa<TDfaState, TSymbol>
+            where TDfaState : IDfaState<TDfaState, TSymbol>
+            where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
+        {
+            private readonly HashSet<TDfaState> _visitedStates = new HashSet<TDfaState>();
+
+            private DfaStatesNotNullConcpetCheck()
+            {
+            }
+
+            [Conditional("DEBUG")]
+            internal static void CheckDfaStatesNotNull(TDfa dfa)
+            {
+                new DfaStatesNotNullConcpetCheck<TDfa, TDfaState, TSymbol>().Check(dfa.Start);
+            }
+
+            private void Check(TDfaState state)
+            {
+                if (state == null)
+                {
+                    Debug.Fail("Found null state in DFA");
+                }
+                if (_visitedStates.Contains(state))
+                    return;
+                _visitedStates.Add(state);
+                Debug.Assert(state.Transitions != null);
+                Debug.Assert(state.Transitions.Length > 0);
+                foreach (var transition in state.Transitions)
+                {
+                    Check(transition.Value);
+                }
+            }
+        }
+
         private static ProductDfa<TSymbol> MakeProductDfa<TLastDfa, TLastDfaState, TNewDfa, TNewDfaState, TSymbol>(
             TLastDfa lastDfa, TNewDfa newDfa, AmbiguityHandler handler)
             where TLastDfa : IDfa<TLastDfaState, TSymbol> where TLastDfaState : IDfaState<TLastDfaState, TSymbol>
@@ -209,8 +248,11 @@ namespace Nicodem.Lexer
             where TNewDfaState : IDfaState<TNewDfaState, TSymbol>
             where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
         {
-            return new ProductDfaBuilder<TLastDfaState, TNewDfaState, TSymbol>(handler).Build(lastDfa.Start,
+            var result = new ProductDfaBuilder<TLastDfaState, TNewDfaState, TSymbol>(handler).Build(lastDfa.Start,
                 newDfa.Start);
+            DfaStatesNotNullConcpetCheck<ProductDfa<TSymbol>, ProductDfaState<TSymbol>, TSymbol>.CheckDfaStatesNotNull(
+                result);
+            return result;
         }
 
         public static MinimizedDfa<TSymbol> MakeMinimizedProductDfa
@@ -222,9 +264,12 @@ namespace Nicodem.Lexer
             where TNewDfaState : IDfaState<TNewDfaState, TSymbol>
             where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
         {
-            return
+            var result =
                 MakeProductDfa<TLastDfa, TLastDfaState, TNewDfa, TNewDfaState, TSymbol>(lastDfa, newDfa, handler)
                     .Minimized<ProductDfa<TSymbol>, ProductDfaState<TSymbol>, TSymbol>();
+            DfaStatesNotNullConcpetCheck<MinimizedDfa<TSymbol>, MinimizedDfaState<TSymbol>, TSymbol>
+                .CheckDfaStatesNotNull(result);
+            return result;
         }
 
         private struct ProductDfaBuilder<TLastDfaState, TNewDfaState, TSymbol>
@@ -343,9 +388,11 @@ namespace Nicodem.Lexer
         internal static MinimizedDfa<TSymbol> MakeEmptyLanguageDfa<TSymbol>()
             where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
         {
-            return
-                new ProductDfa<TSymbol> {Start = ProductDfaState<TSymbol>.MakeDeadState()}
+            var result = new ProductDfa<TSymbol> {Start = ProductDfaState<TSymbol>.MakeDeadState()}
                     .Minimized<ProductDfa<TSymbol>, ProductDfaState<TSymbol>, TSymbol>();
+            DfaStatesNotNullConcpetCheck<MinimizedDfa<TSymbol>,MinimizedDfaState<TSymbol>,TSymbol>.CheckDfaStatesNotNull(result);
+            return result;
+
         }
 
         #endregion
