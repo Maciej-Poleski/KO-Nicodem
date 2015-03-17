@@ -29,6 +29,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="Mono.C5" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="RegexDfa.cs" />
