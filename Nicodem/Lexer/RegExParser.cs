@@ -67,6 +67,7 @@ namespace Nicodem.Lexer
 
                 if(right == null)
                     throw new ParseError();
+
                 return RegExFactory.Union(left, right);
             }
 
@@ -96,6 +97,10 @@ namespace Nicodem.Lexer
             {
                 while(HasPrefix("\\*"))
                     Eat(2);
+
+                if(left == null)
+                    throw new ParseError();
+
                 return RegExFactory.Star(left);
             }
 
