@@ -123,7 +123,7 @@ namespace Nicodem.Lexer
             if(HasPrefix("\\^"))
             {
                 Eat(2);
-                var node = ParseUnion();
+                var node = ParseAtom();
                 if(node == null)
                     throw new ParseError();
                 return RegExFactory.Complement(node);
