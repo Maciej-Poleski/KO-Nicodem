@@ -1,12 +1,12 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Nicodem.Source;
 using System.IO;
 
 namespace Nicodem.Source.Tests
 {
-	[TestFixture]
-	public class FileOriginTests : IOriginAbstractTests
-	{
+    [TestFixture]
+    public class FileOriginTests : IOriginAbstractTests
+    {
         private string tmpTestFilePath;
 
         [TestFixtureSetUp]
@@ -28,13 +28,12 @@ namespace Nicodem.Source.Tests
             System.Console.WriteLine("===================================");
         }
 
-		public override IOrigin CreateOriginTest(string source)
-		{
+        public override IOrigin CreateOriginTest(string source)
+        {
             System.Console.WriteLine("-> WRITING source to temporary file: \"" + source + "\"");
             File.WriteAllText(tmpTestFilePath, source);
             System.Console.WriteLine("DONE");
             return new FileOrigin(tmpTestFilePath);
-		}
-	}
+        }
+    }
 }
-

@@ -1,4 +1,4 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System;
 using System.Text;
 using Nicodem.Source;
@@ -68,27 +68,25 @@ namespace Nicodem.Source.Tests
             iReader = iOrigin.GetReader();
 
             StringBuilder readString = new StringBuilder();
-            while (iReader.MoveNext())
-            {
+            while (iReader.MoveNext()) {
                 readString.Append(iReader.CurrentCharacter);
             }
             Assert.AreEqual(source, readString.ToString());
         }
 
-		[Test]
-		public void ReadSourceWithEmptyLinesTest()
-		{
-			string source = "I \n\nlike reading \nsources!\n\n\nEspecially\nin\n tests.";
-			iOrigin = CreateOriginTest(source);
-			iReader = iOrigin.GetReader();
+        [Test]
+        public void ReadSourceWithEmptyLinesTest()
+        {
+            string source = "I \n\nlike reading \nsources!\n\n\nEspecially\nin\n tests.";
+            iOrigin = CreateOriginTest(source);
+            iReader = iOrigin.GetReader();
 
-			StringBuilder readString = new StringBuilder();
-			while (iReader.MoveNext())
-			{
-				readString.Append(iReader.CurrentCharacter);
-			}
-			Assert.AreEqual(source, readString.ToString());
-		}
+            StringBuilder readString = new StringBuilder();
+            while (iReader.MoveNext()) {
+                readString.Append(iReader.CurrentCharacter);
+            }
+            Assert.AreEqual(source, readString.ToString());
+        }
 
         [Test]
         public void FalseMoveNextCallsTest()
@@ -97,7 +95,7 @@ namespace Nicodem.Source.Tests
             iOrigin = CreateOriginTest(source);
             iReader = iOrigin.GetReader();
 
-            while (iReader.MoveNext());
+            while (iReader.MoveNext()) ;
             Assert.IsFalse(iReader.MoveNext());
             Assert.IsFalse(iReader.MoveNext());
             Assert.IsFalse(iReader.MoveNext());
@@ -212,8 +210,7 @@ namespace Nicodem.Source.Tests
         [TearDown]
         public void DisposeReader()
         {
-            if (iReader != null)
-            {
+            if (iReader != null) {
                 iReader.Dispose();
             }
         }
