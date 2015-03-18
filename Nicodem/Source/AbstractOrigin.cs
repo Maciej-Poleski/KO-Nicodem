@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using System.Text;
 
 namespace Nicodem.Source
 {
@@ -39,6 +39,39 @@ namespace Nicodem.Source
             get
             {
                 return begin;
+            }
+        }
+
+        public string GetText(IFragment fragment)
+        {
+            if (fragment.Origin == this) {
+                return this.GetText(fragment.GetBeginOriginPosition(), fragment.GetEndOriginPosition());
+            } else {
+                throw new ArgumentException("Invalid origin");
+            }
+        }
+
+        internal string GetText(OriginPosition beg, OriginPosition end)
+        {
+            --beg.LineNumber;
+            --end.LineNumber;
+            if (beg.LineNumber == end.LineNumber) {
+                if (beg.CharNumber == end.CharNumber)
+                    return "";
+                return sourceLines[beg.LineNumber].Substring(beg.CharNumber, end.CharNumber - beg.CharNumber);
+            }
+            else {
+                StringBuilder sb = new StringBuilder();
+                System.Console.WriteLine("!=");
+                sb.Append(sourceLines[beg.LineNumber].Substring(beg.CharNumber));
+                sb.Append('\n');
+                for (int line = beg.LineNumber + 1; line < end.LineNumber; ++line)
+                {
+                    sb.Append(sourceLines[line]);
+                    sb.Append('\n');
+                }
+                sb.Append(sourceLines[end.LineNumber].Substring(0, end.CharNumber));
+                return sb.ToString();
             }
         }
     }
