@@ -41,7 +41,7 @@ namespace Nicodem.Parser
                 List<IDfa<DFAState<Symbol>, Symbol>> automatons = new List<IDfa<DFAState<Symbol>, Symbol>>();
 				foreach (var production in symbolProductions.Value)
 				{
-                    automatons.Add(new RegexDfa<Symbol>(production.Rhs, productionMarker));
+                    automatons.Add(new RegExDfa<Symbol>(production.Rhs, productionMarker));
                     WhichProduction[productionMarker] = production;
 					productionMarker++;
 				}
