@@ -2,14 +2,14 @@ using System;
 
 namespace Nicodem.Source
 {
-    public class FileOriginReader : IOriginReader
+    public class OriginReader : IOriginReader
     {
-        private FileOrigin origin;
+        private AbstractOrigin origin;
         private OriginLocation curLocation;
 
-        public FileOriginReader(FileOrigin fileOrigin)
+        public OriginReader(AbstractOrigin origin)
         {
-            this.origin = fileOrigin;
+            this.origin = origin;
             this.curLocation = origin.begin;
         }
 
