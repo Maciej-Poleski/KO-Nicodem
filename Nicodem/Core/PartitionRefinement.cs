@@ -35,13 +35,6 @@ namespace Nicodem.Core
 			Difference.Remove (el);
 			return Intersection.AddLast (el.Value);
 		}
-
-		internal void swap()
-		{
-			LinkedList <T> tmp = Difference;
-			Difference = Intersection;
-			Intersection = tmp;
-		}
 	}
 
 	public class PartitionRefinement <T>
@@ -102,8 +95,13 @@ namespace Nicodem.Core
 			foreach (var partNode in changedNodes) {
 				var intersectionPart = new SetPartition<T> (partNode.Value.Intersection);
 				var node = partition.AddLast (intersectionPart);
+
 				if (!partNode.Value.Difference.Any ()) {
-					partNode.Value.swap ();
+                    foreach(T el in partNode.Value.Intersection) {
+                        var backIt = partNode.Value.Difference.AddLast(el);
+                        pointers[el].ToIterator = backIt;
+                    }
+                    partNode.Value.Intersection.Clear();
 				}
 
 				foreach (T el in partNode.Value.Intersection)
