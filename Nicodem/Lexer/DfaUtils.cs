@@ -152,6 +152,10 @@ namespace Nicodem.Lexer
                 else
                     P = S;
             }
+
+			if (L == array.Length || array [L].Key.CompareTo(c) != 0)
+				L--;
+
             return L;
         }
 
@@ -173,9 +177,10 @@ namespace Nicodem.Lexer
 
             ISet<LinkedList<TDfaState>> queue = new HashSet<LinkedList<TDfaState>>();
 
-			foreach (var set in stateGroups) {
-				if (set.Key != 0)
-					queue.Add (set.Value);
+            foreach (var state in stateList) {
+                var set = partition[state];
+                if (state.Accepting != 0 && !queue.Contains(set))
+					queue.Add (set);
 			}
  
 			while (queue.Count > 0) {
@@ -188,13 +193,18 @@ namespace Nicodem.Lexer
 
 					foreach (var state in stateList) {
                         var deltaState = state.Transitions[SimpleBinarySearch<TDfaState, TSymbol> (state.Transitions, c)].Value; //or upperbound?
-						if (partition [deltaState] == mainSet)
-							prevSet.AddFirst (state);
-					}
 
+                        if(partition[deltaState] == mainSet) 
+                            prevSet.AddFirst(state);
+					}
+						
 					var setsPartition = partition.Refine (prevSet);
 
 					foreach (var setPartition in setsPartition) {
+                        if(setPartition.Difference.Count == 0 || setPartition.Intersection.Count == 0) {
+                            continue;
+                        }
+
 						if (queue.Contains (setPartition.Difference)) {
 							queue.Add (setPartition.Intersection);
 						} else {
