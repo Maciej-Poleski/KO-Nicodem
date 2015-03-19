@@ -39,6 +39,8 @@
     <Compile Include="RegExFactoryTests.cs" />
     <Compile Include="RegExCompareToTests.cs" />
     <Compile Include="DfaUtilsTests.cs" />
+    <Compile Include="RegExParserTests.cs" />
+    <Compile Include="RegExDfaTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

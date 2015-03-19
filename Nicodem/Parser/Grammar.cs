@@ -14,8 +14,10 @@ namespace Nicodem.Parser
 		internal ISet<Symbol> Nullable { get; private set; }
 		internal IDictionary<Symbol, ISet<Symbol>> First { get; private set; }
 		internal IDictionary<Symbol, ISet<Symbol>> Follow { get; private set; }
-
-		// returns true if word belongs to the FIRST+ set for given term
+        IDictionary<IDfa<DFAState<Symbol>, Symbol>, List<DFAState<Symbol>>> acceptingStates;
+        IDictionary<DFAState<Symbol>,List<KeyValuePair<Symbol, DFAState<Symbol>>>> predecessors;
+		
+        // returns true if word belongs to the FIRST+ set for given term
 		internal bool InFirstPlus(Symbol term, Symbol word)
 		{
 			return First[term].Contains(word) || (Nullable.Contains(term) && Follow[term].Contains(word));
@@ -41,12 +43,14 @@ namespace Nicodem.Parser
                 List<IDfa<DFAState<Symbol>, Symbol>> automatons = new List<IDfa<DFAState<Symbol>, Symbol>>();
 				foreach (var production in symbolProductions.Value)
 				{
-                    automatons.Add(new RegexDfa<Symbol>(production.Rhs, productionMarker));
+                    automatons.Add(new RegExDfa<Symbol>(production.Rhs, productionMarker));
                     WhichProduction[productionMarker] = production;
 					productionMarker++;
 				}
                 Automatons[symbolProductions.Key] = ProductAutomaton(automatons.ToArray());
 			}
+            // necessary for computing Nullable and Follow sets
+            acceptingStates = new Dictionary<IDfa<DFAState<Symbol>, Symbol>, List<DFAState<Symbol>>>();
 		}
 
         private bool DepthFirstSearchOnSymbol(Symbol symbol, Dictionary<DFAState<Symbol>,int> color)
@@ -109,12 +113,17 @@ namespace Nicodem.Parser
 		}
 
         // Returns the list of all accepting states of an automaton.
-        private List<DFAState<Symbol>> GetAllAcceptingStates(IDfa<DFAState<Symbol>, Symbol> automaton)
+        private List<DFAState<Symbol>> GetAllAcceptingStates(IDfa<DFAState<Symbol>, Symbol> dfa)
         {
+            if(!acceptingStates.ContainsKey(dfa))
+                acceptingStates[dfa] = new List<DFAState<Symbol>>();
+            else
+                return acceptingStates[dfa];
+            
             var result = new List<DFAState<Symbol>>();
             var queue = new Queue<DFAState<Symbol>>();
             var visited = new HashSet<DFAState<Symbol>>();
-            queue.Enqueue(automaton.Start);
+            queue.Enqueue(dfa.Start);
 
             while(queue.Count > 0) {
                 var state = queue.Dequeue();
@@ -128,13 +137,14 @@ namespace Nicodem.Parser
                     }
                 }
             }
+            acceptingStates[dfa] = result;
             return result;
         }
 
         // Computes predecessors of states in all the grammar's automatons.
-        private Dictionary<DFAState<Symbol>,List<KeyValuePair<Symbol, DFAState<Symbol>>>> ComputePredecessors()
+        private void ComputePredecessors()
         {
-            var predecessors = new Dictionary<DFAState<Symbol>, List<KeyValuePair<Symbol, DFAState<Symbol>>>>();
+            predecessors = new Dictionary<DFAState<Symbol>, List<KeyValuePair<Symbol, DFAState<Symbol>>>>();
             foreach(var dfa in Automatons.Values) {
                 var queue = new Queue<DFAState<Symbol>>();
                 var visited = new HashSet<DFAState<Symbol>>();
@@ -151,7 +161,6 @@ namespace Nicodem.Parser
                     }
                 }
             }
-            return predecessors;
         }
 
         internal void ComputeNullable()
@@ -176,7 +185,7 @@ namespace Nicodem.Parser
                 }
             }
 
-            var predecessors = ComputePredecessors();
+            if(predecessors==null)ComputePredecessors();
 
             while(queue.Count > 0)
             {
@@ -210,6 +219,82 @@ namespace Nicodem.Parser
                     }
                 }
             }
+        }
+
+        private void ComputeFollow()
+        {
+            var follow = new Dictionary<Symbol, ISet<Symbol>>();
+            var queue = new Queue<DFAState<Symbol>>();
+            // stores (lhs symbol A, s) of production A -> dfa(E) where s is accepting state in dfa(E).
+            var lhsForAccStates = new Dictionary<DFAState<Symbol>, Symbol>();
+            if(predecessors==null)ComputePredecessors();
+            // at the beginning enqueue all accepting states
+            foreach(var kv in Automatons) {
+                var dfa = kv.Value;
+                var lhsSymbol = kv.Key;
+                foreach(var accstate in GetAllAcceptingStates(dfa))
+                    lhsForAccStates[accstate] = lhsSymbol;
+            }
+
+            bool changes = true;
+            // While there are any changes
+            while(changes) {
+                changes = false;
+                // Enqueue all accepting states from all automatons
+                foreach(var dfa in Automatons.Values)
+                    foreach(var accstate in GetAllAcceptingStates(dfa))
+                        queue.Enqueue(accstate);
+                   
+                while(queue.Count > 0) {
+                    var state = queue.Dequeue();
+                    // compute Follow set in the state i.e. the set-sum of 
+                    // Follow sets of all symbols from its outgoing edges.
+                    var followSetSum = new HashSet<Symbol>();
+                    foreach(var kv in state.Transitions){
+                        // symbol on the outgoing edge
+                        var outSymbol = kv.Key;
+                        // copy all symbols from First set
+                        if(First.ContainsKey(outSymbol))
+                            foreach(var s in First[outSymbol])
+                                followSetSum.Add(s);
+                        // if the outSymbol is nullable, copy also all symbols from its Follow set.
+                        if(Nullable.Contains(outSymbol) && follow.ContainsKey(outSymbol))
+                            foreach(var s in follow[outSymbol])
+                                followSetSum.Add(s);
+                    }
+
+                    // Additionally, if state is an accepting state in the dfa for production A -> dfa(E),
+                    // we should add to followSetSum all the symbols from Follow(A).
+                    if(state.Accepting > 0) {
+                        // lhsSymbol=A in production A->E
+                        var lhsSymbol = lhsForAccStates[state];
+                        if(follow.ContainsKey(lhsSymbol))
+                            foreach(var s in follow[lhsSymbol])
+                                followSetSum.Add(s);
+                    }
+                        
+                    // For all symbols on ingoing edges update their
+                    // follow sets adding symbols from followSetSum.
+                    foreach(var kv in predecessors[state]) {
+                        // symbol on the ingoing edge
+                        var inSymbol = kv.Key;
+                        // if localChange = true, i.e. follow set of the inSymbol
+                        // has been enlarged, a predecessor state is enqueued. 
+                        var localChange = false;
+                        if(!follow.ContainsKey(inSymbol))
+                            follow[inSymbol] = new HashSet<Symbol>();
+                        foreach(var s in followSetSum)
+                            if(!follow[inSymbol].Contains(s)) {
+                                changes = true;
+                                localChange = true;
+                                follow[inSymbol].Add(s);
+                            }
+                        if(localChange)
+                            queue.Enqueue(kv.Value);
+                    }
+                }//end while queue not empty
+            }//end while there are no changes
+            Follow = follow;
         }
 
         // FIRST(A) = { B \in Sigma : A ->* B\beta }

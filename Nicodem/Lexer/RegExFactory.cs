@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using C5;
 
 namespace Nicodem.Lexer
 {
@@ -65,10 +65,8 @@ namespace Nicodem.Lexer
         /// <param name="regexes">set of regexes</param>
         public static RegEx<T> Union<T>(params RegEx<T>[] regexes) where T : IComparable<T>, IEquatable<T>
         {
-            Array.Sort(regexes);
-
             // build list of all regexes
-            var list = new LinkedList<RegEx<T>>();
+            var list = new ArrayList<RegEx<T>>();
             foreach (var regex in regexes)
             {
                 // check if regex is empty
@@ -81,15 +79,15 @@ namespace Nicodem.Lexer
 
                 // other cases
                 var rconv = regex as RegExUnion<T>;
-                if (rconv != null)
-                    foreach (var r in rconv.Regexes)
-                        list.AddLast(r);
+                if(rconv != null)
+                    list.AddAll(rconv.Regexes);
                 else
-                    list.AddLast(regex);
+                    list.Add(regex);
             }
 
             // X + Y ~ Y + X
             // X + X ~ X
+            list.Sort();
             var distinct = list.Distinct().ToArray();
 
             // {X} -> X
@@ -109,10 +107,8 @@ namespace Nicodem.Lexer
         /// <param name="regexes">set of regexes</param>
         public static RegEx<T> Intersection<T>(params RegEx<T>[] regexes) where T : IComparable<T>, IEquatable<T>
         {
-            Array.Sort(regexes);
-
             // build list of all regexes
-            var list = new LinkedList<RegEx<T>>();
+            var list = new ArrayList<RegEx<T>>();
             foreach (var regex in regexes)
             {
                 // check if regex is empty
@@ -125,15 +121,15 @@ namespace Nicodem.Lexer
 
                 // other cases
                 var rconv = regex as RegExIntersection<T>;
-                if (rconv != null)
-                    foreach (var r in rconv.Regexes)
-                        list.AddLast(r);
+                if(rconv != null)
+                    list.AddAll(rconv.Regexes);
                 else
-                    list.AddLast(regex);
+                    list.Add(regex);
             }
 
             // X * Y ~ Y * X
             // X * X ~ X
+            list.Sort();
             var distinct = list.Distinct().ToArray();
 
             // {X} -> X
@@ -151,7 +147,7 @@ namespace Nicodem.Lexer
         public static RegEx<T> Concat<T>(params RegEx<T>[] regexes) where T : IComparable<T>, IEquatable<T>
         {
             // build list of all regexes
-            var list = new LinkedList<RegEx<T>>();
+            var list = new ArrayList<RegEx<T>>();
             foreach (var regex in regexes)
             {
                 // check if regex is empty
@@ -164,11 +160,10 @@ namespace Nicodem.Lexer
 
                 // other cases
                 var rconv = regex as RegExConcat<T>;
-                if (rconv != null)
-                    foreach (var r in rconv.Regexes)
-                        list.AddLast(r);
+                if(rconv != null)
+                    list.AddAll(rconv.Regexes);
                 else
-                    list.AddLast(regex);
+                    list.Add(regex);
             }
 
             // (XY)Z ~ X(YZ)

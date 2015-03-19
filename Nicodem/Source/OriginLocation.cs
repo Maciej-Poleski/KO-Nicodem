@@ -14,7 +14,7 @@ namespace Nicodem.Source
 
         public override string ToString()
         {
-            return "line: " + pos.lineNumber + ":" + pos.charNumber; 
+            return "line: " + pos.LineNumber + ":" + pos.CharNumber; 
         }
 
         // -------------- ILocation methods --------------
@@ -22,6 +22,13 @@ namespace Nicodem.Source
             get {
                 return origin;
             }
+        }
+
+        public OriginPosition GetOriginPosition()
+        {
+            OriginPosition res = pos;
+            ++res.LineNumber;
+            return res;
         }
     }
 }

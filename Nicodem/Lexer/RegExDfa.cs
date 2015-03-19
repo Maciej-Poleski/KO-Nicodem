@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 namespace Nicodem.Lexer
 {
-    public class RegexDfa<T> : IDfa<DFAState<T>, T> where T : IComparable<T>, IEquatable<T>
+    public class RegExDfa<T> : IDfa<DFAState<T>, T> where T : IComparable<T>, IEquatable<T>
     {
         private readonly uint accepting;
 
         private readonly SortedDictionary<RegEx<T>, DFAState<T>> dictionaryOfDfaStates =
             new SortedDictionary<RegEx<T>, DFAState<T>>();
 
-        public RegexDfa(RegEx<T> regEx, uint acceptingStateMarker)
+        public RegExDfa(RegEx<T> regEx, uint acceptingStateMarker)
         {
             accepting = acceptingStateMarker;
             Start = CalculateDfaState(regEx);
@@ -30,11 +30,7 @@ namespace Nicodem.Lexer
 
             foreach (var c in regEx.DerivChanges())
             {
-                var deriv = regEx.Derivative(c);
-                if (deriv == regEx)
-                    listOfTransitions.Add(new KeyValuePair<T, DFAState<T>>(c, null));
-                else
-                    listOfTransitions.Add(new KeyValuePair<T, DFAState<T>>(c, CalculateDfaState(regEx.Derivative(c))));
+                listOfTransitions.Add(new KeyValuePair<T, DFAState<T>>(c, CalculateDfaState(regEx.Derivative(c))));
             }
 
             if (regEx.HasEpsilon())

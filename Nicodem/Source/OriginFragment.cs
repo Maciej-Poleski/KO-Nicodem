@@ -19,6 +19,21 @@ namespace Nicodem.Source
                 return origin;
             }
         }
+
+        public OriginPosition GetBeginOriginPosition()
+        {
+            return new OriginPosition(beg.LineNumber + 1, beg.CharNumber);
+        }
+
+        public OriginPosition GetEndOriginPosition()
+        {
+            return new OriginPosition(end.LineNumber + 1, end.CharNumber);
+        }
+
+        public string GetOriginText()
+        {
+            return origin.GetText(this);
+        }
     }
 }
 

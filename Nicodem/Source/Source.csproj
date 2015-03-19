@@ -11,7 +11,7 @@
     <AssemblyName>Source</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <ProductVersion>12.0.0</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -33,28 +33,23 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System.Data, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=x86" />
+    <Reference Include="System.Xml, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbstractOrigin.cs" />
     <Compile Include="IFragment.cs" />
     <Compile Include="IOrigin.cs" />
     <Compile Include="IOriginReader.cs" />
     <Compile Include="ILocation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SourceDiagnostic.cs" />
     <Compile Include="StringOrigin.cs" />
-    <Compile Include="StringOriginReader.cs" />
-    <Compile Include="StringLocation.cs" />
-    <Compile Include="StringFragment.cs" />
     <Compile Include="OriginPosition.cs" />
     <Compile Include="OriginLocation.cs" />
     <Compile Include="OriginFragment.cs" />
     <Compile Include="FileOrigin.cs" />
-    <Compile Include="FileOriginReader.cs" />
+    <Compile Include="OriginReader.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

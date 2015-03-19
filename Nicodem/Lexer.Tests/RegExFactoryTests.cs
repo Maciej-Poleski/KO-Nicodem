@@ -53,6 +53,18 @@ namespace Lexer.Tests
 			Assert.AreEqual (0, union1.CompareTo (union2));
 		}
 
+        [Test]
+        public void Test_Sum_Associativity()
+        {
+            var regex1 = RegExFactory.Range('a');
+            var regex2 = RegExFactory.Range('b');
+            var regex3 = RegExFactory.Range('c');
+            var union1 = RegExFactory.Union(regex1, RegExFactory.Union(regex2, regex3));
+            var union2 = RegExFactory.Union(RegExFactory.Union(regex1, regex2), regex3);
+
+            Assert.AreEqual (0, union1.CompareTo (union2));
+        }
+
 		#endregion
 
 		#region Intersection
@@ -101,6 +113,18 @@ namespace Lexer.Tests
 
 			Assert.AreEqual (0, intersection1.CompareTo (intersection2));
 		}
+
+        [Test]
+        public void Test_Intersect_Associativity()
+        {
+            var regex1 = RegExFactory.Range('a');
+            var regex2 = RegExFactory.Range('b');
+            var regex3 = RegExFactory.Range('c');
+            var int1 = RegExFactory.Intersection(regex1, RegExFactory.Intersection(regex2, regex3));
+            var int2 = RegExFactory.Intersection(RegExFactory.Intersection(regex1, regex2), regex3);
+
+            Assert.AreEqual (0, int1.CompareTo (int2));
+        }
 
 		#endregion
 

@@ -13,5 +13,7 @@
         IOriginReader GetReader();
 
         IFragment MakeFragment(ILocation from, ILocation to);
+
+        string GetText(IFragment fragment);
     }
 }

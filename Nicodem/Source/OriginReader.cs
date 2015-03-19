@@ -2,14 +2,14 @@ using System;
 
 namespace Nicodem.Source
 {
-    public class FileOriginReader : IOriginReader
+    public class OriginReader : IOriginReader
     {
-        private FileOrigin origin;
+        private AbstractOrigin origin;
         private OriginLocation curLocation;
 
-        public FileOriginReader(FileOrigin fileOrigin)
+        public OriginReader(AbstractOrigin origin)
         {
-            this.origin = fileOrigin;
+            this.origin = origin;
             this.curLocation = origin.begin;
         }
 
@@ -18,11 +18,11 @@ namespace Nicodem.Source
         {
             if(origin.end.Equals(curLocation))
                 return false;
-            if(curLocation.pos.charNumber + 1 <= origin.sourceLines[curLocation.pos.lineNumber].Length) {
-                ++curLocation.pos.charNumber;
+            if(curLocation.pos.CharNumber + 1 <= origin.sourceLines[curLocation.pos.LineNumber].Length) {
+                ++curLocation.pos.CharNumber;
             } else {
-                ++curLocation.pos.lineNumber;
-                curLocation.pos.charNumber = 0;
+                ++curLocation.pos.LineNumber;
+                curLocation.pos.CharNumber = 0;
             }
             return true;
         }
@@ -45,10 +45,10 @@ namespace Nicodem.Source
 
         public char CurrentCharacter {
             get {
-                if(curLocation.pos.charNumber == 0) {
+                if(curLocation.pos.CharNumber == 0) {
                     return '\n';
                 }
-                return origin.sourceLines[curLocation.pos.lineNumber][curLocation.pos.charNumber - 1];
+                return origin.sourceLines[curLocation.pos.LineNumber][curLocation.pos.CharNumber - 1];
             }
         }
 

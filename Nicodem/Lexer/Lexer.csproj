@@ -8,8 +8,6 @@
     <RootNamespace>Nicodem.Lexer</RootNamespace>
     <AssemblyName>Lexer</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <ProductVersion>12.0.0</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,10 +28,12 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="C5" />
     <Reference Include="System" />
+    <Reference Include="Mono.C5" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="RegexDfa.cs" />
+    <Compile Include="RegExDfa.cs" />
     <Compile Include="DFAState.cs" />
     <Compile Include="DfaUtils.cs" />
     <Compile Include="IDfaState.cs" />
@@ -49,6 +49,7 @@
     <Compile Include="RegExFactory.cs" />
     <Compile Include="RegExEpsilon.cs" />
     <Compile Include="IDfa.cs" />
+    <Compile Include="RegExParser.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
