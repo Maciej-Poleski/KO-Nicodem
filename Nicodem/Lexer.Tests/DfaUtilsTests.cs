@@ -30,5 +30,11 @@ namespace Lexer.Tests
             Assert.AreEqual(stateList.Count, 2);
         }
 
+        [Test]
+        public void MinimizedEmpty()
+        {
+            DfaUtils.MakeEmptyLanguageDfa<char>();
+        }
+
     }
 }
