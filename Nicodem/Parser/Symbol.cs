@@ -8,6 +8,13 @@ namespace Nicodem.Parser
 		{
 		}
 
+        public static Symbol EOF
+        {
+            get {
+                throw new NotImplementedException();
+            }
+        }
+
 		public int CompareTo(Symbol other)
 		{
 			throw new NotImplementedException();

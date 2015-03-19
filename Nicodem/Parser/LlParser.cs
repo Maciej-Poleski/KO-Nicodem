@@ -14,62 +14,70 @@ namespace Nicodem.Parser
 		public LlParser(Grammar<TProduction> grammar)
 		{
 			if(grammar.HasLeftRecursion()) {
-				// TODO fail somehow
+                throw new ArgumentException("Grammar has left recursion");
 			}
             _grammar = grammar;
 		}
 
 		// TODO specify what happens when parser fails to eat the word
-		public IParseTree<TProduction> 
-			Parse(IEnumerable<IParseTree<TProduction>> word)
+        // At this moment return null when parsing fails
+        public IParseTree<TProduction> Parse(IEnumerable<IParseTree<TProduction>> word)
 		{
 			var memoizedWord = new MemoizedInput<IParseTree<TProduction>>(word);
-			// TODO check what if the whole input is not eaten
-			return ParseTerm(_grammar.Start, memoizedWord, memoizedWord.Begin).Tree;
+            var result = ParseTerm(_grammar.Start, memoizedWord, memoizedWord.Begin).ElementAt(0);
+
+            // whole input has to be eaten
+            if(result && result.Iterator == memoizedWord.End) {
+                return result.Tree;
+            } else {
+                return null;
+            }
 		}
 
-		private ParseResult ParseTerm(Symbol term, MemoizedInput<IParseTree<TProduction>> word, MemoizedInput<IParseTree<TProduction>>.Iterator input)
+        // returns either a list of successfull parsed results or a singleton list with failure 
+        private IEnumerable<ParseResult> ParseTerm(Symbol term, MemoizedInput<IParseTree<TProduction>> word, MemoizedInput<IParseTree<TProduction>>.Iterator input)
 		{
 			// stack for backtracking - <position in word, current state of appropriate DFA>
 			var dfa = _grammar.Automatons[term];
 			var st = new Stack<ParseState>(); 
 			var children = new Stack<IParseTree<TProduction>>(); 
+            bool accepted = false;
 
 			// the furthest in terms of position in the word parsed paths along with productions
-			var furthestParsed = new ParseScope(new List<IParseTree<TProduction>>(), input); // maybe used in future for error handling
-			ParseScope furthestAccepting = null;
+			var furthestParsed = new ParseScope(new List<IParseTree<TProduction>>(), input); // maybe used in the future for error handling
 
 			st.Push(new ParseState(dfa.Start, 0, input));
 
 			while(st.Any()) {
 				var node = st.Peek().State;
 				var it = st.Peek().Iterator;
+                Symbol currentSymbol = (it != word.End) ? it.Current.Symbol : Symbol.EOF;
 
-				if(node.Accepting > 0 && (furthestAccepting == null || it > furthestAccepting.Iterator)) {
-					var newFurthestAccepting = children.ToList();
-					newFurthestAccepting.Reverse();
-					furthestAccepting = new ParseScope(newFurthestAccepting, it);
+                if(node.Accepting > 0 && _grammar.Follow[term].Contains(currentSymbol)) {
+                    accepted = true;
+					var parsedChildren = children.ToList();
+					parsedChildren.Reverse();
+                    var parsedTree = new ParseBranch<TProduction>(); // TODO set it up
+                    yield return new ParseResult(parsedTree, it);
 				}
 
 				var trans = node.Transitions;
 				for(int i = st.Peek().TransitionIndex; i < trans.Length; i++) {
-					if(it == word.End) {
-						// TODO EOF - what to do?
-					} else if(_grammar.InFirstPlus(trans[i].Key, it.Current.Symbol)) {
 
-						if(_grammar.IsTerminal(it.Current.Symbol)) {
+                    if(_grammar.InFirstPlus(trans[i].Key, currentSymbol)) {
+                        if(_grammar.IsTerminal(currentSymbol) || currentSymbol == Symbol.EOF) {
 
 							children.Push(new ParseLeaf<TProduction>()); // TODO set the leaf appropriately
 							st.Push(new ParseState(trans[i].Value, 0, it.Next()));
 							break;
 						} else {
-
-							var nextResult = ParseTerm(trans[i].Key, word, it);
-							if(nextResult) {
-								children.Push(nextResult.Tree);
-								st.Push(new ParseState(trans[i].Value, 0, it));
-								break;
-							}
+                            IEnumerator<ParseResult> resultIt = ParseTerm(trans[i].Key, word, it).GetEnumerator();
+                            resultIt.MoveNext();
+                            if(resultIt.Current) {
+                                children.Push(resultIt.Current.Tree);
+                                st.Push(new ParseState(trans[i].Value, 0, resultIt.Current.Iterator, resultIt));
+                                break;
+                            }
 						}
 					}
 				}
@@ -81,30 +89,39 @@ namespace Nicodem.Parser
 						newFurthestParsed.Reverse();
 						furthestParsed = new ParseScope(newFurthestParsed, st.Peek().Iterator);
 					}
-					Backtrack(st);
+					Backtrack(st, children);
 				}
 			}
 
-			if(furthestAccepting != null) {
-				// can return an ok tree choosing
-				var branch = new ParseBranch<TProduction>(); // TODO setup branch appropriately
-				return new ParseResult(branch, furthestAccepting.Iterator);
+			if(accepted) {
+                yield break;
 			} else {
 				var branch = new ParseBranch<TProduction>(); // TODO setup branch appropriately
-				return new ParseResult(branch, furthestParsed.Iterator, false);
+				yield return new ParseResult(branch, furthestParsed.Iterator, false);
 			}
 		}
 
-		private static void Backtrack(Stack<ParseState> stack)
+        private static void Backtrack(Stack<ParseState> stack, Stack<IParseTree<TProduction>> children)
 		{
-			do {
-				stack.Pop();
-			} while(stack.Any() && stack.Peek().TransitionIndex + 1 >= stack.Peek().State.Transitions.Length);
+            while(stack.Any()) {
+                var state = stack.Pop();
+                if(children.Any()) {
+                    children.Pop();
+                }
 
-			if(stack.Any()) {
-				var oldPState = stack.Pop();
-				stack.Push(new ParseState(oldPState.State, oldPState.TransitionIndex + 1, oldPState.Iterator));
-			}
+                if(state.NextPossibleResult != null && state.NextPossibleResult.MoveNext()) {
+
+                    var nextRes = state.NextPossibleResult.Current;
+                    children.Push(nextRes.Tree);
+                    stack.Push(new ParseState(state.State, state.TransitionIndex, nextRes.Iterator, state.NextPossibleResult));
+                    return;
+                } else if(state.TransitionIndex + 1 < state.State.Transitions.Length) {
+
+                    stack.Push(new ParseState(state.State, state.TransitionIndex + 1, state.Iterator));
+                    return;
+                }
+
+            }
 		}
 
 		/* --- data types ----- */
@@ -113,13 +130,19 @@ namespace Nicodem.Parser
 			public DFAState<Symbol> State { get; private set; } 
 			public int TransitionIndex { get; private set; }
 			public MemoizedInput<IParseTree<TProduction>>.Iterator Iterator { get; private set; }
+            // used when function may return multiple ok results during one call
+            public IEnumerator<ParseResult> NextPossibleResult { get; private set; } 
 
-			public ParseState(DFAState<Symbol> state, int transitionIndex, MemoizedInput<IParseTree<TProduction>>.Iterator iterator)
+            public ParseState(DFAState<Symbol> state, 
+                int transitionIndex, 
+                MemoizedInput<IParseTree<TProduction>>.Iterator iterator, 
+                IEnumerator<ParseResult> nextPossibleResult = null)
 				: this()
 			{
 				State = state;
 				TransitionIndex = transitionIndex;
 				Iterator = iterator;
+                NextPossibleResult = nextPossibleResult;
 			}
 		}
 
@@ -156,6 +179,5 @@ namespace Nicodem.Parser
 				return result._ok;
 			}
 		}
-
 	}
 }
