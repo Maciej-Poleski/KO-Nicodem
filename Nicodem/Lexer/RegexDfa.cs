@@ -16,7 +16,7 @@ namespace Nicodem.Lexer
             Start = CalculateDfaState(regEx);
         }
 
-        public DFAState<T> Start { get; private set; }
+        public DFAState<T> Start { get; set; }
 
         private DFAState<T> CalculateDfaState(RegEx<T> regEx)
         {
