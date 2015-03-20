@@ -9,8 +9,10 @@ namespace Nicodem.Parser
 		public Symbol Symbol { get; private set; }
 		public IFragment Fragment { get; private set; }
 
-		public ParseLeaf()
+		public ParseLeaf(IFragment fragment, Symbol symbol)
 		{
+			Fragment = fragment;
+			Symbol = symbol;
 		}
 	}
 }

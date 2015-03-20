@@ -8,13 +8,17 @@ namespace Nicodem.Parser
 	internal class ParseBranch<TProduction> : IParseTree<TProduction>
 		where TProduction:IProduction
 	{
-		public Symbol Symbol { get; private set; }
 		public IFragment Fragment { get; private set; }
+		public Symbol Symbol { get; private set; }
 		public TProduction Production { get; private set; }
 		public IEnumerable<IParseTree<TProduction>> Children { get; private set; }
 
-		public ParseBranch()
+		public ParseBranch(IFragment fragment, Symbol symbol, TProduction production, IEnumerable<IParseTree<TProduction>> children)
 		{
+			Fragment = fragment;
+			Symbol = symbol;
+			Production = production;
+			Children = children;
 		}
 	}
 }

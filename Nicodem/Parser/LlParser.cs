@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections;
 using Nicodem.Lexer;
 using Nicodem.Core;
+using Nicodem.Source;
 
 namespace Nicodem.Parser
 {
@@ -19,7 +20,6 @@ namespace Nicodem.Parser
             _grammar = grammar;
 		}
 
-		// TODO specify what happens when parser fails to eat the word
         // At this moment return null when parsing fails
         public IParseTree<TProduction> Parse(IEnumerable<IParseTree<TProduction>> word)
 		{
@@ -57,7 +57,12 @@ namespace Nicodem.Parser
                     accepted = true;
 					var parsedChildren = children.ToList();
 					parsedChildren.Reverse();
-                    var parsedTree = new ParseBranch<TProduction>(); // TODO set it up
+					var parsedTree = new ParseBranch<TProduction>(
+						GetFragmentRange(input.Current.Fragment, children.Peek().Fragment),
+						term, 
+						_grammar.WhichProduction[node.Accepting], 
+						parsedChildren);
+
                     yield return new ParseResult(parsedTree, it);
 				}
 
@@ -67,13 +72,13 @@ namespace Nicodem.Parser
                     if(_grammar.InFirstPlus(trans[i].Key, currentSymbol)) {
                         if(_grammar.IsTerminal(currentSymbol) || currentSymbol == Symbol.EOF) {
 
-							children.Push(new ParseLeaf<TProduction>()); // TODO set the leaf appropriately
+							children.Push(new ParseLeaf<TProduction>(it.Current.Fragment, currentSymbol));
 							st.Push(new ParseState(trans[i].Value, 0, it.Next()));
 							break;
 						} else {
                             IEnumerator<ParseResult> resultIt = ParseTerm(trans[i].Key, word, it).GetEnumerator();
                             resultIt.MoveNext();
-                            if(resultIt.Current) {
+                            if(resultIt.Current) { // TODO else and look at the furthest parsed
                                 children.Push(resultIt.Current.Tree);
                                 st.Push(new ParseState(trans[i].Value, 0, resultIt.Current.Iterator, resultIt));
                                 break;
@@ -96,7 +101,11 @@ namespace Nicodem.Parser
 			if(accepted) {
                 yield break;
 			} else {
-				var branch = new ParseBranch<TProduction>(); // TODO setup branch appropriately
+				var branch = new ParseBranch<TProduction>(
+					GetFragmentRange(input.Current.Fragment, furthestParsed.Children.Last().Fragment), 
+						term, 
+						_grammar.Productions[term][0],  // TODO could not parse any productions
+						furthestParsed.Children);
 				yield return new ParseResult(branch, furthestParsed.Iterator, false);
 			}
 		}
@@ -122,6 +131,10 @@ namespace Nicodem.Parser
                 }
 
             }
+		}
+
+		private static IFragment GetFragmentRange(IFragment begin, IFragment end) {
+			return new OriginFragment(begin.Origin, begin.GetBeginOriginPosition(), end.GetEndOriginPosition());
 		}
 
 		/* --- data types ----- */
