@@ -12,5 +12,10 @@ namespace Nicodem.Lexer
         public KeyValuePair<T, DFAState<T>>[] Transitions { get; internal set; }
 
         public DFAState(){}
+        public DFAState(uint accepting, KeyValuePair<T, DFAState<T>>[] transitions)
+        {
+            Accepting = accepting;
+            Transitions = transitions;
+        }
     }
 }

@@ -10,6 +10,11 @@ namespace Nicodem.Lexer
         private readonly SortedDictionary<RegEx<T>, DFAState<T>> dictionaryOfDfaStates =
             new SortedDictionary<RegEx<T>, DFAState<T>>();
 
+        public RegExDfa(DFAState<T> start)
+        {
+            Start = start;
+        }
+
         public RegExDfa(RegEx<T> regEx, uint acceptingStateMarker)
         {
             accepting = acceptingStateMarker;
