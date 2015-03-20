@@ -6,8 +6,8 @@ namespace Nicodem.Lexer
 	public interface IDfaState<TDfaState, TSymbol> where TDfaState : IDfaState<TDfaState, TSymbol>
         where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
     {
-        uint Accepting { get; }
-        KeyValuePair<TSymbol, TDfaState>[] Transitions { get; }
+        uint Accepting { get; set; }
+        KeyValuePair<TSymbol, TDfaState>[] Transitions { get; set; }
     }
 
     internal static class Extensions
