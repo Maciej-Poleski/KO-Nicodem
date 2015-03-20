@@ -51,6 +51,8 @@
     <Compile Include="Grammar.cs" />
     <Compile Include="ParseBranch.cs" />
     <Compile Include="ParseLeaf.cs" />
+    <Compile Include="Dfa.cs" />
+    <Compile Include="DfaState.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

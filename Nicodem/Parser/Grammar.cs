@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Nicodem.Lexer;
 
 namespace Nicodem.Parser
 {
@@ -9,13 +8,13 @@ namespace Nicodem.Parser
 	{
 		public Symbol Start { get; private set; }
 		public IDictionary<Symbol, TProduction[]> Productions { get; private set; } 
-		internal IDictionary<Symbol, IDfa<DFAState<Symbol>, Symbol>> Automatons { get; private set; }
+		internal IDictionary<Symbol, Dfa<Symbol>> Automatons { get; private set; }
 		internal IDictionary<uint, TProduction> WhichProduction { get; private set; } // accepting state marker -> production
 		internal ISet<Symbol> Nullable { get; private set; }
 		internal IDictionary<Symbol, ISet<Symbol>> First { get; private set; }
 		internal IDictionary<Symbol, ISet<Symbol>> Follow { get; private set; }
-        IDictionary<IDfa<DFAState<Symbol>, Symbol>, List<DFAState<Symbol>>> acceptingStates;
-        IDictionary<DFAState<Symbol>,List<KeyValuePair<Symbol, DFAState<Symbol>>>> predecessors;
+		IDictionary<Dfa<Symbol>, List<DfaState<Symbol>>> acceptingStates;
+		IDictionary<DfaState<Symbol>,List<KeyValuePair<Symbol, DfaState<Symbol>>>> predecessors;
 		
         // returns true if word belongs to the FIRST+ set for given term
 		internal bool InFirstPlus(Symbol term, Symbol word)
@@ -27,12 +26,7 @@ namespace Nicodem.Parser
 		{
 			return Productions[term].Length == 0;
 		}
-
-        private IDfa<DFAState<Symbol>, Symbol> ProductAutomaton(IDfa<DFAState<Symbol>, Symbol>[] automatons) {
-            // TODO: It is implemented in Lexer but needs to be made public.
-            throw new NotImplementedException();
-        }
-
+			
         public Grammar(IDictionary<Symbol, TProduction[]> productions)
 		{
             Productions = productions;
@@ -40,26 +34,26 @@ namespace Nicodem.Parser
 			uint productionMarker = 1;
 			foreach (var symbolProductions in Productions)
 			{
-                List<IDfa<DFAState<Symbol>, Symbol>> automatons = new List<IDfa<DFAState<Symbol>, Symbol>>();
+				var automatons = new List<Dfa<Symbol>>();
 				foreach (var production in symbolProductions.Value)
 				{
-                    automatons.Add(new RegExDfa<Symbol>(production.Rhs, productionMarker));
+					automatons.Add(Dfa<Symbol>.RegexDfa(production.Rhs, productionMarker));
                     WhichProduction[productionMarker] = production;
 					productionMarker++;
 				}
-                Automatons[symbolProductions.Key] = ProductAutomaton(automatons.ToArray());
+				Automatons[symbolProductions.Key] = Dfa<Symbol>.ProductDfa(automatons.ToArray());
 			}
             // necessary for computing Nullable and Follow sets
-            acceptingStates = new Dictionary<IDfa<DFAState<Symbol>, Symbol>, List<DFAState<Symbol>>>();
+			acceptingStates = new Dictionary<Dfa<Symbol>, List<DfaState<Symbol>>>();
 		}
 
-        private bool DepthFirstSearchOnSymbol(Symbol symbol, Dictionary<DFAState<Symbol>,int> color)
+        private bool DepthFirstSearchOnSymbol(Symbol symbol, Dictionary<DfaState<Symbol>,int> color)
         {
             var automata = Automatons[symbol];
             return DepthFirstSearchOnState(automata.Start, color);
         }
 
-        private bool DepthFirstSearchOnState(DFAState<Symbol> state, Dictionary<DFAState<Symbol>, int> color)
+        private bool DepthFirstSearchOnState(DfaState<Symbol> state, Dictionary<DfaState<Symbol>, int> color)
         {
             
             //check if is visited or not
@@ -100,7 +94,7 @@ namespace Nicodem.Parser
                 throw new ArgumentNullException("Can not check left recursion without knowledge about Nullable");
 
             //color of state white(0)/gray(1)/black(2)
-            var color = new Dictionary<DFAState<Symbol>, int>();
+            var color = new Dictionary<DfaState<Symbol>, int>();
 
             //try to search on every symbol
             foreach (var symbol in Automatons.Keys)
@@ -113,16 +107,16 @@ namespace Nicodem.Parser
 		}
 
         // Returns the list of all accepting states of an automaton.
-        private List<DFAState<Symbol>> GetAllAcceptingStates(IDfa<DFAState<Symbol>, Symbol> dfa)
+		private List<DfaState<Symbol>> GetAllAcceptingStates(Dfa<Symbol> dfa)
         {
             if(!acceptingStates.ContainsKey(dfa))
-                acceptingStates[dfa] = new List<DFAState<Symbol>>();
+                acceptingStates[dfa] = new List<DfaState<Symbol>>();
             else
                 return acceptingStates[dfa];
             
-            var result = new List<DFAState<Symbol>>();
-            var queue = new Queue<DFAState<Symbol>>();
-            var visited = new HashSet<DFAState<Symbol>>();
+            var result = new List<DfaState<Symbol>>();
+            var queue = new Queue<DfaState<Symbol>>();
+            var visited = new HashSet<DfaState<Symbol>>();
             queue.Enqueue(dfa.Start);
 
             while(queue.Count > 0) {
@@ -144,16 +138,16 @@ namespace Nicodem.Parser
         // Computes predecessors of states in all the grammar's automatons.
         private void ComputePredecessors()
         {
-            predecessors = new Dictionary<DFAState<Symbol>, List<KeyValuePair<Symbol, DFAState<Symbol>>>>();
+            predecessors = new Dictionary<DfaState<Symbol>, List<KeyValuePair<Symbol, DfaState<Symbol>>>>();
             foreach(var dfa in Automatons.Values) {
-                var queue = new Queue<DFAState<Symbol>>();
-                var visited = new HashSet<DFAState<Symbol>>();
+                var queue = new Queue<DfaState<Symbol>>();
+                var visited = new HashSet<DfaState<Symbol>>();
                 queue.Enqueue(dfa.Start);
                 while(queue.Count > 0) {
                     var state = queue.Dequeue();
                     foreach(var kv in state.Transitions) {
                         var nextState = kv.Value;
-                        predecessors[nextState].Add(new KeyValuePair<Symbol, DFAState<Symbol>>(kv.Key,state));
+                        predecessors[nextState].Add(new KeyValuePair<Symbol, DfaState<Symbol>>(kv.Key,state));
                         if(!visited.Contains(nextState)) {
                             visited.Add(nextState);
                             queue.Enqueue(nextState);
@@ -166,10 +160,10 @@ namespace Nicodem.Parser
         internal void ComputeNullable()
         {
             // For productions A -> E startStatesLhs maps start state of automaton of E to A
-            var startStatesLhs = new Dictionary<DFAState<Symbol>, Symbol>();
+            var startStatesLhs = new Dictionary<DfaState<Symbol>, Symbol>();
             // conditional stores states which will be enqueued as soon as Symbol turns out to be nullable.
-            var conditional = new Dictionary<Symbol, List<DFAState<Symbol>>>();
-            var queue = new Queue<DFAState<Symbol>>();
+            var conditional = new Dictionary<Symbol, List<DfaState<Symbol>>>();
+            var queue = new Queue<DfaState<Symbol>>();
 
             foreach(var symbol in Automatons.Keys)
             {
@@ -213,7 +207,7 @@ namespace Nicodem.Parser
                             queue.Enqueue(kv.Value);
                         else {
                             if(!conditional.ContainsKey(kv.Key))
-                                conditional.Add(kv.Key, new List<DFAState<Symbol>>());
+                                conditional.Add(kv.Key, new List<DfaState<Symbol>>());
                             conditional[kv.Key].Add(kv.Value);
                         }
                     }
@@ -224,9 +218,9 @@ namespace Nicodem.Parser
         private void ComputeFollow()
         {
             var follow = new Dictionary<Symbol, ISet<Symbol>>();
-            var queue = new Queue<DFAState<Symbol>>();
+            var queue = new Queue<DfaState<Symbol>>();
             // stores (lhs symbol A, s) of production A -> dfa(E) where s is accepting state in dfa(E).
-            var lhsForAccStates = new Dictionary<DFAState<Symbol>, Symbol>();
+            var lhsForAccStates = new Dictionary<DfaState<Symbol>, Symbol>();
             if(predecessors==null)ComputePredecessors();
             // at the beginning enqueue all accepting states
             foreach(var kv in Automatons) {
@@ -319,7 +313,7 @@ namespace Nicodem.Parser
 
                 // perform BFS from automata startstate
                 // using only edges labeled by symbols from nullable set
-                var Q = new Queue<DFAState<Symbol>>();
+                var Q = new Queue<DfaState<Symbol>>();
                 Q.Enqueue(automata.Start);
 
                 while(Q.Count > 0) {

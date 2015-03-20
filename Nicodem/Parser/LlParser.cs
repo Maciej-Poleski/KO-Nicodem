@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
-using Nicodem.Lexer;
 using Nicodem.Core;
 using Nicodem.Source;
 
@@ -140,13 +139,13 @@ namespace Nicodem.Parser
 		/* --- data types ----- */
 		private struct ParseState
 		{
-			public DFAState<Symbol> State { get; private set; } 
+			public DfaState<Symbol> State { get; private set; } 
 			public int TransitionIndex { get; private set; }
 			public MemoizedInput<IParseTree<TProduction>>.Iterator Iterator { get; private set; }
             // used when function may return multiple ok results during one call
             public IEnumerator<ParseResult> NextPossibleResult { get; private set; } 
 
-            public ParseState(DFAState<Symbol> state, 
+            public ParseState(DfaState<Symbol> state, 
                 int transitionIndex, 
                 MemoizedInput<IParseTree<TProduction>>.Iterator iterator, 
                 IEnumerator<ParseResult> nextPossibleResult = null)
