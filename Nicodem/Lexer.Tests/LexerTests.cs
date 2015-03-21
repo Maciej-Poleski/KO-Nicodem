@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Nicodem.Lexer;
 using Nicodem.Source;
 using NUnit.Framework;
@@ -26,13 +28,10 @@ namespace Lexer.Tests
         }
 
         [Test]
-        public void LexerEpsilon()
+        public void LexerSingleRange()
         {
-            var lexer = new Nicodem.Lexer.Lexer(new[] { RegExFactory.Epsilon<char>() });
-            var result = lexer.Process(new StringOrigin("")).ToArray();
-            Assert.Equals(result.Length, 1);
-            Assert.Equals(result[0].Item2.ToArray(), new[] {0});
-            // IFragment.GetString missing?
+            var lexer = new Nicodem.Lexer.Lexer(new[] { MakeCharRangeRegex('b','d')});
+            Assert.IsEmpty(lexer.Process(new StringOrigin("")));
             Assert.IsEmpty(lexer.Process(new StringOrigin(" ")));
             Assert.IsEmpty(lexer.Process(new StringOrigin("a")));
             Assert.IsEmpty(lexer.Process(new StringOrigin("asdf")));
@@ -40,6 +39,15 @@ namespace Lexer.Tests
             Assert.IsEmpty(lexer.Process(new StringOrigin("*^& GY?'\t\n\t\tlikjd")));
             Assert.IsEmpty(lexer.Process(new StringOrigin("\\")));
             Assert.IsEmpty(lexer.Process(new StringOrigin("\\n")));
+            Assert.IsEmpty(Process(lexer, "ba"));
+            Assert.IsEmpty(Process(lexer, "bb"));
+            Assert.IsEmpty(Process(lexer, "ab"));
+            Assert.IsEmpty(Process(lexer, "db"));
+        }
+
+        private static IEnumerable<Tuple<IFragment, IEnumerable<int>>> Process(Nicodem.Lexer.Lexer lexer, string s)
+        {
+            return lexer.Process(new StringOrigin(s));
         }
 
         private static RegEx<char> MakeCharRangeRegex(char a, char b)
