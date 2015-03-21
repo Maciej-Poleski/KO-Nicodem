@@ -3,7 +3,7 @@ using Nicodem.Lexer;
 
 namespace Nicodem.Parser
 {
-	internal class Dfa<TSymbol> 
+	public class Dfa<TSymbol> 
 		where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
 	{
 		private DfaUtils.MinimizedDfa<TSymbol> wrappedDfa;

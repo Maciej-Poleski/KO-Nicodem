@@ -53,8 +53,12 @@
     <Compile Include="Dfa.cs" />
     <Compile Include="DfaState.cs" />
     <Compile Include="ISymbol.cs" />
+    <Compile Include="GrammarUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

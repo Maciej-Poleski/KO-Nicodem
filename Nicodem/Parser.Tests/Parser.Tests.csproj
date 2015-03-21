@@ -42,11 +42,14 @@
     <Compile Include="CharSymbol.cs" />
     <Compile Include="StringProduction.cs" />
     <Compile Include="LL1ParserTests.cs" />
+    <Compile Include="GrammarUtilsTests.cs" />
+    <Compile Include="StringSymbol.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

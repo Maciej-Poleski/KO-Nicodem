@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Nicodem.Parser
 {
-	internal class DfaState<TSymbol> 
+	public class DfaState<TSymbol> 
 		where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
 	{
 		private readonly DFAState<TSymbol> wrappedState;
