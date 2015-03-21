@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Nicodem.Lexer
 {
@@ -15,7 +16,7 @@ namespace Nicodem.Lexer
         internal static bool IsDead<T>(this T state) where T : IDfaState<T, char>
         {
             var deadTransition = new[] {new KeyValuePair<char, T>('\0', state)};
-            return state.Accepting == 0 && state.Transitions == deadTransition;
+            return state.Accepting == 0 && deadTransition.SequenceEqual(state.Transitions);
         }
 
         internal static bool IsAccepting<TDfaState, TSymbol>(this TDfaState state)

@@ -37,7 +37,7 @@ namespace Nicodem.Parser.Tests
 
 		public ISymbol EOF {
 			get {
-				return new CharSymbol('^');
+				return new CharSymbol('$');
 			}
 		}
 

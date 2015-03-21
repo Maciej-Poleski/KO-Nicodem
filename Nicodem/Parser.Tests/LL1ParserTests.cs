@@ -12,7 +12,7 @@ namespace Nicodem.Parser.Tests
 		public void EmptyGrammarTest()
 		{
 			var start = new CharSymbol('S');
-			var prodChar = RegExParser.Parse("^");
+			var prodChar = RegExParser.Parse("$");
 			var prodSymbol = new StringProduction(start.C, prodChar);
 
 			var grammar = new Grammar<StringProduction>(new Dictionary<ISymbol, StringProduction[]>{
