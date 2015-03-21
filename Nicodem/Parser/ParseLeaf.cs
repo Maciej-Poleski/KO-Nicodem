@@ -6,10 +6,10 @@ namespace Nicodem.Parser
 {
 	internal class ParseLeaf<TProduction> : IParseTree<TProduction> where TProduction:IProduction
 	{
-		public Symbol Symbol { get; private set; }
+		public ISymbol Symbol { get; private set; }
 		public IFragment Fragment { get; private set; }
 
-		public ParseLeaf(IFragment fragment, Symbol symbol)
+		public ParseLeaf(IFragment fragment, ISymbol symbol)
 		{
 			Fragment = fragment;
 			Symbol = symbol;

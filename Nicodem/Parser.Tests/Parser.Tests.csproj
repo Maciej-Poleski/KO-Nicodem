@@ -8,8 +8,6 @@
     <RootNamespace>Nicodem.Parser.Tests</RootNamespace>
     <AssemblyName>Parser.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <ProductVersion>12.0.0</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,9 +33,15 @@
       <Project>{DC9385D6-C37E-441F-8BAA-3B7EAEC2DA39}</Project>
       <Name>Parser</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Lexer\Lexer.csproj">
+      <Project>{3A107436-1EC7-48E3-BF42-5E5E50C259E7}</Project>
+      <Name>Lexer</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ParserTests.cs" />
+    <Compile Include="CharSymbol.cs" />
+    <Compile Include="StringProduction.cs" />
+    <Compile Include="LL1ParserTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">

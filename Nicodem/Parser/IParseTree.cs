@@ -6,7 +6,7 @@ namespace Nicodem.Parser
 {
 	public interface IParseTree<TProduction> where TProduction:IProduction
 	{
-		Symbol Symbol { get; }
+		ISymbol Symbol { get; }
 		IFragment Fragment { get; }
 	}
 }

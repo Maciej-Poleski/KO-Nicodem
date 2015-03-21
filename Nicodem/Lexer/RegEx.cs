@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using C5;
 
 namespace Nicodem.Lexer
 {
@@ -57,5 +58,57 @@ namespace Nicodem.Lexer
         }
 
         #endregion
+
+		public static RegEx<N> Convert<N>(RegEx<T> regex, Func<T, N> converter)
+			where N : IComparable<N>, IEquatable<N>
+		{
+			switch(regex.TypeId) {
+			case 0:
+				return RegExEpsilon<N>.RegexEpsilon;
+			case 1:
+				{
+					var r = regex as RegExRange<T>;
+					return new RegExRange<N>(converter(r.Character));
+				}
+			case 2:
+				{
+					var r = regex as RegExStar<T>;
+					return new RegExStar<N>(Convert(r.Regex, converter));
+				}
+			case 3:
+				{
+					var r = regex as RegExComplement<T>;
+					return new RegExComplement<N>(Convert(r.Regex, converter));
+				}
+			case 4:
+				{
+					var r = regex as RegExConcat<T>;
+					var l = new ArrayList<RegEx<N>>();
+					foreach(var recr in r.Regexes) {
+						l.Add(Convert(recr, converter));
+					}
+					return new RegExConcat<N>(l.ToArray());
+				}
+			case 5:
+				{
+					var r = regex as RegExUnion<T>;
+					var l = new ArrayList<RegEx<N>>();
+					foreach(var recr in r.Regexes) {
+						l.Add(Convert(recr, converter));
+					}
+					return new RegExUnion<N>(l.ToArray());
+				}
+			case 6:
+				{
+					var r = regex as RegExIntersection<T>;
+					var l = new ArrayList<RegEx<N>>();
+					foreach(var recr in r.Regexes) {
+						l.Add(Convert(recr, converter));
+					}
+					return new RegExIntersection<N>(l.ToArray());
+				}
+			}
+			return null;
+		}
     }
 }

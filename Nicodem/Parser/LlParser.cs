@@ -34,7 +34,7 @@ namespace Nicodem.Parser
 		}
 
         // returns either a list of successfull parsed results or a singleton list with failure 
-        private IEnumerable<ParseResult> ParseTerm(Symbol term, MemoizedInput<IParseTree<TProduction>> word, MemoizedInput<IParseTree<TProduction>>.Iterator input)
+        private IEnumerable<ParseResult> ParseTerm(ISymbol term, MemoizedInput<IParseTree<TProduction>> word, MemoizedInput<IParseTree<TProduction>>.Iterator input)
 		{
 			// stack for backtracking - <position in word, current state of appropriate DFA>
 			var dfa = _grammar.Automatons[term];
@@ -50,7 +50,7 @@ namespace Nicodem.Parser
 			while(st.Any()) {
 				var node = st.Peek().State;
 				var it = st.Peek().Iterator;
-                Symbol currentSymbol = (it != word.End) ? it.Current.Symbol : Symbol.EOF;
+                ISymbol currentSymbol = (it != word.End) ? it.Current.Symbol : term.EOF;
 
                 if(node.Accepting > 0 && _grammar.Follow[term].Contains(currentSymbol)) {
                     accepted = true;
@@ -69,7 +69,7 @@ namespace Nicodem.Parser
 				for(int i = st.Peek().TransitionIndex; i < trans.Length; i++) {
 
                     if(_grammar.InFirstPlus(trans[i].Key, currentSymbol)) {
-                        if(_grammar.IsTerminal(currentSymbol) || currentSymbol == Symbol.EOF) {
+                        if(_grammar.IsTerminal(currentSymbol) || currentSymbol == term.EOF) {
 
 							children.Push(new ParseLeaf<TProduction>(it.Current.Fragment, currentSymbol));
 							st.Push(new ParseState(trans[i].Value, 0, it.Next()));
@@ -139,13 +139,13 @@ namespace Nicodem.Parser
 		/* --- data types ----- */
 		private struct ParseState
 		{
-			public DfaState<Symbol> State { get; private set; } 
+			public DfaState<ISymbol> State { get; private set; } 
 			public int TransitionIndex { get; private set; }
 			public MemoizedInput<IParseTree<TProduction>>.Iterator Iterator { get; private set; }
             // used when function may return multiple ok results during one call
             public IEnumerator<ParseResult> NextPossibleResult { get; private set; } 
 
-            public ParseState(DfaState<Symbol> state, 
+            public ParseState(DfaState<ISymbol> state, 
                 int transitionIndex, 
                 MemoizedInput<IParseTree<TProduction>>.Iterator iterator, 
                 IEnumerator<ParseResult> nextPossibleResult = null)

@@ -45,7 +45,6 @@
   <ItemGroup>
     <Compile Include="IProduction.cs" />
     <Compile Include="IParseTree.cs" />
-    <Compile Include="Symbol.cs" />
     <Compile Include="IParser.cs" />
     <Compile Include="LlParser.cs" />
     <Compile Include="Grammar.cs" />
@@ -53,6 +52,7 @@
     <Compile Include="ParseLeaf.cs" />
     <Compile Include="Dfa.cs" />
     <Compile Include="DfaState.cs" />
+    <Compile Include="ISymbol.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
