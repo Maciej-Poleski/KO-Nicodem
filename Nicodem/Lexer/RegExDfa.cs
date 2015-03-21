@@ -10,6 +10,8 @@ namespace Nicodem.Lexer
         private readonly SortedDictionary<RegEx<T>, DFAState<T>> dictionaryOfDfaStates =
             new SortedDictionary<RegEx<T>, DFAState<T>>();
 
+        private DFAState<T> deadState;
+
         public RegExDfa(DFAState<T> start)
         {
             Start = start;
@@ -42,6 +44,17 @@ namespace Nicodem.Lexer
                 new_state.Accepting = accepting;
             else
                 new_state.Accepting = 0;
+
+            if (listOfTransitions.Count == 0)
+            {
+                if (deadState == null)
+                {
+                    deadState = new DFAState<T>();
+                    deadState.Accepting = 0;
+                    deadState.Transitions = new KeyValuePair<T, DFAState<T>>[] { new KeyValuePair<T, DFAState<T>>(default(T), deadState)};
+                }
+                listOfTransitions.Add(new KeyValuePair<T, DFAState<T>>(default(T), deadState));
+            }
 
             new_state.Transitions = listOfTransitions.ToArray();
 
