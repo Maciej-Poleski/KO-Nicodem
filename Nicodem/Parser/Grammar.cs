@@ -41,6 +41,11 @@ namespace Nicodem.Parser
 				}
 				Automatons[symbolProductions.Key] = Dfa<ISymbol>.ProductDfa(automatons.ToArray());
 			}
+
+			// set Nullable, First and Follow
+			Nullable = GrammarUtils.ComputeNullable (Automatons);
+			First = GrammarUtils.ComputeFirst (Automatons, Nullable);
+			Follow = GrammarUtils.ComputeFollow (Automatons, Nullable, First);
 		}
 
         private bool DepthFirstSearchOnSymbol(ISymbol symbol, Dictionary<DfaState<ISymbol>,int> color)
