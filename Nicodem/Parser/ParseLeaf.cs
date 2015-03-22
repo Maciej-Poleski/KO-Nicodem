@@ -4,7 +4,7 @@ using Nicodem.Source;
 
 namespace Nicodem.Parser
 {
-	internal class ParseLeaf<TProduction> : IParseTree<TProduction> where TProduction:IProduction
+	internal class ParseLeaf<TProduction> : IParseTree<TProduction> where TProduction : IProduction
 	{
 		public ISymbol Symbol { get; private set; }
 		public IFragment Fragment { get; private set; }
@@ -13,6 +13,10 @@ namespace Nicodem.Parser
 		{
 			Fragment = fragment;
 			Symbol = symbol;
+		}
+			
+		public bool Equals(IParseTree<TProduction> other){
+			return (other is ParseLeaf<TProduction> && Symbol.Equals(other.Symbol));
 		}
 	}
 }
