@@ -41,6 +41,10 @@
       <Project>{5E967501-0A63-4196-A29B-B8B148785048}</Project>
       <Name>Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\System.Collections.Immutable\System.Collections.Immutable.csproj">
+      <Project>{024A2111-4B19-44D7-917E-8514CF632469}</Project>
+      <Name>System.Collections.Immutable</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IProduction.cs" />
