@@ -32,7 +32,7 @@ namespace Nicodem.Parser
 			uint productionMarker = 1;
 			foreach (var symbolProductions in Productions)
 			{
-				var automatons = new List<Dfa<ISymbol>>();
+				var automatons = new List<Lexer.DfaUtils.MinimizedDfa<ISymbol>>();
 				foreach (var production in symbolProductions.Value)
 				{
 					automatons.Add(Dfa<ISymbol>.RegexDfa(production.Rhs, productionMarker));

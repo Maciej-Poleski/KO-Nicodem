@@ -66,7 +66,7 @@ namespace Nicodem.Parser
 				}
 
 				var trans = node.Transitions;
-				for(int i = st.Peek().TransitionIndex; i < trans.Length; i++) {
+				for(int i = st.Peek().TransitionIndex; i < trans.Count; i++) {
 
                     if(_grammar.InFirstPlus(trans[i].Key, currentSymbol)) {
                         if(_grammar.IsTerminal(currentSymbol) || currentSymbol == term.EOF) {
@@ -123,7 +123,7 @@ namespace Nicodem.Parser
                     children.Push(nextRes.Tree);
                     stack.Push(new ParseState(state.State, state.TransitionIndex, nextRes.Iterator, state.NextPossibleResult));
                     return;
-                } else if(state.TransitionIndex + 1 < state.State.Transitions.Length) {
+                } else if(state.TransitionIndex + 1 < state.State.Transitions.Count) {
 
                     stack.Push(new ParseState(state.State, state.TransitionIndex + 1, state.Iterator));
                     return;
