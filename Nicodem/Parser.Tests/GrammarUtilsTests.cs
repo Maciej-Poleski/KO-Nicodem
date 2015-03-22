@@ -11,6 +11,7 @@ namespace Nicodem.Parser.Tests
 		ISet<ISymbol> nullable;
 		IDictionary<ISymbol, ISet<ISymbol>> first;
 		IDictionary<ISymbol, ISet<ISymbol>> follow;
+		IDictionary<ISymbol, Dfa<ISymbol>> automatons;
 
 		static ISet<ISymbol> CreateSet( params ISymbol[] args )
 		{
@@ -104,7 +105,9 @@ namespace Nicodem.Parser.Tests
 
 			// ** Build automatons **
 			//TODO(Jakub Brzeski & Patryk Mikos) build automatons
-			// var state_goal = new DfaState<StringSymbol> ();
+			automatons = new Dictionary<ISymbol, Dfa<ISymbol>> ();
+
+			var state_goal = new DfaState<ISymbol> ();
 
 			// Goal -> automaton 
 			// (a --Expr--> b)
@@ -132,16 +135,14 @@ namespace Nicodem.Parser.Tests
 		[Test]
 		public void testNullable()
 		{
-			//TODO(set automatons)
-			var computedNullable = GrammarUtils.ComputeNullable (null);
+			var computedNullable = GrammarUtils.ComputeNullable (automatons);
 			Assert.IsTrue (nullable.SetEquals (computedNullable));
 		}
 
 		[Test]
 		public void testFirst()
 		{
-			//TODO(set automatons)
-			var computedFirst = GrammarUtils.ComputeFirst (null, nullable);
+			var computedFirst = GrammarUtils.ComputeFirst (automatons, nullable);
 			Assert.AreEqual (first.Keys.Count, computedFirst.Keys.Count);
 
 			foreach (var key in first.Keys) {
@@ -157,8 +158,7 @@ namespace Nicodem.Parser.Tests
 		[Test]
 		public void testFollow()
 		{
-			//TODO(set automatons)
-			var computedFollow = GrammarUtils.ComputeFollow (null, nullable, first);
+			var computedFollow = GrammarUtils.ComputeFollow (automatons, nullable, first);
 			Assert.AreEqual (follow.Keys.Count, computedFollow.Keys.Count);
 
 			foreach (var key in follow.Keys) {
