@@ -11,6 +11,12 @@ namespace Nicodem.Parser.Tests
 			Rhs = RegEx<char>.Convert<ISymbol>(production, c => new CharSymbol(c));
 		}
 
+		public StringProduction(char symbol, string production)
+		{
+			Lhs = new CharSymbol(symbol);
+			Rhs = RegEx<char>.Convert<ISymbol>(RegExParser.Parse(production), c => new CharSymbol(c));
+		}
+
 		#region IProduction implementation
 
 		public ISymbol Lhs { get; private set; }
