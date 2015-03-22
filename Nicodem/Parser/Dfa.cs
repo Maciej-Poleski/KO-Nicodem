@@ -19,6 +19,28 @@ namespace Nicodem.Parser
 				return leftState;
 			}
 		}
+
+		public Dfa(DfaState<TSymbol> start)
+		{
+			Start = start;
+			var queue = new Queue<DfaState<TSymbol>>();
+			var enqueued = new HashSet<DfaState<TSymbol>>();
+			queue.Enqueue(start);
+			enqueued.Add(start);
+			while (queue.Count > 0) {
+				var s = queue.Dequeue();
+				if (s.Transitions == null) {
+					throw new ArgumentNullException("The state graph is not initialized.");
+				}
+				foreach (var i in s.Transitions) {
+					if (enqueued.Contains(i.Value)) {
+						continue;
+					}
+					queue.Enqueue(i.Value);
+					enqueued.Add(i.Value);
+				}
+			}
+		}
 			
 		public Dfa(DfaUtils.MinimizedDfa<TSymbol> lexerDfa)
 		{
