@@ -8,11 +8,6 @@ namespace Nicodem.Parser
 	internal class ParseBranch<TProduction> : IParseTree<TProduction>
 		where TProduction:IProduction
 	{
-		public bool Equals (TProduction other)
-		{
-			throw new NotImplementedException ();
-		}
-
 		public IFragment Fragment { get; private set; }
 		public ISymbol Symbol { get; private set; }
 		public TProduction Production { get; private set; }
