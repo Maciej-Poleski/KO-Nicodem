@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Nicodem.Lexer
 {
-    public interface IDfa<TDfaState, TSymbol> where TDfaState : IDfaState<TDfaState, TSymbol>
-        where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
+    public interface IDfa<TSymbol> where TSymbol : IEquatable<TSymbol>, IComparable<TSymbol>
     {
-        TDfaState Start { get; set; }
+        IDfaState<TSymbol> Start { get; }
     }
 }

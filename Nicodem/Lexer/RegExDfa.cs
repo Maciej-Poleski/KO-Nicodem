@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Nicodem.Lexer
 {
-    public class RegExDfa<T> : IDfa<DFAState<T>, T> where T : IComparable<T>, IEquatable<T>
+    public class RegExDfa<T> : AbstractDfa<DFAState<T>, T> where T : IComparable<T>, IEquatable<T>
     {
         private readonly uint accepting;
 
@@ -11,19 +11,23 @@ namespace Nicodem.Lexer
             new SortedDictionary<RegEx<T>, DFAState<T>>();
 
         private DFAState<T> deadState;
+        private readonly DFAState<T> _start;
 
         public RegExDfa(DFAState<T> start)
         {
-            Start = start;
+            _start = start;
         }
 
         public RegExDfa(RegEx<T> regEx, uint acceptingStateMarker)
         {
             accepting = acceptingStateMarker;
-            Start = CalculateDfaState(regEx);
+            _start = CalculateDfaState(regEx);
         }
 
-        public DFAState<T> Start { get; set; }
+        public override DFAState<T> Start
+        {
+            get { return _start; }
+        }
 
         private DFAState<T> CalculateDfaState(RegEx<T> regEx)
         {
@@ -41,22 +45,22 @@ namespace Nicodem.Lexer
             }
 
             if (regEx.HasEpsilon())
-                new_state.Accepting = accepting;
+                new_state._accepting = accepting;
             else
-                new_state.Accepting = 0;
+                new_state._accepting = 0;
 
             if (listOfTransitions.Count == 0)
             {
                 if (deadState == null)
                 {
                     deadState = new DFAState<T>();
-                    deadState.Accepting = 0;
-                    deadState.Transitions = new KeyValuePair<T, DFAState<T>>[] { new KeyValuePair<T, DFAState<T>>(default(T), deadState)};
+                    deadState._accepting = 0;
+                    deadState._transitions = new KeyValuePair<T, DFAState<T>>[] { new KeyValuePair<T, DFAState<T>>(default(T), deadState)};
                 }
                 listOfTransitions.Add(new KeyValuePair<T, DFAState<T>>(default(T), deadState));
             }
 
-            new_state.Transitions = listOfTransitions.ToArray();
+            new_state._transitions = listOfTransitions.ToArray();
 
             return new_state;
         }

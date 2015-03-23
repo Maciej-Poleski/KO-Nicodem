@@ -79,12 +79,12 @@ namespace Nicodem.Parser
 			if (acceptingStateMarker == 0) {
 				throw new ArgumentOutOfRangeException();
 			}
-			IDfa<DFAState<TSymbol>, TSymbol> factorDfa = 
-				(IDfa<DFAState<TSymbol>, TSymbol>) new RegExDfa<TSymbol>(RegEx, acceptingStateMarker);
+			AbstractDfa<DFAState<TSymbol>, TSymbol> factorDfa = 
+				(AbstractDfa<DFAState<TSymbol>, TSymbol>) new RegExDfa<TSymbol>(RegEx, acceptingStateMarker);
 			return DfaUtils.MakeMinimizedProductDfa<
-					IDfa<DFAState<TSymbol>, TSymbol>,
+					AbstractDfa<DFAState<TSymbol>, TSymbol>,
 					DFAState<TSymbol>,	
-					IDfa<DFAState<TSymbol>, TSymbol>,
+					AbstractDfa<DFAState<TSymbol>, TSymbol>,
 					DFAState<TSymbol>,
 					TSymbol
 				>(factorDfa, factorDfa, new DfaUtils.AmbiguityHandler(MaxAmbiguityHandler));

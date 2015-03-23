@@ -165,12 +165,12 @@ namespace Nicodem.Lexer
 
         #region CategoryDecompression
 
-        private IEnumerable<int> GetCategoriesFromState<T>(T dfaState) where T : IDfaState<T, char>
+        private IEnumerable<int> GetCategoriesFromState<T>(T dfaState) where T : AbstractDfaState<T, char>
         {
             return new CategoryEnumerable(this, dfaState.Accepting);
         }
 
-        private static T FindTransition<T>(KeyValuePair<char, T>[] transitions, char c) where T : IDfaState<T, char>
+        private static T FindTransition<T>(KeyValuePair<char, T>[] transitions, char c) where T : AbstractDfaState<T, char>
         {
             return Array.FindLast(transitions, pair => pair.Key <= c).Value;
         }

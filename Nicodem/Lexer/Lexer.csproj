@@ -37,10 +37,12 @@
     <Reference Include="Mono.C5" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IDfa.cs" />
+    <Compile Include="IDfaState.cs" />
     <Compile Include="RegExDfa.cs" />
     <Compile Include="DFAState.cs" />
     <Compile Include="DfaUtils.cs" />
-    <Compile Include="IDfaState.cs" />
+    <Compile Include="AbstractDfaState.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegEx.cs" />
@@ -52,7 +54,7 @@
     <Compile Include="RegExComplement.cs" />
     <Compile Include="RegExFactory.cs" />
     <Compile Include="RegExEpsilon.cs" />
-    <Compile Include="IDfa.cs" />
+    <Compile Include="AbstractDfa.cs" />
     <Compile Include="RegExParser.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

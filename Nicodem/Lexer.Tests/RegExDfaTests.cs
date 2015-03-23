@@ -18,8 +18,8 @@ namespace Lexer.Tests
         public void init()
         {
             deadState = new DFAState<char>();
-            deadState.Accepting = 0;
-            deadState.Transitions = new KeyValuePair<char, DFAState<char>>[] { new KeyValuePair<char, DFAState<char>>('\0', deadState) };
+            deadState._accepting = 0;
+            deadState._transitions = new KeyValuePair<char, DFAState<char>>[] { new KeyValuePair<char, DFAState<char>>('\0', deadState) };
             deadTransition = new KeyValuePair<char, DFAState<char>>('\0', deadState);
         }
 
@@ -57,8 +57,8 @@ namespace Lexer.Tests
         }
 
         //TODO(karol-banys)
-        bool CompareDfaState<TDfaState, TSymbol>(IDfaState<TDfaState, TSymbol> a, IDfaState<TDfaState, TSymbol> b, Dictionary<Tuple<IDfaState<TDfaState, TSymbol> ,IDfaState<TDfaState, TSymbol> >, int> visited)
-            where TDfaState : IDfaState<TDfaState, TSymbol>
+        bool CompareDfaState<TDfaState, TSymbol>(AbstractDfaState<TDfaState, TSymbol> a, AbstractDfaState<TDfaState, TSymbol> b, Dictionary<Tuple<AbstractDfaState<TDfaState, TSymbol> ,AbstractDfaState<TDfaState, TSymbol> >, int> visited)
+            where TDfaState : AbstractDfaState<TDfaState, TSymbol>
             where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
         {
             //if (visited.Contains(Tuple.Create(a, b))) return true;
@@ -88,11 +88,11 @@ namespace Lexer.Tests
             return true;
         }
 
-        bool CompareDfa<TDfaState, TSymbol>(IDfa<TDfaState, TSymbol> a, IDfa<TDfaState, TSymbol> b)
-            where TDfaState : IDfaState<TDfaState, TSymbol>
+        bool CompareDfa<TDfaState, TSymbol>(AbstractDfa<TDfaState, TSymbol> a, AbstractDfa<TDfaState, TSymbol> b)
+            where TDfaState : AbstractDfaState<TDfaState, TSymbol>
             where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
         {
-            var visited = new Dictionary<Tuple<IDfaState<TDfaState, TSymbol>, IDfaState<TDfaState, TSymbol>>, int>();
+            var visited = new Dictionary<Tuple<AbstractDfaState<TDfaState, TSymbol>, AbstractDfaState<TDfaState, TSymbol>>, int>();
             return CompareDfaState(a.Start, b.Start, visited);
         }
 

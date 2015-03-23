@@ -16,13 +16,13 @@ namespace Lexer.Tests
         public void SimpleTest()
         {
             var firstState = new DfaUtils. MinimizedDfaState<char>();
-            firstState.Accepting = 0;
+            firstState._accepting = 0;
             var secondState = new DfaUtils. MinimizedDfaState<char>();
-            secondState.Accepting = 1;
-            firstState.Transitions = new KeyValuePair<char, DfaUtils.MinimizedDfaState<char>>[1] {new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('a', secondState)};
-            secondState.Transitions = new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>[1] {new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('a', secondState)};
+            secondState._accepting = 1;
+            firstState._transitions = new KeyValuePair<char, DfaUtils.MinimizedDfaState<char>>[1] {new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('a', secondState)};
+            secondState._transitions = new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>[1] {new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('a', secondState)};
             var dfa = new DfaUtils.MinimizedDfa<char>();
-            dfa.Start = firstState;
+            dfa._start = firstState;
 
 
             dfa = DfaUtils.Minimized<DfaUtils.MinimizedDfa<char>, DfaUtils.MinimizedDfaState<char>, char>(dfa);
@@ -39,16 +39,16 @@ namespace Lexer.Tests
         public void SimpleTest2()
         {
             var firstState = new DfaUtils. MinimizedDfaState<char>();
-            firstState.Accepting = 0;
+            firstState._accepting = 0;
             var secondState = new DfaUtils. MinimizedDfaState<char>();
-            secondState.Accepting = 1;
+            secondState._accepting = 1;
             var thirdState = new DfaUtils. MinimizedDfaState<char>();
-            thirdState.Accepting = 1;
-            firstState.Transitions = new KeyValuePair<char, DfaUtils.MinimizedDfaState<char>>[1] {new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('a', secondState)};
-            secondState.Transitions = new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>[1] {new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('a', thirdState)};
-            thirdState.Transitions = new KeyValuePair<char, DfaUtils.MinimizedDfaState<char>>[1] {new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('a', secondState)};
+            thirdState._accepting = 1;
+            firstState._transitions = new KeyValuePair<char, DfaUtils.MinimizedDfaState<char>>[1] {new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('a', secondState)};
+            secondState._transitions = new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>[1] {new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('a', thirdState)};
+            thirdState._transitions = new KeyValuePair<char, DfaUtils.MinimizedDfaState<char>>[1] {new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('a', secondState)};
             var dfa = new DfaUtils.MinimizedDfa<char>();
-            dfa.Start = firstState;
+            dfa._start = firstState;
 
 
             dfa = DfaUtils.Minimized<DfaUtils.MinimizedDfa<char>, DfaUtils.MinimizedDfaState<char>, char>(dfa);
@@ -69,38 +69,38 @@ namespace Lexer.Tests
         public void SimpleTest3()
         {
             var firstState = new DfaUtils. MinimizedDfaState<char>();
-            firstState.Accepting = 0;
+            firstState._accepting = 0;
             var secondState = new DfaUtils. MinimizedDfaState<char>();
-            secondState.Accepting = 0;
+            secondState._accepting = 0;
             var thirdState = new DfaUtils. MinimizedDfaState<char>();
-            thirdState.Accepting = 0;
+            thirdState._accepting = 0;
             var fourthState = new DfaUtils. MinimizedDfaState<char>();
-            fourthState.Accepting = 1;
+            fourthState._accepting = 1;
             var fifthState = new DfaUtils. MinimizedDfaState<char>();
-            fifthState.Accepting = 1;
+            fifthState._accepting = 1;
             var sixthState = new DfaUtils. MinimizedDfaState<char>();
-            sixthState.Accepting = 1;
+            sixthState._accepting = 1;
 
-            firstState.Transitions = new KeyValuePair<char, DfaUtils.MinimizedDfaState<char>>[2]
+            firstState._transitions = new KeyValuePair<char, DfaUtils.MinimizedDfaState<char>>[2]
             {new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('a', secondState),
                 new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('b', firstState)};
-            secondState.Transitions = new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>[2]
+            secondState._transitions = new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>[2]
             {new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('a', thirdState),
                 new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('b', firstState)};
-            thirdState.Transitions = new KeyValuePair<char, DfaUtils.MinimizedDfaState<char>>[2]
+            thirdState._transitions = new KeyValuePair<char, DfaUtils.MinimizedDfaState<char>>[2]
             {new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('a', thirdState),
                 new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('b', fourthState)};
-            fourthState.Transitions = new KeyValuePair<char, DfaUtils.MinimizedDfaState<char>>[2]
+            fourthState._transitions = new KeyValuePair<char, DfaUtils.MinimizedDfaState<char>>[2]
             {new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('a', fifthState),
                 new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('b', fourthState)};
-            fifthState.Transitions = new KeyValuePair<char, DfaUtils.MinimizedDfaState<char>>[2]
+            fifthState._transitions = new KeyValuePair<char, DfaUtils.MinimizedDfaState<char>>[2]
             {new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('a', sixthState),
                 new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('b', fourthState)};
-            sixthState.Transitions = new KeyValuePair<char, DfaUtils.MinimizedDfaState<char>>[2]
+            sixthState._transitions = new KeyValuePair<char, DfaUtils.MinimizedDfaState<char>>[2]
             {new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('a', sixthState),
                 new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('b', fourthState)};
             var dfa = new DfaUtils.MinimizedDfa<char>();
-            dfa.Start = firstState;
+            dfa._start = firstState;
 
 
             dfa = DfaUtils.Minimized<DfaUtils.MinimizedDfa<char>, DfaUtils.MinimizedDfaState<char>, char>(dfa);
