@@ -11,7 +11,7 @@ namespace Lexer.Tests
         {
             var regex = RegExFactory.Empty<char>();
             var dfa = new RegExDfa<char>(regex, 1);
-            DfaUtils.DfaStatesNotNullConcpetCheck<RegExDfa<char>, DFAState<char>, char>.CheckDfaStatesNotNull(dfa);
+            DfaUtils.DfaStatesNotNullConcpetCheck<char>.CheckDfaStatesNotNull(dfa);
         }
     }
 }

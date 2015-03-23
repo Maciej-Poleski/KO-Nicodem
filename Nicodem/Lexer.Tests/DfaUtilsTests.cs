@@ -116,5 +116,26 @@ namespace Lexer.Tests
             DfaUtils.MakeEmptyLanguageDfa<char>();
         }
 
+        [Test]
+        public void MakeMinimizedProductDfaTypePunnedInvocation()
+        {
+            IDfa<char> someDfa = DfaUtils.MakeEmptyLanguageDfa<char>();
+            var someOtherDfa = DfaUtils.MakeMinimizedProductDfa(someDfa, someDfa,
+                (a, b) =>
+                {
+                    if (a != 0 && b != 0)
+                    {
+                        throw new ArgumentException();
+                    }
+                    return a + b;
+                });
+            Assert.NotNull(someOtherDfa);
+            Assert.NotNull(someOtherDfa.Start);
+            Assert.AreEqual(someOtherDfa.Start.Accepting, 0);
+            Assert.AreEqual(someOtherDfa.Start.Transitions.Count, 1);
+            Assert.AreEqual(someOtherDfa.Start.Transitions[0].Key, '\0');
+            Assert.AreEqual(someOtherDfa.Start.Transitions[0].Value, someOtherDfa.Start);
+        }
+
     }
 }

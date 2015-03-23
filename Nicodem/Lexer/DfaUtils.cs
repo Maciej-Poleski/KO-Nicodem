@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using Nicodem.Core;
 
 namespace Nicodem.Lexer
@@ -243,42 +244,16 @@ namespace Nicodem.Lexer
 
         #region ProductDfa
 
-        public delegate uint AmbiguityHandler(uint leftState, uint rightState);
+        private static readonly MethodInfo MakeMinimizedProductDfaMethod;
 
-        internal class DfaStatesNotNullConcpetCheck<TDfa, TDfaState, TSymbol>
-            where TDfa : AbstractDfa<TDfaState, TSymbol>
-            where TDfaState : AbstractDfaState<TDfaState, TSymbol>
-            where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
+        static DfaUtils()
         {
-            private readonly HashSet<TDfaState> _visitedStates = new HashSet<TDfaState>();
-
-            private DfaStatesNotNullConcpetCheck()
-            {
-            }
-
-            [Conditional("DEBUG")]
-            internal static void CheckDfaStatesNotNull(TDfa dfa)
-            {
-                new DfaStatesNotNullConcpetCheck<TDfa, TDfaState, TSymbol>().Check(dfa.Start);
-            }
-
-            private void Check(TDfaState state)
-            {
-                if (state == null)
-                {
-                    Debug.Fail("Found null state in DFA");
-                }
-                if (_visitedStates.Contains(state))
-                    return;
-                _visitedStates.Add(state);
-                Debug.Assert(state.Transitions != null);
-                Debug.Assert(state.Transitions.Length > 0);
-                foreach (var transition in state.Transitions)
-                {
-                    Check(transition.Value);
-                }
-            }
+            MakeMinimizedProductDfaMethod = typeof(DfaUtils)
+                .GetMethods()
+                .First(mi => mi.Name == "MakeMinimizedProductDfa" && mi.GetGenericArguments().Length == 5);
         }
+
+        public delegate uint AmbiguityHandler(uint leftState, uint rightState);
 
         private static ProductDfa<TSymbol> MakeProductDfa<TLastDfa, TLastDfaState, TNewDfa, TNewDfaState, TSymbol>(
             TLastDfa lastDfa, TNewDfa newDfa, AmbiguityHandler handler)
@@ -289,8 +264,7 @@ namespace Nicodem.Lexer
         {
             var result = new ProductDfaBuilder<TLastDfaState, TNewDfaState, TSymbol>(handler).Build(lastDfa.Start,
                 newDfa.Start);
-            DfaStatesNotNullConcpetCheck<ProductDfa<TSymbol>, ProductDfaState<TSymbol>, TSymbol>.CheckDfaStatesNotNull(
-                result);
+            DfaStatesNotNullConcpetCheck<TSymbol>.CheckDfaStatesNotNull(result);
             return result;
         }
 
@@ -306,9 +280,23 @@ namespace Nicodem.Lexer
             var result =
                 MakeProductDfa<TLastDfa, TLastDfaState, TNewDfa, TNewDfaState, TSymbol>(lastDfa, newDfa, handler)
                     .Minimized<ProductDfa<TSymbol>, ProductDfaState<TSymbol>, TSymbol>();
-            DfaStatesNotNullConcpetCheck<MinimizedDfa<TSymbol>, MinimizedDfaState<TSymbol>, TSymbol>
-                .CheckDfaStatesNotNull(result);
+            DfaStatesNotNullConcpetCheck<TSymbol>.CheckDfaStatesNotNull(result);
             return result;
+        }
+
+        public static IDfa<TSymbol> MakeMinimizedProductDfa<TSymbol>(IDfa<TSymbol> lastDfa, IDfa<TSymbol> newDfa,
+            AmbiguityHandler handler)
+            where TSymbol : IEquatable<TSymbol>, IComparable<TSymbol>
+        {
+            // This implementation assumes that all instances of IDfa are in fact instances of AbstractDfa
+            var lastDfaType = lastDfa.GetType();
+            var newDfaType = newDfa.GetType();
+            var lastDfaStateType = lastDfa.Start.GetType();
+            var newDfaStateType = newDfa.Start.GetType();
+
+            return (IDfa<TSymbol>) MakeMinimizedProductDfaMethod
+                .MakeGenericMethod(lastDfaType, lastDfaStateType, newDfaType, newDfaStateType, typeof (TSymbol))
+                .Invoke(null, new object[] {lastDfa, newDfa, handler});
         }
 
         private struct ProductDfaBuilder<TLastDfaState, TNewDfaState, TSymbol>
@@ -444,10 +432,46 @@ namespace Nicodem.Lexer
         {
             var result = new ProductDfa<TSymbol> {_start = ProductDfaState<TSymbol>.MakeDeadState()}
                     .Minimized<ProductDfa<TSymbol>, ProductDfaState<TSymbol>, TSymbol>();
-            DfaStatesNotNullConcpetCheck<MinimizedDfa<TSymbol>,MinimizedDfaState<TSymbol>,TSymbol>.CheckDfaStatesNotNull(result);
+            DfaStatesNotNullConcpetCheck<TSymbol>.CheckDfaStatesNotNull(result);
             return result;
 
         }
+
+        #endregion
+
+        #region DfaConceptsChecks
+
+        internal class DfaStatesNotNullConcpetCheck<TSymbol> where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
+        {
+            private readonly HashSet<IDfaState<TSymbol>> _visitedStates = new HashSet<IDfaState<TSymbol>>();
+
+            private DfaStatesNotNullConcpetCheck()
+            {
+            }
+
+            [Conditional("DEBUG")]
+            internal static void CheckDfaStatesNotNull(IDfa<TSymbol> dfa)
+            {
+                new DfaStatesNotNullConcpetCheck<TSymbol>().Check(dfa.Start);
+            }
+
+            private void Check(IDfaState<TSymbol> state)
+            {
+                if (state == null)
+                {
+                    Debug.Fail("Found null state in DFA");
+                }
+                if (_visitedStates.Contains(state))
+                    return;
+                _visitedStates.Add(state);
+                Debug.Assert(state.Transitions != null);
+                Debug.Assert(state.Transitions.Count > 0);
+                foreach (var transition in state.Transitions)
+                {
+                    Check(transition.Value);
+                }
+            }
+        } 
 
         #endregion
     }
