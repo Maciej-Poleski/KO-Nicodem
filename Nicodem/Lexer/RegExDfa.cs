@@ -13,6 +13,13 @@ namespace Nicodem.Lexer
         private DFAState<T> deadState;
         private readonly DFAState<T> _start;
 
+        private static readonly T MinSymbol;
+
+        static RegExDfa()
+        {
+            MinSymbol = (T)typeof(T).GetField("MinValue").GetValue(null);
+        }
+
         public RegExDfa(DFAState<T> start)
         {
             _start = start;
@@ -49,15 +56,15 @@ namespace Nicodem.Lexer
             else
                 new_state._accepting = 0;
 
-            if (listOfTransitions.Count == 0)
+            if (listOfTransitions.Count == 0 || !listOfTransitions[0].Key.Equals(MinSymbol))
             {
                 if (deadState == null)
                 {
                     deadState = new DFAState<T>();
                     deadState._accepting = 0;
-                    deadState._transitions = new KeyValuePair<T, DFAState<T>>[] { new KeyValuePair<T, DFAState<T>>(default(T), deadState)};
+                    deadState._transitions = new KeyValuePair<T, DFAState<T>>[] { new KeyValuePair<T, DFAState<T>>(MinSymbol, deadState) };
                 }
-                listOfTransitions.Add(new KeyValuePair<T, DFAState<T>>(default(T), deadState));
+                listOfTransitions.Insert(0, new KeyValuePair<T, DFAState<T>>(MinSymbol, deadState));
             }
 
             new_state._transitions = listOfTransitions.ToArray();
