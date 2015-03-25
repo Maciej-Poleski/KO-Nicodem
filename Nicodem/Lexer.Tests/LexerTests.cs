@@ -16,39 +16,99 @@ namespace Lexer.Tests
                 RegExFactory.Complement(RegExFactory.Range((char) (b + 1))));
         }
 
+        private static RegEx<char> MakeCharRegex(char c)
+        {
+            return MakeCharRangeRegex(c, c);
+        }
+
+        private static Tuple<string, IEnumerable<int>> T(string token, params int[] categories)
+        {
+            return new Tuple<string, IEnumerable<int>>(token, categories);
+        }
+
+        [Test]
+        public void LexerComplexLanguages()
+        {
+            // 0: a*
+            // 1: a*b
+            // 2: a*b*
+
+            var regex0 = RegExFactory.Star(MakeCharRegex('a'));
+            var regex1 = RegExFactory.Concat(regex0, MakeCharRegex('b'));
+            var regex2 = RegExFactory.Concat(regex0, RegExFactory.Star(MakeCharRegex('b')));
+
+            var lexex = new Nicodem.Lexer.Lexer(regex0, regex1, regex2);
+            Assert.IsEmpty(lexex.Process("b"));
+            Assert.IsTrue(lexex.Process("").TokenizedTo(T("", 0, 2)));
+            /* ...
+             * a
+             * aaa
+             * ab
+             * abb
+             */
+        }
+
         [Test]
         public void LexerEmpty()
         {
             foreach (var arr in new[] {new RegEx<char>[0], new[] {RegExFactory.Empty<char>()}})
             {
                 var lexer = new Nicodem.Lexer.Lexer(arr);
-                Assert.IsEmpty(lexer.Process(new StringOrigin("")));
-                Assert.IsEmpty(lexer.Process(new StringOrigin(" ")));
-                Assert.IsEmpty(lexer.Process(new StringOrigin("a")));
-                Assert.IsEmpty(lexer.Process(new StringOrigin("asdf")));
-                Assert.IsEmpty(lexer.Process(new StringOrigin(" _\n")));
-                Assert.IsEmpty(lexer.Process(new StringOrigin("*^& GY?'\t\n\t\tlikjd")));
-                Assert.IsEmpty(lexer.Process(new StringOrigin("\\")));
-                Assert.IsEmpty(lexer.Process(new StringOrigin("\\n")));
+                Assert.IsEmpty(lexer.Process(""));
+                Assert.IsEmpty(lexer.Process(" "));
+                Assert.IsEmpty(lexer.Process("a"));
+                Assert.IsEmpty(lexer.Process("asdf"));
+                Assert.IsEmpty(lexer.Process(" _\n"));
+                Assert.IsEmpty(lexer.Process("*^& GY?'\t\n\t\tlikjd"));
+                Assert.IsEmpty(lexer.Process("\\"));
+                Assert.IsEmpty(lexer.Process("\\n"));
             }
+        }
+
+        [Test]
+        public void LexerSimpleRanges()
+        {
+            var lexer =
+                new Nicodem.Lexer.Lexer(MakeCharRangeRegex('b', 'd'), MakeCharRangeRegex('d', 'g'),
+                    MakeCharRangeRegex('g', 'i'));
+            Assert.IsEmpty(lexer.Process("a"));
+            Assert.IsEmpty(lexer.Process("ab"));
+            Assert.IsEmpty(lexer.Process("j"));
+            Assert.IsTrue(lexer.Process("b").TokenizedTo(T("b", 0)));
+            Assert.IsTrue(lexer.Process("c").TokenizedTo(T("c", 0)));
+            Assert.IsTrue(lexer.Process("d").TokenizedTo(T("d", 0, 1)));
+            Assert.IsTrue(lexer.Process("e").TokenizedTo(T("e", 1)));
+            Assert.IsTrue(lexer.Process("f").TokenizedTo(T("f", 1)));
+            Assert.IsTrue(lexer.Process("g").TokenizedTo(T("g", 1, 2)));
+            Assert.IsTrue(lexer.Process("h").TokenizedTo(T("h", 2)));
+            Assert.IsTrue(lexer.Process("i").TokenizedTo(T("i", 2)));
+            Assert.IsTrue(lexer.Process("bbdgheijb").TokenizedTo(
+                T("b", 0),
+                T("b", 0),
+                T("d", 0, 1),
+                T("g", 1, 2),
+                T("h", 2),
+                T("e", 1),
+                T("i", 2)));
         }
 
         [Test]
         public void LexerSingleRange()
         {
-            var lexer = new Nicodem.Lexer.Lexer(new[] {MakeCharRangeRegex('b', 'd')});
-            Assert.IsEmpty(lexer.Process(new StringOrigin("")));
-            Assert.IsEmpty(lexer.Process(new StringOrigin(" ")));
-            Assert.IsEmpty(lexer.Process(new StringOrigin("a")));
-            Assert.IsEmpty(lexer.Process(new StringOrigin("asdf")));
-            Assert.IsEmpty(lexer.Process(new StringOrigin(" _\n")));
-            Assert.IsEmpty(lexer.Process(new StringOrigin("*^& GY?'\t\n\t\tlikjd")));
-            Assert.IsEmpty(lexer.Process(new StringOrigin("\\")));
-            Assert.IsEmpty(lexer.Process(new StringOrigin("\\n")));
+            var lexer = new Nicodem.Lexer.Lexer(MakeCharRangeRegex('b', 'd'));
+            Assert.IsEmpty(lexer.Process(""));
+            Assert.IsEmpty(lexer.Process(" "));
+            Assert.IsEmpty(lexer.Process("a"));
+            Assert.IsEmpty(lexer.Process("asdf"));
+            Assert.IsEmpty(lexer.Process(" _\n"));
+            Assert.IsEmpty(lexer.Process("*^& GY?'\t\n\t\tlikjd"));
+            Assert.IsEmpty(lexer.Process("\\"));
+            Assert.IsEmpty(lexer.Process("\\n"));
             Assert.IsTrue(lexer.Process("ba").Tokens().SequenceEqual(new[] {"b"}));
             Assert.IsTrue(lexer.Process("bb").Tokens().SequenceEqual(new[] {"b", "b"}));
             Assert.IsEmpty(lexer.Process("ab"));
-            Assert.IsTrue(lexer.Process("db").Tokens().SequenceEqual(new [] {"d","b"}));
+            Assert.IsTrue(lexer.Process("db").Tokens().SequenceEqual(new[] {"d", "b"}));
+            Assert.IsEmpty(lexer.Process("eb"));
         }
     }
 
@@ -65,6 +125,24 @@ namespace Lexer.Tests
         internal static IEnumerable<string> Tokens(this IEnumerable<Tuple<string, IEnumerable<int>>> tokens)
         {
             return tokens.Select(t => t.Item1);
+        }
+
+        internal static bool TokenizedTo(this IEnumerable<Tuple<string, IEnumerable<int>>> tokens,
+            params Tuple<string, IEnumerable<int>>[] expectation)
+        {
+            var i = 0;
+            foreach (var token in tokens)
+            {
+                Assert.Less(i, expectation.Length);
+                Assert.AreEqual(token.Item1, expectation[i].Item1);
+                var tok1 = token.Item2.ToList();
+                tok1.Sort();
+                var tok2 = expectation[i].Item2.ToList();
+                tok2.Sort();
+                Assert.IsTrue(tok1.SequenceEqual(tok2));
+                i += 1;
+            }
+            return i == expectation.Length;
         }
     }
 }
