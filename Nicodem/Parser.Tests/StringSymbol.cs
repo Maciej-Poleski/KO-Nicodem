@@ -37,6 +37,11 @@ namespace Nicodem.Parser.Tests
 				return new StringSymbol (Char.MinValue.ToString());
 			}
 		}
+
+		public override string ToString ()
+		{
+			return "'" + S + "'";
+		}
 	}
 }
 

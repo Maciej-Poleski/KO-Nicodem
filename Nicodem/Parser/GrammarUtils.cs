@@ -190,13 +190,13 @@ namespace Nicodem.Parser
 			// begin with FIRST(A) := { A } foreach A
 			foreach(var A in automatons.Keys) {
 				first [A] = new HashSet<ISymbol> ();
-				first[A].Add(A);
+				first [A].Add (A);
 			}
 
 			// foreach production A -> E
 			// where A - symbol, E - automata
 			foreach(var symbol in automatons.Keys) {
-				var automata = automatons[symbol];
+				var automata = automatons [symbol];
 
 				// perform BFS from automata startstate
 				// using only edges labeled by symbols from nullable set
@@ -208,7 +208,7 @@ namespace Nicodem.Parser
 					// check all edges
 					foreach(var transition in state.Transitions) {
 						// add label to FIRST(symbol)
-						first[symbol].Add(transition.Key);
+						first [symbol].Add (transition.Key);
 						// if label is in NULLABLE set continue BFS using this edge
 						if(nullable.Contains(transition.Key))
 							Q.Enqueue(transition.Value);
@@ -220,15 +220,28 @@ namespace Nicodem.Parser
 			var change = true;
 			while(change) {
 				change = false;
+				// diff between before-phase and after-phase sets
+				var diff = new Dictionary<ISymbol, ISet<ISymbol>> ();
+
 				foreach(var A in first.Keys) {
+					diff [A] = new HashSet<ISymbol> ();
+
 					foreach(var B in first[A]) {
-						foreach(var x in first[B]) {
-							change |= !first[A].Contains(x);
-							first[A].Add(x);
+						if (first.ContainsKey (B)) {
+							foreach (var x in first[B]) {
+								change |= !(first [A].Contains (x) || diff [A].Contains (x));
+								diff [A].Add (x);
+							}
 						}
 					}
 				}
+
+				// update set
+				foreach (var A in first.Keys)
+					foreach (var x in diff[A])
+						first [A].Add (x);
 			}
+
 			return first;
 		}
 			

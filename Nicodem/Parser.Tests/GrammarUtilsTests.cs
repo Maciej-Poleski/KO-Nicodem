@@ -19,6 +19,14 @@ namespace Nicodem.Parser.Tests
 			return new HashSet<ISymbol>(args);
 		}
 
+		static Dfa<ISymbol> CreateDummyAcceptingDfa() 
+		{
+			var a = new DfaState<ISymbol> ();
+			var aTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			a.Initialize (0, aTransitionList);
+			return new Dfa<ISymbol> (a);
+		}
+
 		[TestFixtureSetUp]
 		public void initAutomatons(){
 			/*
@@ -85,6 +93,7 @@ namespace Nicodem.Parser.Tests
 			first [term] = CreateSet (openbracket, name, num);
 			first [term2] = CreateSet (multiply, divide, epsi);
 			first [factor] = CreateSet (openbracket, name, num);
+			first [goal] = first [expr];
 
 			// FOLLOW
 			// TODO(Jakub Brzeski)
@@ -111,6 +120,17 @@ namespace Nicodem.Parser.Tests
 
 			// ** Build automatons **
 
+			// for terminals - nulls
+			automatons [openbracket] = CreateDummyAcceptingDfa ();
+			automatons [closebracket] = CreateDummyAcceptingDfa ();
+			automatons [add] = CreateDummyAcceptingDfa ();
+			automatons [subtract] = CreateDummyAcceptingDfa ();
+			automatons [multiply] = CreateDummyAcceptingDfa ();
+			automatons [divide] = CreateDummyAcceptingDfa ();
+			automatons [num] = CreateDummyAcceptingDfa ();
+			automatons [name] = CreateDummyAcceptingDfa ();
+			automatons [epsi] = CreateDummyAcceptingDfa ();
+			automatons [eof] = CreateDummyAcceptingDfa ();
 
 			// Goal   -> Expr EOF
 			// Expr   -> Term Expr2
@@ -251,6 +271,14 @@ namespace Nicodem.Parser.Tests
 			Assert.IsTrue (nullable.SetEquals (computedNullable));
 		}
 
+		static void writeSet<T>( ISet<T> set )
+		{
+			Console.Write ("[ ");
+			foreach (var s in set)
+				Console.Write (s + " ");
+			Console.WriteLine ("]");
+		}
+
 		[Test]
 		public void testFirst()
 		{
@@ -263,6 +291,9 @@ namespace Nicodem.Parser.Tests
 
 				var set1 = first [key];
 				var set2 = computedFirst [key];
+				writeSet (set1);
+				writeSet (set2);
+				Console.WriteLine ();
 				Assert.IsTrue (set1.SetEquals (set2));
 			}
 		}

@@ -37,6 +37,10 @@
       <Project>{3A107436-1EC7-48E3-BF42-5E5E50C259E7}</Project>
       <Name>Lexer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\System.Collections.Immutable\System.Collections.Immutable.csproj">
+      <Project>{024A2111-4B19-44D7-917E-8514CF632469}</Project>
+      <Name>System.Collections.Immutable</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CharSymbol.cs" />
