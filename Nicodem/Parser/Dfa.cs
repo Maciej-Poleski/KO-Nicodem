@@ -6,7 +6,7 @@ using System.Collections.Immutable;
 namespace Nicodem.Parser
 {
 	// Remember that Transitions is indexed by symbol **ranges**.
-	public class Dfa<TSymbol> 
+	public class Dfa<TSymbol>
 		where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
 	{
 		public DfaState<TSymbol> Start { get; private set; }

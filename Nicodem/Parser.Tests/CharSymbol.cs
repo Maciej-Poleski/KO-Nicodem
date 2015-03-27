@@ -41,6 +41,12 @@ namespace Nicodem.Parser.Tests
 			}
 		}
 
+
+		public ISymbol MinValue {
+			get {
+				return new CharSymbol (Char.MinValue);
+			}
+		}
 		#endregion
 	}
 }

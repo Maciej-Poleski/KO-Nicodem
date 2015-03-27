@@ -69,7 +69,7 @@ namespace Nicodem.Parser
 				for(int i = st.Peek().TransitionIndex; i < trans.Count; i++) {
 
                     if(_grammar.InFirstPlus(trans[i].Key, currentSymbol)) {
-                        if(_grammar.IsTerminal(currentSymbol) || currentSymbol == term.EOF) {
+						if(_grammar.IsTerminal(currentSymbol) || currentSymbol.Equals(term.EOF)) {
 
 							children.Push(new ParseLeaf<TProduction>(it.Current.Fragment, currentSymbol));
 							st.Push(new ParseState(trans[i].Value, 0, it.Next()));
