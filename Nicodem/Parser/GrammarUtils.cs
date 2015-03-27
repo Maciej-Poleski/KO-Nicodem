@@ -40,6 +40,8 @@ namespace Nicodem.Parser
 					var state = queue.Dequeue();
 					foreach(var kv in state.Transitions) {
 						var nextState = kv.Value;
+						if (!predecessors.ContainsKey (nextState))
+							predecessors [nextState] = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
 						predecessors[nextState].Add(new KeyValuePair<ISymbol, DfaState<ISymbol>>(kv.Key,state));
 						if(!visited.Contains(nextState)) {
 							visited.Add(nextState);
@@ -187,6 +189,7 @@ namespace Nicodem.Parser
 
 			// begin with FIRST(A) := { A } foreach A
 			foreach(var A in automatons.Keys) {
+				first [A] = new HashSet<ISymbol> ();
 				first[A].Add(A);
 			}
 
@@ -202,13 +205,10 @@ namespace Nicodem.Parser
 
 				while(Q.Count > 0) {
 					var state = Q.Dequeue();
-
 					// check all edges
 					foreach(var transition in state.Transitions) {
-
 						// add label to FIRST(symbol)
 						first[symbol].Add(transition.Key);
-
 						// if label is in NULLABLE set continue BFS using this edge
 						if(nullable.Contains(transition.Key))
 							Q.Enqueue(transition.Value);
@@ -220,23 +220,18 @@ namespace Nicodem.Parser
 			var change = true;
 			while(change) {
 				change = false;
-
 				foreach(var A in first.Keys) {
 					foreach(var B in first[A]) {
-
 						foreach(var x in first[B]) {
 							change |= !first[A].Contains(x);
 							first[A].Add(x);
 						}
-
 					}
 				}
 			}
-		
 			return first;
 		}
-
-
+			
 	}
 }
 

@@ -1,6 +1,7 @@
 ﻿using Nicodem.Lexer;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System;
 
 namespace Nicodem.Parser.Tests
@@ -52,11 +53,16 @@ namespace Nicodem.Parser.Tests
 			var epsi = new StringSymbol ("epsi");
 			var eof = new StringSymbol ("EOF");
 
+			automatons = new Dictionary<ISymbol, Dfa<ISymbol>> ();
+
 			// ** Prepare correct nullable, first and follow sets ** 
 
 			// NULLABLE
 			// TODO(Jakub Brzeski)
 			nullable = CreateSet ();
+			nullable.Add (expr2);
+			nullable.Add (term2);
+
 
 			// FIRST
 			first = new Dictionary<ISymbol, ISet<ISymbol>>();
@@ -104,13 +110,7 @@ namespace Nicodem.Parser.Tests
 			follow [factor] = CreateSet (eof, add, subtract, multiply, divide, closebracket);
 
 			// ** Build automatons **
-			//TODO(Jakub Brzeski & Patryk Mikos) build automatons
-			automatons = new Dictionary<ISymbol, Dfa<ISymbol>> ();
 
-			var state_goal = new DfaState<ISymbol> ();
-
-			// Goal -> automaton 
-			// (a --Expr--> b)
 
 			// Goal   -> Expr EOF
 			// Expr   -> Term Expr2
@@ -125,17 +125,129 @@ namespace Nicodem.Parser.Tests
 			// 		  |  num
 			//        |  name
 
-			var bTransitions = new KeyValuePair<ISymbol, DFAState<ISymbol>>[0];
-			var b = new DFAState<ISymbol> (1, bTransitions);
-			var aTransitions = new KeyValuePair<ISymbol, DFAState<ISymbol>>[1];
-			aTransitions [0] = new KeyValuePair<ISymbol, DFAState<ISymbol>>(expr, b);
-			var a = new DFAState<ISymbol> (0, aTransitions);
+			// Goal -> Expr
+			// (a --Expr--> b)
+			var a = new DfaState<ISymbol> ();
+			var b = new DfaState<ISymbol> ();
+			var aTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			var bTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			aTransitionList.Add (new KeyValuePair<ISymbol, DfaState<ISymbol>>(expr, b));
+			a.Initialize (0, aTransitionList);
+			b.Initialize (1, bTransitionList);
+			automatons [goal] = new Dfa<ISymbol> (a);
+
+			// Expr -> Term Expr2
+			// a --Term--> b --Expr2--> c
+			a = new DfaState<ISymbol> ();
+			b = new DfaState<ISymbol> ();
+			var c = new DfaState<ISymbol> ();
+			aTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			bTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			var cTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			aTransitionList.Add(new KeyValuePair<ISymbol, DfaState<ISymbol>>(term, b));
+			bTransitionList.Add(new KeyValuePair<ISymbol, DfaState<ISymbol>>(expr2, c));
+			a.Initialize (0, aTransitionList);
+			b.Initialize (0, bTransitionList);
+			c.Initialize (1, cTransitionList);
+			automatons [expr] = new Dfa<ISymbol> (a);
+
+			// Expr2  -> + Term Expr2
+			// 		  |	- Term Expr2
+			// 		  |  epsilon
+			// a --'+'--> b --Term--> c --Expr2--> d
+			// a --'-'--> b
+			// a = accepting (because of epsilon)
+			a = new DfaState<ISymbol> ();
+			b = new DfaState<ISymbol> ();
+			c = new DfaState<ISymbol> ();
+			var d = new DfaState<ISymbol> ();
+			aTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			bTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			cTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			var dTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			aTransitionList.Add(new KeyValuePair<ISymbol, DfaState<ISymbol>>(add, b));
+			aTransitionList.Add(new KeyValuePair<ISymbol, DfaState<ISymbol>>(subtract, b));
+			bTransitionList.Add(new KeyValuePair<ISymbol, DfaState<ISymbol>>(term, c));
+			cTransitionList.Add(new KeyValuePair<ISymbol, DfaState<ISymbol>>(expr2, d));
+			a.Initialize (1, aTransitionList);
+			b.Initialize (0, bTransitionList);
+			c.Initialize (0, cTransitionList);
+			d.Initialize (1, dTransitionList);
+			automatons [expr2] = new Dfa<ISymbol> (a);
+
+			// Term   -> Factor Term2
+			// a --Factor--> b --Term2--> c
+			a = new DfaState<ISymbol> ();
+			b = new DfaState<ISymbol> ();
+			c = new DfaState<ISymbol> ();
+			aTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			bTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			cTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			aTransitionList.Add(new KeyValuePair<ISymbol, DfaState<ISymbol>>(factor, b));
+			bTransitionList.Add(new KeyValuePair<ISymbol, DfaState<ISymbol>>(term2, c));
+			a.Initialize (0, aTransitionList);
+			b.Initialize (0, bTransitionList);
+			c.Initialize (1, cTransitionList);
+			automatons [term] = new Dfa<ISymbol> (a);
+
+			// Term2  -> * Factor Term2
+			// 		  |  / Factor Term2
+			// 		  |  epsilon
+			// a --'*'--> b --Factor--> c --Term2--> d
+			// a --'/'--> b
+			// a = accepting (because of epsilon)
+			a = new DfaState<ISymbol> ();
+			b = new DfaState<ISymbol> ();
+			c = new DfaState<ISymbol> ();
+			d = new DfaState<ISymbol> ();
+			aTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			bTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			cTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			dTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			aTransitionList.Add(new KeyValuePair<ISymbol, DfaState<ISymbol>>(multiply, b));
+			aTransitionList.Add(new KeyValuePair<ISymbol, DfaState<ISymbol>>(divide, b));
+			bTransitionList.Add(new KeyValuePair<ISymbol, DfaState<ISymbol>>(factor, c));
+			cTransitionList.Add(new KeyValuePair<ISymbol, DfaState<ISymbol>>(term2, d));
+			a.Initialize (1, aTransitionList);
+			b.Initialize (0, bTransitionList);
+			c.Initialize (0, cTransitionList);
+			d.Initialize (1, dTransitionList);
+			automatons [term2] = new Dfa<ISymbol> (a);
+
+			// Factor -> '(' Expr ')'
+			// 		  |  num
+			//        |  name
+			// a --'('--> b --Expr--> c --')'--> d
+			// a --num--> d
+			// a --name-> d
+			a = new DfaState<ISymbol> ();
+			b = new DfaState<ISymbol> ();
+			c = new DfaState<ISymbol> ();
+			d = new DfaState<ISymbol> ();
+			aTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			bTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			cTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			dTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			aTransitionList.Add(new KeyValuePair<ISymbol, DfaState<ISymbol>>(openbracket, b));
+			aTransitionList.Add(new KeyValuePair<ISymbol, DfaState<ISymbol>>(num, d));
+			aTransitionList.Add(new KeyValuePair<ISymbol, DfaState<ISymbol>>(name, d));
+			bTransitionList.Add(new KeyValuePair<ISymbol, DfaState<ISymbol>>(expr, c));
+			cTransitionList.Add(new KeyValuePair<ISymbol, DfaState<ISymbol>>(closebracket, d));
+			a.Initialize (0, aTransitionList);
+			b.Initialize (0, bTransitionList);
+			c.Initialize (0, cTransitionList);
+			d.Initialize (1, dTransitionList);
+			automatons [factor] = new Dfa<ISymbol> (a);
+
 		}
 
 		[Test]
 		public void testNullable()
 		{
 			var computedNullable = GrammarUtils.ComputeNullable (automatons);
+			foreach (var symbol in computedNullable) {
+				Console.Write (((StringSymbol)symbol).S);
+			}
 			Assert.IsTrue (nullable.SetEquals (computedNullable));
 		}
 
