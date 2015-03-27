@@ -474,5 +474,53 @@ namespace Nicodem.Lexer
         } 
 
         #endregion
+
+        #region CompareDfa
+        internal class CompareDfa<TDfa, TDfaState, TSymbol> 
+            where TDfa : AbstractDfa<TDfaState, TSymbol> 
+            where TDfaState : AbstractDfaState<TDfaState, TSymbol> 
+            where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
+        {
+
+            private CompareDfa() { }
+
+            private static Dictionary<Tuple<TDfaState, TDfaState>, int> visited = new Dictionary<Tuple<TDfaState, TDfaState>, int>();
+
+            private bool CompareStates(TDfaState a, TDfaState b)
+            {
+                if (visited.ContainsKey(Tuple.Create(a, b))) return true;
+                visited[Tuple.Create(a, b)] = 1;
+                if (a == null || b == null) return false;
+                if (a.Accepting != b.Accepting) return false;
+                if (a.Transitions == null || b.Transitions == null) return false;
+                if (a.Transitions.Length != b.Transitions.Length) return false;
+
+                foreach (var transitionA in a.Transitions)
+                {
+                    foreach (var transitionB in b.Transitions)
+                    {
+                        bool statesAreEqual = false;
+                        if (transitionA.Key.Equals(transitionB.Key))
+                        {
+                            if (!CompareStates(transitionA.Value, transitionB.Value)) return false;
+                            else
+                            {
+                                statesAreEqual = true;
+                                break;
+                            }
+                        }
+                        if (!statesAreEqual) return false;
+                    }
+                }
+                visited[Tuple.Create(a, b)] = 2;
+                return true;
+            }
+
+            internal static bool Compare(TDfa a, TDfa b)
+            {
+                return new CompareDfa<TDfa, TDfaState, TSymbol>().CompareStates(a.Start, b.Start);
+            }
+        }
+        #endregion
     }
 }

@@ -55,7 +55,7 @@ namespace Lexer.Tests
             }
 
         }
-
+        /*
         //TODO(karol-banys)
         bool CompareDfaState<TDfaState, TSymbol>(AbstractDfaState<TDfaState, TSymbol> a, AbstractDfaState<TDfaState, TSymbol> b, Dictionary<Tuple<AbstractDfaState<TDfaState, TSymbol> ,AbstractDfaState<TDfaState, TSymbol> >, int> visited)
             where TDfaState : AbstractDfaState<TDfaState, TSymbol>
@@ -95,14 +95,14 @@ namespace Lexer.Tests
             var visited = new Dictionary<Tuple<AbstractDfaState<TDfaState, TSymbol>, AbstractDfaState<TDfaState, TSymbol>>, int>();
             return CompareDfaState(a.Start, b.Start, visited);
         }
-
+        */
          [Test]
          public void EmptyRegExTests()
          {
              RegExDfa<char> regExDfa = new RegExDfa<char>(RegExFactory.Empty<char>(), 0);
              CheckNullTransitionTests(regExDfa);
              var dfaEmpty = new RegExDfa<char>(new DFAState<char>(0, new KeyValuePair<char, DFAState<char>>[]{ deadTransition }));
-            //Assert.IsTrue(CompareDfa(regExDfa, dfaEmpty)); <- comparison hasn't worked yet
+             Assert.IsTrue(DfaUtils.CompareDfa<RegExDfa<char>, DFAState<char>, char>.Compare(regExDfa, dfaEmpty));
          }
 
 
@@ -112,7 +112,7 @@ namespace Lexer.Tests
             RegExDfa<char> regExDfa = new RegExDfa<char>(RegExFactory.Epsilon<char>(), 1);
             CheckNullTransitionTests(regExDfa);
             var dfaEpsilon = new RegExDfa<char>(new DFAState<char>(1, new KeyValuePair<char, DFAState<char>>[] { deadTransition }));
-            //Assert.IsTrue(CompareDfa(regExDfa, dfaEpsilon)); <- comparison hasn't worked yet
+            Assert.IsTrue(DfaUtils.CompareDfa<RegExDfa<char>, DFAState<char>, char>.Compare(regExDfa, dfaEpsilon));
         }
     }
 }
