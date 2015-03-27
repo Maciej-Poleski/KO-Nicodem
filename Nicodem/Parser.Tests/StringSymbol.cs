@@ -23,7 +23,7 @@ namespace Nicodem.Parser.Tests
 			if (other is StringSymbol) {
 				return String.Compare (S, (other as StringSymbol).S);
 			}
-			return 0;
+			return -1;
 		}
 
 		public ISymbol EOF {
@@ -32,6 +32,11 @@ namespace Nicodem.Parser.Tests
 			}
 		}
 	
+		public ISymbol MinValue {
+			get {
+				return new StringSymbol (Char.MinValue.ToString());
+			}
+		}
 	}
 }
 
