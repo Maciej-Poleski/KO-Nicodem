@@ -134,7 +134,7 @@ namespace Lexer.Tests
             Assert.AreEqual(someOtherDfa.Start.Accepting, 0);
             Assert.AreEqual(someOtherDfa.Start.Transitions.Count, 1);
             Assert.AreEqual(someOtherDfa.Start.Transitions[0].Key, '\0');
-            Assert.AreEqual(someOtherDfa.Start.Transitions[0].Value, someOtherDfa.Start);
+            Assert.AreSame(someOtherDfa.Start.Transitions[0].Value, someOtherDfa.Start);
         }
 
     }

@@ -37,7 +37,7 @@ namespace Nicodem.Lexer
         ///     będą oznaczane kategorią
         ///     <code>i</code>
         /// </param>
-        public Lexer(RegEx<char>[] regexCategories)
+        public Lexer(params RegEx<char>[] regexCategories)
         {
             _atomicCategoryLimit = (uint) regexCategories.Length;
             _nextCategory = _atomicCategoryLimit + 1;
