@@ -7,11 +7,11 @@ namespace Nicodem.Parser
 {
 	public struct LlConfiguration<TSymbol> where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
 	{
-		public ISymbol Label { get; private set; } 
+		public readonly TSymbol label; 
 		private Stack<DfaState<TSymbol> > stack;
 
 		public LlConfiguration(TSymbol label) {
-			Label = label;
+			this.label = label;
 			stack = new Stack<DfaState<TSymbol> > ();
 		}
 
@@ -24,7 +24,7 @@ namespace Nicodem.Parser
 			return stack.Pop ();
 		}
 
-		public Dfa<TSymbol> Peek() {
+		public DfaState<TSymbol> Peek() {
 			return stack.Peek();
 		}
 
