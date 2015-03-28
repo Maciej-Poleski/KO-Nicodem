@@ -58,24 +58,17 @@ namespace Nicodem.Parser.Tests
 			var divide = new StringSymbol ("/");
 			var num = new StringSymbol ("num");
 			var name = new StringSymbol ("name");
-			var epsi = new StringSymbol ("epsi");
 			var eof = new StringSymbol ("EOF");
 
 			automatons = new Dictionary<ISymbol, Dfa<ISymbol>> ();
 
-			// ** Prepare correct nullable, first and follow sets ** 
-
 			// NULLABLE
-			// TODO(Jakub Brzeski)
 			nullable = CreateSet ();
 			nullable.Add (expr2);
 			nullable.Add (term2);
 
-
 			// FIRST
 			first = new Dictionary<ISymbol, ISet<ISymbol>>();
-
-			//terminals
 			first [openbracket] = CreateSet (openbracket);
 			first [closebracket] = CreateSet (closebracket);
 			first [add] = CreateSet (add);
@@ -84,22 +77,17 @@ namespace Nicodem.Parser.Tests
 			first [divide] = CreateSet (divide);
 			first [num] = CreateSet (num);
 			first [name] = CreateSet (name);
-			first [epsi] = CreateSet (epsi);
 			first [eof] = CreateSet (eof);
-
 			//nonterminals
-			first [expr] = CreateSet (openbracket, name, num);
-			first [expr2] = CreateSet (add, subtract, epsi);
-			first [term] = CreateSet (openbracket, name, num);
-			first [term2] = CreateSet (multiply, divide, epsi);
-			first [factor] = CreateSet (openbracket, name, num);
-			first [goal] = first [expr];
+			first [goal] = CreateSet (goal, expr, term, factor, openbracket, name, num);
+			first [expr] = CreateSet (expr, term, factor, openbracket, name, num);
+			first [expr2] = CreateSet (expr2, add, subtract);
+			first [term] = CreateSet (term, factor, openbracket, name, num);
+			first [term2] = CreateSet (term2, multiply, divide);
+			first [factor] = CreateSet (factor, openbracket, name, num);
 
 			// FOLLOW
-			// TODO(Jakub Brzeski)
 			follow = new Dictionary<ISymbol, ISet<ISymbol>>();
-
-			//terminals
 			follow [openbracket] = CreateSet ();
 			follow [closebracket] = CreateSet ();
 			follow [add] = CreateSet ();
@@ -108,9 +96,7 @@ namespace Nicodem.Parser.Tests
 			follow [divide] = CreateSet ();
 			follow [num] = CreateSet ();
 			follow [name] = CreateSet ();
-			follow [epsi] = CreateSet ();
 			follow [eof] = CreateSet ();
-
 			//nonterminals
 			follow [expr] = CreateSet (eof, closebracket);
 			follow [expr2] = CreateSet (eof, closebracket);
@@ -129,7 +115,6 @@ namespace Nicodem.Parser.Tests
 			automatons [divide] = CreateDummyAcceptingDfa ();
 			automatons [num] = CreateDummyAcceptingDfa ();
 			automatons [name] = CreateDummyAcceptingDfa ();
-			automatons [epsi] = CreateDummyAcceptingDfa ();
 			automatons [eof] = CreateDummyAcceptingDfa ();
 
 			// Goal   -> Expr EOF
@@ -145,25 +130,29 @@ namespace Nicodem.Parser.Tests
 			// 		  |  num
 			//        |  name
 
-			// Goal -> Expr
-			// (a --Expr--> b)
+			// Goal -> Expr EOF
+			// (a --Expr--> b --EOF--> c)
 			var a = new DfaState<ISymbol> ();
 			var b = new DfaState<ISymbol> ();
+			var c = new DfaState<ISymbol> ();
 			var aTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
 			var bTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			var cTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
 			aTransitionList.Add (new KeyValuePair<ISymbol, DfaState<ISymbol>>(expr, b));
+			bTransitionList.Add (new KeyValuePair<ISymbol, DfaState<ISymbol>> (eof, c));
 			a.Initialize (0, aTransitionList);
-			b.Initialize (1, bTransitionList);
+			b.Initialize (0, bTransitionList);
+			c.Initialize (1, cTransitionList);
 			automatons [goal] = new Dfa<ISymbol> (a);
 
 			// Expr -> Term Expr2
 			// a --Term--> b --Expr2--> c
 			a = new DfaState<ISymbol> ();
 			b = new DfaState<ISymbol> ();
-			var c = new DfaState<ISymbol> ();
+			c = new DfaState<ISymbol> ();
 			aTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
 			bTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
-			var cTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
+			cTransitionList = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
 			aTransitionList.Add(new KeyValuePair<ISymbol, DfaState<ISymbol>>(term, b));
 			bTransitionList.Add(new KeyValuePair<ISymbol, DfaState<ISymbol>>(expr2, c));
 			a.Initialize (0, aTransitionList);
@@ -284,16 +273,10 @@ namespace Nicodem.Parser.Tests
 		{
 			var computedFirst = GrammarUtils.ComputeFirst (automatons, nullable);
 			Assert.AreEqual (first.Keys.Count, computedFirst.Keys.Count);
-
 			foreach (var key in first.Keys) {
-
 				Assert.IsTrue (computedFirst.ContainsKey (key));
-
 				var set1 = first [key];
 				var set2 = computedFirst [key];
-				writeSet (set1);
-				writeSet (set2);
-				Console.WriteLine ();
 				Assert.IsTrue (set1.SetEquals (set2));
 			}
 		}

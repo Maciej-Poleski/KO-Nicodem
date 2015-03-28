@@ -245,34 +245,6 @@ namespace Nicodem.Parser
 				}
 			}
 
-			/*
-			// B \in FIRST(A) => FIRST(B) <= FIRST(A)
-			var change = true;
-			while(change) {
-				change = false;
-				// diff between before-phase and after-phase sets
-				var diff = new Dictionary<ISymbol, ISet<ISymbol>> ();
-
-				foreach(var A in first.Keys) {
-					diff [A] = new HashSet<ISymbol> ();
-
-					foreach(var B in first[A]) {
-						if (first.ContainsKey (B)) {
-							foreach (var x in first[B]) {
-								change |= !(first [A].Contains (x) || diff [A].Contains (x));
-								diff [A].Add (x);
-							}
-						}
-					}
-				}
-
-				// update set
-				foreach (var A in first.Keys)
-					foreach (var x in diff[A])
-						first [A].Add (x);
-			}
-			*/
-
 			ComputeTransitiveComplement (first);
 			return first;
 		}
