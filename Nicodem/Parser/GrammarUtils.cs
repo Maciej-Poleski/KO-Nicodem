@@ -53,6 +53,35 @@ namespace Nicodem.Parser
 			return predecessors;
 		}
 
+		public static void ComputeTransitiveComplement<T>(IDictionary<T, ISet<T>> dict) 
+		{
+			// B \in D(A) => D(B) <= D(A)
+			var change = true;
+			while(change) {
+				change = false;
+				// diff between before-phase and after-phase sets
+				var diff = new Dictionary<T, ISet<T>> ();
+
+				foreach(var A in dict.Keys) {
+					diff [A] = new HashSet<T> ();
+
+					foreach(var B in dict[A]) {
+						if (dict.ContainsKey (B)) {
+							foreach (var x in dict[B]) {
+								change |= !(dict [A].Contains (x) || diff [A].Contains (x));
+								diff [A].Add (x);
+							}
+						}
+					}
+				}
+
+				// update set
+				foreach (var A in dict.Keys)
+					foreach (var x in diff[A])
+						dict [A].Add (x);
+			}
+		}
+
 		public static ISet<ISymbol> ComputeNullable(IDictionary<ISymbol, Dfa<ISymbol>> automatons) 
 		{
 			// For productions A -> E startStatesLhs maps start state of automaton of E to A
@@ -216,6 +245,7 @@ namespace Nicodem.Parser
 				}
 			}
 
+			/*
 			// B \in FIRST(A) => FIRST(B) <= FIRST(A)
 			var change = true;
 			while(change) {
@@ -241,7 +271,9 @@ namespace Nicodem.Parser
 					foreach (var x in diff[A])
 						first [A].Add (x);
 			}
+			*/
 
+			ComputeTransitiveComplement (first);
 			return first;
 		}
 			

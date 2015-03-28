@@ -313,6 +313,127 @@ namespace Nicodem.Parser.Tests
 				Assert.IsTrue (set1.SetEquals (set2));
 			}
 		}
+
+		[Test]
+		public void testTransitiveComplement_DiagonalRelation()
+		{
+			var relation = new Dictionary<int, ISet<int>> ();
+			for (int i = 0; i < 4; ++i)
+				relation.Add (i, new HashSet<int> { i });
+
+			GrammarUtils.ComputeTransitiveComplement (relation);
+
+			Assert.AreEqual (4, relation.Keys.Count);
+			for (int i = 0; i < 4; ++i)
+				Assert.IsTrue (relation [i].SetEquals (new HashSet<int>{ i }));
+		}
+
+		[Test]
+		public void testTransitiveComplement_UpperTriangleRelation()
+		{
+			var relation = new Dictionary<int, ISet<int>> ();
+
+			// 0 > 1, 1 > 2, 2 > 3, 3 > 4
+			for (int i = 0; i < 4; ++i)
+				relation.Add (i, new HashSet<int> { i + 1 });
+			relation.Add (4, new HashSet<int> ());
+
+			GrammarUtils.ComputeTransitiveComplement (relation);
+
+			Assert.AreEqual (5, relation.Keys.Count);
+			for (int i = 0; i < 5; ++i) {
+				var s = new HashSet<int> ();
+				for (int j = i + 1; j < 5; ++j)
+					s.Add (j);
+				Assert.IsTrue (relation [i].SetEquals (s));
+			}
+		}
+
+		[Test]
+		public void testTransitiveComplement_FullRelation()
+		{
+			var relation = new Dictionary<int, ISet<int>> ();
+
+			// 0 > 1, 1 > 2, 2 > 3, 3 > 4, 4 > 0
+			for (int i = 0; i < 5; ++i)
+				relation.Add (i, new HashSet<int> { (i + 1) % 5 });
+
+			GrammarUtils.ComputeTransitiveComplement (relation);
+
+			Assert.AreEqual (5, relation.Keys.Count);
+			var s = new HashSet<int> { 0, 1, 2, 3, 4 };
+			for (int i = 0; i < 5; ++i)
+				Assert.IsTrue (relation [i].SetEquals (s));
+		}
+
+		[Test]
+		public void testTransitiveComplement_EmptyRelation()
+		{
+			var relation = new Dictionary<int, ISet<int>> ();
+
+			for (int i = 0; i < 5; ++i)
+				relation.Add (i, new HashSet<int> ());
+
+			GrammarUtils.ComputeTransitiveComplement (relation);
+
+			Assert.AreEqual (5, relation.Keys.Count);
+			for (int i = 0; i < 5; ++i)
+				Assert.IsTrue (relation [i].SetEquals (new HashSet<int> ()));
+		}
+
+		[Test]
+		public void testTransitiveComplement_3ClassesRelation()
+		{
+			var relation = new Dictionary<int, ISet<int>> ();
+
+			// first class { 0, 1 }
+			relation.Add (0, new HashSet<int> { 1 });
+			relation.Add (1, new HashSet<int> { 0 });
+
+			// second class { 2, 3, 4, 5 }
+			relation.Add (2, new HashSet<int> { 5 });
+			relation.Add (3, new HashSet<int> { 4 });
+			relation.Add (4, new HashSet<int> { 2 });
+			relation.Add (5, new HashSet<int> { 3 });
+
+			// third class { 6 }
+			relation.Add (6, new HashSet<int> { 6 });
+
+			GrammarUtils.ComputeTransitiveComplement (relation);
+
+			Assert.AreEqual (7, relation.Keys.Count);
+
+			Assert.IsTrue (relation [0].SetEquals (new HashSet<int> { 0, 1 }));
+			Assert.IsTrue (relation [1].SetEquals (new HashSet<int> { 0, 1 }));
+
+			Assert.IsTrue (relation [2].SetEquals (new HashSet<int> { 2, 3, 4, 5 }));
+			Assert.IsTrue (relation [3].SetEquals (new HashSet<int> { 2, 3, 4, 5 }));
+			Assert.IsTrue (relation [4].SetEquals (new HashSet<int> { 2, 3, 4, 5 }));
+			Assert.IsTrue (relation [5].SetEquals (new HashSet<int> { 2, 3, 4, 5 }));
+
+			Assert.IsTrue (relation [6].SetEquals (new HashSet<int> { 6 }));
+		}
+
+		[Test]
+		public void testTransitiveComplement_MixedRelation()
+		{
+			var relation = new Dictionary<int, ISet<int>> ();
+			relation.Add (0, new HashSet<int> { 1, 3, 4 });
+			relation.Add (1, new HashSet<int> ());
+			relation.Add (2, new HashSet<int> { 0 });
+			relation.Add (3, new HashSet<int> ());
+			relation.Add (4, new HashSet<int> { 2 });
+
+			GrammarUtils.ComputeTransitiveComplement (relation);
+
+			Assert.AreEqual (5, relation.Keys.Count);
+
+			Assert.IsTrue (relation [0].SetEquals (new HashSet<int> { 0, 1, 2, 3, 4 }));
+			Assert.IsTrue (relation [1].SetEquals (new HashSet<int> ()));
+			Assert.IsTrue (relation [2].SetEquals (new HashSet<int> { 0, 1, 2, 3, 4 }));
+			Assert.IsTrue (relation [3].SetEquals (new HashSet<int> ()));
+			Assert.IsTrue (relation [4].SetEquals (new HashSet<int> { 0, 1, 2, 3, 4 }));
+		}
 	}
 }
 
