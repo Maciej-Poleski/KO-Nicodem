@@ -5,24 +5,30 @@ using System.Collections.Immutable;
 
 namespace Nicodem.Parser
 {
-	public struct LlConfiguration
+	public struct LlConfiguration<TSymbol> where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
 	{
-		public May<ISymbol> Decision { get; private set; } // optional because the decision can be to accept
-		public ImmutableList<DfaState<ISymbol>> Stack { get; private set; }
+		public ISymbol Label { get; private set; } 
+		private Stack<DfaState<TSymbol> > stack;
 
-		public IEnumerable<KeyValuePair<May<ISymbol>, LlConfiguration>> OutgoingEdges
-		{
-			get {
-				throw new NotImplementedException();
-			}
+		public LlConfiguration(TSymbol label) {
+			Label = label;
+			stack = new Stack<DfaState<TSymbol> > ();
 		}
 
-		public LlConfiguration(May<ISymbol> decision, ImmutableList<DfaState<ISymbol>> stack)
+		public void Push(DfaState<TSymbol> state)
 		{
-			throw new NotImplementedException();
+			stack.Push (state);
 		}
 
-		public bool Subsumes(LlConfiguration rhs)
+		public DfaState<TSymbol> Pop() {
+			return stack.Pop ();
+		}
+
+		public Dfa<TSymbol> Peek() {
+			return stack.Peek();
+		}
+
+		public bool Subsumes(LlConfiguration<TSymbol> rhs)
 		{
 			throw new NotImplementedException();
 		}
