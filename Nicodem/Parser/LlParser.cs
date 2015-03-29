@@ -34,10 +34,10 @@ namespace Nicodem.Parser
 		}
 
         // returns either a list of successfull parsed results or a singleton list with failure 
-        private IEnumerable<ParseResult> ParseTerm(ISymbol term, MemoizedInput<IParseTree<TProduction>> word, MemoizedInput<IParseTree<TProduction>>.Iterator input)
+		private IEnumerable<ParseResult<TProduction>> ParseTerm(ISymbol term, MemoizedInput<IParseTree<TProduction>> word, MemoizedInput<IParseTree<TProduction>>.Iterator input)
 		{
-			// stack for backtracking - <position in word, current state of appropriate DFA>
 			var dfa = _grammar.Automatons[term];
+			// stack for backtracking - <position in word, current state of appropriate DFA>
 			var st = new Stack<ParseState>(); 
 			var children = new Stack<IParseTree<TProduction>>(); 
             bool accepted = false;
@@ -62,20 +62,20 @@ namespace Nicodem.Parser
 						_grammar.WhichProduction[node.Accepting], 
 						parsedChildren);
 
-                    yield return new ParseResult(parsedTree, it);
+					yield return new ParseResult<TProduction>(parsedTree, it);
 				}
 
 				var trans = node.Transitions;
 				for(int i = st.Peek().TransitionIndex; i < trans.Count; i++) {
 
                     if(_grammar.InFirstPlus(trans[i].Key, currentSymbol)) {
-						if(_grammar.IsTerminal(currentSymbol) || currentSymbol.Equals(term.EOF)) {
+						if(_grammar.IsTerminal(trans[i].Key)) {
 
 							children.Push(new ParseLeaf<TProduction>(it.Current.Fragment, currentSymbol));
 							st.Push(new ParseState(trans[i].Value, 0, it.Next()));
 							break;
 						} else {
-                            IEnumerator<ParseResult> resultIt = ParseTerm(trans[i].Key, word, it).GetEnumerator();
+							IEnumerator<ParseResult<TProduction>> resultIt = ParseTerm(trans[i].Key, word, it).GetEnumerator();
                             resultIt.MoveNext();
                             if(resultIt.Current) { // TODO else and look at the furthest parsed
                                 children.Push(resultIt.Current.Tree);
@@ -105,7 +105,7 @@ namespace Nicodem.Parser
 						term, 
 						_grammar.Productions[term][0],  // TODO could not parse any productions
 						furthestParsed.Children);
-				yield return new ParseResult(branch, furthestParsed.Iterator, false);
+				yield return new ParseResult<TProduction>(branch, furthestParsed.Iterator, false);
 			}
 		}
 
@@ -143,12 +143,12 @@ namespace Nicodem.Parser
 			public int TransitionIndex { get; private set; }
 			public MemoizedInput<IParseTree<TProduction>>.Iterator Iterator { get; private set; }
             // used when function may return multiple ok results during one call
-            public IEnumerator<ParseResult> NextPossibleResult { get; private set; } 
+			public IEnumerator<ParseResult<TProduction>> NextPossibleResult { get; private set; } 
 
             public ParseState(DfaState<ISymbol> state, 
                 int transitionIndex, 
                 MemoizedInput<IParseTree<TProduction>>.Iterator iterator, 
-                IEnumerator<ParseResult> nextPossibleResult = null)
+				IEnumerator<ParseResult<TProduction>> nextPossibleResult = null)
 				: this()
 			{
 				State = state;
@@ -170,26 +170,5 @@ namespace Nicodem.Parser
 			}
 		}
 
-		// TODO consider adding something denoting parsing error
-		private struct ParseResult 
-		{
-
-			public IParseTree<TProduction> Tree { get; private set; } 
-			public MemoizedInput<IParseTree<TProduction>>.Iterator Iterator { get; private set; }
-			private bool _ok;
-
-			public ParseResult(IParseTree<TProduction> tree, MemoizedInput<IParseTree<TProduction>>.Iterator iterator, bool ok = true)
-				: this()
-			{
-				Tree = tree;
-				Iterator = iterator;
-				_ok = ok;
-			}
-
-			public static implicit operator bool(ParseResult result)
-			{
-				return result._ok;
-			}
-		}
 	}
 }

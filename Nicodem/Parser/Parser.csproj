@@ -61,6 +61,8 @@
     <Compile Include="LookaheadDfa.cs" />
     <Compile Include="LlConfiguration.cs" />
     <Compile Include="LookaheadDfaBuilder.cs" />
+    <Compile Include="LLStarParser.cs" />
+    <Compile Include="ParseResult.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
