@@ -176,10 +176,15 @@ namespace Nicodem.Lexer
         ///     Properties:
         ///     X** = X*
         ///     epsi* ~ empty* ~ epsi
+		/// 	all* ~ all
         /// </summary>
         /// <param name="regex">RegEx to be starred</param>
         public static RegEx<T> Star<T>(RegEx<T> regex) where T : IComparable<T>, IEquatable<T>
         {
+			// all* ~ all
+			if (0 == All<T> ().CompareTo (regex))
+				return All<T> ();
+
             // epsi* ~ empty* ~ epsi
             if (0 == Epsilon<T>().CompareTo(regex) || 0 == Empty<T>().CompareTo(regex))
                 return Epsilon<T>();
@@ -191,10 +196,20 @@ namespace Nicodem.Lexer
         /// <summary>
         ///     Properties:
         ///     ~~X ~ X
+		/// 	~all ~ empty
+		/// 	~empty ~ all
         /// </summary>
         /// <param name="regex"></param>
         public static RegEx<T> Complement<T>(RegEx<T> regex) where T : IComparable<T>, IEquatable<T>
         {
+			// ~all ~ empty
+			if (All<T> ().Equals (regex))
+				return Empty<T> ();
+
+			// ~empty ~ all
+			if (Empty<T> ().Equals (regex))
+				return All<T> ();
+
             // ~~X ~ X
             var rcomp = regex as RegExComplement<T>;
             return rcomp != null ? rcomp.Regex : new RegExComplement<T>(regex);

@@ -218,6 +218,16 @@ namespace Lexer.Tests
 			Assert.AreEqual (0, epsi.CompareTo (star_empty));
 		}
 
+		// star(all) = all
+		[Test]
+		public void Test_Star_All()
+		{
+			var all = RegExFactory.All<char> ();
+			var star = RegExFactory.Star (all);
+
+			Assert.AreEqual (all, star);
+		}
+
 		#endregion
 
 		#region Complement
@@ -232,6 +242,28 @@ namespace Lexer.Tests
 
 			Assert.IsTrue (compl2 is RegExRange<char>);
 			Assert.AreEqual (0, regex.CompareTo (compl2));
+		}
+
+		[Test]
+		// complement(all) = empty
+		public void Test_Complement_All() 
+		{
+			var all = RegExFactory.All<char> ();
+			var compl_all = RegExFactory.Complement (all);
+			var empty = RegExFactory.Empty<char> ();
+
+			Assert.AreEqual (empty, compl_all);
+		}
+
+		[Test]
+		// complement(empty) = all
+		public void Test_Complement_Empty() 
+		{
+			var all = RegExFactory.All<char> ();
+			var empty = RegExFactory.Empty<char> ();
+			var compl_empty = RegExFactory.Complement (empty);
+
+			Assert.AreEqual (all, compl_empty);
 		}
 
 		#endregion
