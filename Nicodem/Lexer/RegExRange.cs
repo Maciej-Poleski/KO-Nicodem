@@ -25,6 +25,11 @@ namespace Nicodem.Lexer
             return Character.CompareTo(range.Character);
         }
 
+		public override string ToString ()
+		{
+			return string.Format ("[...{0}]", Character);
+		}
+
         public override bool HasEpsilon()
         {
             return false;

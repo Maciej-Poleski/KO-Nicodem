@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Nicodem.Lexer
 {
@@ -36,6 +37,14 @@ namespace Nicodem.Lexer
 
             return 0;
         }
+
+		public override string ToString ()
+		{
+			var builder = new StringBuilder ();
+			foreach (var r in Regexes)
+				builder.Append ("(").Append (r).Append (") | ");
+			return builder.ToString ();
+		}
 
         public override bool HasEpsilon()
         {

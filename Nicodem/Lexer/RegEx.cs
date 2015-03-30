@@ -57,6 +57,11 @@ namespace Nicodem.Lexer
             return base.GetHashCode();
         }
 
+		public override string ToString ()
+		{
+			return string.Format ("RegEx ");
+		}
+
         #endregion
 
 		public static RegEx<N> Convert<N>(RegEx<T> regex, Func<T, N> converter)

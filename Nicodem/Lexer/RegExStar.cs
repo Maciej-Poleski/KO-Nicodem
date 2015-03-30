@@ -25,6 +25,11 @@ namespace Nicodem.Lexer
 			return Regex.CompareTo (star.Regex);
 		}
 
+		public override string ToString ()
+		{
+			return string.Format ("({0})*", Regex);
+		}
+
 		public override bool HasEpsilon()
 		{
 			return true;

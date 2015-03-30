@@ -20,6 +20,11 @@ namespace Nicodem.Lexer
             return TypeId - other.TypeId;
         }
 
+		public override string ToString ()
+		{
+			return string.Format ("epsi");
+		}
+
         public override bool HasEpsilon()
         {
             return true;
