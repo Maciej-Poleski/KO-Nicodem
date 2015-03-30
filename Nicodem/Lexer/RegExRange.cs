@@ -27,7 +27,7 @@ namespace Nicodem.Lexer
 
 		public override string ToString ()
 		{
-			return string.Format ("[...{0}]", Character);
+            return string.Format("[{0}...]", Character);
 		}
 
         public override bool HasEpsilon()
