@@ -13,7 +13,7 @@ namespace Nicodem.Parser
 
 		public LlParser(Grammar<TProduction> grammar)
 		{
-			if(grammar.HasLeftRecursion()) {
+			if(grammar.HasLeftRecursion) {
                 throw new ArgumentException("Grammar has left recursion");
 			}
             _grammar = grammar;

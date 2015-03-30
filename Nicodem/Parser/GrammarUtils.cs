@@ -248,6 +248,76 @@ namespace Nicodem.Parser
 			ComputeTransitiveComplement (first);
 			return first;
 		}
+
+
+        private static bool DepthFirstSearchOnSymbol(ISymbol symbol, Dictionary<DfaState<ISymbol>, int> color, IDictionary<ISymbol, Dfa<ISymbol>> automatons, ISet<ISymbol> nullable)
+        {
+            var automata = automatons[symbol];
+            return DepthFirstSearchOnState(automata.Start, color, automatons, nullable);
+        }
+
+        private static bool DepthFirstSearchOnState(DfaState<ISymbol> state, Dictionary<DfaState<ISymbol>, int> color, IDictionary<ISymbol, Dfa<ISymbol>> automatons, ISet<ISymbol> nullable)
+        {
+
+            //check if is visited or not
+            if (color.ContainsKey(state))
+            {
+                if (color[state] == 1)
+                    return true;
+                else
+                    return false;
+            }
+
+            color[state] = 1;
+
+            foreach (var transition in state.Transitions)
+            {
+                //for nullable keys go on the same automata
+                if (nullable.Contains(transition.Key))
+                {
+                    if (DepthFirstSearchOnState(transition.Value, color, automatons, nullable))
+                        return true;
+                }
+
+                //for every key go on symbol
+                if (DepthFirstSearchOnSymbol(transition.Key, color, automatons, nullable))
+                    return true;
+            }
+
+
+            color[state] = 2;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Function check presence of left recursion
+        /// </summary>
+        /// <param name="automatons">Automatons for grammatic</param>
+        /// <param name="nullable">Nullable set in grammatic</param>
+        /// <returns></returns>
+        public static bool HasLeftRecursion(IDictionary<ISymbol, Dfa<ISymbol>> automatons, ISet<ISymbol> nullable)
+        {
+            //check if is nullable available
+            if (nullable == null)
+                throw new ArgumentNullException("Can not check left recursion without knowledge about Nullable");
+
+            //check if there is at least one automaton
+            if (automatons == null)
+                throw new ArgumentNullException("Can not check left recursion on null automaton");
+
+            //color of state white(0)/gray(1)/black(2)
+            var color = new Dictionary<DfaState<ISymbol>, int>();
+
+            //try to search on every symbol
+            foreach (var symbol in automatons.Keys)
+            {
+                if (DepthFirstSearchOnSymbol(symbol, color, automatons, nullable))
+                    return true;
+            }
+
+            return false;
+        }
 			
 	}
 }
