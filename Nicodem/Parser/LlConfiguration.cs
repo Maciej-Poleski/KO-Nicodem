@@ -28,9 +28,28 @@ namespace Nicodem.Parser
 			return stack.Peek();
 		}
 
-		public bool Subsumes(LlConfiguration<TSymbol> rhs)
+		public int Count() {
+			return stack.Count;
+		}
+
+		public bool Subsumes(LlConfiguration<TSymbol> configuration)
 		{
-			throw new NotImplementedException();
+			if ( (this.label.CompareTo(configuration.label) == 0 ) 
+				|| this.stack.Count > configuration.Count())
+				return false;
+
+			var firstStack = this.stack.ToArray();
+			Array.Reverse (firstStack);
+
+			var secondStack = this.stack.ToArray();
+			Array.Reverse (secondStack);
+
+			for (int i = 0; i < firstStack.Length; i++) {
+				if (firstStack [i] != secondStack [i])
+					return false;
+			}
+
+			return true;
 		}
 	}
 }
