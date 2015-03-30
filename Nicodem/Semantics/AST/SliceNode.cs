@@ -1,4 +1,6 @@
-﻿namespace Nicodem.Semantics.AST
+﻿using Nicodem.Semantics.Visitors;
+
+namespace Nicodem.Semantics.AST
 {
 	class SliceNode : ExpressionNode
 	{
@@ -8,6 +10,11 @@
 
 		public bool HasLeft { get { return !ReferenceEquals (Left, null); } }
 		public bool HasRight { get { return !ReferenceEquals (Right, null); } }
+
+		public override void Accept (AbstractVisitor visitor)
+		{
+			visitor.Visit (this);
+		}
 	}
 }
 

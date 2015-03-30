@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Nicodem.Semantics.Visitors;
 
 namespace Nicodem.Semantics.AST
 {
@@ -8,6 +9,11 @@ namespace Nicodem.Semantics.AST
 
 		public ArrayNode( TypeNode type ) : base( type )
 		{
+		}
+
+		public override void Accept (AbstractVisitor visitor)
+		{
+			visitor.Visit (this);
 		}
 	}
 }

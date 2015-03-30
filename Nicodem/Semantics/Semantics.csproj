@@ -54,10 +54,12 @@
     <Compile Include="AST\LoopControlNode.cs" />
     <Compile Include="AST\SliceNode.cs" />
     <Compile Include="AST\ElementNode.cs" />
+    <Compile Include="Visitors\AbstractVisitor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="AST\" />
+    <Folder Include="Visitors\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Source\Source.csproj">

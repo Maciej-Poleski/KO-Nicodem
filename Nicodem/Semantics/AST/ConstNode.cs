@@ -1,4 +1,6 @@
-﻿namespace Nicodem.Semantics.AST
+﻿using Nicodem.Semantics.Visitors;
+
+namespace Nicodem.Semantics.AST
 {
 	class ConstNode : ExpressionNode
 	{
@@ -15,6 +17,11 @@
 		public ConstNode( TypeNode type )
 		{
 			this.VariableType = type;
+		}
+
+		public override void Accept (AbstractVisitor visitor)
+		{
+			visitor.Visit (this);
 		}
 	}
 }

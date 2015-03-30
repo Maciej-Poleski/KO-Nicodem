@@ -1,4 +1,6 @@
-﻿namespace Nicodem.Semantics.AST
+﻿using Nicodem.Semantics.Visitors;
+
+namespace Nicodem.Semantics.AST
 {
 	class IfNode : ExpressionNode
 	{
@@ -7,6 +9,11 @@
 		public ExpressionNode Else { get; set; }
 
 		public bool HasElse { get { return !ReferenceEquals (Else, null); } }
+
+		public override void Accept (AbstractVisitor visitor)
+		{
+			visitor.Visit (this);
+		}
 	}
 }
 
