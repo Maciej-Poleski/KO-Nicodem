@@ -99,7 +99,8 @@ namespace Lexer.Tests
          [Test]
          public void EmptyRegExTests()
          {
-             RegExDfa<char> regExDfa = new RegExDfa<char>(RegExFactory.Empty<char>(), 0);
+             RegEx<char> regEx = RegExFactory.Empty<char>();
+             RegExDfa<char> regExDfa = new RegExDfa<char>(regEx, 1);
              CheckNullTransitionTests(regExDfa);
              var dfaEmpty = new RegExDfa<char>(new DFAState<char>(0, new KeyValuePair<char, DFAState<char>>[]{ deadTransition }));
              Assert.IsTrue(DfaUtils.CompareDfa<RegExDfa<char>, DFAState<char>, char>.Compare(regExDfa, dfaEmpty));
@@ -109,10 +110,25 @@ namespace Lexer.Tests
         [Test]
         public void EpsilonRegExTests()
         {
-            RegExDfa<char> regExDfa = new RegExDfa<char>(RegExFactory.Epsilon<char>(), 1);
+            RegEx<char> regEx = RegExFactory.Epsilon<char>();
+            RegExDfa<char> regExDfa = new RegExDfa<char>(regEx, 1);
             CheckNullTransitionTests(regExDfa);
             var dfaEpsilon = new RegExDfa<char>(new DFAState<char>(1, new KeyValuePair<char, DFAState<char>>[] { deadTransition }));
             Assert.IsTrue(DfaUtils.CompareDfa<RegExDfa<char>, DFAState<char>, char>.Compare(regExDfa, dfaEpsilon));
+        }
+
+        [Test]
+        public void StarRegExTests()
+        {
+            RegEx<char> regEx = RegExFactory.Star<char>(RegExFactory.Intersection<char>(RegExFactory.Range<char>('a'), RegExFactory.Complement<char>(RegExFactory.Range<char>('b'))));
+            RegExDfa<char> regExDfa = new RegExDfa<char>(regEx, 1);
+            CheckNullTransitionTests(regExDfa);
+            DFAState<char> state_1 = new DFAState<char>();
+            state_1._accepting = 1;
+            state_1._transitions = new KeyValuePair<char, DFAState<char>>[] { deadTransition, new KeyValuePair<char, DFAState<char>>('a', state_1), new KeyValuePair<char, DFAState<char>>('b', deadState)};
+
+            var dfaStar = new RegExDfa<char>(state_1);
+            Assert.IsTrue(DfaUtils.CompareDfa<RegExDfa<char>, DFAState<char>, char>.Compare(regExDfa, dfaStar));
         }
     }
 }
