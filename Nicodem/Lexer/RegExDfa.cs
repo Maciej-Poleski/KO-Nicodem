@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace Nicodem.Lexer
 {
@@ -15,25 +16,35 @@ namespace Nicodem.Lexer
 
         private static readonly T MinSymbol;
 
+        public override DFAState<T> Start
+        {
+            get { return _start; }
+        }
+
         static RegExDfa()
         {
             MinSymbol = (T)typeof(T).GetField("MinValue").GetValue(null);
+            //MinSymbol = Expression.Lambda<Func<T>>(Expression.Convert(Expression.Parameter(typeof(T), "MinValue"), typeof(T)), new ParameterExpression[] { }).Compile()();
         }
 
+        /// <summary>
+        /// Create RegExDfa with start state
+        /// </summary>
+        /// <param name="start">Start state</param>
         public RegExDfa(DFAState<T> start)
         {
             _start = start;
         }
 
+        /// <summary>
+        /// Create RegExDfa from RegEx
+        /// </summary>
+        /// <param name="regEx">Regular Expression from which is made automata</param>
+        /// <param name="acceptingStateMarker">Number for accepting states</param>
         public RegExDfa(RegEx<T> regEx, uint acceptingStateMarker)
         {
             accepting = acceptingStateMarker;
             _start = CalculateDfaState(regEx);
-        }
-
-        public override DFAState<T> Start
-        {
-            get { return _start; }
         }
 
         private DFAState<T> CalculateDfaState(RegEx<T> regEx)

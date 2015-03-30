@@ -55,60 +55,20 @@ namespace Lexer.Tests
             }
 
         }
-        /*
-        //TODO(karol-banys)
-        bool CompareDfaState<TDfaState, TSymbol>(AbstractDfaState<TDfaState, TSymbol> a, AbstractDfaState<TDfaState, TSymbol> b, Dictionary<Tuple<AbstractDfaState<TDfaState, TSymbol> ,AbstractDfaState<TDfaState, TSymbol> >, int> visited)
-            where TDfaState : AbstractDfaState<TDfaState, TSymbol>
-            where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
-        {
-            //if (visited.Contains(Tuple.Create(a, b))) return true;
-            visited[Tuple.Create(a, b)] = 1;
-            if (a == null || b == null) return false;
-            if (a.Accepting != b.Accepting) return false;
-            if (a.Transitions == null || b.Transitions == null) return false;
-            if (a.Transitions.Length != b.Transitions.Length) return false;
 
-            foreach (var transitionA in a.Transitions)
-            {
-                foreach (var transitionB in b.Transitions)
-                {
-                    bool statesAreEqual = false;
-                    if (transitionA.Key.Equals(transitionB.Key))
-                    {
-                        if (!CompareDfaState(transitionA.Value, transitionB.Value, visited)) return false;
-                        else
-                        {
-                            statesAreEqual = true;
-                            break;
-                        }
-                    }
-                    if (!statesAreEqual) return false;
-                }
-            }
-            return true;
-        }
-
-        bool CompareDfa<TDfaState, TSymbol>(AbstractDfa<TDfaState, TSymbol> a, AbstractDfa<TDfaState, TSymbol> b)
-            where TDfaState : AbstractDfaState<TDfaState, TSymbol>
-            where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
+        [Test]
+        public void RegExDfaEmptyTest()
         {
-            var visited = new Dictionary<Tuple<AbstractDfaState<TDfaState, TSymbol>, AbstractDfaState<TDfaState, TSymbol>>, int>();
-            return CompareDfaState(a.Start, b.Start, visited);
+            RegEx<char> regEx = RegExFactory.Empty<char>();
+            RegExDfa<char> regExDfa = new RegExDfa<char>(regEx, 1);
+            CheckNullTransitionTests(regExDfa);
+            var dfaEmpty = new RegExDfa<char>(new DFAState<char>(0, new KeyValuePair<char, DFAState<char>>[]{ deadTransition }));
+            Assert.IsTrue(DfaUtils.CompareDfa<RegExDfa<char>, DFAState<char>, char>.Compare(regExDfa, dfaEmpty));
         }
-        */
-         [Test]
-         public void EmptyRegExTests()
-         {
-             RegEx<char> regEx = RegExFactory.Empty<char>();
-             RegExDfa<char> regExDfa = new RegExDfa<char>(regEx, 1);
-             CheckNullTransitionTests(regExDfa);
-             var dfaEmpty = new RegExDfa<char>(new DFAState<char>(0, new KeyValuePair<char, DFAState<char>>[]{ deadTransition }));
-             Assert.IsTrue(DfaUtils.CompareDfa<RegExDfa<char>, DFAState<char>, char>.Compare(regExDfa, dfaEmpty));
-         }
 
 
         [Test]
-        public void EpsilonRegExTests()
+        public void RegExDfaEpsilonTest()
         {
             RegEx<char> regEx = RegExFactory.Epsilon<char>();
             RegExDfa<char> regExDfa = new RegExDfa<char>(regEx, 1);
@@ -118,7 +78,7 @@ namespace Lexer.Tests
         }
 
         [Test]
-        public void StarRegExTests()
+        public void RegExDfaStarTest()
         {
             RegEx<char> regEx = RegExFactory.Star<char>(RegExFactory.Intersection<char>(RegExFactory.Range<char>('a'), RegExFactory.Complement<char>(RegExFactory.Range<char>('b'))));
             RegExDfa<char> regExDfa = new RegExDfa<char>(regEx, 1);
