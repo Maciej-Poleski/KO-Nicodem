@@ -497,9 +497,10 @@ namespace Nicodem.Lexer
 
                 foreach (var transitionA in a.Transitions)
                 {
+                    bool statesAreEqual = false;
                     foreach (var transitionB in b.Transitions)
                     {
-                        bool statesAreEqual = false;
+                        
                         if (transitionA.Key.Equals(transitionB.Key))
                         {
                             if (!CompareStates(transitionA.Value, transitionB.Value)) return false;
@@ -509,8 +510,8 @@ namespace Nicodem.Lexer
                                 break;
                             }
                         }
-                        if (!statesAreEqual) return false;
                     }
+                    if (!statesAreEqual) return false;
                 }
                 visited[Tuple.Create(a, b)] = 2;
                 return true;
