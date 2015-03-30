@@ -34,6 +34,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Tests", "Core.Tests\Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Collections.Immutable", "System.Collections.Immutable\System.Collections.Immutable.csproj", "{024A2111-4B19-44D7-917E-8514CF632469}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Semantics", "Semantics", "{10DC7463-1E26-46A2-B827-4F2FAC2F28E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Semantics", "Semantics\Semantics.csproj", "{B0BC59FC-D28F-42B9-A4CC-5470287924B2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,6 +76,10 @@ Global
 		{746D247C-6E5D-41D2-88E3-3A51D2DAC0B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{746D247C-6E5D-41D2-88E3-3A51D2DAC0B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{746D247C-6E5D-41D2-88E3-3A51D2DAC0B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0BC59FC-D28F-42B9-A4CC-5470287924B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0BC59FC-D28F-42B9-A4CC-5470287924B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0BC59FC-D28F-42B9-A4CC-5470287924B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0BC59FC-D28F-42B9-A4CC-5470287924B2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DC9385D6-C37E-441F-8BAA-3B7EAEC2DA39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DC9385D6-C37E-441F-8BAA-3B7EAEC2DA39}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC9385D6-C37E-441F-8BAA-3B7EAEC2DA39}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -86,6 +94,7 @@ Global
 		{3BA2695E-0103-4E64-B9E7-B14CC056C7AC} = {F6EABA18-5D24-4AAB-A322-DFF62EA073B2}
 		{5E967501-0A63-4196-A29B-B8B148785048} = {652F65C3-4194-4751-AB31-9543E6DA2826}
 		{2AFAC738-0F82-474D-A7C1-4DB18D2FF0A9} = {652F65C3-4194-4751-AB31-9543E6DA2826}
+		{B0BC59FC-D28F-42B9-A4CC-5470287924B2} = {10DC7463-1E26-46A2-B827-4F2FAC2F28E9}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
