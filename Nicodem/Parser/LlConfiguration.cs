@@ -15,9 +15,25 @@ namespace Nicodem.Parser
 			stack = new Stack<DfaState<TSymbol> > ();
 		}
 
+		public LlConfiguration(TSymbol label, Stack<DfaState<TSymbol>> stack) {
+			this.label = label;
+			this.stack = stack;
+		}
+
 		public void Push(DfaState<TSymbol> state)
 		{
 			stack.Push (state);
+		}
+
+		// Performs shallow copy of the stack
+		public Stack<DfaState<TSymbol>> copyOfStack() {
+			var copy = new Stack<DfaState<TSymbol>> ();
+			var array = stack.ToArray ();
+			Array.Reverse (array);
+			foreach (var state in array) {
+				copy.Push (state);
+			}
+			return copy;
 		}
 
 		public DfaState<TSymbol> Pop() {

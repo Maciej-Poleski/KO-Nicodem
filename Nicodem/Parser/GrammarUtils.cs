@@ -5,6 +5,7 @@ namespace Nicodem.Parser
 {
 	public static class GrammarUtils
 	{
+
 		// Returns the list of all accepting states of an automaton.
 		private static List<DfaState<ISymbol>> GetAllAcceptingStates(Dfa<ISymbol> dfa) 
 		{
@@ -51,6 +52,32 @@ namespace Nicodem.Parser
 				}
 			}
 			return predecessors;
+		}
+
+		// computes dictionary which for each symbol keeps a list of states s.t. there exits an edge labelled by this symbol to the given state.
+		public static IDictionary<ISymbol, List<DfaState<ISymbol>>> computeTargetStatesDictionary (IDictionary<ISymbol, Dfa<ISymbol>> automatons){
+			var resultDictionary = new Dictionary<ISymbol, List<DfaState<ISymbol>>> ();
+			foreach(var dfa in automatons.Values) {
+				var queue = new Queue<DfaState<ISymbol>>();
+				var visited = new HashSet<DfaState<ISymbol>>();
+				queue.Enqueue(dfa.Start);
+				while(queue.Count > 0) {
+					var state = queue.Dequeue();
+
+					foreach(var kv in state.Transitions) {
+						var nextState = kv.Value;
+						var symbol = kv.Key;
+						if (!resultDictionary.ContainsKey (symbol))
+							resultDictionary [symbol] = new List<DfaState<ISymbol>> ();
+						resultDictionary [symbol].Add (nextState);
+						if(!visited.Contains(nextState)) {
+							visited.Add(nextState);
+							queue.Enqueue(nextState);
+						}
+					}
+				}
+			}
+			return resultDictionary;
 		}
 
 		public static void ComputeTransitiveComplement<T>(IDictionary<T, ISet<T>> dict) 
