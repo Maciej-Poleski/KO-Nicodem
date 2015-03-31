@@ -230,7 +230,10 @@ namespace Nicodem.Parser
 				// perform BFS from automata startstate
 				// using only edges labeled by symbols from nullable set
 				var Q = new Queue<DfaState<ISymbol>>();
-				Q.Enqueue(automata.Start);
+				var visited = new HashSet<DfaState<ISymbol>> ();
+
+				Q.Enqueue (automata.Start);
+				visited.Add (automata.Start);
 
 				while(Q.Count > 0) {
 					var state = Q.Dequeue();
@@ -239,8 +242,10 @@ namespace Nicodem.Parser
 						// add label to FIRST(symbol)
 						first [symbol].Add (transition.Key);
 						// if label is in NULLABLE set continue BFS using this edge
-						if(nullable.Contains(transition.Key))
-							Q.Enqueue(transition.Value);
+						if (nullable.Contains (transition.Key) && !visited.Contains (transition.Value)) {
+							Q.Enqueue (transition.Value);
+							visited.Add (transition.Value);
+						}
 					}
 				}
 			}
