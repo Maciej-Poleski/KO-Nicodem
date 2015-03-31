@@ -65,13 +65,33 @@ namespace Lexer.Tests
             Assert.AreEqual (0, union1.CompareTo (union2));
         }
 
+		// union() = empty
+		[Test]
+		public void Test_Sum_EmptyList()
+		{
+			var empty = RegExFactory.Empty<char> ();
+			var empty_sum = RegExFactory.Union (new RegEx<char>[]{ });
+
+			Assert.AreEqual (empty, empty_sum);
+		}
+
+		// union(a) = a
+		[Test]
+		public void Test_Sum_SingleElement()
+		{
+			var regex = RegExFactory.Range ('a');
+			var union = RegExFactory.Union (regex);
+
+			Assert.AreEqual (regex, union);
+		}
+
 		#endregion
 
 		#region Intersection
 
 		// intersect() = universe
 		[Test]
-		public void Test_Intersection_Empty() 
+		public void Test_Intersect_Empty() 
 		{
 			var all = RegExFactory.All<char> ();
 			var all_intersect = RegExFactory.Intersection<char> ();
@@ -125,6 +145,26 @@ namespace Lexer.Tests
 
             Assert.AreEqual (0, int1.CompareTo (int2));
         }
+
+		// intersect() = all
+		[Test]
+		public void Test_Intersect_EmptyList()
+		{
+			var all = RegExFactory.All<char> ();
+			var empty_intersect = RegExFactory.Intersection (new RegEx<char>[]{ });
+
+			Assert.AreEqual (all, empty_intersect);
+		}
+
+		// intersect(a) = a
+		[Test]
+		public void Test_Intersect_SingleElement()
+		{
+			var regex = RegExFactory.Range ('a');
+			var intersection = RegExFactory.Intersection (regex);
+
+			Assert.AreEqual (regex, intersection);
+		}
 
 		#endregion
 
@@ -187,6 +227,26 @@ namespace Lexer.Tests
 			Assert.AreEqual (0, regex.CompareTo (concat2));
 		}
 
+		// concat() = epsi
+		[Test]
+		public void Test_Concat_EmptyList()
+		{
+			var epsi = RegExFactory.Epsilon<char> ();
+			var empty_concat = RegExFactory.Concat (new RegEx<char>[]{ });
+
+			Assert.AreEqual (epsi, empty_concat);
+		}
+
+		// concat(a) = a
+		[Test]
+		public void Test_Concat_SingleElement()
+		{
+			var regex = RegExFactory.Range ('a');
+			var concat = RegExFactory.Concat (regex);
+
+			Assert.AreEqual (regex, concat);
+		}
+
 		#endregion
 
 		#region Star
@@ -227,17 +287,6 @@ namespace Lexer.Tests
 
 			Assert.AreEqual (all, star);
 		}
-
-        [Test]
-        public void RegExStarSimpleDerivativeTest()
-        {
-            var aStar = RegExFactory.Star<char>(RegExFactory.Intersection<char>(RegExFactory.Range<char>('a'), RegExFactory.Complement<char>(RegExFactory.Range<char>('b'))));
-            var bStar = RegExFactory.Star<char>(RegExFactory.Intersection<char>(RegExFactory.Range<char>('b'), RegExFactory.Complement<char>(RegExFactory.Range<char>('c'))));
-            var cStar = RegExFactory.Star<char>(RegExFactory.Intersection<char>(RegExFactory.Range<char>('c'), RegExFactory.Complement<char>(RegExFactory.Range<char>('d'))));
-            var dStar = RegExFactory.Star<char>(RegExFactory.Intersection<char>(RegExFactory.Range<char>('d'), RegExFactory.Complement<char>(RegExFactory.Range<char>('e'))));
-            var aStarbStarcStar = RegExFactory.Concat<char>(aStar, bStar, cStar, dStar);
-            Assert.AreEqual(dStar, aStarbStarcStar.Derivative('c'));
-        }
 
 		#endregion
 

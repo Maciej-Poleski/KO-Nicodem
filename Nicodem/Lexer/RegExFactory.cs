@@ -154,7 +154,7 @@ namespace Nicodem.Lexer
                 if (0 == Empty<T>().CompareTo(regex))
                     return Empty<T>();
 
-                // check if regex is epsi TODO check case {epsi}
+                // check if regex is epsi
                 if (0 == Epsilon<T>().CompareTo(regex))
                     continue;
 
@@ -168,7 +168,16 @@ namespace Nicodem.Lexer
 
             // (XY)Z ~ X(YZ)
             var arr = list.ToArray();
-            return arr.Length == 1 ? arr[0] : new RegExConcat<T>(arr);
+
+			// concat() = epsi
+			if (arr.Length == 0)
+				return Epsilon<T> ();
+
+			// concat(a) = a
+			if (arr.Length == 1)
+				return arr [0];
+            
+			return new RegExConcat<T>(arr);
         }
 
         /// <summary>
