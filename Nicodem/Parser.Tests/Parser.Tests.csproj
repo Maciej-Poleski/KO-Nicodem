@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CharSymbol.cs" />
+    <Compile Include="LookaheadDfaTests.cs" />
     <Compile Include="StringProduction.cs" />
     <Compile Include="LL1ParserTests.cs" />
     <Compile Include="GrammarUtilsTests.cs" />
