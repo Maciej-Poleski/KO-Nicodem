@@ -35,6 +35,7 @@ namespace Nicodem.Lexer
             return new T[] {};
         }
 
+		// epsi^a = empty ?
         public override RegEx<T> Derivative(T c)
         {
             return RegExFactory.Empty<T>();

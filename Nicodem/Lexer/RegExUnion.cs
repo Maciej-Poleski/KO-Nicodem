@@ -68,6 +68,7 @@ namespace Nicodem.Lexer
             return changes;
         }
 
+		// sum( X1, ... )^a = sum( X1^a, ... )
         public override RegEx<T> Derivative(T c)
         {
             var derivatives = new List<RegEx<T>>();

@@ -40,6 +40,7 @@ namespace Nicodem.Lexer
 			return Regex.DerivChanges();
 		}
 
+		// star(X)^a = concat(X^a, star(X))
 		public override RegEx<T> Derivative(T c)
 		{
 			return RegExFactory.Concat(Regex.Derivative(c), RegExFactory.Star(Regex));
