@@ -44,6 +44,17 @@ namespace Lexer.Tests
 			return true;
 		}
 
+		static IEnumerable<T> joinEnumerables<T>( params IEnumerable<T>[] lists )
+		{
+			var S = new HashSet<T> ();
+
+			foreach (var list in lists)
+				foreach (var elem in list)
+					S.Add (elem);
+
+			return S;
+		}
+
 		[Test]
 		public void Test_Range()
 		{
@@ -70,25 +81,119 @@ namespace Lexer.Tests
 		[Test]
 		public void Test_Complement()
 		{
-			throw new NotImplementedException ();
+			var regex = RegExFactory.Range ('a');
+			var compl = RegExFactory.Complement (regex);
+
+			var regexChanges = regex.DerivChanges ();
+			var complChanges = compl.DerivChanges ();
+
+			Assert.AreEqual (regexChanges, complChanges);
+			Assert.IsTrue (isUniqueAndSorted (complChanges));
 		}
 
 		[Test]
 		public void Test_Union()
 		{
-			throw new NotImplementedException ();
+			var regA = RegExFactory.Range ('a');
+			var regB = RegExFactory.Range ('b');
+			var regC = RegExFactory.Range ('c');
+			var union = RegExFactory.Union (regA, regB, regC);
+
+			var unionChanges = union.DerivChanges ();
+			var expectedChanges = joinEnumerables (regA.DerivChanges (), regB.DerivChanges (), regC.DerivChanges ());
+
+			Assert.IsTrue (isUniqueAndSorted (unionChanges));
+			Assert.AreEqual (expectedChanges, unionChanges);
 		}
 
 		[Test]
 		public void Test_Intersection()
 		{
-			throw new NotImplementedException ();
+			var regA = RegExFactory.Range ('a');
+			var regB = RegExFactory.Range ('b');
+			var regC = RegExFactory.Range ('c');
+			var inter = RegExFactory.Intersection (regA, regB, regC);
+
+			var interChanges = inter.DerivChanges ();
+			var expectedChanges = joinEnumerables (regA.DerivChanges (), regB.DerivChanges (), regC.DerivChanges ());
+
+			Assert.IsTrue (isUniqueAndSorted (interChanges));
+			Assert.AreEqual (expectedChanges, interChanges);
 		}
 
 		[Test]
-		public void Test_Concat()
+		public void Test_Concat_XYZ_withoutEpsi()
 		{
-			throw new NotImplementedException ();
+			var regA = RegExFactory.Range ('a');
+			var regB = RegExFactory.Range ('b');
+			var regC = RegExFactory.Range ('c');
+			var concat = RegExFactory.Concat (regA, regB, regC);
+
+			var concatChanges = concat.DerivChanges ();
+			var expectedChanges = regA.DerivChanges ();
+
+			Assert.IsTrue (isUniqueAndSorted (concatChanges));
+			Assert.AreEqual (expectedChanges, concatChanges);
+		}
+
+		[Test]
+		public void Test_Concat_XYZ_withEpsiX()
+		{
+			var regA = RegExFactory.Star (RegExFactory.Range ('a'));
+			var regB = RegExFactory.Range ('b');
+			var regC = RegExFactory.Range ('c');
+			var concat = RegExFactory.Concat (regA, regB, regC);
+
+			var concatChanges = concat.DerivChanges ();
+			var expectedChanges = joinEnumerables (regA.DerivChanges (), regB.DerivChanges ());
+
+			Assert.IsTrue (isUniqueAndSorted (concatChanges));
+			Assert.AreEqual (expectedChanges, concatChanges);
+		}
+
+		[Test]
+		public void Test_Concat_XYZ_withEpsiXZ()
+		{
+			var regA = RegExFactory.Star (RegExFactory.Range ('a'));
+			var regB = RegExFactory.Range ('b');
+			var regC = RegExFactory.Star (RegExFactory.Range ('c'));
+			var concat = RegExFactory.Concat (regA, regB, regC);
+
+			var concatChanges = concat.DerivChanges ();
+			var expectedChanges = joinEnumerables (regA.DerivChanges (), regB.DerivChanges ());
+
+			Assert.IsTrue (isUniqueAndSorted (concatChanges));
+			Assert.AreEqual (expectedChanges, concatChanges);
+		}
+
+		[Test]
+		public void Test_Concat_XYZ_withEpsiXY()
+		{
+			var regA = RegExFactory.Star (RegExFactory.Range ('a'));
+			var regB = RegExFactory.Star (RegExFactory.Range ('b'));
+			var regC = RegExFactory.Range ('c');
+			var concat = RegExFactory.Concat (regA, regB, regC);
+
+			var concatChanges = concat.DerivChanges ();
+			var expectedChanges = joinEnumerables (regA.DerivChanges (), regB.DerivChanges (), regC.DerivChanges ());
+
+			Assert.IsTrue (isUniqueAndSorted (concatChanges));
+			Assert.AreEqual (expectedChanges, concatChanges);
+		}
+
+		[Test]
+		public void Test_Concat_XYZ_withEpsiXYZ()
+		{
+			var regA = RegExFactory.Star (RegExFactory.Range ('a'));
+			var regB = RegExFactory.Star (RegExFactory.Range ('b'));
+			var regC = RegExFactory.Star (RegExFactory.Range ('c'));
+			var concat = RegExFactory.Concat (regA, regB, regC);
+
+			var concatChanges = concat.DerivChanges ();
+			var expectedChanges = joinEnumerables (regA.DerivChanges (), regB.DerivChanges (), regC.DerivChanges ());
+
+			Assert.IsTrue (isUniqueAndSorted (concatChanges));
+			Assert.AreEqual (expectedChanges, concatChanges);
 		}
 	}
 }
