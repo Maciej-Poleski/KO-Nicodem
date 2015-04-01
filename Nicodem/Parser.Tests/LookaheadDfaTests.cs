@@ -15,8 +15,11 @@ namespace Nicodem.Parser.Tests
         public void init()
         {
             /* One Level Dfa Test
+             * 
              * Considered production 0 --A--> 1
+             * 
              * a,b,c,x - nonterminals
+             * 
              * Productions in Grammatic:
              * A: 2 ---B--> 3 | 2 ---C--> 4
              * B: 5 --x--> 5 | 5 --b--> 6(acc) | 4 --D--> 6(acc)
@@ -24,19 +27,36 @@ namespace Nicodem.Parser.Tests
              * D: 9 --a--> 10(acc)
              * 
              * Correct automaton: 
-             * state | acc value 
-             * s1 | 0
-             * s2 | 'B'
-             * s3 | 'B'
-             * s4 | 'C'
              * 
-             * s1 ---> s1 
-             * s1 ---> s2
-             * s1 ---> s3
-             * s1 ---> s4
+             * s1: --x--> s1 | --a--> s2 | s1 --b--> s3 |--c--> s4
+             * s2: acc state 'B'
+             * s3: acc state 'B'
+             * s4: acc state 'C'
              */
 
-            /* MoreComplexDfaTest
+            /* More Complex Dfa Test
+             * 
+             * Considered production 0 --A--> 1 --b--> 15
+             *
+             * a,b,c - nonterminals
+             * 
+             * Productions in Grammatic:
+             * A: 2 ---B--> 3 | 2 ---C--> 4 | 2 --D--> 5
+             * B: 6 --b-->7(acc) | 6 --a-->8
+             * C: 9 --a--> 9 | 9 --c--> 10 (acc)
+             * D: 11 --a-->12 | 11 --E--> 13
+             * E: 14 --a--> 14 | 14 --b--> 14
+             * 
+             * Correct automaton: 
+             * 
+             * s1: --a--> s2 | --b--> s6 | --c--> s4
+             * s2: --a--> s3 | --b--> s7 | --c--> s4
+             * s3: --a--> s3 | --b--> s5 | --c--> s4
+             * s4: acc state 'C'
+             * s5: acc state 'D'
+             * s6: --a--> s8 | --b--> s7 | --c--> null?
+             * s7: --a--> s8 | --b--> s5 | --c--> null?
+             * s8: acc state 'D'
              * 
              */
         }

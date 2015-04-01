@@ -322,6 +322,18 @@ namespace Lexer.Tests
             Assert.IsTrue(derivativeChangesOfRegexesAreUnique(concat, derivConcat, RegExFactory.Concat(derivX, Y, Z)));
 		}
 
+        // ((a*)^a)^a = a*
+        [Test]
+        public void RegExStarAStarDerivativeTest()
+        {
+            var aStar = RegExFactory.Star(RegExFactory.Range('a', 'b'));
+            var derivaStar = aStar.Derivative('a');
+            var derivderivaStar = derivaStar.Derivative('a');
+
+            Assert.IsTrue(derivativeChangesOfRegexesAreUnique(aStar, derivaStar, derivderivaStar, derivderivaStar.Derivative('a')));
+            Assert.AreEqual(aStar, derivderivaStar.Derivative('a'));
+        }
+
         // (a*b)^b = {epsi}
         [Test]
         public void RegExStarSimpleDerivativeTest()
