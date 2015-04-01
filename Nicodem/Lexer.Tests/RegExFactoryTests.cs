@@ -6,6 +6,11 @@ namespace Lexer.Tests
 	[TestFixture]
 	public class RegExFactoryTests
 	{
+		private static RegEx<char> singleton(char c)
+		{
+			return RegExFactory.Range (c, (char)(c + 1));
+		}
+
 		#region Sum
 
 		// sum() = empty
@@ -65,7 +70,7 @@ namespace Lexer.Tests
             Assert.AreEqual (0, union1.CompareTo (union2));
         }
 
-		// union() = empty
+		// sum() = empty
 		[Test]
 		public void Test_Sum_EmptyList()
 		{
@@ -75,7 +80,7 @@ namespace Lexer.Tests
 			Assert.AreEqual (empty, empty_sum);
 		}
 
-		// union(a) = a
+		// sum(a) = a
 		[Test]
 		public void Test_Sum_SingleElement()
 		{
@@ -245,6 +250,31 @@ namespace Lexer.Tests
 			var concat = RegExFactory.Concat (regex);
 
 			Assert.AreEqual (regex, concat);
+		}
+
+		// 1. concat(a*, a*) = a*
+		// 2. concat(a*, a*, b*) = concat(a*, b*)
+		// 3. concat(a*, b*, a*) = concat(a*, b*, a*)
+		// 4. concat(f, a*, a*, f, a*, b*, b*, f, b*, b*, b*) = concat(f, a*, f, a*, b*, f, b*)
+		[Test]
+		public void Test_Concat_JoinConsecutiveStars()
+		{
+			var starA = RegExFactory.Star (singleton ('a'));
+			var starB = RegExFactory.Star (singleton ('b'));
+			var regex = RegExFactory.Range ('f');
+
+			var concatAA = RegExFactory.Concat (starA, starA);
+			Assert.AreEqual (starA, concatAA);
+
+			var concatAAB = RegExFactory.Concat (starA, starA, starB);
+			Assert.AreEqual (RegExFactory.Concat (starA, starB), concatAAB);
+
+			var concatABA = RegExFactory.Concat (starA, starB, starA);
+			Assert.AreEqual (RegExFactory.Concat (starA, starB, starA), concatABA);
+
+			var concatFAAFABBFBBB = RegExFactory.Concat (regex, starA, starA, regex, starA, starB, starB, regex, starB, starB, starB);
+			var expectedFAFABFB = RegExFactory.Concat (regex, starA, regex, starA, starB, regex, starB);
+			Assert.AreEqual (expectedFAFABFB, concatFAAFABBFBBB);
 		}
 
 		#endregion

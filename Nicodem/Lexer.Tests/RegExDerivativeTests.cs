@@ -29,32 +29,21 @@ namespace Lexer.Tests
 
 		// a^a = {epsi} = empty*
 		[Test]
-		public void Test_SingleLetterMatch()
+		public void Test_Range()
 		{
-			var regex = RegExFactory.Range ('a');
+			var regex = RegExFactory.Range ('b');
 			var derivChanges = regex.DerivChanges ().ToArray ();
 
 			Assert.AreEqual (1, derivChanges.Length);
-			Assert.AreEqual ('a', derivChanges [0]);
+			Assert.AreEqual ('b', derivChanges [0]);
 
-			var deriv = regex.Derivative ('a');
-			var singl_empty = RegExFactory.Epsilon<char> ();
+			var derivA = regex.Derivative ('a');
+			var derivB = regex.Derivative ('b');
+			var derivC = regex.Derivative ('c');
 
-			Assert.AreEqual (singl_empty, deriv);
-		}
-
-		// a^b = empty  when b != a
-		[Test]
-		public void Test_SingleLetterMismatch()
-		{
-            var regex = RegExFactory.Range('a');
-			var derivChanges = regex.DerivChanges ().ToArray ();
-
-			Assert.AreEqual (1, derivChanges.Length);
-			Assert.AreEqual ('a', derivChanges [0]);
-
-			var deriv = regex.Derivative ('b');
-			Assert.AreEqual (RegExFactory.Empty<char> (), deriv);
+			Assert.AreEqual (RegExFactory.Empty<char> (), derivA);
+			Assert.AreEqual (RegExFactory.Epsilon<char> (), derivB);
+			Assert.AreEqual (RegExFactory.Epsilon<char> (), derivC);
 		}
 
 		// sum(X, Y)^a = sum(X^a, Y^a)
@@ -125,6 +114,8 @@ namespace Lexer.Tests
 			Assert.AreEqual (derivComplB, RegExFactory.Complement (derivB));
 		}
 
+		#region Star
+
 		// star(X)^a = concat(X^a, star(X))
 		[Test]
 		public void Test_Star()
@@ -142,6 +133,40 @@ namespace Lexer.Tests
 			Assert.AreEqual (derivStarA, RegExFactory.Concat (derivA, starA));
 			Assert.AreEqual (derivStarB, RegExFactory.Concat (derivB, starB));
 		}
+
+		// (((a*)^a)^a)^a = a*
+		[Test]
+		public void Test_StarTripleDerivative()
+		{
+			var star = RegExFactory.Star (singleton ('a'));
+			var dStar = star.Derivative('a');
+			var ddStar = dStar.Derivative('a');
+			var dddStar = ddStar.Derivative ('a');
+
+			Assert.AreEqual(star, dddStar);
+		}
+
+		// (a*b*)*^a = (a*b*)(a*b*)*
+		// (a*b*)*^b = b*(a*b*)*
+		[Test]
+		public void Test_Star_AstarBstar()
+		{
+			var aStar = RegExFactory.Star (singleton ('a'));
+			var bStar = RegExFactory.Star (singleton ('b'));
+
+			var aStarbStar = RegExFactory.Concat (aStar, bStar);
+			var aStarbStarSTAR = RegExFactory.Star (aStarbStar);
+
+			var expectedA = RegExFactory.Concat (aStarbStar, aStarbStarSTAR);
+			var expectedB = RegExFactory.Concat (bStar, aStarbStarSTAR);
+
+			Assert.AreEqual(expectedA, aStarbStarSTAR.Derivative('a'));
+			Assert.AreEqual(expectedB, aStarbStarSTAR.Derivative('b'));
+		}
+
+		#endregion
+
+		#region Concat
 
 		// concat(XY)^a = X^aY  if epsi not in X
 		[Test]
@@ -173,7 +198,7 @@ namespace Lexer.Tests
 			var derivConcat = concat.Derivative ('a');
 
 			Assert.IsTrue (X.HasEpsilon ());
-			Assert.AreEqual (derivConcat, RegExFactory.Union (RegExFactory.Concat (derivX, Y), derivY));
+			Assert.AreEqual (RegExFactory.Union (RegExFactory.Concat (derivX, Y), derivY), derivConcat);
 		}
 
 		// concat(XYZW)^a = sum(X^aYZW, Y^aZW, Z^aW, W^a)  if epsi in X, Y, Z
@@ -200,13 +225,13 @@ namespace Lexer.Tests
 			Assert.IsTrue (Y.HasEpsilon ());
 			Assert.IsTrue (Z.HasEpsilon ());
 			Assert.IsFalse (W.HasEpsilon ());
-			Assert.AreEqual (derivConcat,
+			Assert.AreEqual (
 				RegExFactory.Union (
 					RegExFactory.Concat (derivX, Y, Z, W),
 					RegExFactory.Concat (derivY, Z, W),
 					RegExFactory.Concat (derivZ, W),
 					derivW
-				));
+				), derivConcat);
 		}
 
 		// concat(XYZ)^a = sum(X^aYZ, Y^aZ, Z^a)  if epsi in X, Y
@@ -229,12 +254,12 @@ namespace Lexer.Tests
 			Assert.IsTrue (X.HasEpsilon ());
 			Assert.IsTrue (Y.HasEpsilon ());
 			Assert.IsFalse (Z.HasEpsilon ());
-			Assert.AreEqual (derivConcat,
+			Assert.AreEqual (
 				RegExFactory.Union (
 					RegExFactory.Concat (derivX, Y, Z),
 					RegExFactory.Concat (derivY, Z),
 					derivZ
-				));
+				), derivConcat);
 		}
 
 		// concat(XYZ)^a = sum(X^aYZ, Y^aZ)  if epsi in X
@@ -255,11 +280,11 @@ namespace Lexer.Tests
 			Assert.IsTrue (X.HasEpsilon ());
 			Assert.IsFalse (Y.HasEpsilon ());
 			Assert.IsFalse (Z.HasEpsilon ());
-			Assert.AreEqual (derivConcat,
+			Assert.AreEqual (
 				RegExFactory.Union (
 					RegExFactory.Concat (derivX, Y, Z),
 					RegExFactory.Concat (derivY, Z)
-				));
+				), derivConcat);
 		}
 
 		// concat(XYZ)^a = X^aYZ  if epsi not in X
@@ -281,31 +306,22 @@ namespace Lexer.Tests
 			Assert.AreEqual (derivConcat, RegExFactory.Concat (derivX, Y, Z));
 		}
 
-        // ((a*)^a)^a = a*
-        [Test]
-        public void RegExStarAStarDerivativeTest()
-        {
-			var aStar = RegExFactory.Star (singleton ('a'));
-            var derivaStar = aStar.Derivative('a');
-            var derivderivaStar = derivaStar.Derivative('a');
-
-            Assert.AreEqual(aStar, derivderivaStar.Derivative('a'));
-        }
-
-        // (a*b)^b = {epsi}
-        [Test]
-        public void RegExStarSimpleDerivativeTest()
-        {
-			var aStar = RegExFactory.Star (singleton ('a'));
-			var b = singleton ('b');
-            var aStarb = RegExFactory.Concat(aStar, b);
-
-            Assert.AreEqual(RegExFactory.Epsilon<char>(), aStarb.Derivative('b'));
-        }
-
-        // (a*b*c*d*)^d = d*
+		// (a*b)^b = {epsi}
 		[Test]
-		public void RegExStarComplexDerivativeTest()
+		public void Test_Concat_AstarB()
+		{
+			var regAStar = RegExFactory.Star (singleton ('a'));
+			var regB = singleton ('b');
+
+			var regex = RegExFactory.Concat(regAStar, regB);
+			var deriv = regex.Derivative ('b');
+
+			Assert.AreEqual (RegExFactory.Epsilon<char> (), deriv);
+		}
+
+		// (a*b*c*d*)^d = d*
+		[Test]
+		public void Test_Concat_AstarBstarCstarDstar_derivD()
 		{
 			var aStar = RegExFactory.Star (singleton ('a'));
 			var bStar = RegExFactory.Star (singleton ('b'));
@@ -313,20 +329,10 @@ namespace Lexer.Tests
 			var dStar = RegExFactory.Star (singleton ('d'));
 			var aStarbStarcStardStar = RegExFactory.Concat(aStar, bStar, cStar, dStar);
 
-            Assert.AreEqual(dStar, aStarbStarcStardStar.Derivative('d'));
+			Assert.AreEqual(dStar, aStarbStarcStardStar.Derivative('d'));
 		}
 
-        // (a*b*)*^b = (a*b*)*^a = (a*b*)*
-        [Test]
-        public void RegExStarDoubleStarDerivativeTest()
-        {
-			var aStar = RegExFactory.Star (singleton ('a'));
-			var bStar = RegExFactory.Star (singleton ('b'));
-            var aStarbStarSTAR = RegExFactory.Star(RegExFactory.Concat(aStar, bStar));
-
-            Assert.AreEqual(aStarbStarSTAR, aStarbStarSTAR.Derivative('a'));
-            Assert.AreEqual(aStarbStarSTAR, aStarbStarSTAR.Derivative('b'));
-        }
+		#endregion
 	}
 }
 

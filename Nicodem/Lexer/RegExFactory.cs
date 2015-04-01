@@ -1,11 +1,41 @@
 ﻿using System;
 using System.Linq;
 using C5;
+using System.Collections.Generic;
 
 namespace Nicodem.Lexer
 {
     public static class RegExFactory
     {
+		/// <summary>
+		/// 	Checks if collection contains both X and ~X.
+		/// </summary>
+		private static bool checkContainsDisjointSymbols<T>( IEnumerable<RegEx<T>> elements ) where T : IEquatable<T>, IComparable<T>
+		{
+			var normal = new System.Collections.Generic.HashSet<RegEx<T>> ();
+			var complement = new System.Collections.Generic.HashSet<RegEx<T>> ();
+
+			foreach (var elem in elements) {
+				var compl = elem as RegExComplement<T>;
+				if (compl != null)
+					complement.Add (compl.Regex);
+				else
+					normal.Add (elem);
+			}
+
+			if (normal.Count < complement.Count) {
+				foreach (var elem in normal)
+					if (complement.Contains (elem))
+						return true;
+			} else {
+				foreach (var elem in complement)
+					if (normal.Contains (elem))
+						return true;
+			}
+
+			return false;
+		}
+
         /// <summary>
         ///     RegEx representing empty language.
         /// </summary>
@@ -61,10 +91,15 @@ namespace Nicodem.Lexer
         ///     {X,Y} ~ {Y,X}
         ///     {empty,X} ~ X
         ///     {all, X} ~ all
+		/// 	{X, ~X} ~ all
         /// </summary>
         /// <param name="regexes">set of regexes</param>
         public static RegEx<T> Union<T>(params RegEx<T>[] regexes) where T : IComparable<T>, IEquatable<T>
         {
+			// sum(X, ~X) = all
+			if (checkContainsDisjointSymbols (regexes))
+				return All<T> ();
+
             // build list of all regexes
             var list = new ArrayList<RegEx<T>>();
             foreach (var regex in regexes)
@@ -103,10 +138,15 @@ namespace Nicodem.Lexer
         ///     {X,Y} ~ {Y,X}
         ///     {empty, X} ~ empty
         ///     {all, X} ~ X
+		/// 	{X, ~X} ~ empty
         /// </summary>
         /// <param name="regexes">set of regexes</param>
         public static RegEx<T> Intersection<T>(params RegEx<T>[] regexes) where T : IComparable<T>, IEquatable<T>
         {
+			// intersect(X, ~X) = empty
+			if (checkContainsDisjointSymbols (regexes))
+				return Empty<T> ();
+
             // build list of all regexes
             var list = new ArrayList<RegEx<T>>();
             foreach (var regex in regexes)
@@ -142,6 +182,7 @@ namespace Nicodem.Lexer
         ///     (XY)Z ~ X(YZ)
         ///     emptyX ~ Xempty ~ empty
         ///     epsiX ~ Xepsi ~ X
+		/// 	X*X* ~ X*
         /// </summary>
         /// <param name="regexes">set of regexes</param>
         public static RegEx<T> Concat<T>(params RegEx<T>[] regexes) where T : IComparable<T>, IEquatable<T>
@@ -166,8 +207,41 @@ namespace Nicodem.Lexer
                     list.Add(regex);
             }
 
+			// reduce consecutive stars
+			var lst = new ArrayList<RegEx<T>> ();
+			var index = 0;
+			RegExStar<T> lastStar = null;
+
+			while (index < list.Count) {
+				var star = list [index] as RegExStar<T>;
+
+				// next element in sequence is a star
+				if (star != null) {
+					if (lastStar != null) {
+						if (!lastStar.Equals (star)) {
+							lst.Add (lastStar);
+							lastStar = star;
+						}
+					} else
+						lastStar = star;
+				}
+
+				// next element in sequence is not a star
+				else {
+					if (lastStar != null)
+						lst.Add (lastStar);
+					lastStar = null;
+					lst.Add (list [index]);
+				}
+
+				index++;
+			}
+
+			if (lastStar != null)
+				lst.Add (lastStar);
+
             // (XY)Z ~ X(YZ)
-            var arr = list.ToArray();
+            var arr = lst.ToArray();
 
 			// concat() = epsi
 			if (arr.Length == 0)
