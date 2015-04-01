@@ -54,6 +54,31 @@ namespace Nicodem.Parser
 			return predecessors;
 		}
 
+		// computes a dictionary which maps an accepting state to a symbol (nonterminal) whose DFA contains this state. 
+		public static IDictionary<DfaState<ISymbol>, ISymbol> computeAccStateOwnerDictionary (IDictionary<ISymbol, Dfa<ISymbol>> automatons) {
+			var resultDictionary = new Dictionary<DfaState<ISymbol>, ISymbol> ();
+			foreach(var automaton in automatons) {
+				var dfa = automaton.Value;
+				var owner = automaton.Key;
+				var queue = new Queue<DfaState<ISymbol>>();
+				var visited = new HashSet<DfaState<ISymbol>>();
+				queue.Enqueue(dfa.Start);
+				while(queue.Count > 0) {
+					var state = queue.Dequeue();
+					if (state.Accepting > 0)
+						resultDictionary [state] = owner;
+					foreach(var kv in state.Transitions) {
+						var nextState = kv.Value;
+						if(!visited.Contains(nextState)) {
+							visited.Add(nextState);
+							queue.Enqueue(nextState);
+						}
+					}
+				}
+			}
+			return resultDictionary;
+		}
+
 		// computes dictionary which for each symbol keeps a list of states s.t. there exits an edge labelled by this symbol to the given state.
 		public static IDictionary<ISymbol, List<DfaState<ISymbol>>> computeTargetStatesDictionary (IDictionary<ISymbol, Dfa<ISymbol>> automatons){
 			var resultDictionary = new Dictionary<ISymbol, List<DfaState<ISymbol>>> ();
