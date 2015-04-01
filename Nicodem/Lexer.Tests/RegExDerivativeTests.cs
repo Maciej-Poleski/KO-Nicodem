@@ -359,6 +359,19 @@ namespace Lexer.Tests
             Assert.IsTrue(derivativeChangesOfRegexesAreUnique(aStar, bStar, cStar, dStar, aStarbStarcStardStar, aStarbStarcStardStar.Derivative('d')));
 			Assert.AreEqual(dStar, aStarbStarcStardStar.Derivative('d'));
 		}
+
+        // (a*b*)*^b = (a*b*)*^a = (a*b*)*
+        [Test]
+        public void RegExStarDoubleStarDerivativeTest()
+        {
+            var aStar = RegExFactory.Star(RegExFactory.Range('a', 'b'));
+            var bStar = RegExFactory.Star(RegExFactory.Range('b', 'c'));
+            var aStarbStarSTAR = RegExFactory.Star(RegExFactory.Concat(aStar, bStar));
+
+            Assert.IsTrue(derivativeChangesOfRegexesAreUnique(aStar, bStar, aStarbStarSTAR, aStarbStarSTAR.Derivative('b'), aStarbStarSTAR.Derivative('a')));
+            Assert.AreEqual(aStarbStarSTAR, aStarbStarSTAR.Derivative('a'));
+            Assert.AreEqual(aStarbStarSTAR, aStarbStarSTAR.Derivative('b'));
+        }
 	}
 }
 
