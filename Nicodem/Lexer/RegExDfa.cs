@@ -14,17 +14,21 @@ namespace Nicodem.Lexer
         private DFAState<T> deadState;
         private readonly DFAState<T> _start;
 
-        private static readonly T MinSymbol;
+        public static TSymbol MinSymbol<TSymbol>()
+        {
+            try
+            {
+                return Expression.Lambda<Func<TSymbol>>(Expression.Field(null, typeof(TSymbol), "MinValue")).Compile()();
+            }
+            catch (ArgumentException e)
+            {
+                throw new ArgumentException(String.Format("There is no implemented static field MinValue in {0}", typeof(TSymbol)), e);
+            }
+        }
 
         public override DFAState<T> Start
         {
             get { return _start; }
-        }
-
-        static RegExDfa()
-        {
-            MinSymbol = (T)typeof(T).GetField("MinValue").GetValue(null);
-            //MinSymbol = Expression.Lambda<Func<T>>(Expression.Convert(Expression.Parameter(typeof(T), "MinValue"), typeof(T)), new ParameterExpression[] { }).Compile()();
         }
 
         /// <summary>
@@ -67,15 +71,15 @@ namespace Nicodem.Lexer
             else
                 new_state._accepting = 0;
 
-            if (listOfTransitions.Count == 0 || !listOfTransitions[0].Key.Equals(MinSymbol))
+            if (listOfTransitions.Count == 0 || !listOfTransitions[0].Key.Equals(MinSymbol<T>()))
             {
                 if (deadState == null)
                 {
                     deadState = new DFAState<T>();
                     deadState._accepting = 0;
-                    deadState._transitions = new KeyValuePair<T, DFAState<T>>[] { new KeyValuePair<T, DFAState<T>>(MinSymbol, deadState) };
+                    deadState._transitions = new KeyValuePair<T, DFAState<T>>[] { new KeyValuePair<T, DFAState<T>>(MinSymbol<T>(), deadState) };
                 }
-                listOfTransitions.Insert(0, new KeyValuePair<T, DFAState<T>>(MinSymbol, deadState));
+                listOfTransitions.Insert(0, new KeyValuePair<T, DFAState<T>>(MinSymbol<T>(), deadState));
             }
 
             new_state._transitions = listOfTransitions.ToArray();
