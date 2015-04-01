@@ -40,6 +40,9 @@ namespace Nicodem.Lexer
             return new[] {Character};
         }
 
+		// [a...) = sum( {a}, {a+1}, {a+2}, ... )
+		// [a...)^x = sum( {a}, ... )^x = sum( {a}^x, {a+1}^x, ... )
+		// = epsilon if x >= a else empty
         public override RegEx<T> Derivative(T c)
         {
             return Character.CompareTo(c) <= 0 ? RegExFactory.Epsilon<T>() : RegExFactory.Empty<T>();

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using C5;
 
 namespace Nicodem.Lexer
 {
@@ -54,46 +55,55 @@ namespace Nicodem.Lexer
             }
             return true;
         }
-
+			
         public override IEnumerable<T> DerivChanges()
         {
-            if (Regexes.Length == 0)
-            {
-                return new T[] {};
-            }
-            if (Regexes.Length == 1)
-            {
-                return Regexes[0].DerivChanges();
-            }
-            if (Regexes[0].HasEpsilon())
-            {
-                return Regexes[0].DerivChanges().Union(Regexes[1].DerivChanges());
-            }
-            return Regexes[0].DerivChanges();
+			var lst = new ArrayList<T> ();
+
+			var index = 0;
+			while (index < Regexes.Length && Regexes [index].HasEpsilon ())
+				lst.AddAll (Regexes [index++].DerivChanges ());
+
+			if (index < Regexes.Length)
+				lst.AddAll (Regexes [index].DerivChanges ());
+
+			return lst;
         }
 
+		// concat(XY)^a = X^aY if epsi not in X
+		// concat(XY)^a = X^aY + Y^a  if epsi in X
         public override RegEx<T> Derivative(T c)
         {
-            if (Regexes.Length == 0)
-            {
-                return RegExFactory.Empty<T>();
-            }
-            if (Regexes.Length == 1)
-            {
-                return Regexes[0].Derivative(c);
-            }
-            RegEx<T> firstTwo;
-            if (Regexes[0].HasEpsilon())
-            {
-                firstTwo = RegExFactory.Union(RegExFactory.Concat(Regexes[0].Derivative(c), Regexes[1]),
-                    Regexes[1].Derivative(c));
-            }
-            else
-            {
-                firstTwo = RegExFactory.Concat(Regexes[0].Derivative(c), Regexes[1]);
-            }
-            return RegExFactory.Concat(firstTwo,
-                RegExFactory.Concat(new ArraySegment<RegEx<T>>(Regexes, 2, Regexes.Length - 2).Array));
-        }
+			return ComputeDerivative (0, c);
+		}
+
+		private RegEx<T> ComputeDerivative( int depth, T c )
+		{
+			// the last one
+			if (depth == Regexes.Length - 1)
+				return Regexes[depth].Derivative(c);
+
+			// (R[i])^a(R[i+1])....
+			var this_level = RegExFactory.Concat (
+				           Regexes [depth].Derivative (c),
+				           ConcatRegexes (depth + 1)
+			           );
+
+			// first can be skipped
+			if (Regexes [depth].HasEpsilon ())
+				return RegExFactory.Union (this_level, ComputeDerivative (depth + 1, c));
+
+			// cannot be skipped
+			return this_level;
+		}
+
+		// return (R[i])(R[i+1])....(R[len-1])
+		private RegEx<T> ConcatRegexes( int depth ) 
+		{
+			if (depth == Regexes.Length - 1)
+				return Regexes [depth];
+
+			return RegExFactory.Concat (Regexes [depth], ConcatRegexes (depth + 1));
+		}
     }
 }

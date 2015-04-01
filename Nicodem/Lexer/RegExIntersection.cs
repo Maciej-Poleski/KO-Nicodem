@@ -67,6 +67,7 @@ namespace Nicodem.Lexer
             return changes;
         }
 
+		// inter( X1, ... )^a = inter( X1^a, ... )
         public override RegEx<T> Derivative(T c)
         {
             var derivatives = new List<RegEx<T>>();

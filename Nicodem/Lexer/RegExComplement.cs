@@ -12,6 +12,7 @@ namespace Nicodem.Lexer
         }
 
         public RegEx<T> Regex { private set; get; }
+
         // typeid diff if other is not complement
         // compareTo( Regex, other.Regex ) otherwise
         public override int CompareTo(RegEx<T> other)
@@ -39,6 +40,7 @@ namespace Nicodem.Lexer
             return Regex.DerivChanges();
         }
 
+		// (~X)^a = ~(X^a)
         public override RegEx<T> Derivative(T c)
         {
             return RegExFactory.Complement(Regex.Derivative(c));

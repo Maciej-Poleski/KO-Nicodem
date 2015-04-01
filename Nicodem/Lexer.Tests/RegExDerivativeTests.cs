@@ -188,7 +188,7 @@ namespace Lexer.Tests
 			var derivZ = Z.Derivative ('a');
 			var derivW = W.Derivative ('a');
 
-			var concat = RegExFactory.Concat (X, Y, Z);
+			var concat = RegExFactory.Concat (X, Y, Z, W);
 			var derivConcat = concat.Derivative ('a');
 
 			Assert.IsTrue (X.HasEpsilon ());
@@ -279,12 +279,12 @@ namespace Lexer.Tests
 		[Test]
 		public void RegExStarSimpleDerivativeTest()
 		{
-			var aStar = RegExFactory.Star<char>(RegExFactory.Intersection<char>(RegExFactory.Range<char>('a'), RegExFactory.Complement<char>(RegExFactory.Range<char>('b'))));
-			var bStar = RegExFactory.Star<char>(RegExFactory.Intersection<char>(RegExFactory.Range<char>('b'), RegExFactory.Complement<char>(RegExFactory.Range<char>('c'))));
-			var cStar = RegExFactory.Star<char>(RegExFactory.Intersection<char>(RegExFactory.Range<char>('c'), RegExFactory.Complement<char>(RegExFactory.Range<char>('d'))));
-			var dStar = RegExFactory.Star<char>(RegExFactory.Intersection<char>(RegExFactory.Range<char>('d'), RegExFactory.Complement<char>(RegExFactory.Range<char>('e'))));
-			var aStarbStarcStar = RegExFactory.Concat<char>(aStar, bStar, cStar, dStar);
-			Assert.AreEqual(dStar, aStarbStarcStar.Derivative('c'));
+			var aStar = RegExFactory.Star (RegExFactory.Range ('a', 'b'));
+			var bStar = RegExFactory.Star (RegExFactory.Range ('b', 'c'));
+			var cStar = RegExFactory.Star (RegExFactory.Range ('c', 'd'));
+			var dStar = RegExFactory.Star (RegExFactory.Range ('d', 'e'));
+			var aStarbStarcStar = RegExFactory.Concat(aStar, bStar, cStar, dStar);
+			Assert.AreEqual(dStar, aStarbStarcStar.Derivative('d'));
 		}
 	}
 }
