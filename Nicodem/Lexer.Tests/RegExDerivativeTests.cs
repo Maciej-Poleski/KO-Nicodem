@@ -29,9 +29,12 @@ namespace Lexer.Tests
         public bool derivativeChangesIsUnique(RegEx<char> regEx)
         {
             char prev = (char)0xffff;
-            foreach(var c in regEx.DerivChanges())
-                if(c.Equals(prev))
+            foreach (var c in regEx.DerivChanges())
+            {
+                if (c.Equals(prev))
                     return false;
+                prev = c;
+            }
             return true;
         }
 
