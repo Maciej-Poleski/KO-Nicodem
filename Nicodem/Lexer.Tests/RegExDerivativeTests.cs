@@ -276,6 +276,7 @@ namespace Lexer.Tests
 			Assert.AreEqual (derivConcat, RegExFactory.Concat (derivX, Y, Z));
 		}
 
+        // concat(a*b*c*d*)^d = d*
 		[Test]
 		public void RegExStarSimpleDerivativeTest()
 		{
