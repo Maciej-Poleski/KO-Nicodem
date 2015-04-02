@@ -35,11 +35,12 @@ namespace Lexer.Tests
         {
             var epsi = RegExFactory.Epsilon<char>(); // typeId = 0
             var range = RegExFactory.Range('a'); // typeId = 1
+			var range2 = RegExFactory.Range ('b'); // typeId = 1
             var star = RegExFactory.Star(range); // typeId = 2
             var compl = RegExFactory.Complement(range); // typeId = 3
             var concat = RegExFactory.Concat(range, star); // typeId = 4
-            var union = RegExFactory.Union(range, star, compl); // typeId = 5
-            var inter = RegExFactory.Intersection(range, star, compl); // typeId = 6
+            var union = RegExFactory.Union(range, star, range2); // typeId = 5
+            var inter = RegExFactory.Intersection(range, star, range2); // typeId = 6
 
             // a < b
             Assert.IsTrue(epsi.CompareTo(range) < 0);
