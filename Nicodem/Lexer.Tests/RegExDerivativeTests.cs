@@ -319,17 +319,28 @@ namespace Lexer.Tests
 			Assert.AreEqual (RegExFactory.Epsilon<char> (), deriv);
 		}
 
-		// (a*b*c*d*)^d = d*
+		// (a*b*c*d*)^a = (a*)^ab*c*d* + (b*)^ac*d* + (c*)^ad* + (d*)^a = (a^a)a*b*c*d* + (emp x 3) = a*b*c*d*
+		// (a*b*c*d*)^b = (a*)^bb*c*d* + (b*)^bc*d* + (c*)^bd* + (d*)^b = emp + (b^b)b*c*d* + emp x 2 = b*c*d*
+		// (a*b*c*d*)^c = ... = c*d*
+		// (a*b*c*d*)^d = ... = d*
+		// (a*b*c*d*)^x = ... = emp
 		[Test]
-		public void Test_Concat_AstarBstarCstarDstar_derivD()
+		public void Test_Concat_AstarBstarCstarDstar()
 		{
 			var aStar = RegExFactory.Star (singleton ('a'));
 			var bStar = RegExFactory.Star (singleton ('b'));
 			var cStar = RegExFactory.Star (singleton ('c'));
 			var dStar = RegExFactory.Star (singleton ('d'));
-			var aStarbStarcStardStar = RegExFactory.Concat(aStar, bStar, cStar, dStar);
 
-			Assert.AreEqual(dStar, aStarbStarcStardStar.Derivative('d'));
+			var aSbScSdS = RegExFactory.Concat(aStar, bStar, cStar, dStar);
+			var bScSdS = RegExFactory.Concat(bStar, cStar, dStar);
+			var cSdS = RegExFactory.Concat(cStar, dStar);
+
+			Assert.AreEqual(aSbScSdS, aSbScSdS.Derivative('a'));
+			Assert.AreEqual(bScSdS, aSbScSdS.Derivative('b'));
+			Assert.AreEqual(cSdS, aSbScSdS.Derivative('c'));
+			Assert.AreEqual(dStar, aSbScSdS.Derivative('d'));
+			Assert.AreEqual (RegExFactory.Empty<char> (), aSbScSdS.Derivative ('x'));
 		}
 
 		#endregion

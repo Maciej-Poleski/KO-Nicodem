@@ -58,16 +58,18 @@ namespace Nicodem.Lexer
 			
         public override IEnumerable<T> DerivChanges()
         {
-			var lst = new ArrayList<T> ();
+			var s = new System.Collections.Generic.HashSet<T> ();
 
 			var index = 0;
 			while (index < Regexes.Length && Regexes [index].HasEpsilon ())
-				lst.AddAll (Regexes [index++].DerivChanges ());
+				foreach (var c in Regexes [index++].DerivChanges ())
+					s.Add (c);
 
 			if (index < Regexes.Length)
-				lst.AddAll (Regexes [index].DerivChanges ());
+				foreach (var c in Regexes [index].DerivChanges ())
+					s.Add (c);
 
-			return lst;
+			return s;
         }
 
 		// concat(XY)^a = X^aY if epsi not in X
