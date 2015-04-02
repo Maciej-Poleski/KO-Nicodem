@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -31,6 +31,9 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Grammar\NicodemGrammarProductions.cs" />
+    <Compile Include="Grammar\Production.cs" />
+    <Compile Include="Grammar\Symbol.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AST\Node.cs" />
     <Compile Include="AST\ProgramNode.cs" />
@@ -58,11 +61,16 @@
     <Compile Include="Visitors\AbstractRecursiveVisitor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="AST\" />
-    <Folder Include="Visitors\" />
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\Lexer\Lexer.csproj">
+      <Project>{3A107436-1EC7-48E3-BF42-5E5E50C259E7}</Project>
+      <Name>Lexer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Parser\Parser.csproj">
+      <Project>{DC9385D6-C37E-441F-8BAA-3B7EAEC2DA39}</Project>
+      <Name>Parser</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Source\Source.csproj">
       <Project>{6078FFE3-28C8-4169-831D-E1D1AAFDD72F}</Project>
       <Name>Source</Name>
