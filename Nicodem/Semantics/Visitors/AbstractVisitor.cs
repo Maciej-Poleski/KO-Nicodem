@@ -4,7 +4,9 @@ namespace Nicodem.Semantics.Visitors
 {
 	abstract class AbstractVisitor
 	{
-		public abstract void Visit (Node node);
+		public virtual void Visit (Node node)
+		{
+		}
 
 		#region Node direct children
 		public virtual void Visit(ProgramNode node) {
@@ -40,7 +42,7 @@ namespace Nicodem.Semantics.Visitors
 
 		#region ExpressionNode direct children
 		public virtual void Visit(ArrayNode node) {
-			Visit (node as ExpressionNode);
+			Visit (node as ConstNode);
 		}
 
 		public virtual void Visit(BlockExpressionNode node) {

@@ -55,6 +55,7 @@
     <Compile Include="AST\SliceNode.cs" />
     <Compile Include="AST\ElementNode.cs" />
     <Compile Include="Visitors\AbstractVisitor.cs" />
+    <Compile Include="Visitors\AbstractRecursiveVisitor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
