@@ -39,7 +39,7 @@ namespace Nicodem.Semantics.Grammar
         private static TokenCategory ShortComment = "`(^(\n|`))*`";
 
         // Type
-        private static TokenCategory TypeName = "^[:space:]";
+        private static TokenCategory TypeName = "(^[:space:])+";
 
         // TODO operators (remember - left recursion is forbidden)
 
@@ -47,5 +47,8 @@ namespace Nicodem.Semantics.Grammar
         private static TokenCategory DecimalNumberLiteral = "[:digit:]+"; // Only decimal number literals for now
         private static TokenCategory CharacterLiteral = "'[:print:]'";
         private static TokenCategory StringLiteral = "\"(^((^\\)\"))*(^\\)\"";  // String literal is delimited by not escaped " character
+        private static TokenCategory BooleanLiteral = "true|false";
+        // Inject 'name resolution' functionality with above literals families to avoid ambiguity
+        private static TokenCategory ObjectName = "(^[:space:])+";
     }
 }
