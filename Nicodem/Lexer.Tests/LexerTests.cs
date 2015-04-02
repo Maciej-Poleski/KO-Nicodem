@@ -29,23 +29,26 @@ namespace Lexer.Tests
         [Test]
         public void LexerComplexLanguages()
         {
-            // 0: a*
+            // 0: a+
             // 1: a*b
-            // 2: a*b*
+            // 2: a*b+
 
-            var regex0 = RegExFactory.Star(MakeCharRegex('a'));
-            var regex1 = RegExFactory.Concat(regex0, MakeCharRegex('b'));
-            var regex2 = RegExFactory.Concat(regex0, RegExFactory.Star(MakeCharRegex('b')));
+            var regex0 = RegExFactory.Concat(MakeCharRegex('a'), RegExFactory.Star(MakeCharRegex('a')));
+            var regex1 = RegExFactory.Concat(RegExFactory.Star(MakeCharRegex('a')), MakeCharRegex('b'));
+            var regex2 = RegExFactory.Concat(RegExFactory.Star(MakeCharRegex('a')),
+                RegExFactory.Concat(MakeCharRegex('b'), RegExFactory.Star(MakeCharRegex('b'))));
 
             var lexex = new Nicodem.Lexer.Lexer(regex0, regex1, regex2);
-            Assert.IsEmpty(lexex.Process("b"));
-            Assert.IsTrue(lexex.Process("").TokenizedTo(T("", 0, 2)));
-            /* ...
-             * a
-             * aaa
-             * ab
-             * abb
-             */
+            Assert.IsTrue(lexex.Process("b").TokenizedTo(T("b", 1, 2)));
+            Assert.IsEmpty(lexex.Process(""));
+            Assert.IsTrue(lexex.Process("a").TokenizedTo(T("a", 0)));
+            Assert.IsTrue(lexex.Process("aaa").TokenizedTo(T("aaa", 0)));
+            Assert.IsTrue(lexex.Process("ab").TokenizedTo(T("ab", 1, 2)));
+            Assert.IsTrue(lexex.Process("abb").TokenizedTo(T("abb", 2)));
+            Assert.IsTrue(lexex.Process("bb").TokenizedTo(T("bb", 2)));
+            Assert.IsTrue(lexex.Process("baabab").TokenizedTo(T("b", 1, 2), T("aab", 1, 2), T("ab", 1, 2)));
+            Assert.IsTrue(lexex.Process("bbab").TokenizedTo(T("bb", 2), T("ab", 1, 2)));
+            Assert.IsTrue(lexex.Process("bbacb").TokenizedTo(T("bb", 2), T("a", 0)));
         }
 
         [Test]
