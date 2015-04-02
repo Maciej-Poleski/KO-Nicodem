@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using C5;
 using System.Collections.Generic;
 
 namespace Nicodem.Lexer
@@ -12,8 +11,8 @@ namespace Nicodem.Lexer
 		/// </summary>
 		private static bool checkContainsDisjointSymbols<T>( IEnumerable<RegEx<T>> elements ) where T : IEquatable<T>, IComparable<T>
 		{
-			var normal = new System.Collections.Generic.HashSet<RegEx<T>> ();
-			var complement = new System.Collections.Generic.HashSet<RegEx<T>> ();
+			var normal = new HashSet<RegEx<T>> ();
+			var complement = new HashSet<RegEx<T>> ();
 
 			foreach (var elem in elements) {
 				var compl = elem as RegExComplement<T>;
@@ -100,8 +99,10 @@ namespace Nicodem.Lexer
 			if (checkContainsDisjointSymbols (regexes))
 				return All<T> ();
 
-            // build list of all regexes
-            var list = new ArrayList<RegEx<T>>();
+            // build set of all regexes
+			// X + Y ~ Y + X
+			// X + X ~ X
+			var S = new SortedSet<RegEx<T>>();
             foreach (var regex in regexes)
             {
                 // check if regex is empty
@@ -114,16 +115,15 @@ namespace Nicodem.Lexer
 
                 // other cases
                 var rconv = regex as RegExUnion<T>;
-                if(rconv != null)
-                    list.AddAll(rconv.Regexes);
-                else
-                    list.Add(regex);
+				if (rconv != null)
+					foreach (var reg in rconv.Regexes)
+						S.Add (reg);
+				else
+					S.Add (regex);
             }
 
-            // X + Y ~ Y + X
-            // X + X ~ X
-            list.Sort();
-            var distinct = list.Distinct().ToArray();
+			// final list of distinct elements
+			var distinct = S.ToArray ();
 
             // {X} -> X
             return distinct.Length == 1 ? distinct[0] : new RegExUnion<T>(distinct);
@@ -147,8 +147,10 @@ namespace Nicodem.Lexer
 			if (checkContainsDisjointSymbols (regexes))
 				return Empty<T> ();
 
-            // build list of all regexes
-            var list = new ArrayList<RegEx<T>>();
+            // build set of all regexes
+			// X * Y ~ Y * X
+			// X * X ~ X
+			var S = new SortedSet<RegEx<T>> ();
             foreach (var regex in regexes)
             {
                 // check if regex is empty
@@ -161,16 +163,15 @@ namespace Nicodem.Lexer
 
                 // other cases
                 var rconv = regex as RegExIntersection<T>;
-                if(rconv != null)
-                    list.AddAll(rconv.Regexes);
-                else
-                    list.Add(regex);
+				if (rconv != null)
+					foreach (var reg in rconv.Regexes)
+						S.Add (reg);
+				else
+					S.Add (regex);
             }
 
-            // X * Y ~ Y * X
-            // X * X ~ X
-            list.Sort();
-            var distinct = list.Distinct().ToArray();
+			// final list of distinct regexes
+			var distinct = S.ToArray ();
 
             // {X} -> X
             return distinct.Length == 1 ? distinct[0] : new RegExIntersection<T>(distinct);
@@ -188,7 +189,7 @@ namespace Nicodem.Lexer
         public static RegEx<T> Concat<T>(params RegEx<T>[] regexes) where T : IComparable<T>, IEquatable<T>
         {
             // build list of all regexes
-            var list = new ArrayList<RegEx<T>>();
+            var list = new LinkedList<RegEx<T>>();
             foreach (var regex in regexes)
             {
                 // check if regex is empty
@@ -201,25 +202,25 @@ namespace Nicodem.Lexer
 
                 // other cases
                 var rconv = regex as RegExConcat<T>;
-                if(rconv != null)
-                    list.AddAll(rconv.Regexes);
-                else
-                    list.Add(regex);
+				if (rconv != null)
+					foreach (var reg in rconv.Regexes)
+						list.AddLast (reg);
+				else
+					list.AddLast (regex);
             }
 
 			// reduce consecutive stars
-			var lst = new ArrayList<RegEx<T>> ();
-			var index = 0;
+			var lst = new LinkedList<RegEx<T>> ();
 			RegExStar<T> lastStar = null;
 
-			while (index < list.Count) {
-				var star = list [index] as RegExStar<T>;
+			foreach (var regex in list) {
+				var star = regex as RegExStar<T>;
 
 				// next element in sequence is a star
 				if (star != null) {
 					if (lastStar != null) {
 						if (!lastStar.Equals (star)) {
-							lst.Add (lastStar);
+							lst.AddLast (lastStar);
 							lastStar = star;
 						}
 					} else
@@ -229,16 +230,14 @@ namespace Nicodem.Lexer
 				// next element in sequence is not a star
 				else {
 					if (lastStar != null)
-						lst.Add (lastStar);
+						lst.AddLast (lastStar);
 					lastStar = null;
-					lst.Add (list [index]);
+					lst.AddLast (regex);
 				}
-
-				index++;
 			}
 
 			if (lastStar != null)
-				lst.Add (lastStar);
+				lst.AddLast (lastStar);
 
             // (XY)Z ~ X(YZ)
             var arr = lst.ToArray();

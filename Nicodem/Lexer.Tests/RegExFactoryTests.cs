@@ -1,5 +1,6 @@
 ﻿using Nicodem.Lexer;
 using NUnit.Framework;
+using System;
 
 namespace Lexer.Tests
 {
@@ -124,7 +125,7 @@ namespace Lexer.Tests
 			var intersection1 = RegExFactory.Intersection (regex1, regex2);
 			var intersection2 = RegExFactory.Intersection (regex2, regex1);
 
-			Assert.AreEqual (0, intersection1.CompareTo (intersection2));
+			Assert.AreEqual (intersection1, intersection2);
 		}
 
 		// intersect(X, Y, X) = intersect(Y, X)
@@ -136,7 +137,7 @@ namespace Lexer.Tests
 			var intersection1 = RegExFactory.Intersection (regex1, regex2, regex1);
 			var intersection2 = RegExFactory.Intersection (regex2, regex1);
 
-			Assert.AreEqual (0, intersection1.CompareTo (intersection2));
+			Assert.AreEqual (intersection1, intersection2);
 		}
 
         [Test]

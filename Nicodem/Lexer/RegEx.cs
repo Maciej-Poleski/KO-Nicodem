@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using C5;
+using System.Linq;
 
 namespace Nicodem.Lexer
 {
@@ -88,27 +88,27 @@ namespace Nicodem.Lexer
 			case 4:
 				{
 					var r = regex as RegExConcat<T>;
-					var l = new ArrayList<RegEx<N>>();
+					var l = new LinkedList<RegEx<N>>();
 					foreach(var recr in r.Regexes) {
-						l.Add(Convert(recr, converter));
+						l.AddLast(Convert(recr, converter));
 					}
 					return new RegExConcat<N>(l.ToArray());
 				}
 			case 5:
 				{
 					var r = regex as RegExUnion<T>;
-					var l = new ArrayList<RegEx<N>>();
+					var l = new LinkedList<RegEx<N>>();
 					foreach(var recr in r.Regexes) {
-						l.Add(Convert(recr, converter));
+						l.AddLast(Convert(recr, converter));
 					}
 					return new RegExUnion<N>(l.ToArray());
 				}
 			case 6:
 				{
 					var r = regex as RegExIntersection<T>;
-					var l = new ArrayList<RegEx<N>>();
+					var l = new LinkedList<RegEx<N>>();
 					foreach(var recr in r.Regexes) {
-						l.Add(Convert(recr, converter));
+						l.AddLast(Convert(recr, converter));
 					}
 					return new RegExIntersection<N>(l.ToArray());
 				}
