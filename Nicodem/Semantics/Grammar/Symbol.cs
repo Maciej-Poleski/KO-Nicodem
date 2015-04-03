@@ -59,6 +59,11 @@ namespace Nicodem.Semantics.Grammar
             return new Symbol(category);
         }
 
+        internal Symbol Next()
+        {
+            return new Symbol(_category + 1);
+        }
+
         public static bool operator ==(Symbol left, Symbol right)
         {
             return left.Equals(right);
