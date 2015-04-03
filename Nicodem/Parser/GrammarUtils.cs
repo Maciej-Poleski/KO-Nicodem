@@ -39,6 +39,8 @@ namespace Nicodem.Parser
 				queue.Enqueue(dfa.Start);
 				while(queue.Count > 0) {
 					var state = queue.Dequeue();
+					if (!predecessors.ContainsKey (state)) // each state should have, even empty, list of predecessors.
+						predecessors [state] = new List<KeyValuePair<ISymbol, DfaState<ISymbol>>> ();
 					foreach(var kv in state.Transitions) {
 						var nextState = kv.Value;
 						if (!predecessors.ContainsKey (nextState))
@@ -189,14 +191,18 @@ namespace Nicodem.Parser
 		{
 			var follow = new Dictionary<ISymbol, ISet<ISymbol>>();
 			var queue = new Queue<DfaState<ISymbol>>();
-			// stores (lhs symbol A, s) of production A -> dfa(E) where s is accepting state in dfa(E).
+			// for accepting state s it stores A - nonterminal whose automaton contains s.
 			var lhsForAccStates = new Dictionary<DfaState<ISymbol>, ISymbol>();
 			var predecessors = ComputePredecessors(automatons);
-			// at the beginning enqueue all accepting states
+			var acceptingStates = new Dictionary<Dfa<ISymbol>,List<DfaState<ISymbol>>> ();
+
+			foreach (var dfa in automatons.Values)
+				acceptingStates [dfa] = GetAllAcceptingStates (dfa);
+
 			foreach(var kv in automatons) {
 				var dfa = kv.Value;
 				var lhsT = kv.Key;
-				foreach(var accstate in GetAllAcceptingStates(dfa))
+				foreach(var accstate in acceptingStates[dfa])
 					lhsForAccStates[accstate] = lhsT;
 			}
 
@@ -206,7 +212,7 @@ namespace Nicodem.Parser
 				changes = false;
 				// Enqueue all accepting states from all automatons
 				foreach(var dfa in automatons.Values)
-					foreach(var accstate in GetAllAcceptingStates(dfa))
+					foreach(var accstate in acceptingStates[dfa])
 						queue.Enqueue(accstate);
 
 				while(queue.Count > 0) {
@@ -214,7 +220,7 @@ namespace Nicodem.Parser
 					// compute Follow set in the state i.e. the set-sum of 
 					// Follow sets of all symbols from its outgoing edges.
 					var followSetSum = new HashSet<ISymbol>();
-					foreach(var kv in state.Transitions){
+					foreach(var kv in state.Transitions) {
 						// symbol on the outgoing edge
 						var outT = kv.Key;
 						// copy all symbols from First set
@@ -242,19 +248,16 @@ namespace Nicodem.Parser
 					foreach(var kv in predecessors[state]) {
 						// symbol on the ingoing edge
 						var inT = kv.Key;
-						// if localChange = true, i.e. follow set of the inT
-						// has been enlarged, a predecessor state is enqueued. 
-						var localChange = false;
-						if(!follow.ContainsKey(inT))
-							follow[inT] = new HashSet<ISymbol>();
+						if (!follow.ContainsKey (inT))
+							follow [inT] = new HashSet<ISymbol> ();
+
 						foreach(var s in followSetSum)
 							if(!follow[inT].Contains(s)) {
 								changes = true;
-								localChange = true;
 								follow[inT].Add(s);
 							}
-						if(localChange)
-							queue.Enqueue(kv.Value);
+
+						queue.Enqueue(kv.Value);
 					}
 				}//end while queue not empty
 			}//end while there are no changes

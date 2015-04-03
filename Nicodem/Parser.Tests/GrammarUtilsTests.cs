@@ -93,21 +93,21 @@ namespace Nicodem.Parser.Tests
 
 			// FOLLOW
 			follow = new Dictionary<ISymbol, ISet<ISymbol>>();
-			follow [openbracket] = CreateSet ();
-			follow [closebracket] = CreateSet ();
-			follow [add] = CreateSet ();
-			follow [subtract] = CreateSet ();
-			follow [multiply] = CreateSet ();
-			follow [divide] = CreateSet ();
-			follow [num] = CreateSet ();
-			follow [name] = CreateSet ();
+			follow [openbracket] = CreateSet (expr, term, factor, openbracket, name, num);
+			follow [closebracket] = CreateSet (eof, add, subtract, multiply, divide, closebracket, term2, expr2);
+			follow [add] = CreateSet (term, openbracket, num, name, factor);
+			follow [subtract] = CreateSet (term, openbracket, num, name, factor);
+			follow [multiply] = CreateSet (factor, openbracket, name, num);
+			follow [divide] = CreateSet (factor, openbracket, name, num);
+			follow [num] = follow [closebracket];
+			follow [name] = follow [closebracket];
 			follow [eof] = CreateSet ();
 			//nonterminals
 			follow [expr] = CreateSet (eof, closebracket);
 			follow [expr2] = CreateSet (eof, closebracket);
-			follow [term] = CreateSet (eof, add, subtract, closebracket);
-			follow [term2] = CreateSet (eof, add, subtract, closebracket);
-			follow [factor] = CreateSet (eof, add, subtract, multiply, divide, closebracket);
+			follow [term] = CreateSet (eof, add, subtract, closebracket, expr2);
+			follow [term2] = CreateSet (eof, add, subtract, closebracket, expr2);
+			follow [factor] = CreateSet (eof, add, subtract, multiply, divide, closebracket, term2, expr2);
 
 			// ** Build automatons **
 
@@ -526,11 +526,8 @@ namespace Nicodem.Parser.Tests
 		{
 			var computedFollow = GrammarUtils.ComputeFollow (automatons, nullable, first);
 			Assert.AreEqual (follow.Keys.Count, computedFollow.Keys.Count);
-
 			foreach (var key in follow.Keys) {
-
 				Assert.IsTrue (computedFollow.ContainsKey (key));
-
 				var set1 = follow [key];
 				var set2 = computedFollow [key];
 				Assert.IsTrue (set1.SetEquals (set2));
