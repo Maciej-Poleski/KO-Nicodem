@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Nicodem.Lexer;
 
 namespace Nicodem.Semantics.Grammar
@@ -155,6 +151,7 @@ namespace Nicodem.Semantics.Grammar
 
         // TODO operators (remember - left recursion is forbidden)
         // using T(this string) extension to shorten code
+        // NOTE Done using implicit categories
 
         // Literal values (atomic expression)
         private static TokenCategory DecimalNumberLiteral = "[:digit:]+"; // Only decimal number literals for now
@@ -231,6 +228,11 @@ namespace Nicodem.Semantics.Grammar
             public static RegexSymbol operator +(string left, UniversalSymbol right)
             {
                 return (UniversalSymbol)left + right;
+            }
+
+            public RegexSymbol Star
+            {
+                get { return ((RegexSymbol) this).Star; }
             }
 
             public UniversalSymbol()
@@ -353,25 +355,93 @@ namespace Nicodem.Semantics.Grammar
             {
                 return new RegexSymbol(() => RegExFactory.Union<Symbol>(left,right));
             }
+
+            public RegexSymbol Star
+            {
+                get
+                {
+                    return new RegexSymbol(() => RegExFactory.Star(_regexSymbol()));
+                }
+            }
+
+            public static RegexSymbol operator *(RegexSymbol left, RegexSymbol right)
+            {
+                return new RegexSymbol(() => RegExFactory.Concat(left._regexSymbol(), right._regexSymbol()));
+            }
+
+            public RegexSymbol Optional
+            {
+                get
+                {
+                    return new RegexSymbol(() => RegExFactory.Union(_regexSymbol(), RegExFactory.Empty<Symbol>()));
+                }
+            }
+        }
+
+        private static RegexSymbol Optional(this string implicitToken)
+        {
+            return ((RegexSymbol) implicitToken).Optional;
         }
 
         private static readonly Dictionary<UniversalSymbol,RegexSymbol> _productions=new Dictionary<UniversalSymbol, RegexSymbol>(); 
 
-        private static UniversalSymbol that = new UniversalSymbol();
+        private static UniversalSymbol NewNonterminal()
+        {
+            return new UniversalSymbol();
+        }
 
-        private static UniversalSymbol Production(RegexSymbol regexSymbol)
+        private static void SetProduction(this UniversalSymbol that, RegexSymbol regexSymbol)
         {
             _productions.Add(that,regexSymbol);
-            var result = that;
-            that = new UniversalSymbol();
-            return result;
         }
 
         #endregion
 
         #region Productions
 
-        private static UniversalSymbol WhiteSpace = Production(LineCommentCStyle+LineCommentShortStyle+ShortComment+"[:space:]*");
+        private static UniversalSymbol WhiteSpace = NewNonterminal();
+        private static UniversalSymbol TypeSpecifier = NewNonterminal();
+        private static UniversalSymbol ObjectDeclaration = NewNonterminal();
+        private static UniversalSymbol BlockExpression = NewNonterminal();
+        private static UniversalSymbol ObjectDefinitionExpression = NewNonterminal();   // VariableDefNode
+        private static UniversalSymbol ArrayLiteralExpression = NewNonterminal();       // ArrayNode
+        private static UniversalSymbol ObjectUseExpression = NewNonterminal();          // VariableUseNode __and__ ConstNode
+        private static UniversalSymbol IfExpression = NewNonterminal();                 // IfNode
+        private static UniversalSymbol WhileExpression = NewNonterminal();              // WhileNode
+        private static UniversalSymbol LoopControlExpression = NewNonterminal();        // LoopControlNode
+
+        private static UniversalSymbol OperatorExpression = NewNonterminal();           // OperationNode
+        private static UniversalSymbol Expression = NewNonterminal();
+        private static UniversalSymbol ParametersList = NewNonterminal();               // NOTE: There is no such node in AST, flatten this
+        private static UniversalSymbol Function = NewNonterminal();
+        private static UniversalSymbol Program = NewNonterminal();
+
+        static NicodemGrammarProductions()
+        {
+            Program.SetProduction((WhiteSpace.Star + Function).Star * WhiteSpace.Star);
+            WhiteSpace.SetProduction(LineCommentCStyle+LineCommentShortStyle+ShortComment+"[:space:]*");
+            Function.SetProduction(ObjectName * WhiteSpace.Star * "(" * WhiteSpace.Star * ParametersList * WhiteSpace.Star * ")" * WhiteSpace.Star * "->" * WhiteSpace.Star * TypeSpecifier * WhiteSpace.Star * Expression);
+            ParametersList.SetProduction(((ObjectDeclaration * WhiteSpace.Star * "," * WhiteSpace.Star).Star * ObjectDeclaration).Optional);
+            ObjectDeclaration.SetProduction(TypeSpecifier * WhiteSpace.Star * ObjectName);
+            TypeSpecifier.SetProduction(TypeName * WhiteSpace.Star * ("mutable".Optional() * WhiteSpace.Star * "[" * Expression * "]" * WhiteSpace.Star).Star  * "mutable".Optional());
+            Expression.SetProduction(
+                BlockExpression +
+                ObjectDefinitionExpression +
+                ArrayLiteralExpression +
+                ObjectUseExpression +
+                IfExpression +
+                WhileExpression +
+                LoopControlExpression +
+                OperatorExpression  // TODO all operators including subscript, slices, call, operator precedence
+                );
+            BlockExpression.SetProduction("{" * (WhiteSpace.Star * Expression).Star * WhiteSpace.Star * "}");   // No left-recursion thanks to '{'
+            ObjectDefinitionExpression.SetProduction(TypeSpecifier * WhiteSpace.Star * ObjectName * WhiteSpace.Star * "=" * WhiteSpace.Star * Expression);  // NOTE: "=" is _not_ an assignment operator here
+            ArrayLiteralExpression.SetProduction("[" * (WhiteSpace.Star * Expression).Star * WhiteSpace.Star * "]");
+            ObjectUseExpression.SetProduction(ObjectName);    // Literals are handled by 'name resolution'
+            IfExpression.SetProduction("if" * WhiteSpace.Star * Expression * WhiteSpace.Star * Expression * (WhiteSpace.Star * "else" * Expression).Optional);  // FIXME: if should be an operator
+            WhileExpression.SetProduction("while" * WhiteSpace.Star * Expression * WhiteSpace.Star * Expression * (WhiteSpace.Star * "else" * Expression).Optional);    // the same here?
+            LoopControlExpression.SetProduction(("break".Token() + "continue") * (WhiteSpace.Star * Expression * (WhiteSpace.Star * DecimalNumberLiteral).Optional).Optional);
+        }
 
         #endregion
     }
