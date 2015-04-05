@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Nicodem.Lexer;
 
 namespace Nicodem.Semantics.Grammar
@@ -235,6 +236,11 @@ namespace Nicodem.Semantics.Grammar
                 get { return ((RegexSymbol) this).Star; }
             }
 
+            public RegexSymbol Optional
+            {
+                get { return ((RegexSymbol) this).Optional; }
+            }
+
             public UniversalSymbol()
             {
                 _symbol = new UnknownNonterminalSymbol();
@@ -356,6 +362,14 @@ namespace Nicodem.Semantics.Grammar
                 return new RegexSymbol(() => RegExFactory.Union<Symbol>(left,right));
             }
 
+            public static RegexSymbol MakeUnion(params string[] tokens)
+            {
+                return new RegexSymbol(() =>
+                {
+                    return RegExFactory.Union(tokens.Select(t => ((RegexSymbol) t)._regexSymbol()).ToArray());
+                });
+            }
+
             public RegexSymbol Star
             {
                 get
@@ -395,6 +409,12 @@ namespace Nicodem.Semantics.Grammar
             _productions.Add(that,regexSymbol);
         }
 
+        private static RegexSymbol MakeInfixOperatorExpressionRegex(UniversalSymbol operatorExpression, params string[] operators)
+        {
+            var operatorsRegex = RegexSymbol.MakeUnion(operators);
+            return operatorExpression * (WhiteSpace.Star * operatorsRegex * WhiteSpace.Star * operatorExpression).Star;
+        }
+
         #endregion
 
         #region Productions
@@ -409,7 +429,25 @@ namespace Nicodem.Semantics.Grammar
         private static UniversalSymbol IfExpression = NewNonterminal();                 // IfNode
         private static UniversalSymbol WhileExpression = NewNonterminal();              // WhileNode
         private static UniversalSymbol LoopControlExpression = NewNonterminal();        // LoopControlNode
-
+        private static UniversalSymbol AtomicExpression = NewNonterminal();             // above expressions
+        private static UniversalSymbol Operator0Expression = NewNonterminal();          // atomic expression or parenthesized general expression
+        private static UniversalSymbol Operator1Expression = NewNonterminal();          // left-to-right scope resolution (unimplemented)
+        private static UniversalSymbol Operator2Expression = NewNonterminal();          // left-to-right ++ -- (postfix) function call, array subscript, slice subscript
+        private static UniversalSymbol Operator3Expression = NewNonterminal();          // right-to-left ++ -- + - ! ~ ((de)reference, new not implemented) prefix
+        private static UniversalSymbol Operator4Expression = NewNonterminal();          // left-to-right pointer to member, not implemented
+        private static UniversalSymbol Operator5Expression = NewNonterminal();          // left-to-right * / %
+        private static UniversalSymbol Operator6Expression = NewNonterminal();          // left-to-right + -
+        private static UniversalSymbol Operator7Expression = NewNonterminal();          // left-to-right << >>
+        private static UniversalSymbol Operator8Expression = NewNonterminal();          // left-to-right < <= > >=
+        private static UniversalSymbol Operator9Expression = NewNonterminal();          // left-to-right == !=
+        private static UniversalSymbol Operator10Expression = NewNonterminal();         // left-to-right &
+        private static UniversalSymbol Operator11Expression = NewNonterminal();         // left-to-right ^
+        private static UniversalSymbol Operator12Expression = NewNonterminal();         // left-to-right |
+        private static UniversalSymbol Operator13Expression = NewNonterminal();         // left-to-right &&
+        private static UniversalSymbol Operator14Expression = NewNonterminal();         // left-to-right ||
+        private static UniversalSymbol Operator15Expression = NewNonterminal();         // right-to-left = += -= *= /= %= <<= >>= &= ^= |=
+        private static UniversalSymbol Operator16Expression = NewNonterminal();         // right-to-left throw
+        private static UniversalSymbol Operator17Expression = NewNonterminal();         // left-to-right ,
         private static UniversalSymbol OperatorExpression = NewNonterminal();           // OperationNode
         private static UniversalSymbol Expression = NewNonterminal();
         private static UniversalSymbol ParametersList = NewNonterminal();               // NOTE: There is no such node in AST, flatten this
@@ -424,15 +462,34 @@ namespace Nicodem.Semantics.Grammar
             ParametersList.SetProduction(((ObjectDeclaration * WhiteSpace.Star * "," * WhiteSpace.Star).Star * ObjectDeclaration).Optional);
             ObjectDeclaration.SetProduction(TypeSpecifier * WhiteSpace.Star * ObjectName);
             TypeSpecifier.SetProduction(TypeName * WhiteSpace.Star * ("mutable".Optional() * WhiteSpace.Star * "[" * Expression * "]" * WhiteSpace.Star).Star  * "mutable".Optional());
-            Expression.SetProduction(
+            Expression.SetProduction(OperatorExpression);
+            OperatorExpression.SetProduction(Operator17Expression);
+            Operator17Expression.SetProduction(Operator16Expression);
+            Operator16Expression.SetProduction(Operator15Expression);
+            Operator15Expression.SetProduction(MakeInfixOperatorExpressionRegex(Operator14Expression, "= += -= *= /= %= <<= >>= &= ^= |=".Split(' ')));
+            Operator14Expression.SetProduction(MakeInfixOperatorExpressionRegex(Operator13Expression, "||"));
+            Operator13Expression.SetProduction(MakeInfixOperatorExpressionRegex(Operator12Expression, "&&"));
+            Operator12Expression.SetProduction(MakeInfixOperatorExpressionRegex(Operator11Expression, "|"));
+            Operator11Expression.SetProduction(MakeInfixOperatorExpressionRegex(Operator10Expression, "^"));
+            Operator10Expression.SetProduction(MakeInfixOperatorExpressionRegex(Operator9Expression, "&"));
+            Operator9Expression.SetProduction(MakeInfixOperatorExpressionRegex(Operator8Expression, "==", "!="));
+            Operator8Expression.SetProduction(MakeInfixOperatorExpressionRegex(Operator7Expression, "< <= > >=".Split(' ')));
+            Operator7Expression.SetProduction(MakeInfixOperatorExpressionRegex(Operator6Expression, "<< >>".Split(' ')));
+            Operator6Expression.SetProduction(MakeInfixOperatorExpressionRegex(Operator5Expression, "+ -".Split(' ')));
+            Operator5Expression.SetProduction(MakeInfixOperatorExpressionRegex(Operator4Expression, "* / %".Split(' ')));
+            Operator4Expression.SetProduction(Operator3Expression);
+            Operator3Expression.SetProduction((RegexSymbol.MakeUnion("++ -- + - ! ~".Split(' ')) * WhiteSpace.Star).Star * Operator2Expression);
+            Operator2Expression.SetProduction(Operator1Expression * WhiteSpace.Star * (RegexSymbol.MakeUnion("++", "--") + ("(" * (WhiteSpace.Star * Expression).Star * WhiteSpace.Star * ")") + ("[" * WhiteSpace.Star * Expression * WhiteSpace.Star * "]") + ("[" * WhiteSpace.Star * Expression.Optional * ".." * Expression.Optional * "]")).Star);
+            Operator1Expression.SetProduction(Operator0Expression);
+            Operator0Expression.SetProduction(AtomicExpression + ("(" * WhiteSpace.Star * Expression * WhiteSpace.Star * ")"));
+            AtomicExpression.SetProduction(
                 BlockExpression +
                 ObjectDefinitionExpression +
                 ArrayLiteralExpression +
                 ObjectUseExpression +
                 IfExpression +
                 WhileExpression +
-                LoopControlExpression +
-                OperatorExpression  // TODO all operators including subscript, slices, call, operator precedence
+                LoopControlExpression
                 );
             BlockExpression.SetProduction("{" * (WhiteSpace.Star * Expression).Star * WhiteSpace.Star * "}");   // No left-recursion thanks to '{'
             ObjectDefinitionExpression.SetProduction(TypeSpecifier * WhiteSpace.Star * ObjectName * WhiteSpace.Star * "=" * WhiteSpace.Star * Expression);  // NOTE: "=" is _not_ an assignment operator here
