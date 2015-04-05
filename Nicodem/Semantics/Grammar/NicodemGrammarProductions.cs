@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Nicodem.Lexer;
+using Nicodem.Parser;
 
 namespace Nicodem.Semantics.Grammar
 {
@@ -397,7 +398,16 @@ namespace Nicodem.Semantics.Grammar
             return ((RegexSymbol) implicitToken).Optional;
         }
 
-        private static readonly Dictionary<UniversalSymbol,RegexSymbol> _productions=new Dictionary<UniversalSymbol, RegexSymbol>(); 
+        private static readonly Dictionary<UniversalSymbol,RegexSymbol> _productions=new Dictionary<UniversalSymbol, RegexSymbol>();
+
+        /// <summary>
+        /// Creates dictionary instance specifically for <see cref="Grammar{TProduction}"/> constructor.
+        /// </summary>
+        /// <returns></returns>
+        internal static IDictionary<ISymbol,Production[]> MakeProductionsDictionaryForGrammarConstructor()
+        {
+            return _productions.ToDictionary<KeyValuePair<UniversalSymbol, RegexSymbol>, ISymbol, Production[]>(production => (Symbol) production.Key, production => new[] {new Production((Symbol) production.Key, production.Value)});
+        }
 
         private static UniversalSymbol NewNonterminal()
         {
