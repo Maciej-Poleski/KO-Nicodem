@@ -18,7 +18,7 @@ namespace Nicodem.Lexer
         {
             try
             {
-                return Expression.Lambda<Func<TSymbol>>(Expression.Field(null, typeof(TSymbol), "MinValue")).Compile()();
+				return Expression.Lambda<Func<TSymbol>>(Expression.Property(null, typeof(TSymbol), "MinValue")).Compile()();
             }
             catch (ArgumentException e)
             {

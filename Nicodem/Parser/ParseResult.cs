@@ -4,14 +4,14 @@ using Nicodem.Core;
 namespace Nicodem.Parser
 {
 
-	internal struct ParseResult<TProduction> where TProduction : IProduction
+	internal struct ParseResult<TSymbol> where TSymbol : ISymbol<TSymbol>
 	{
 
-		public IParseTree<TProduction> Tree { get; private set; } 
-		public MemoizedInput<IParseTree<TProduction>>.Iterator Iterator { get; private set; }
+		public IParseTree<TSymbol> Tree { get; private set; } 
+		public MemoizedInput<IParseTree<TSymbol>>.Iterator Iterator { get; private set; }
 		private bool _ok;
 
-		public ParseResult(IParseTree<TProduction> tree, MemoizedInput<IParseTree<TProduction>>.Iterator iterator, bool ok = true)
+		public ParseResult(IParseTree<TSymbol> tree, MemoizedInput<IParseTree<TSymbol>>.Iterator iterator, bool ok = true)
 			: this()
 		{
 			Tree = tree;
@@ -19,7 +19,7 @@ namespace Nicodem.Parser
 			_ok = ok;
 		}
 
-		public static implicit operator bool(ParseResult<TProduction> result)
+		public static implicit operator bool(ParseResult<TSymbol> result)
 		{
 			return result._ok;
 		}

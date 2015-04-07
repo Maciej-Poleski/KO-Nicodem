@@ -15,12 +15,12 @@ namespace Nicodem.Parser.Tests
 			var prodChar = RegExParser.Parse("$");
 			var prodSymbol = new StringProduction(start.C, prodChar);
 
-			var grammar = new Grammar<StringProduction>(new Dictionary<ISymbol, StringProduction[]>{
+			var grammar = new Grammar<CharSymbol>(new Dictionary<CharSymbol, Production<CharSymbol>[]>{
 				{ start, new []{prodSymbol} }
 			});
 
-			var parser = new LlParser<StringProduction>(grammar);
-			var emptyInput = new List<IParseTree<StringProduction>>();
+			var parser = new LlParser<CharSymbol>(grammar);
+			var emptyInput = new List<IParseTree<CharSymbol>>();
 
 			Assert.IsNotNull(parser.Parse(emptyInput));
 		}

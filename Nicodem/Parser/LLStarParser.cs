@@ -7,11 +7,11 @@ using Strilanc.Value;
 
 namespace Nicodem.Parser
 {
-	public class LLStarParser<TProduction> : IParser<TProduction> where TProduction:IProduction
+	public class LLStarParser<TSymbol> : IParser<TSymbol> where TSymbol : class, ISymbol<TSymbol>
 	{
-		private readonly Grammar<TProduction> _grammar;
+		private readonly Grammar<TSymbol> _grammar;
 
-		public LLStarParser(Grammar<TProduction> grammar)
+		public LLStarParser(Grammar<TSymbol> grammar)
 		{
 			if(grammar.HasLeftRecursion) {
                 throw new ArgumentException("Grammar has left recursion");
@@ -19,9 +19,9 @@ namespace Nicodem.Parser
             _grammar = grammar;
 		}
 
-        public IParseTree<TProduction> Parse(IEnumerable<IParseTree<TProduction>> word)
+        public IParseTree<TSymbol> Parse(IEnumerable<IParseTree<TSymbol>> word)
 		{
-			var memoizedWord = new MemoizedInput<IParseTree<TProduction>>(word);
+			var memoizedWord = new MemoizedInput<IParseTree<TSymbol>>(word);
 			var result = ParseTerm(_grammar.Start, memoizedWord, memoizedWord.Begin);
 
             // whole input has to be eaten
@@ -32,32 +32,33 @@ namespace Nicodem.Parser
             }
 		}
 
-		private ParseResult<TProduction> ParseTerm(ISymbol term, MemoizedInput<IParseTree<TProduction>> word, MemoizedInput<IParseTree<TProduction>>.Iterator input)
+		private ParseResult<TSymbol> ParseTerm(TSymbol term, MemoizedInput<IParseTree<TSymbol>> word, MemoizedInput<IParseTree<TSymbol>>.Iterator input)
 		{
 			var dfa = _grammar.Automatons[term];
-			var children = new List<IParseTree<TProduction>>(); 
+			var children = new List<IParseTree<TSymbol>>(); 
 
 			var it = input;
 			var state = dfa.Start;
+			var eof = ParserUtils<TSymbol>.GetEOF();
 
 			while(true) {
-				LookaheadDfa lookeaheadDfa = null; // TODO will be initialized
+				LookaheadDfa<TSymbol> lookeaheadDfa = null; // TODO will be initialized
 				var lookState = lookeaheadDfa.Start;
-                ISymbol currentSymbol = (it != word.End) ? it.Current.Symbol : term.EOF;
+                TSymbol currentSymbol = (it != word.End) ? it.Current.Symbol : eof;
 
                 if(state.Accepting > 0 && _grammar.Follow[term].Contains(currentSymbol)) {
-					var parsedTree = new ParseBranch<TProduction>(
+					var parsedTree = new ParseBranch<TSymbol>(
 						GetFragmentRange(input.Current.Fragment, children.Last().Fragment),
 						term, 
 						_grammar.WhichProduction[state.Accepting], 
 						children);
 
-					return new ParseResult<TProduction>(parsedTree, it);
+					return new ParseResult<TSymbol>(parsedTree, it);
 				}
 
 				var lookIt = it;
 				while(lookState.Accepting == 0) {
-                	ISymbol lookSym = (lookIt != word.End) ? lookIt.Current.Symbol : term.EOF;
+                	TSymbol lookSym = (lookIt != word.End) ? lookIt.Current.Symbol : eof;
 					lookState = FindTransition(lookState.Transitions, lookSym);
 					lookIt = lookIt.Next();
 				}
@@ -71,10 +72,10 @@ namespace Nicodem.Parser
 					return ReturnError(term, children, input, it);
 				}
 
-				ISymbol transSymbol = decisions.ElementAt(0).ForceGetValue();
+				TSymbol transSymbol = decisions.ElementAt(0).ForceGetValue();
 				if(_grammar.IsTerminal(transSymbol)) {
 
-					children.Add(new ParseLeaf<TProduction>(it.Current.Fragment, currentSymbol));
+					children.Add(new ParseLeaf<TSymbol>(it.Current.Fragment, currentSymbol));
 					it = it.Next();
 				} else {
 
@@ -90,15 +91,15 @@ namespace Nicodem.Parser
 			}
 		}
 
-		private ParseResult<TProduction> ReturnError(ISymbol term, IList<IParseTree<TProduction>> children, 
-				MemoizedInput<IParseTree<TProduction>>.Iterator input, MemoizedInput<IParseTree<TProduction>>.Iterator currentIt)
+		private ParseResult<TSymbol> ReturnError(TSymbol term, IList<IParseTree<TSymbol>> children, 
+				MemoizedInput<IParseTree<TSymbol>>.Iterator input, MemoizedInput<IParseTree<TSymbol>>.Iterator currentIt)
 		{
-			var branch = new ParseBranch<TProduction>(
+			var branch = new ParseBranch<TSymbol>(
 				GetFragmentRange(input.Current.Fragment, children.Last().Fragment), 
 					term, 
 					_grammar.Productions[term][0],  // TODO could not parse any productions
 					children);
-			return new ParseResult<TProduction>(branch, currentIt, false);
+			return new ParseResult<TSymbol>(branch, currentIt, false);
 		}
 
 		private static IFragment GetFragmentRange(IFragment begin, IFragment end) {
@@ -106,7 +107,7 @@ namespace Nicodem.Parser
 		}
 
 		// TODO use binary search if possible and extract it somewhere
-		private static DfaState<ISymbol> FindTransition(IReadOnlyList<KeyValuePair<ISymbol, DfaState<ISymbol>>> transitions, ISymbol edge)
+		private static DfaState<TSymbol> FindTransition(IReadOnlyList<KeyValuePair<TSymbol, DfaState<TSymbol>>> transitions, TSymbol edge)
 		{
 			return transitions.FirstOrDefault(kv => kv.Key.Equals(edge)).Value;
 		}

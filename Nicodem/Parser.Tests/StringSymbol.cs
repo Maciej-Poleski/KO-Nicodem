@@ -2,7 +2,7 @@
 
 namespace Nicodem.Parser.Tests
 {
-	public class StringSymbol : ISymbol
+	public class StringSymbol : ISymbol<StringSymbol>
 	{
 		internal String S { get; private set; }
 		internal StringSymbol (String s)
@@ -10,29 +10,26 @@ namespace Nicodem.Parser.Tests
 			S = s;
 		}
 			
-		public bool Equals(ISymbol other)
+		public bool Equals(StringSymbol other)
 		{
-			if (other is StringSymbol && String.Equals(S, (other as StringSymbol).S)) {
-				return true;
-			}
-			return false;
+			return (other != null && String.Equals(S, other.S));
 		}
 			
-		public int CompareTo(ISymbol other)
+		public int CompareTo(StringSymbol other)
 		{
-			if (other is StringSymbol) {
-				return String.Compare (S, (other as StringSymbol).S);
+			if (other != null) {
+				return String.Compare (S, other.S);
 			}
 			return -1;
 		}
 
-		public ISymbol EOF {
+		public static StringSymbol EOF {
 			get {
 				return new StringSymbol ("EOF");
 			}
 		}
 	
-		public ISymbol MinValue {
+		public static StringSymbol MinValue {
 			get {
 				return new StringSymbol (Char.MinValue.ToString());
 			}

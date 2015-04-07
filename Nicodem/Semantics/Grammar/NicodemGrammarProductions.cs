@@ -404,9 +404,9 @@ namespace Nicodem.Semantics.Grammar
         /// Creates dictionary instance specifically for <see cref="Grammar{TProduction}"/> constructor.
         /// </summary>
         /// <returns></returns>
-        internal static IDictionary<ISymbol,Production[]> MakeProductionsDictionaryForGrammarConstructor()
+        internal static IDictionary<Symbol,Production[]> MakeProductionsDictionaryForGrammarConstructor()
         {
-            return _productions.ToDictionary<KeyValuePair<UniversalSymbol, RegexSymbol>, ISymbol, Production[]>(production => (Symbol) production.Key, production => new[] {new Production((Symbol) production.Key, production.Value)});
+            return _productions.ToDictionary<KeyValuePair<UniversalSymbol, RegexSymbol>, Symbol, Production[]>(production => (Symbol) production.Key, production => new[] {new Production((Symbol) production.Key, production.Value)});
         }
 
         private static UniversalSymbol NewNonterminal()
