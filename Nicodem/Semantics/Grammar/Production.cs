@@ -3,11 +3,15 @@ using Nicodem.Parser;
 
 namespace Nicodem.Semantics.Grammar
 {
-    internal class Production : Production<Symbol>
+    internal class Production : IProduction<Symbol>
     {
+		public Symbol Lhs { get; private set; }
+		public RegEx<Symbol> Rhs { get; private set; }
+
         public Production(Symbol lhs, RegEx<Symbol> rhs)
-			: base (lhs, rhs)
         {
+			Lhs = lhs;
+			Rhs = rhs;
         }
 
         public override string ToString()

@@ -2,11 +2,12 @@
 
 namespace Nicodem.Parser.Tests
 {
-	internal class CharSymbol : ISymbol<CharSymbol>
+	internal struct CharSymbol : ISymbol<CharSymbol>
 	{
 		internal char C { get; private set; }
 
 		internal CharSymbol(char c)
+			: this()
 		{
 			C = c;
 		}
@@ -15,7 +16,7 @@ namespace Nicodem.Parser.Tests
 
 		public bool Equals(CharSymbol other)
 		{
-			return (other != null && C == other.C);
+			return C == other.C;
 		}
 
 		#endregion
@@ -24,7 +25,7 @@ namespace Nicodem.Parser.Tests
 
 		public int CompareTo(CharSymbol other)
 		{
-			return other != null ? C.CompareTo(other.C) : -1;
+			return C.CompareTo(other.C);
 		}
 
 		#endregion

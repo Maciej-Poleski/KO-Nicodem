@@ -4,12 +4,12 @@ using System.Collections.Generic;
 namespace Nicodem.Parser
 {
 	// TODO: This class should be immutable. Find a way to use IImmutableDictionary and IImmutableSet.
-	public class Grammar<TSymbol> where TSymbol : class, ISymbol<TSymbol>
+	public class Grammar<TSymbol> where TSymbol : struct, ISymbol<TSymbol>
 	{
 		public TSymbol Start { get; private set; }
-		public IDictionary<TSymbol, Production<TSymbol>[]> Productions { get; private set; } 
+		public IDictionary<TSymbol, IProduction<TSymbol>[]> Productions { get; private set; } 
 		internal IDictionary<TSymbol, Dfa<TSymbol>> Automatons { get; private set; }
-		internal IDictionary<uint, Production<TSymbol>> WhichProduction { get; private set; } // accepting state marker -> production
+		internal IDictionary<uint, IProduction<TSymbol>> WhichProduction { get; private set; } // accepting state marker -> production
 		internal ISet<TSymbol> Nullable { get; private set; }
 		internal IDictionary<TSymbol, ISet<TSymbol>> First { get; private set; }
 		internal IDictionary<TSymbol, ISet<TSymbol>> Follow { get; private set; }
@@ -30,10 +30,10 @@ namespace Nicodem.Parser
 			return Productions[term].Length == 0;
 		}
 
-		public Grammar(IDictionary<TSymbol, Production<TSymbol>[]> productions)
+		public Grammar(IDictionary<TSymbol, IProduction<TSymbol>[]> productions)
 		{
             Productions = productions;
-			WhichProduction = new Dictionary<uint, Production<TSymbol>>();
+			WhichProduction = new Dictionary<uint, IProduction<TSymbol>>();
 			Automatons = new Dictionary<TSymbol, Dfa<TSymbol>>();
 			// Here we prepare automatons for each symbol.
 			uint productionMarker = 1;
@@ -58,21 +58,21 @@ namespace Nicodem.Parser
 		}
 
 		// for a given LlConfiguration the function computes list of edges to all other possible LlConfigurations.
-		public List<KeyValuePair<TSymbol,LlConfiguration<TSymbol>>> OutgoingEdges(LlConfiguration<TSymbol> llconf) {
+		public List<KeyValuePair<TSymbol?,LlConfiguration<TSymbol>>> OutgoingEdges(LlConfiguration<TSymbol> llconf) {
 			if (llconf.Count() == 0) {
 				// If intially the stack is empty we cannot figure out next edges, so return an empty list.
-				return new List<KeyValuePair<TSymbol, LlConfiguration<TSymbol>>> ();
+				return new List<KeyValuePair<TSymbol?, LlConfiguration<TSymbol>>> ();
 			}
 
 			var topState = llconf.Pop ();
 			var transitions = topState.Transitions;
-			var result = new List<KeyValuePair<TSymbol,LlConfiguration<TSymbol>>>();
+			var result = new List<KeyValuePair<TSymbol?,LlConfiguration<TSymbol>>>();
 
 			foreach (var kv in transitions) {
 				var symbol = kv.Key;
 				var targetState = kv.Value;
 				var newStack = llconf.copyOfStack (); // shallow copy of the stack
-				TSymbol newEdgeSymbol = null; // symbol on the edge to new LlConfiguration, epsilon == null
+				TSymbol? newEdgeSymbol = null; // symbol on the edge to new LlConfiguration, epsilon == null
 
 				// topState---symbol-->targetState (we pop topState and push targetState)
 				if (IsTerminal (symbol)) {
@@ -84,7 +84,7 @@ namespace Nicodem.Parser
 				}
 
 				var newLlConf = new LlConfiguration<TSymbol> (llconf.label, newStack);
-				var newEdge = new KeyValuePair<TSymbol, LlConfiguration<TSymbol>> (newEdgeSymbol, newLlConf);
+				var newEdge = new KeyValuePair<TSymbol?, LlConfiguration<TSymbol>> (newEdgeSymbol, newLlConf);
 				result.Add (newEdge);
 			}
 
@@ -102,13 +102,13 @@ namespace Nicodem.Parser
 						var newStack = new Stack<DfaState<TSymbol>> ();
 						newStack.Push (targetState);
 						var newLlConf = new LlConfiguration<TSymbol> (llconf.label, newStack);
-						var newEdge = new KeyValuePair<TSymbol, LlConfiguration<TSymbol>> (null, newLlConf);
+						var newEdge = new KeyValuePair<TSymbol?, LlConfiguration<TSymbol>> (null, newLlConf);
 						result.Add (newEdge);
 					}
 				} else {
 					var newStack = llconf.copyOfStack (); // shallow copy of the stack
 					var newLlConf = new LlConfiguration<TSymbol> (llconf.label, newStack);
-					var newEdge = new KeyValuePair<TSymbol, LlConfiguration<TSymbol>> (null, newLlConf);
+					var newEdge = new KeyValuePair<TSymbol?, LlConfiguration<TSymbol>> (null, newLlConf);
 					result.Add (newEdge);
 				}
 			}

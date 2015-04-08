@@ -7,7 +7,7 @@ using Strilanc.Value;
 
 namespace Nicodem.Parser
 {
-	public class LLStarParser<TSymbol> : IParser<TSymbol> where TSymbol : class, ISymbol<TSymbol>
+	public class LLStarParser<TSymbol> : IParser<TSymbol> where TSymbol : struct, ISymbol<TSymbol>
 	{
 		private readonly Grammar<TSymbol> _grammar;
 

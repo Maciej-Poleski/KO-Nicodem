@@ -3,20 +3,22 @@ using Nicodem.Lexer;
 
 namespace Nicodem.Parser.Tests
 {
-	internal class StringProduction : Production<CharSymbol>
+	internal class StringProduction : IProduction<CharSymbol>
 	{
+
+		public CharSymbol Lhs { get; private set; }
+		public RegEx<CharSymbol> Rhs { get; private set; }
+
 		public StringProduction(char symbol, RegEx<char> production)
-			: base(
-				new CharSymbol(symbol),
-				RegEx<char>.Convert<CharSymbol>(production, c => new CharSymbol(c)))
 		{
+			Lhs = new CharSymbol(symbol);
+			Rhs = RegEx<char>.Convert<CharSymbol>(production, c => new CharSymbol(c));
 		}
 
 		public StringProduction(char symbol, string production)
-			: base(
-				new CharSymbol(symbol),
-				RegEx<char>.Convert<CharSymbol>(RegExParser.Parse(production), c => new CharSymbol(c)))
 		{
+			Lhs = new CharSymbol(symbol);
+			Rhs = RegEx<char>.Convert<CharSymbol>(RegExParser.Parse(production), c => new CharSymbol(c));
 		}
 	}
 }

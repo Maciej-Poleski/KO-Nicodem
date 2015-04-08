@@ -62,8 +62,8 @@
     <Compile Include="LookaheadDfaBuilder.cs" />
     <Compile Include="LLStarParser.cs" />
     <Compile Include="ParseResult.cs" />
-    <Compile Include="Production.cs" />
     <Compile Include="ParserUtils.cs" />
+    <Compile Include="IProduction.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

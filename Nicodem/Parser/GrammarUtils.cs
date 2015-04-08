@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Nicodem.Parser
 {
-	public static class GrammarUtils<TSymbol> where TSymbol : ISymbol<TSymbol>
+	public static class GrammarUtils<TSymbol> where TSymbol : struct, ISymbol<TSymbol>
 	{
 
 		// Returns the list of all accepting states of an automaton.

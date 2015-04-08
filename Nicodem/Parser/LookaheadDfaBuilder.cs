@@ -2,7 +2,7 @@
 
 namespace Nicodem.Parser
 {
-	public class LookaheadDfaBuilder<TSymbol> where TSymbol : class, ISymbol<TSymbol>
+	public class LookaheadDfaBuilder<TSymbol> where TSymbol : struct, ISymbol<TSymbol>
 	{
 		public LookaheadDfaBuilder()
 		{

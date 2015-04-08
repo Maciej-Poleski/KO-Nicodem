@@ -23,7 +23,7 @@ namespace Nicodem.Parser.Tests
 		[Test]
 		public void test1()
 		{
-			var productions = new Dictionary<CharSymbol, Production<CharSymbol>[]>();
+			var productions = new Dictionary<CharSymbol, IProduction<CharSymbol>[]>();
 			/*
 			productions[new CharSymbol('A')] = new StringProduction[]{ 
 				new StringProduction('A', "BC"), 

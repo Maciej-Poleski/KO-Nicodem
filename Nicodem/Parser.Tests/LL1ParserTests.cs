@@ -15,7 +15,7 @@ namespace Nicodem.Parser.Tests
 			var prodChar = RegExParser.Parse("$");
 			var prodSymbol = new StringProduction(start.C, prodChar);
 
-			var grammar = new Grammar<CharSymbol>(new Dictionary<CharSymbol, Production<CharSymbol>[]>{
+			var grammar = new Grammar<CharSymbol>(new Dictionary<CharSymbol, IProduction<CharSymbol>[]>{
 				{ start, new []{prodSymbol} }
 			});
 

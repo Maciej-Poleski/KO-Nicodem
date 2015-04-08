@@ -10,10 +10,10 @@ namespace Nicodem.Parser
 	{
 		public IFragment Fragment { get; private set; }
 		public TSymbol Symbol { get; private set; }
-		public Production<TSymbol> Production { get; private set; }
+		public IProduction<TSymbol> Production { get; private set; }
 		public IEnumerable<IParseTree<TSymbol>> Children { get; private set; }
 
-		public ParseBranch(IFragment fragment, TSymbol symbol, Production<TSymbol> production, IEnumerable<IParseTree<TSymbol>> children)
+		public ParseBranch(IFragment fragment, TSymbol symbol, IProduction<TSymbol> production, IEnumerable<IParseTree<TSymbol>> children)
 		{
 			Fragment = fragment;
 			Symbol = symbol;

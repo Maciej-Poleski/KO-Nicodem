@@ -2,25 +2,23 @@
 
 namespace Nicodem.Parser.Tests
 {
-	public class StringSymbol : ISymbol<StringSymbol>
+	public struct StringSymbol : ISymbol<StringSymbol>
 	{
 		internal String S { get; private set; }
 		internal StringSymbol (String s)
+			: this()
 		{
 			S = s;
 		}
 			
 		public bool Equals(StringSymbol other)
 		{
-			return (other != null && String.Equals(S, other.S));
+			return String.Equals(S, other.S);
 		}
 			
 		public int CompareTo(StringSymbol other)
 		{
-			if (other != null) {
-				return String.Compare (S, other.S);
-			}
-			return -1;
+			return String.Compare (S, other.S);
 		}
 
 		public static StringSymbol EOF {

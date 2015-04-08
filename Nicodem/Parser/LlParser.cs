@@ -7,7 +7,7 @@ using Nicodem.Source;
 
 namespace Nicodem.Parser
 {
-	public class LlParser<TSymbol> : IParser<TSymbol> where TSymbol : class, ISymbol<TSymbol>
+	public class LlParser<TSymbol> : IParser<TSymbol> where TSymbol : struct, ISymbol<TSymbol>
 	{ 
 		private readonly Grammar<TSymbol> _grammar;
 

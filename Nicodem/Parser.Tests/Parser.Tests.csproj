@@ -43,13 +43,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CharSymbol.cs" />
     <Compile Include="LookaheadDfaTests.cs" />
     <Compile Include="StringProduction.cs" />
     <Compile Include="LL1ParserTests.cs" />
     <Compile Include="GrammarUtilsTests.cs" />
     <Compile Include="StringSymbol.cs" />
     <Compile Include="GrammarTests.cs" />
+    <Compile Include="CharSymbol.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">
