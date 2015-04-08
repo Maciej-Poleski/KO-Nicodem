@@ -1,4 +1,4 @@
-﻿using Nicodem.Semantics.Visitors;
+using Nicodem.Semantics.Visitors;
 
 namespace Nicodem.Semantics.AST
 {
@@ -6,9 +6,9 @@ namespace Nicodem.Semantics.AST
 	{
 		public OperatorType Operator { get; set; }
 
-		public override TResult Accept<TResult> (AbstractVisitor<TResult> visitor)
+		public override void Accept (AbstractVisitor visitor)
 		{
-			return visitor.Visit (this);
+			visitor.Visit (this);
 		}
 	}
 }

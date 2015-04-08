@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Nicodem.Semantics.Visitors;
 
 namespace Nicodem.Semantics.AST
@@ -10,9 +10,9 @@ namespace Nicodem.Semantics.AST
 		public TypeNode Type { get; set; }
 		public ExpressionNode Body { get; set; }
 
-		public override TResult Accept<TResult> (AbstractVisitor<TResult> visitor)
+		public override void Accept (AbstractVisitor visitor)
 		{
-			return visitor.Visit (this);
+			visitor.Visit (this);
 		}
 	}
 }

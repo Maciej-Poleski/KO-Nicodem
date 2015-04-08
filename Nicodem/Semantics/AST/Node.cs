@@ -1,4 +1,4 @@
-﻿using Nicodem.Source;
+using Nicodem.Source;
 using Nicodem.Semantics.Visitors;
 
 namespace Nicodem.Semantics.AST
@@ -7,9 +7,9 @@ namespace Nicodem.Semantics.AST
 	{
 		public IFragment Fragment { get; set; }
 
-		public virtual TResult Accept<TResult> (AbstractVisitor<TResult> visitor)
+		public virtual void Accept (AbstractVisitor visitor)
 		{
-			return visitor.Visit (this);
+			visitor.Visit (this);
 		}
 	}
 }
