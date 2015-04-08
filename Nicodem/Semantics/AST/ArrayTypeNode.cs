@@ -9,9 +9,9 @@ namespace Nicodem.Semantics.AST
 		public bool IsFixedSize { get; set; }
 		public int Length { get; set; }
 
-		public override void Accept (AbstractVisitor visitor)
+		public override TResult Accept<TResult> (AbstractVisitor<TResult> visitor)
 		{
-			visitor.Visit (this);
+			return visitor.Visit (this);
 		}
 	}
 }

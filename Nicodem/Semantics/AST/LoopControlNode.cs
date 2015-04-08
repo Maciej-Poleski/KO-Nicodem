@@ -14,9 +14,9 @@ namespace Nicodem.Semantics.AST
 		public int Depth { get; set; }
 		public ExpressionNode Value { get; set; }
 
-		public override void Accept (AbstractVisitor visitor)
+		public override TResult Accept<TResult> (AbstractVisitor<TResult> visitor)
 		{
-			visitor.Visit (this);
+			return visitor.Visit (this);
 		}
 	}
 }

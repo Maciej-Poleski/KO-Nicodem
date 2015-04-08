@@ -2,17 +2,17 @@
 
 namespace Nicodem.Semantics.Visitors
 {
-	abstract class AbstractRecursiveVisitor : AbstractVisitor
+	abstract class AbstractRecursiveVisitor<TResult> : AbstractVisitor<TResult>
 	{
 		#region Node direct children
-		public override void Visit(ProgramNode node)
+		public override TResult Visit(ProgramNode node)
 		{
 			base.Visit (node);
 			foreach (var child in node.Functions)
 				Visit (child);
 		}
 
-		public override void Visit(FunctionNode node)
+		public override TResult Visit(FunctionNode node)
 		{
 			base.Visit (node);
 			Visit (node.Type);
@@ -21,13 +21,13 @@ namespace Nicodem.Semantics.Visitors
 				Visit (parameter);
 		}
 
-		public override void Visit(ParameterNode node) 
+		public override TResult Visit(ParameterNode node) 
 		{
 			base.Visit (node);
 			Visit (node.Type);
 		}
 
-		public override void Visit(ExpressionNode node) 
+		public override TResult Visit(ExpressionNode node) 
 		{
 			base.Visit (node);
 			Visit (node.ExpressionType);
@@ -35,7 +35,7 @@ namespace Nicodem.Semantics.Visitors
 		#endregion
 
 		#region TypeNode direct children
-		public override void Visit(ArrayTypeNode node)
+		public override TResult Visit(ArrayTypeNode node)
 		{
 			base.Visit (node);
 			Visit (node.ElementType);
@@ -43,41 +43,41 @@ namespace Nicodem.Semantics.Visitors
 		#endregion
 
 		#region ExpressionNode direct children
-		public override void Visit(ArrayNode node)
+		public override TResult Visit(ArrayNode node)
 		{
 			base.Visit (node);
 			foreach (var child in node.Elements)
 				Visit (child);
 		}
 
-		public override void Visit(BlockExpressionNode node)
+		public override TResult Visit(BlockExpressionNode node)
 		{
 			base.Visit (node);
 			foreach (var child in node.Elements)
 				Visit (child);
 		}
 
-		public override void Visit(ConstNode node)
+		public override TResult Visit(ConstNode node)
 		{
 			base.Visit (node);
 			Visit (node.VariableType);
 		}
 
-		public override void Visit(ElementNode node)
+		public override TResult Visit(ElementNode node)
 		{
 			base.Visit (node);
 			Visit (node.Array);
 			Visit (node.Index);
 		}
 
-		public override void Visit(FunctionCallNode node)
+		public override TResult Visit(FunctionCallNode node)
 		{
 			base.Visit (node);
 			foreach (var arg in node.Arguments)
 				Visit (arg);
 		}
 
-		public override void Visit(IfNode node)
+		public override TResult Visit(IfNode node)
 		{
 			base.Visit (node);
 			Visit (node.Condition);
@@ -86,20 +86,20 @@ namespace Nicodem.Semantics.Visitors
 				Visit (node.Else);
 		}
 
-		public override void Visit(LoopControlNode node)
+		public override TResult Visit(LoopControlNode node)
 		{
 			base.Visit (node);
 			Visit (node.Value);
 		}
 
-		public override void Visit(OperationNode node)
+		public override TResult Visit(OperationNode node)
 		{
 			base.Visit (node);
 			foreach (var arg in node.Arguments)
 				Visit (arg);
 		}
 
-		public override void Visit(SliceNode node)
+		public override TResult Visit(SliceNode node)
 		{
 			base.Visit (node);
 			Visit (node.Array);
@@ -109,20 +109,20 @@ namespace Nicodem.Semantics.Visitors
 				Visit (node.Right);
 		}
 
-		public override void Visit(VariableDefNode node)
+		public override TResult Visit(VariableDefNode node)
 		{
 			base.Visit (node);
 			Visit (node.VariableType);
 			Visit (node.Value);
 		}
 
-		public override void Visit(VariableUseNode node)
+		public override TResult Visit(VariableUseNode node)
 		{
 			base.Visit (node);
 			Visit (node.Definition);
 		}
 
-		public override void Visit(WhileNode node)
+		public override TResult Visit(WhileNode node)
 		{
 			base.Visit (node);
 			Visit (node.Condition);

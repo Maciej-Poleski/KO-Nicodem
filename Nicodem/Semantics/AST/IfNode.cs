@@ -10,9 +10,9 @@ namespace Nicodem.Semantics.AST
 
 		public bool HasElse { get { return !ReferenceEquals (Else, null); } }
 
-		public override void Accept (AbstractVisitor visitor)
+		public override TResult Accept<TResult> (AbstractVisitor<TResult> visitor)
 		{
-			visitor.Visit (this);
+			return visitor.Visit (this);
 		}
 	}
 }

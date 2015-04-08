@@ -2,96 +2,98 @@
 
 namespace Nicodem.Semantics.Visitors
 {
-	abstract class AbstractVisitor
+	abstract class AbstractVisitor<TResult>
 	{
-		public virtual void Visit (Node node)
-		{
-		}
+		/// <summary>
+		/// 	Every visitor should implement this method to define default result.
+		/// </summary>
+		/// <param name="node">Node.</param>
+		public abstract TResult Visit (Node node);
 
 		#region Node direct children
-		public virtual void Visit(ProgramNode node) {
-			Visit (node as Node);
+		public virtual TResult Visit(ProgramNode node) {
+			return Visit (node as Node);
 		}
 
-		public virtual void Visit(FunctionNode node) {
-			Visit (node as Node);
+		public virtual TResult Visit(FunctionNode node) {
+			return Visit (node as Node);
 		}
 
-		public virtual void Visit(ParameterNode node) {
-			Visit (node as Node);
+		public virtual TResult Visit(ParameterNode node) {
+			return Visit (node as Node);
 		}
 
-		public virtual void Visit(TypeNode node) {
-			Visit (node as Node);
+		public virtual TResult Visit(TypeNode node) {
+			return Visit (node as Node);
 		}
 
-		public virtual void Visit(ExpressionNode node) {
-			Visit (node as Node);
+		public virtual TResult Visit(ExpressionNode node) {
+			return Visit (node as Node);
 		}
 		#endregion
 
 
 		#region TypeNode direct children
-		public virtual void Visit(NamedTypeNode node) {
-			Visit (node as TypeNode);
+		public virtual TResult Visit(NamedTypeNode node) {
+			return Visit (node as TypeNode);
 		}
-		public virtual void Visit(ArrayTypeNode node) {
-			Visit (node as TypeNode);
+		public virtual TResult Visit(ArrayTypeNode node) {
+			return Visit (node as TypeNode);
 		}
 		#endregion
 
 		#region ExpressionNode direct children
-		public virtual void Visit(ArrayNode node) {
-			Visit (node as ConstNode);
+		public virtual TResult Visit(ArrayNode node) {
+			return Visit (node as ConstNode);
 		}
 
-		public virtual void Visit(BlockExpressionNode node) {
-			Visit (node as ExpressionNode);
+		public virtual TResult Visit(BlockExpressionNode node) {
+			return Visit (node as ExpressionNode);
 		}
 
-		public virtual void Visit(ConstNode node) {
-			Visit (node as ExpressionNode);
+		public virtual TResult Visit(ConstNode node) {
+			return Visit (node as ExpressionNode);
 		}
 
-		public virtual void Visit(ElementNode node) {
-			Visit (node as ExpressionNode);
+		public virtual TResult Visit(ElementNode node) {
+			return Visit (node as ExpressionNode);
 		}
 
-		public virtual void Visit(FunctionCallNode node) {
-			Visit (node as ExpressionNode);
+		public virtual TResult Visit(FunctionCallNode node) {
+			return Visit (node as ExpressionNode);
 		}
 
-		public virtual void Visit(IfNode node) {
-			Visit (node as ExpressionNode);
+		public virtual TResult Visit(IfNode node) {
+			return Visit (node as ExpressionNode);
 		}
 
-		public virtual void Visit(LoopControlNode node) {
-			Visit (node as ExpressionNode);
+		public virtual TResult Visit(LoopControlNode node) {
+			return Visit (node as ExpressionNode);
 		}
 
-		public virtual void Visit(OperationNode node) {
-			Visit (node as ExpressionNode);
+		public virtual TResult Visit(OperationNode node) {
+			return Visit (node as ExpressionNode);
 		}
 
-		public virtual void Visit(SliceNode node) {
-			Visit (node as ExpressionNode);
+		public virtual TResult Visit(SliceNode node) {
+			return Visit (node as ExpressionNode);
 		}
 
-		public virtual void Visit(VariableDefNode node) {
-			Visit (node as ExpressionNode);
+		public virtual TResult Visit(VariableDefNode node) {
+			return Visit (node as ExpressionNode);
 		}
 
-		public virtual void Visit(VariableUseNode node) {
-			Visit (node as ExpressionNode);
+		public virtual TResult Visit(VariableUseNode node) {
+			return Visit (node as ExpressionNode);
 		}
 
-		public virtual void Visit(WhileNode node) {
-			Visit (node as ExpressionNode);
+		public virtual TResult Visit(WhileNode node) {
+			return Visit (node as ExpressionNode);
 		}
 		#endregion
 
-		public virtual void Visit(OperatorNode node) {
-			Visit (node as OperationNode);
+		public virtual TResult Visit(OperatorNode node) {
+			return Visit (node as OperationNode);
 		}
 	}
 }

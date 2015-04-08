@@ -7,9 +7,9 @@ namespace Nicodem.Semantics.AST
 		public ExpressionNode Array { get; set; }
 		public ExpressionNode Index { get; set; }
 
-		public override void Accept (AbstractVisitor visitor)
+		public override TResult Accept<TResult> (AbstractVisitor<TResult> visitor)
 		{
-			visitor.Visit (this);
+			return visitor.Visit (this);
 		}
 	}
 }

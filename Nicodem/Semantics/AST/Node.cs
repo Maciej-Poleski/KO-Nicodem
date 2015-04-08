@@ -7,9 +7,9 @@ namespace Nicodem.Semantics.AST
 	{
 		public IFragment Fragment { get; set; }
 
-		public virtual void Accept (AbstractVisitor visitor)
+		public virtual TResult Accept<TResult> (AbstractVisitor<TResult> visitor)
 		{
-			visitor.Visit (this);
+			return visitor.Visit (this);
 		}
 	}
 }

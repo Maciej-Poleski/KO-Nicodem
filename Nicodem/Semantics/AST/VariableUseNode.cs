@@ -7,9 +7,9 @@ namespace Nicodem.Semantics.AST
 		public string Name { get; set; }
 		public VariableDefNode Definition { get; set; }
 
-		public override void Accept (AbstractVisitor visitor)
+		public override TResult Accept<TResult> (AbstractVisitor<TResult> visitor)
 		{
-			visitor.Visit (this);
+			return visitor.Visit (this);
 		}
 	}
 }

@@ -6,9 +6,9 @@ namespace Nicodem.Semantics.AST
 	{
 		public TypeNode ExpressionType { get; set; }
 
-		public override void Accept (AbstractVisitor visitor)
+		public override TResult Accept<TResult> (AbstractVisitor<TResult> visitor)
 		{
-			visitor.Visit (this);
+			return visitor.Visit (this);
 		}
 	}
 }

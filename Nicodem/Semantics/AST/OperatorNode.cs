@@ -6,9 +6,9 @@ namespace Nicodem.Semantics.AST
 	{
 		public OperatorType Operator { get; set; }
 
-		public override void Accept (AbstractVisitor visitor)
+		public override TResult Accept<TResult> (AbstractVisitor<TResult> visitor)
 		{
-			visitor.Visit (this);
+			return visitor.Visit (this);
 		}
 	}
 }
