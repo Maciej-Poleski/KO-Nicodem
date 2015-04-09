@@ -32,7 +32,7 @@ namespace Nicodem.Parser.Tests
 			productions[new CharSymbol('E')] = new StringProduction[]{ 
 				new StringProduction('E', "A")
 			};
-			grammar = new Grammar<CharSymbol>(productions);
+			grammar = new Grammar<CharSymbol>(new CharSymbol('E'), productions);
 			// TODO: this test fails, because grammar construction fails.
 		}
 	}

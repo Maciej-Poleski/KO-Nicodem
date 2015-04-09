@@ -30,8 +30,9 @@ namespace Nicodem.Parser
 			return Productions[term].Length == 0;
 		}
 
-		public Grammar(IDictionary<TSymbol, IProduction<TSymbol>[]> productions)
+		public Grammar(TSymbol start, IDictionary<TSymbol, IProduction<TSymbol>[]> productions)
 		{
+			Start = start;
             Productions = productions;
 			WhichProduction = new Dictionary<uint, IProduction<TSymbol>>();
 			Automatons = new Dictionary<TSymbol, Dfa<TSymbol>>();
