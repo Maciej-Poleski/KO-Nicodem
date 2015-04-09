@@ -16,14 +16,15 @@ namespace Nicodem.Lexer
 
         public static TSymbol MinSymbol<TSymbol>()
         {
-            try
-            {
-                return Expression.Lambda<Func<TSymbol>>(Expression.Field(null, typeof(TSymbol), "MinValue")).Compile()();
-            }
-            catch (ArgumentException e)
-            {
-                throw new ArgumentException(String.Format("There is no implemented static field MinValue in {0}", typeof(TSymbol)), e);
-            }
+			if(typeof(TSymbol).GetField("MinValue") != null) {
+
+				return Expression.Lambda<Func<TSymbol>>(Expression.Field(null, typeof(TSymbol), "MinValue")).Compile()();
+			} else if(typeof(TSymbol).GetProperty("MinValue") != null) {
+
+				return Expression.Lambda<Func<TSymbol>>(Expression.Property(null, typeof(TSymbol), "MinValue")).Compile()();
+			}
+
+            throw new ArgumentException(String.Format("There is no implemented static field MinValue in {0}", typeof(TSymbol)));
         }
 
         public override DFAState<T> Start

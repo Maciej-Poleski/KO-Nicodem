@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Nicodem.Parser
 {
-	public interface IParser<TProduction> where TProduction:IProduction
+	public interface IParser<TSymbol> where TSymbol : ISymbol<TSymbol>
 	{
-		IParseTree<TProduction> Parse(IEnumerable<IParseTree<TProduction>> word);
+		IParseTree<TSymbol> Parse(IEnumerable<IParseTree<TSymbol>> word);
 	}
 }
 

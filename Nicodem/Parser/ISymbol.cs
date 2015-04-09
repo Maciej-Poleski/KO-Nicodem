@@ -2,8 +2,7 @@
 
 namespace Nicodem.Parser
 {
-    public interface ISymbol : IComparable<ISymbol>, IEquatable<ISymbol>
+    public interface ISymbol<TSymbol> : IComparable<TSymbol>, IEquatable<TSymbol>
     {
-        ISymbol EOF { get; }
     }
 }

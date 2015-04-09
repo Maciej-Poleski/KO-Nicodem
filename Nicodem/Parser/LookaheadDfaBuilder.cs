@@ -2,14 +2,13 @@
 
 namespace Nicodem.Parser
 {
-	public class LookaheadDfaBuilder<TProduction> 
-		where TProduction : IProduction
+	public class LookaheadDfaBuilder<TSymbol> where TSymbol : struct, ISymbol<TSymbol>
 	{
 		public LookaheadDfaBuilder()
 		{
 		}
 
-		public LookaheadDfa Build(Grammar<TProduction> grammar)
+		public LookaheadDfa<TSymbol> Build(Grammar<TSymbol> grammar)
 		{
 			throw new NotImplementedException();
 		}

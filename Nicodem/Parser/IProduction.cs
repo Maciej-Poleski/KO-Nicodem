@@ -3,11 +3,11 @@ using Nicodem.Lexer;
 
 namespace Nicodem.Parser
 {
-	public interface IProduction
+	public interface IProduction<TSymbol> where TSymbol : ISymbol<TSymbol>
 	{
-		ISymbol Lhs { get; }
+		TSymbol Lhs { get; }
 		
-		RegEx<ISymbol> Rhs { get; }
+		RegEx<TSymbol> Rhs { get; }
 	}
 }
 

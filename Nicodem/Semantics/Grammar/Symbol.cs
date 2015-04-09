@@ -3,7 +3,7 @@ using Nicodem.Parser;
 
 namespace Nicodem.Semantics.Grammar
 {
-    internal struct Symbol : ISymbol, IEquatable<Symbol>, IComparable<Symbol>
+    internal struct Symbol : ISymbol<Symbol>
     {
         public static readonly Symbol MinValue = new Symbol(-1);
         private readonly int _category; // Symbol is in fact category of some Regular Expression in Lexer
@@ -23,17 +23,17 @@ namespace Nicodem.Semantics.Grammar
             return _category == other._category;
         }
 
-        ISymbol ISymbol.EOF
+        public static Symbol EOF
         {
             get { throw new NotImplementedException(); }
         }
 
-        bool IEquatable<ISymbol>.Equals(ISymbol other)
+        bool IEquatable<Symbol>.Equals(Symbol other)
         {
             throw new NotImplementedException();
         }
 
-        int IComparable<ISymbol>.CompareTo(ISymbol other)
+        int IComparable<Symbol>.CompareTo(Symbol other)
         {
             throw new NotImplementedException();
         }

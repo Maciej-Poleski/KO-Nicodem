@@ -2,47 +2,43 @@
 
 namespace Nicodem.Parser.Tests
 {
-	internal class CharSymbol : ISymbol
+	internal struct CharSymbol : ISymbol<CharSymbol>
 	{
 		internal char C { get; private set; }
 
 		internal CharSymbol(char c)
+			: this()
 		{
 			C = c;
 		}
 
 		#region IEquatable implementation
 
-		public bool Equals(ISymbol other)
+		public bool Equals(CharSymbol other)
 		{
-			if(other is CharSymbol && C == (other as CharSymbol).C) {
-				return true;
-			}
-			return false;
+			return C == other.C;
 		}
 
 		#endregion
 
 		#region IComparable implementation
 
-		public int CompareTo(ISymbol other)
+		public int CompareTo(CharSymbol other)
 		{
-			var other_c = other as CharSymbol;
-			return other_c != null ? C.CompareTo(other_c.C) : -1;
+			return C.CompareTo(other.C);
 		}
 
 		#endregion
 
 		#region ISymbol implementation
 
-		public ISymbol EOF {
+		public static CharSymbol EOF {
 			get {
 				return new CharSymbol('$');
 			}
 		}
 
-
-		public ISymbol MinValue {
+		public static CharSymbol MinValue {
 			get {
 				return new CharSymbol (Char.MinValue);
 			}
