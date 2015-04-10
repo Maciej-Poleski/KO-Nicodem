@@ -4,19 +4,19 @@ using Nicodem.Source;
 
 namespace Nicodem.Parser
 {
-	internal class ParseLeaf<TProduction> : IParseTree<TProduction> where TProduction : IProduction
+	internal class ParseLeaf<TSymbol> : IParseTree<TSymbol> where TSymbol : ISymbol<TSymbol>
 	{
-		public ISymbol Symbol { get; private set; }
+		public TSymbol Symbol { get; private set; }
 		public IFragment Fragment { get; private set; }
 
-		public ParseLeaf(IFragment fragment, ISymbol symbol)
+		public ParseLeaf(IFragment fragment, TSymbol symbol)
 		{
 			Fragment = fragment;
 			Symbol = symbol;
 		}
 			
-		public bool Equals(IParseTree<TProduction> other){
-			return (other is ParseLeaf<TProduction> && Symbol.Equals(other.Symbol));
+		public bool Equals(IParseTree<TSymbol> other){
+			return (other is ParseLeaf<TSymbol> && Symbol.Equals(other.Symbol));
 		}
 	}
 }

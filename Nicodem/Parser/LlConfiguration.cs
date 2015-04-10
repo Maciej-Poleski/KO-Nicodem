@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 
 namespace Nicodem.Parser
 {
-	public struct LlConfiguration<TSymbol> where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
+	public struct LlConfiguration<TSymbol> where TSymbol : ISymbol<TSymbol>
 	{
 		public readonly TSymbol label; 
 		private Stack<DfaState<TSymbol> > stack;

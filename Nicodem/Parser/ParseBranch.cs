@@ -5,15 +5,15 @@ using Nicodem.Source;
 
 namespace Nicodem.Parser
 {
-	internal class ParseBranch<TProduction> : IParseTree<TProduction>
-		where TProduction:IProduction
+	internal class ParseBranch<TSymbol> : IParseTree<TSymbol>
+		where TSymbol:ISymbol<TSymbol>
 	{
 		public IFragment Fragment { get; private set; }
-		public ISymbol Symbol { get; private set; }
-		public TProduction Production { get; private set; }
-		public IEnumerable<IParseTree<TProduction>> Children { get; private set; }
+		public TSymbol Symbol { get; private set; }
+		public IProduction<TSymbol> Production { get; private set; }
+		public IEnumerable<IParseTree<TSymbol>> Children { get; private set; }
 
-		public ParseBranch(IFragment fragment, ISymbol symbol, TProduction production, IEnumerable<IParseTree<TProduction>> children)
+		public ParseBranch(IFragment fragment, TSymbol symbol, IProduction<TSymbol> production, IEnumerable<IParseTree<TSymbol>> children)
 		{
 			Fragment = fragment;
 			Symbol = symbol;
@@ -21,8 +21,8 @@ namespace Nicodem.Parser
 			Children = children;
 		}
 			
-		public bool Equals(IParseTree<TProduction> other){
-			var branch = other as ParseBranch<TProduction>;
+		public bool Equals(IParseTree<TSymbol> other){
+			var branch = other as ParseBranch<TSymbol>;
 			if (branch == null)
 				return false;
 

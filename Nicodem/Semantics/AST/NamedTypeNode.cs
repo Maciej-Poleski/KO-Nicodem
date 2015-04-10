@@ -1,4 +1,4 @@
-﻿using Nicodem.Semantics.Visitors;
+using Nicodem.Semantics.Visitors;
 
 namespace Nicodem.Semantics.AST
 {

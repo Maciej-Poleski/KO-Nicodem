@@ -4,9 +4,9 @@ using Nicodem.Source;
 
 namespace Nicodem.Parser
 {
-	public interface IParseTree<TProduction> : IEquatable<IParseTree<TProduction>> where TProduction:IProduction
+	public interface IParseTree<TSymbol> : IEquatable<IParseTree<TSymbol>> where TSymbol:ISymbol<TSymbol>
 	{
-		ISymbol Symbol { get; }
+		TSymbol Symbol { get; }
 		IFragment Fragment { get; }
 	}
 }

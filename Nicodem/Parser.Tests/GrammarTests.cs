@@ -8,7 +8,7 @@ namespace Nicodem.Parser.Tests
 	[TestFixture]
 	public class GrammarTests
 	{
-		Grammar<StringProduction> grammar;
+		Grammar<CharSymbol> grammar;
 
 		/* A -> BC
 		 * A -> BD
@@ -23,7 +23,7 @@ namespace Nicodem.Parser.Tests
 		[Test]
 		public void test1()
 		{
-			var productions = new Dictionary<ISymbol, StringProduction[]>();
+			var productions = new Dictionary<CharSymbol, IProduction<CharSymbol>[]>();
 			/*
 			productions[new CharSymbol('A')] = new StringProduction[]{ 
 				new StringProduction('A', "BC"), 
@@ -32,7 +32,7 @@ namespace Nicodem.Parser.Tests
 			productions[new CharSymbol('E')] = new StringProduction[]{ 
 				new StringProduction('E', "A")
 			};
-			grammar = new Grammar<StringProduction>(productions);
+			grammar = new Grammar<CharSymbol>(new CharSymbol('E'), productions);
 			// TODO: this test fails, because grammar construction fails.
 		}
 	}
