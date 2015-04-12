@@ -59,6 +59,8 @@
     <Compile Include="AST\ElementNode.cs" />
     <Compile Include="Visitors\AbstractVisitor.cs" />
     <Compile Include="Visitors\AbstractRecursiveVisitor.cs" />
+    <Compile Include="Visitors\SymbolTable.cs" />
+    <Compile Include="Visitors\DefinitionNotFoundException.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
