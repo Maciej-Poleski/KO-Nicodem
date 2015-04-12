@@ -12,7 +12,8 @@ namespace Nicodem.Lexer
 
     public static class RegExParser
     {
-        private static String regEx;
+
+		private static String regEx;
         private static int head;
 
         public static RegEx<char> Parse(String regEx)
@@ -20,11 +21,21 @@ namespace Nicodem.Lexer
             RegExParser.head = 0;
             RegExParser.regEx = regEx;
 
-            var node = ParseUnion();
+            var result = ParseUnion();
             if(HasNext())
                 throw new ParseError();
-            return node;
+            return sanitize(result);
         }
+
+		private static RegEx<char> sanitize(RegEx<char> result)
+		{
+			return RegExFactory.Intersection(result, RegExFactory.Star(CharactersClasses.print));
+		}
+
+		private static RegEx<char> singleChar(char c)
+		{
+			return RegExFactory.Range(c, (char)(c + 1));
+		}
 
         private static char Peek()
         {
@@ -93,16 +104,21 @@ namespace Nicodem.Lexer
         {
             var left = ParseAtom();
 
-            if(HasPrefix("\\*"))
+            if(HasPrefix("\\*") || HasPrefix("\\+"))
             {
-                while(HasPrefix("\\*"))
+				bool star = false;
+
+                while(HasPrefix("\\*") || HasPrefix("\\+"))
+				{
+					if(HasPrefix("\\+")) star = true;
                     Eat(2);
+				}
 
                 if(left == null)
                     throw new ParseError();
 
-                return RegExFactory.Star(left);
-            }
+				return (star ? RegExFactory.Concat(left, RegExFactory.Star(left)) : RegExFactory.Star(left));
+			} 
 
             return left;
         }
@@ -112,27 +128,43 @@ namespace Nicodem.Lexer
             if(HasPrefix("\\["))
             {
                 Eat(2);
-                var a = Peek();
-                Accept("-");
-                var b = Peek();
-                Accept("\\]");
-                return RegExFactory.Range(a, (char)((int)b + 1));
-            }
+
+				if(HasPrefix("\\:digit\\:\\]"))
+				{
+					Eat(11);
+					return CharactersClasses.digit;
+				} else
+					{
+						if(HasPrefix("\\:print\\:\\]"))
+						{
+							Eat(11);
+							return CharactersClasses.print;
+						} else
+							if(HasPrefix("\\:space\\:\\]"))
+							{
+								Eat(11);
+								return CharactersClasses.space;
+							}
+					}
+				    
+       			var a = Peek();
+           		Accept("-");
+           		var b = Peek();
+           		Accept("\\]");
+            	return RegExFactory.Range(a, (char)((int)b + 1));
+           	}
 
             if(HasNext() && !HasPrefix("\\"))
             {
                 var a = Peek();
-                return RegExFactory.Range(a,(char)((int)a + 1));
+				return singleChar(a);
             }
 
-            if(HasPrefix("\\^"))
-            {
-                Eat(2);
-                var node = ParseAtom();
-                if(node == null)
-                    throw new ParseError();
-                return RegExFactory.Complement(node);
-            }
+			if(HasPrefix("\\."))
+			{
+				Eat(2);
+				return RegExFactory.All<char>();
+			}
 
             if(HasPrefix("\\("))
             {
@@ -142,6 +174,15 @@ namespace Nicodem.Lexer
                     throw new ParseError();
                 Accept("\\)");
                 return node;
+            }
+
+            if(HasPrefix("\\^"))
+            {
+                Eat(2);
+                var node = ParseAtom();
+                if(node == null)
+                    throw new ParseError();
+                return RegExFactory.Complement(node);
             }
 
             return null;

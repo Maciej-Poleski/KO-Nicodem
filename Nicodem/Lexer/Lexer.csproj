@@ -53,6 +53,7 @@
     <Compile Include="RegExEpsilon.cs" />
     <Compile Include="AbstractDfa.cs" />
     <Compile Include="RegExParser.cs" />
+    <Compile Include="CharactersClasses.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
