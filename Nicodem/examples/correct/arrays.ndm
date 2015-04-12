@@ -1,0 +1,28 @@
+
+fn some_slices (int[] dyn_arr `size of the dyn_arr is not know statically`) void {
+
+    int[] dyn_slice = dyn[2..];
+
+    // static arrays
+
+    bool[] z_tab = [false, false, false, true];
+    bool[] z_slice = z_tab[2 .. 4];
+    bool z_val = z_slice[1];    // should be true
+
+
+    int mut[4] m_array;    // I mean an array of mutable values
+    int mut k = 0;
+    while k < 4 {
+        m_array[k] = k;
+        k++;
+    }
+
+    int mut[] m_slice = m_array[3..]; // length of m_slice is 1
+    m_slice[0] += -1;
+
+    // dynamic arrays
+
+    bool mut[k] d_tab;  // dynamic length of an array is 4
+    bool[] d_slice = d_tab[0 .. ]; // immutable view of entire d_tab
+}
+

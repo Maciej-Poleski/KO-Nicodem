@@ -1,0 +1,17 @@
+  //  brzydkie formatowanie   
+ // bardzo
+
+ fn    utterly_useless_thing 	(  int a  , 
+    bool b  ,  int c, 
+bool[2] bt) 	void  
+        {        
+        `fat man sees small door  `   
+            `he knows he cannot fit through`   
+        `tears flow free now`  
+
+        int     mut	k  = if true { 1; }  else  { 	2; } ;
+        k  *=  444444 ;
+
+        5 ; }
+ 
+             		

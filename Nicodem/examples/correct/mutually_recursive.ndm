@@ -1,0 +1,21 @@
+fn tik(int left) int
+{
+    if left == 0 {
+        // assume that we have return statement
+        // to break from the whole function
+        return 1;
+    }
+
+    tak(left-1) << 1;
+}
+
+fn tak(int left) int
+{
+    if (left == 0) 1 else 2 * tik(left-1);
+}
+
+fn tik_tak_pow(int p) int
+{
+    let a = tik(p);
+    a;
+}

@@ -1,0 +1,28 @@
+// Przykład prostej funkcji main
+// Składnia oczywiście może się zmienić
+
+fn main() int {
+    int a = 1;
+    bool mut b = false;
+
+    b = (++a) == 2;
+
+    int z =     `pan if powinien zwrócić jakąś wartość`
+        if b {
+            // raczej tę
+            3;
+        } else {
+            2+3+4*5/10-3-(-3);
+        };
+
+    int[] face = [1, 2, 3];
+
+    { `let's put a slice on that face!`
+        int[] slice = face[1:3];
+        int k = slice[0];
+    }
+
+    bool[] tab = [true, false];
+
+    0;
+}
