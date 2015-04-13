@@ -398,15 +398,29 @@ namespace Nicodem.Semantics.Grammar
             return ((RegexSymbol) implicitToken).Optional;
         }
 
-        private static readonly Dictionary<UniversalSymbol,RegexSymbol> _productions=new Dictionary<UniversalSymbol, RegexSymbol>();
+        private static readonly Dictionary<UniversalSymbol, RegexSymbol> Productions =
+            new Dictionary<UniversalSymbol, RegexSymbol>();
+
+        private static readonly HashSet<Symbol> NonterminalSymbols = new HashSet<Symbol>();
 
         /// <summary>
         /// Creates dictionary instance specifically for <see cref="Grammar{TProduction}"/> constructor.
         /// </summary>
         /// <returns></returns>
-        internal static IDictionary<Symbol,Production[]> MakeProductionsDictionaryForGrammarConstructor()
+        internal static IDictionary<Symbol, Production[]> MakeProductionsDictionaryForGrammarConstructor()
         {
-            return _productions.ToDictionary<KeyValuePair<UniversalSymbol, RegexSymbol>, Symbol, Production[]>(production => (Symbol) production.Key, production => new[] {new Production((Symbol) production.Key, production.Value)});
+            return Productions.ToDictionary(production =>
+            {
+                var symbol = (Symbol) production.Key;
+                NonterminalSymbols.Add(symbol);
+                return symbol;
+            },
+                production => new[] {new Production((Symbol) production.Key, production.Value)});
+        }
+
+        internal static bool IsNonterminalSymbol(Symbol symbol)
+        {
+            return NonterminalSymbols.Contains(symbol);
         }
 
         private static UniversalSymbol NewNonterminal()
@@ -416,7 +430,7 @@ namespace Nicodem.Semantics.Grammar
 
         private static void SetProduction(this UniversalSymbol that, RegexSymbol regexSymbol)
         {
-            _productions.Add(that,regexSymbol);
+            Productions.Add(that,regexSymbol);
         }
 
         private static RegexSymbol MakeInfixOperatorExpressionRegex(UniversalSymbol operatorExpression, params string[] operators)
