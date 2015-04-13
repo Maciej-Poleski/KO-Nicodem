@@ -81,6 +81,9 @@ namespace Nicodem.Lexer
                     deadState._transitions = new KeyValuePair<T, DFAState<T>>[] { new KeyValuePair<T, DFAState<T>>(MinSymbol<T>(), deadState) };
                 }
                 listOfTransitions.Insert(0, new KeyValuePair<T, DFAState<T>>(MinSymbol<T>(), deadState));
+                for (int i = 1; i < listOfTransitions.Count; i++)
+                    if (listOfTransitions[i - 1].Key.CompareTo(listOfTransitions[i].Key) >= 0)
+                        throw new Exception("Inpropper order");
             }
 
             new_state._transitions = listOfTransitions.ToArray();
