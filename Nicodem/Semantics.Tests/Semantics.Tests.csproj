@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -34,10 +34,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Grammar\NicodemGrammarProductionsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
+    <ProjectReference Include="..\Parser\Parser.csproj">
+      <Project>{dc9385d6-c37e-441f-8baa-3b7eaec2da39}</Project>
+      <Name>Parser</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Semantics\Semantics.csproj">
       <Project>{B0BC59FC-D28F-42B9-A4CC-5470287924B2}</Project>
       <Name>Semantics</Name>
@@ -45,5 +50,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
 </Project>

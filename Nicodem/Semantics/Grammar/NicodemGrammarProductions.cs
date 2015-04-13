@@ -404,10 +404,19 @@ namespace Nicodem.Semantics.Grammar
         private static readonly HashSet<Symbol> NonterminalSymbols = new HashSet<Symbol>();
 
         /// <summary>
+        /// Returns left-hand-side symbol of root production
+        /// </summary>
+        /// <returns></returns>
+        internal static Symbol StartSymbol()
+        {
+            return (Symbol) Program;
+        }
+
+        /// <summary>
         /// Creates dictionary instance specifically for <see cref="Grammar{TProduction}"/> constructor.
         /// </summary>
         /// <returns></returns>
-        internal static IDictionary<Symbol, Production[]> MakeProductionsDictionaryForGrammarConstructor()
+        internal static IDictionary<Symbol, IProduction<Symbol>[]> MakeProductionsDictionaryForGrammarConstructor()
         {
             return Productions.ToDictionary(production =>
             {
@@ -415,7 +424,7 @@ namespace Nicodem.Semantics.Grammar
                 NonterminalSymbols.Add(symbol);
                 return symbol;
             },
-                production => new[] {new Production((Symbol) production.Key, production.Value)});
+                production => new IProduction<Symbol>[] {new Production((Symbol) production.Key, production.Value)});
         }
 
         internal static bool IsNonterminalSymbol(Symbol symbol)
