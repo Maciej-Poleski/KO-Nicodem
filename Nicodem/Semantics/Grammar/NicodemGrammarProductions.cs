@@ -365,6 +365,10 @@ namespace Nicodem.Semantics.Grammar
 
             public static RegexSymbol MakeUnion(params string[] tokens)
             {
+                foreach (var token in tokens)
+                {
+                    var ignored = (RegexSymbol) token;
+                }
                 return new RegexSymbol(() =>
                 {
                     return RegExFactory.Union(tokens.Select(t => ((RegexSymbol) t)._regexSymbol()).ToArray());
