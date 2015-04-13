@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 
 namespace Nicodem.Parser
 {
-	public struct LlConfiguration<TSymbol> where TSymbol : ISymbol<TSymbol>
+	public struct LlConfiguration<TSymbol> : IEquatable<LlConfiguration<TSymbol>> where TSymbol : ISymbol<TSymbol>
 	{
 		public readonly TSymbol label; 
 		private Stack<DfaState<TSymbol> > stack;
@@ -50,7 +50,7 @@ namespace Nicodem.Parser
 
 		public bool Subsumes(LlConfiguration<TSymbol> configuration)
 		{
-			if ( (this.label.CompareTo(configuration.label) == 0 ) 
+			if ( (this.label.CompareTo(configuration.label) != 0 ) 
 				|| this.stack.Count > configuration.Count())
 				return false;
 
@@ -67,6 +67,14 @@ namespace Nicodem.Parser
 
 			return true;
 		}
+
+
+		#region IEquatable implementation
+		public bool Equals (LlConfiguration<TSymbol> other)
+		{
+			return this.Subsumes (other) && other.Subsumes (this);
+		}
+		#endregion
 	}
 }
 

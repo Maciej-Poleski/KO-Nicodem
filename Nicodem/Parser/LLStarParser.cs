@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Nicodem.Core;
 using Nicodem.Source;
-using Strilanc.Value;
+//using Strilanc.Value;
 
 namespace Nicodem.Parser
 {
@@ -72,7 +72,7 @@ namespace Nicodem.Parser
 					return ReturnError(term, children, input, it);
 				}
 
-				TSymbol transSymbol = decisions.ElementAt(0).ForceGetValue();
+				TSymbol transSymbol = (TSymbol) decisions.ElementAt(0);
 				if(_grammar.IsTerminal(transSymbol)) {
 
 					children.Add(new ParseLeaf<TSymbol>(it.Current.Fragment, currentSymbol));

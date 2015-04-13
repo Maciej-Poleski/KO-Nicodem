@@ -2,6 +2,7 @@
 using Nicodem.Lexer;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 namespace Nicodem.Parser
 {
@@ -19,6 +20,11 @@ namespace Nicodem.Parser
 			}
 			Accepting = accepting;
 			Transitions = transitions;
+		}
+
+		public DfaState<TSymbol> Transition(TSymbol symbol) {
+			//return Transitions.FirstOrDefault(kv => kv.Key.Equals(symbol)).Value;
+			throw new NotImplementedException();
 		}
 	}
 }
