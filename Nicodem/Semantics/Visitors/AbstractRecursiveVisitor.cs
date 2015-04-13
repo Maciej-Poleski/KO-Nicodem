@@ -9,28 +9,28 @@ namespace Nicodem.Semantics.Visitors
 		{
 			base.Visit (node);
 			foreach (var child in node.Functions)
-				Visit (child);
+				child.Accept (this);
 		}
 
 		public override void Visit(FunctionNode node)
 		{
 			base.Visit (node);
-			Visit (node.Type);
-			Visit (node.Body);
+			node.Type.Accept (this);
+			node.Body.Accept (this);
 			foreach (var parameter in node.Parameters)
-				Visit (parameter);
+				parameter.Accept (this);
 		}
 
 		public override void Visit(ParameterNode node) 
 		{
 			base.Visit (node);
-			Visit (node.Type);
+			node.Type.Accept (this);
 		}
 
 		public override void Visit(ExpressionNode node) 
 		{
 			base.Visit (node);
-			Visit (node.ExpressionType);
+			node.ExpressionType.Accept (this);
 		}
 		#endregion
 
@@ -38,7 +38,7 @@ namespace Nicodem.Semantics.Visitors
 		public override void Visit(ArrayTypeNode node)
 		{
 			base.Visit (node);
-			Visit (node.ElementType);
+			node.ElementType.Accept (this);
 		}
 		#endregion
 
@@ -47,88 +47,88 @@ namespace Nicodem.Semantics.Visitors
 		{
 			base.Visit (node);
 			foreach (var child in node.Elements)
-				Visit (child);
+				child.Accept (this);
 		}
 
 		public override void Visit(BlockExpressionNode node)
 		{
 			base.Visit (node);
 			foreach (var child in node.Elements)
-				Visit (child);
+				child.Accept (this);
 		}
 
 		public override void Visit(ConstNode node)
 		{
 			base.Visit (node);
-			Visit (node.VariableType);
+			node.VariableType.Accept (this);
 		}
 
 		public override void Visit(ElementNode node)
 		{
 			base.Visit (node);
-			Visit (node.Array);
-			Visit (node.Index);
+			node.Array.Accept (this);
+			node.Index.Accept (this);
 		}
 
 		public override void Visit(FunctionCallNode node)
 		{
 			base.Visit (node);
 			foreach (var arg in node.Arguments)
-				Visit (arg);
+				arg.Accept (this);
 		}
 
 		public override void Visit(IfNode node)
 		{
 			base.Visit (node);
-			Visit (node.Condition);
-			Visit (node.Then);
+			node.Condition.Accept (this);
+			node.Then.Accept (this);
 			if (node.HasElse)
-				Visit (node.Else);
+				node.Else.Accept (this);
 		}
 
 		public override void Visit(LoopControlNode node)
 		{
 			base.Visit (node);
-			Visit (node.Value);
+			node.Value.Accept (this);
 		}
 
 		public override void Visit(OperationNode node)
 		{
 			base.Visit (node);
 			foreach (var arg in node.Arguments)
-				Visit (arg);
+				arg.Accept (this);
 		}
 
 		public override void Visit(SliceNode node)
 		{
 			base.Visit (node);
-			Visit (node.Array);
+			node.Array.Accept (this);
 			if (node.HasLeft)
-				Visit (node.Left);
+				node.Left.Accept (this);
 			if (node.HasRight)
-				Visit (node.Right);
+				node.Right.Accept (this);
 		}
 
 		public override void Visit(VariableDefNode node)
 		{
 			base.Visit (node);
-			Visit (node.VariableType);
-			Visit (node.Value);
+			node.VariableType.Accept (this);
+			node.Value.Accept (this);
 		}
 
 		public override void Visit(VariableUseNode node)
 		{
 			base.Visit (node);
-			Visit (node.Definition);
+			node.Definition.Accept (this);
 		}
 
 		public override void Visit(WhileNode node)
 		{
 			base.Visit (node);
-			Visit (node.Condition);
-			Visit (node.Body);
+			node.Condition.Accept (this);
+			node.Body.Accept (this);
 			if (node.HasElse)
-				Visit (node.Else);
+				node.Else.Accept (this);
 		}
 		#endregion
 	}
