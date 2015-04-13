@@ -312,6 +312,8 @@ namespace Nicodem.Parser
 
         private static bool DepthFirstSearchOnSymbol(TSymbol symbol, Dictionary<DfaState<TSymbol>, int> color, IDictionary<TSymbol, Dfa<TSymbol>> automatons, ISet<TSymbol> nullable)
         {
+            if (!automatons.ContainsKey(symbol))
+                return false;
             var automata = automatons[symbol];
             return DepthFirstSearchOnState(automata.Start, color, automatons, nullable);
         }
