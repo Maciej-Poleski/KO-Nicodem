@@ -62,6 +62,8 @@
     <Compile Include="Visitors\SymbolTable.cs" />
     <Compile Include="Visitors\DefinitionNotFoundException.cs" />
     <Compile Include="Visitors\NameResolutionVisitor.cs" />
+    <Compile Include="Visitors\TypeCheckException.cs" />
+    <Compile Include="Visitors\TypeCheckVisitor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
