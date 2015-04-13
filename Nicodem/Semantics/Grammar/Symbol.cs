@@ -1,16 +1,25 @@
 using System;
+using System.Diagnostics;
 using Nicodem.Parser;
 
 namespace Nicodem.Semantics.Grammar
 {
-    internal struct Symbol : ISymbol<Symbol>
+    internal struct Symbol : ISymbol<Symbol>, IEquatable<Symbol>, IComparable<Symbol>
     {
-        public static readonly Symbol MinValue = new Symbol(-1);
+        public static readonly Symbol MinValue = new Symbol(int.MinValue);
+        public static readonly Symbol EOF = new Symbol(-1);
+
+        public bool IsTerminal { get; private set; }
         private readonly int _category; // Symbol is in fact category of some Regular Expression in Lexer
 
         public Symbol(int category)
         {
             _category = category;
+        }
+
+        public Symbol(int category, bool isTerminal) : this(category)
+        {
+            IsTerminal = isTerminal;
         }
 
         public int CompareTo(Symbol other)
@@ -20,27 +29,13 @@ namespace Nicodem.Semantics.Grammar
 
         public bool Equals(Symbol other)
         {
+            Debug.Assert((_category != other._category) || (IsTerminal == other.IsTerminal));
             return _category == other._category;
-        }
-
-        public static Symbol EOF
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        bool IEquatable<Symbol>.Equals(Symbol other)
-        {
-            throw new NotImplementedException();
-        }
-
-        int IComparable<Symbol>.CompareTo(Symbol other)
-        {
-            throw new NotImplementedException();
         }
 
         public override string ToString()
         {
-            return string.Format("{0}", _category);
+            return string.Format("{0}{1}", IsTerminal ? "T" : "N", _category);
         }
 
         public override bool Equals(object obj)
