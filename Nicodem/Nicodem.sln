@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-VisualStudioVersion = 12.0.31101.0
-MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{BDE96647-252C-4DAB-AE41-A02F7214C647}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Source", "Source\Source.csproj", "{6078FFE3-28C8-4169-831D-E1D1AAFDD72F}"
@@ -104,6 +102,7 @@ Global
 		{BD83EE77-2811-480A-A732-BF52C011FC12} = {10DC7463-1E26-46A2-B827-4F2FAC2F28E9}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Source\Source.csproj
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = None
@@ -113,6 +112,28 @@ Global
 		$2.TabsToSpaces = False
 		$2.inheritsSet = VisualStudio
 		$2.inheritsScope = text/plain
+		$0.TextStylePolicy = $3
+		$3.FileWidth = 120
+		$3.EolMarker = Unix
+		$3.inheritsSet = VisualStudio
+		$3.inheritsScope = text/plain
+		$3.scope = text/plain
+		$0.TextStylePolicy = $4
+		$4.inheritsSet = null
+		$4.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $5
+		$5.ElseIfNewLinePlacement = SameLine
+		$5.BeforeMethodDeclarationParentheses = False
+		$5.BeforeMethodCallParentheses = False
+		$5.BeforeConstructorDeclarationParentheses = False
+		$5.BeforeIndexerDeclarationBracket = False
+		$5.BeforeDelegateDeclarationParentheses = False
+		$5.AfterDelegateDeclarationParameterComma = True
+		$5.NewParentheses = False
+		$5.SpacesBeforeBrackets = False
+		$5.inheritsSet = Mono
+		$5.inheritsScope = text/x-csharp
+		$5.scope = text/x-csharp
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
