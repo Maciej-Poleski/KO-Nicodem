@@ -49,33 +49,30 @@ namespace Nicodem.Lexer
         public override bool HasEpsilon()
         {
             foreach (var i in Regexes)
-            {
-                if (i.HasEpsilon())
-                {
-                    return true;
-                }
-            }
-            return false;
+				if (i.HasEpsilon())
+					return true;
+			return false;
         }
 
         public override IEnumerable<T> DerivChanges()
         {
-            IEnumerable<T> changes = new T[] {};
-            foreach (var i in Regexes)
-            {
-                changes = changes.Union(i.DerivChanges());
-            }
-            return changes;
+			var s = new SortedSet<T> ();
+
+			foreach (var reg in Regexes)
+				foreach (var c in reg.DerivChanges())
+					s.Add (c);
+
+			return s;
         }
 
 		// sum( X1, ... )^a = sum( X1^a, ... )
         public override RegEx<T> Derivative(T c)
         {
             var derivatives = new List<RegEx<T>>();
-            foreach (var i in Regexes)
-            {
-                derivatives.Add(i.Derivative(c));
-            }
+            
+			foreach (var i in Regexes)
+				derivatives.Add(i.Derivative(c));
+
             return RegExFactory.Union(derivatives.ToArray());
         }
     }

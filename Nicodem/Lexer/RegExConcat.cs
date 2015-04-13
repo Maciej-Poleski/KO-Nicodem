@@ -44,19 +44,15 @@ namespace Nicodem.Lexer
 
         public override bool HasEpsilon()
         {
-            foreach (var i in Regexes)
-            {
-                if (!i.HasEpsilon())
-                {
-                    return false;
-                }
-            }
-            return true;
+			foreach (var i in Regexes)
+				if (!i.HasEpsilon())
+					return false;
+			return true;
         }
 			
         public override IEnumerable<T> DerivChanges()
         {
-			var s = new System.Collections.Generic.HashSet<T> ();
+			var s = new SortedSet<T> ();
 
 			var index = 0;
 			while (index < Regexes.Length && Regexes [index].HasEpsilon ())
