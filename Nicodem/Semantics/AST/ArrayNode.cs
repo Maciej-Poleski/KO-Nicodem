@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Nicodem.Semantics.Visitors;
+using Nicodem.Parser;
 
 namespace Nicodem.Semantics.AST
 {
@@ -10,6 +11,15 @@ namespace Nicodem.Semantics.AST
 		public ArrayNode( TypeNode type ) : base( type )
 		{
 		}
+        
+        #region implemented abstract members of Node
+
+        public override void BuildNode<TSymbol>(IParseTree<TSymbol> parseTree)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        #endregion
 
 		public override void Accept (AbstractVisitor visitor)
 		{
