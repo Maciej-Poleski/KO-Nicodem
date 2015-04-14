@@ -6,17 +6,28 @@ namespace Nicodem.Semantics.AST
 {
 	class ProgramNode : Node
 	{
-		public IEnumerable<FunctionNode> Functions { get; set; }
+        public IEnumerable<FunctionNode> Functions { get { return functions; } }
+
+        private LinkedList<FunctionNode> functions;
+
+        // ----- Constructor -----
 
         public ProgramNode(){
-            Functions = new LinkedList<FunctionNode>();
+            functions = new LinkedList<FunctionNode>();
         }
+
+        // ----- Methods -----
                 
         #region implemented abstract members of Node
 
         public override void BuildNode<TSymbol>(IParseTree<TSymbol> parseTree)
         {
-            throw new System.NotImplementedException();
+            var node = (ParseBranch<TSymbol>)parseTree;
+            foreach(IParseTree<TSymbol> ch in node.Children){
+                var funNode = new FunctionNode();
+                funNode.BuildNode(ch);
+                functions.AddLast(funNode);
+            }
         }
 
         #endregion
