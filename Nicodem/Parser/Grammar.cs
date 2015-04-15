@@ -65,7 +65,7 @@ namespace Nicodem.Parser
 				return new List<KeyValuePair<TSymbol?, LlConfiguration<TSymbol>>> ();
 			}
 
-			var topState = llconf.Pop ();
+            var topState = llconf.stack[llconf.stack.Count-1];
 			var transitions = topState.Transitions;
 			var result = new List<KeyValuePair<TSymbol?,LlConfiguration<TSymbol>>>();
 
