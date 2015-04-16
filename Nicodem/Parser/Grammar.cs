@@ -22,12 +22,18 @@ namespace Nicodem.Parser
         // returns true if word belongs to the FIRST+ set for given term
 		internal bool InFirstPlus(TSymbol term, TSymbol word)
 		{
-			return First[term].Contains(word) || (Nullable.Contains(term) && Follow[term].Contains(word));
+			if(!First.ContainsKey (term)){
+				return false;
+			} else if(First[term].Contains(word)) {
+				return true;
+			} else {
+				return Nullable.Contains(term) && Follow.ContainsKey(term) && Follow[term].Contains(word);
+			}
 		}
 
 		internal bool IsTerminal(TSymbol term)
 		{
-			return Productions[term].Length == 0;
+			return !(Productions.ContainsKey(term)) || Productions[term].Length == 0;
 		}
 
 		public Grammar(TSymbol start, IDictionary<TSymbol, IProduction<TSymbol>[]> productions)
