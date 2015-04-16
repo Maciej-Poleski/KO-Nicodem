@@ -26,6 +26,11 @@ namespace Nicodem.Semantics.Grammar
             }
         }
 
+        internal static IReadOnlyList<string> WhiteSpaceTokenCategories
+        {
+            get { return _whitespaceTokenCategories.Select(tc => tc.Regex).ToArray(); }
+        }
+
         private static int NextSymbolId { get; set; }
 
         #region TokenCategoryImplementation
@@ -147,6 +152,12 @@ namespace Nicodem.Semantics.Grammar
         private static TokenCategory LineCommentCStyle = "//(^\n)*\n";
         private static TokenCategory LineCommentShortStyle = "`(^(\n|`))*\n";
         private static TokenCategory ShortComment = "`(^(\n|`))*`";
+
+        // Space
+        private static TokenCategory Space = "[:space:]+";
+
+        // WhiteSpace set
+        private static TokenCategory[] _whitespaceTokenCategories = {LineCommentCStyle, LineCommentShortStyle, ShortComment, Space};
 
         // Type
         private static TokenCategory TypeName = "(^[:space:])+";
