@@ -10,11 +10,6 @@ namespace Nicodem.Semantics.Grammar
 {
     internal static class NicodemGrammarProductions
     {
-        internal static int TokenCategoriesCount
-        {
-            get { return NextSymbolId; }
-        }
-
         /// <summary>
         /// All (ordered) token categories Lexer should be aware of.
         /// </summary>
@@ -22,7 +17,6 @@ namespace Nicodem.Semantics.Grammar
         {
             get
             {
-                Debug.Assert(TokenCategory.Categories.Count == TokenCategoriesCount);
                 return TokenCategory.Categories.ConvertAll(tc => tc.Regex);
             }
         }
