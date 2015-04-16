@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using Nicodem.Lexer;
 using Nicodem.Parser;
 
@@ -36,6 +37,16 @@ namespace Nicodem.Semantics.Grammar
         #region TokenCategoryImplementation
 
         private static bool _tokenCategoryAttributionLock = false;
+
+        private static string EscapeRawStringForRegex(string s)
+        {
+            var result=new StringBuilder();
+            foreach (var c in s)
+            {
+                result.Append('\\').Append(c);
+            }
+            return result.ToString();
+        }
 
         private struct TokenCategory : IEquatable<TokenCategory>
         {
@@ -417,13 +428,19 @@ namespace Nicodem.Semantics.Grammar
 
             public static RegexSymbol MakeUnion(params string[] tokens)
             {
-                foreach (var token in tokens)
+                return MakeUnion((IEnumerable<string>) tokens);
+            }
+
+            public static RegexSymbol MakeUnion(IEnumerable<string> tokens)
+            {
+                var enumerable = tokens as string[] ?? tokens.ToArray();
+                foreach (var token in enumerable)
                 {
                     var ignored = (RegexSymbol) token;
                 }
                 return new RegexSymbol(() =>
                 {
-                    return RegExFactory.Union(tokens.Select(t => ((RegexSymbol) t)._regexSymbol()).ToArray());
+                    return RegExFactory.Union(enumerable.Select(t => ((RegexSymbol) t)._regexSymbol()).ToArray());
                 });
             }
 
@@ -488,7 +505,7 @@ namespace Nicodem.Semantics.Grammar
 
         private static RegexSymbol MakeInfixOperatorExpressionRegex(UniversalSymbol operatorExpression, params string[] operators)
         {
-            var operatorsRegex = RegexSymbol.MakeUnion(operators);
+            var operatorsRegex = RegexSymbol.MakeUnion(operators.Select(EscapeRawStringForRegex));
             return operatorExpression * (operatorsRegex * operatorExpression).Star;
         }
 
@@ -533,10 +550,10 @@ namespace Nicodem.Semantics.Grammar
         static NicodemGrammarProductions()
         {
             Program.SetProduction(Function.Star);
-            Function.SetProduction(ObjectName * "("  * ParametersList * ")" * "->" * TypeSpecifier * Expression);
+            Function.SetProduction(ObjectName * "\\("  * ParametersList * "\\)" * "\\-\\>" * TypeSpecifier * Expression);
             ParametersList.SetProduction(((ObjectDeclaration * ",").Star * ObjectDeclaration).Optional);
             ObjectDeclaration.SetProduction(TypeSpecifier * ObjectName);
-            TypeSpecifier.SetProduction(TypeName * ("mutable".Optional() * "[" * Expression * "]").Star * "mutable".Optional());
+            TypeSpecifier.SetProduction(TypeName * ("mutable".Optional() * "\\[" * Expression * "\\]").Star * "mutable".Optional());
             Expression.SetProduction(OperatorExpression);
             OperatorExpression.SetProduction(Operator17Expression);
             Operator17Expression.SetProduction(Operator16Expression);
@@ -554,9 +571,9 @@ namespace Nicodem.Semantics.Grammar
             Operator5Expression.SetProduction(MakeInfixOperatorExpressionRegex(Operator4Expression, "* / %".Split(' ')));
             Operator4Expression.SetProduction(Operator3Expression);
             Operator3Expression.SetProduction(RegexSymbol.MakeUnion("++ -- + - ! ~".Split(' ')).Star * Operator2Expression);
-            Operator2Expression.SetProduction(Operator1Expression * (RegexSymbol.MakeUnion("++", "--") + ("(" * Expression.Star * ")") + ("[" * Expression * "]") + ("[" * Expression.Optional * ".." * Expression.Optional * "]")).Star);
+            Operator2Expression.SetProduction(Operator1Expression * (RegexSymbol.MakeUnion("\\+\\+", "\\-\\-") + ("(" * Expression.Star * ")") + ("\\[" * Expression * "\\]") + ("\\[" * Expression.Optional * "\\.\\." * Expression.Optional * "\\]")).Star);
             Operator1Expression.SetProduction(Operator0Expression);
-            Operator0Expression.SetProduction(AtomicExpression + ("(" * Expression * ")"));
+            Operator0Expression.SetProduction(AtomicExpression + ("\\(" * Expression * "\\)"));
             AtomicExpression.SetProduction(
                 BlockExpression +
                 ObjectDefinitionExpression +
@@ -568,7 +585,7 @@ namespace Nicodem.Semantics.Grammar
                 );
             BlockExpression.SetProduction("{" * Expression.Star * "}");   // No left-recursion thanks to '{'
             ObjectDefinitionExpression.SetProduction(TypeSpecifier * ObjectName * "=" * Expression);  // NOTE: "=" is _not_ an assignment operator here
-            ArrayLiteralExpression.SetProduction("[" * Expression.Star * "]");
+            ArrayLiteralExpression.SetProduction("\\[" * Expression.Star * "\\]");
             ObjectUseExpression.SetProduction(ObjectName);    // Literals are handled by 'name resolution'
             IfExpression.SetProduction("if" * Expression * Expression * ("else" * Expression).Optional);  // FIXME: if should be an operator
             WhileExpression.SetProduction("while" * Expression * Expression * ("else" * Expression).Optional);    // the same here?
