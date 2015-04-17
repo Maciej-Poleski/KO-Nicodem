@@ -19,9 +19,10 @@ namespace Nicodem.Parser
             _grammar = grammar;
 		}
 
-        public IParseTree<TSymbol> Parse(IEnumerable<IParseTree<TSymbol>> word)
+        public IParseTree<TSymbol> Parse(IEnumerable<IEnumerable<IParseTree<TSymbol>>> word)
 		{
-			var memoizedWord = new MemoizedInput<IParseTree<TSymbol>>(word);
+			var memoizedWord = new MemoizedInput<IEnumerable<IParseTree<TSymbol>>>(word);
+            /* TODO fix different input option
 			var result = ParseTerm(_grammar.Start, memoizedWord, memoizedWord.Begin);
 
             // whole input has to be eaten
@@ -30,6 +31,8 @@ namespace Nicodem.Parser
             } else {
                 return null;
             }
+            */
+            return null;
 		}
 
 		private ParseResult<TSymbol> ParseTerm(TSymbol term, MemoizedInput<IParseTree<TSymbol>> word, MemoizedInput<IParseTree<TSymbol>>.Iterator input)
@@ -46,6 +49,7 @@ namespace Nicodem.Parser
 				var lookState = lookeaheadDfa.Start;
                 TSymbol currentSymbol = (it != word.End) ? it.Current.Symbol : eof;
 
+                /* TODO 
                 if(state.Accepting > 0 && _grammar.Follow[term].Contains(currentSymbol)) {
 					var parsedTree = new ParseBranch<TSymbol>(
 						GetFragmentRange(input.Current.Fragment, children.Last().Fragment),
@@ -55,6 +59,7 @@ namespace Nicodem.Parser
 
 					return new ParseResult<TSymbol>(parsedTree, it);
 				}
+                */
 
 				var lookIt = it;
 				while(lookState.Accepting == 0) {
@@ -84,7 +89,7 @@ namespace Nicodem.Parser
 						return ReturnError(term, children, input, it);
 					}
 					children.Add(result.Tree);
-					it = result.Iterator;
+					//it = result.Iterator;
 				}
 				
 				state = FindTransition(state.Transitions, transSymbol);
@@ -99,7 +104,8 @@ namespace Nicodem.Parser
 					term, 
 					_grammar.Productions[term][0],  // TODO could not parse any productions
 					children);
-			return new ParseResult<TSymbol>(branch, currentIt, false);
+			//return new ParseResult<TSymbol>(branch, currentIt, false);
+            throw new NotImplementedException();
 		}
 
 		private static IFragment GetFragmentRange(IFragment begin, IFragment end) {
