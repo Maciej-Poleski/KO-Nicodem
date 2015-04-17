@@ -72,7 +72,6 @@ namespace Lexer.Tests
         public void TestNotEscaped()
         {
             var result = RegExParser.Parse("(\\(\\+\\))*");
-            Console.Write(result);
             var regEx = RegExFactory.Star(RegExFactory.Concat(RegExFactory.Range('(', (char)('(' + 1)), RegExFactory.Range('+', (char)('+' + 1)), RegExFactory.Range(')', (char)(')' + 1))));
             Assert.AreEqual(result, RegExFactory.Intersection(regEx, RegExFactory.Star(CharactersClasses.print)));            
         }
