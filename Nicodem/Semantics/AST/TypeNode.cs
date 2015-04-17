@@ -14,6 +14,12 @@ namespace Nicodem.Semantics.AST
             throw new System.NotImplementedException();
         }
 
+        public static TypeNode GetTypeNode<TSymbol>(IParseTree<TSymbol> parseTree) where TSymbol:ISymbol<TSymbol>
+        {
+            // TODO: how to get TYPE node?
+            throw new System.NotImplementedException();
+        }
+
         #endregion
 
 		public override void Accept (AbstractVisitor visitor)
