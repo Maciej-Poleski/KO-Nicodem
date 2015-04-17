@@ -54,7 +54,7 @@ namespace Nicodem.Parser
 				var it = parseState.Iterator;
                 TSymbol currentSymbol = (it != word.End) ? it.Current.Symbol : eof;
 
-                if(node.Accepting > 0 && _grammar.Follow[term].Contains(currentSymbol)) {
+                if(node.Accepting > 0 && (currentSymbol.Equals(eof) || _grammar.Follow[term].Contains(currentSymbol))) {
                     accepted = true;
 					var parsedChildren = children.ToList();
 					parsedChildren.Reverse();
@@ -74,7 +74,7 @@ namespace Nicodem.Parser
                     if(_grammar.InFirstPlus(trans[ind].Key, currentSymbol)) {
 						if(_grammar.IsTerminal(trans[ind].Key)) {
 
-							children.Push(new ParseLeaf<TSymbol>(it.Current.Fragment, currentSymbol));
+                            children.Push(new ParseLeaf<TSymbol>(it != word.End ? it.Current.Fragment : null, currentSymbol)); // TODO It would be better to have special END fragment
 							st.Push(new ParseState(trans[ind].Value, 0, it.Next()));
 							break;
 						} else {
