@@ -11,7 +11,7 @@ namespace Nicodem.Semantics.Grammar
 
         public bool IsTerminal
         {
-            get { return !NicodemGrammarProductions.IsNonterminalSymbol(this); }
+            get { return !Production.IsNonterminalSymbol(this); }
         }
 
         private readonly int _category; // Symbol is in fact category of some Regular Expression in Lexer

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using Nicodem.Lexer;
 using Nicodem.Parser;
 
@@ -9,11 +10,6 @@ namespace Nicodem.Semantics.Grammar
 {
     internal static class NicodemGrammarProductions
     {
-        internal static int TokenCategoriesCount
-        {
-            get { return NextSymbolId; }
-        }
-
         /// <summary>
         /// All (ordered) token categories Lexer should be aware of.
         /// </summary>
@@ -21,9 +17,13 @@ namespace Nicodem.Semantics.Grammar
         {
             get
             {
-                Debug.Assert(TokenCategory.Categories.Count == TokenCategoriesCount);
                 return TokenCategory.Categories.ConvertAll(tc => tc.Regex);
             }
+        }
+
+        internal static IReadOnlyList<string> WhiteSpaceTokenCategories
+        {
+            get { return _whitespaceTokenCategories.Select(tc => tc.Regex).ToArray(); }
         }
 
         private static int NextSymbolId { get; set; }
@@ -31,6 +31,16 @@ namespace Nicodem.Semantics.Grammar
         #region TokenCategoryImplementation
 
         private static bool _tokenCategoryAttributionLock = false;
+
+        private static string EscapeRawStringForRegex(string s)
+        {
+            var result=new StringBuilder();
+            foreach (var c in s)
+            {
+                result.Append('\\').Append(c);
+            }
+            return result.ToString();
+        }
 
         private struct TokenCategory : IEquatable<TokenCategory>
         {
@@ -94,9 +104,11 @@ namespace Nicodem.Semantics.Grammar
                 return result;
             }
 
+            #region +
+
             public static RegexSymbol operator +(UniversalSymbol left, TokenCategory right)
             {
-                return left + (UniversalSymbol)right;
+                return left + (UniversalSymbol) right;
             }
 
             public static RegexSymbol operator +(TokenCategory left, UniversalSymbol right)
@@ -106,18 +118,34 @@ namespace Nicodem.Semantics.Grammar
 
             public static RegexSymbol operator +(TokenCategory left, TokenCategory right)
             {
-                return (UniversalSymbol) left + (UniversalSymbol)right;
+                return (UniversalSymbol) left + (UniversalSymbol) right;
             }
 
             public static RegexSymbol operator +(TokenCategory left, string right)
             {
-                return (UniversalSymbol)left + (UniversalSymbol)right;
+                return (UniversalSymbol) left + (UniversalSymbol) right;
             }
 
             public static RegexSymbol operator +(string left, TokenCategory right)
             {
-                return (UniversalSymbol)left + (UniversalSymbol)right;
+                return (UniversalSymbol) left + (UniversalSymbol) right;
             }
+
+            #endregion +
+
+            #region *
+
+            public static RegexSymbol operator *(TokenCategory left, string right)
+            {
+                return (RegexSymbol) left * (RegexSymbol) right;
+            }
+
+            public RegexSymbol Optional
+            {
+                get { return ((RegexSymbol) this).Optional; }
+            }
+
+            #endregion
         }
 
         /// <summary>
@@ -147,6 +175,12 @@ namespace Nicodem.Semantics.Grammar
         private static TokenCategory LineCommentCStyle = "//(^\n)*\n";
         private static TokenCategory LineCommentShortStyle = "`(^(\n|`))*\n";
         private static TokenCategory ShortComment = "`(^(\n|`))*`";
+
+        // Space
+        private static TokenCategory Space = "[:space:]+";
+
+        // WhiteSpace set
+        private static TokenCategory[] _whitespaceTokenCategories = {LineCommentCStyle, LineCommentShortStyle, ShortComment, Space};
 
         // Type
         private static TokenCategory TypeName = "(^[:space:])+";
@@ -217,6 +251,8 @@ namespace Nicodem.Semantics.Grammar
                 return implicitToken.Token();
             }
 
+            #region +
+
             public static RegexSymbol operator +(UniversalSymbol left, UniversalSymbol right)
             {
                 return (RegexSymbol)left + (RegexSymbol)right;
@@ -231,6 +267,27 @@ namespace Nicodem.Semantics.Grammar
             {
                 return (UniversalSymbol)left + right;
             }
+            
+            #endregion
+
+            #region *
+
+            public static RegexSymbol operator *(UniversalSymbol left, string right)
+            {
+                return (RegexSymbol) left * (RegexSymbol) right;
+            }
+
+            public static RegexSymbol operator *(UniversalSymbol left, TokenCategory right)
+            {
+                return (RegexSymbol) left * (RegexSymbol) right;
+            }
+
+            public static RegexSymbol operator *(string left, UniversalSymbol right)
+            {
+                return (RegexSymbol) left * (RegexSymbol) right;
+            }
+
+            #endregion
 
             public RegexSymbol Star
             {
@@ -365,13 +422,19 @@ namespace Nicodem.Semantics.Grammar
 
             public static RegexSymbol MakeUnion(params string[] tokens)
             {
-                foreach (var token in tokens)
+                return MakeUnion((IEnumerable<string>) tokens);
+            }
+
+            public static RegexSymbol MakeUnion(IEnumerable<string> tokens)
+            {
+                var enumerable = tokens as string[] ?? tokens.ToArray();
+                foreach (var token in enumerable)
                 {
                     var ignored = (RegexSymbol) token;
                 }
                 return new RegexSymbol(() =>
                 {
-                    return RegExFactory.Union(tokens.Select(t => ((RegexSymbol) t)._regexSymbol()).ToArray());
+                    return RegExFactory.Union(enumerable.Select(t => ((RegexSymbol) t)._regexSymbol()).ToArray());
                 });
             }
 
@@ -405,8 +468,6 @@ namespace Nicodem.Semantics.Grammar
         private static readonly Dictionary<UniversalSymbol, RegexSymbol> Productions =
             new Dictionary<UniversalSymbol, RegexSymbol>();
 
-        private static readonly HashSet<Symbol> NonterminalSymbols = new HashSet<Symbol>();
-
         /// <summary>
         /// Returns left-hand-side symbol of root production
         /// </summary>
@@ -422,18 +483,8 @@ namespace Nicodem.Semantics.Grammar
         /// <returns></returns>
         internal static IDictionary<Symbol, IProduction<Symbol>[]> MakeProductionsDictionaryForGrammarConstructor()
         {
-            return Productions.ToDictionary(production =>
-            {
-                var symbol = (Symbol) production.Key;
-                NonterminalSymbols.Add(symbol);
-                return symbol;
-            },
+            return Productions.ToDictionary(production => (Symbol) production.Key,
                 production => new IProduction<Symbol>[] {new Production((Symbol) production.Key, production.Value)});
-        }
-
-        internal static bool IsNonterminalSymbol(Symbol symbol)
-        {
-            return NonterminalSymbols.Contains(symbol);
         }
 
         private static UniversalSymbol NewNonterminal()
@@ -448,15 +499,14 @@ namespace Nicodem.Semantics.Grammar
 
         private static RegexSymbol MakeInfixOperatorExpressionRegex(UniversalSymbol operatorExpression, params string[] operators)
         {
-            var operatorsRegex = RegexSymbol.MakeUnion(operators);
-            return operatorExpression * (WhiteSpace.Star * operatorsRegex * WhiteSpace.Star * operatorExpression).Star;
+            var operatorsRegex = RegexSymbol.MakeUnion(operators.Select(EscapeRawStringForRegex));
+            return operatorExpression * (operatorsRegex * operatorExpression).Star;
         }
 
         #endregion
 
         #region Productions
 
-        private static UniversalSymbol WhiteSpace = NewNonterminal();
         private static UniversalSymbol TypeSpecifier = NewNonterminal();
         private static UniversalSymbol ObjectDeclaration = NewNonterminal();
         private static UniversalSymbol BlockExpression = NewNonterminal();
@@ -493,12 +543,11 @@ namespace Nicodem.Semantics.Grammar
 
         static NicodemGrammarProductions()
         {
-            Program.SetProduction((WhiteSpace.Star + Function).Star * WhiteSpace.Star);
-            WhiteSpace.SetProduction(LineCommentCStyle+LineCommentShortStyle+ShortComment+"[:space:]*");
-            Function.SetProduction(ObjectName * WhiteSpace.Star * "(" * WhiteSpace.Star * ParametersList * WhiteSpace.Star * ")" * WhiteSpace.Star * "->" * WhiteSpace.Star * TypeSpecifier * WhiteSpace.Star * Expression);
-            ParametersList.SetProduction(((ObjectDeclaration * WhiteSpace.Star * "," * WhiteSpace.Star).Star * ObjectDeclaration).Optional);
-            ObjectDeclaration.SetProduction(TypeSpecifier * WhiteSpace.Star * ObjectName);
-            TypeSpecifier.SetProduction(TypeName * WhiteSpace.Star * ("mutable".Optional() * WhiteSpace.Star * "[" * Expression * "]" * WhiteSpace.Star).Star  * "mutable".Optional());
+            Program.SetProduction(Function.Star);
+            Function.SetProduction(ObjectName * "\\("  * ParametersList * "\\)" * "\\-\\>" * TypeSpecifier * Expression);
+            ParametersList.SetProduction(((ObjectDeclaration * ",").Star * ObjectDeclaration).Optional);
+            ObjectDeclaration.SetProduction(TypeSpecifier * ObjectName);
+            TypeSpecifier.SetProduction(TypeName * ("mutable".Optional() * "\\[" * Expression * "\\]").Star * "mutable".Optional());
             Expression.SetProduction(OperatorExpression);
             OperatorExpression.SetProduction(Operator17Expression);
             Operator17Expression.SetProduction(Operator16Expression);
@@ -515,10 +564,10 @@ namespace Nicodem.Semantics.Grammar
             Operator6Expression.SetProduction(MakeInfixOperatorExpressionRegex(Operator5Expression, "+ -".Split(' ')));
             Operator5Expression.SetProduction(MakeInfixOperatorExpressionRegex(Operator4Expression, "* / %".Split(' ')));
             Operator4Expression.SetProduction(Operator3Expression);
-            Operator3Expression.SetProduction((RegexSymbol.MakeUnion("++ -- + - ! ~".Split(' ')) * WhiteSpace.Star).Star * Operator2Expression);
-            Operator2Expression.SetProduction(Operator1Expression * WhiteSpace.Star * (RegexSymbol.MakeUnion("++", "--") + ("(" * (WhiteSpace.Star * Expression).Star * WhiteSpace.Star * ")") + ("[" * WhiteSpace.Star * Expression * WhiteSpace.Star * "]") + ("[" * WhiteSpace.Star * Expression.Optional * ".." * Expression.Optional * "]")).Star);
+            Operator3Expression.SetProduction(RegexSymbol.MakeUnion("++ -- + - ! ~".Split(' ')).Star * Operator2Expression);
+            Operator2Expression.SetProduction(Operator1Expression * (RegexSymbol.MakeUnion("\\+\\+", "\\-\\-") + ("(" * Expression.Star * ")") + ("\\[" * Expression * "\\]") + ("\\[" * Expression.Optional * "\\.\\." * Expression.Optional * "\\]")).Star);
             Operator1Expression.SetProduction(Operator0Expression);
-            Operator0Expression.SetProduction(AtomicExpression + ("(" * WhiteSpace.Star * Expression * WhiteSpace.Star * ")"));
+            Operator0Expression.SetProduction(AtomicExpression + ("\\(" * Expression * "\\)"));
             AtomicExpression.SetProduction(
                 BlockExpression +
                 ObjectDefinitionExpression +
@@ -528,13 +577,13 @@ namespace Nicodem.Semantics.Grammar
                 WhileExpression +
                 LoopControlExpression
                 );
-            BlockExpression.SetProduction("{" * (WhiteSpace.Star * Expression).Star * WhiteSpace.Star * "}");   // No left-recursion thanks to '{'
-            ObjectDefinitionExpression.SetProduction(TypeSpecifier * WhiteSpace.Star * ObjectName * WhiteSpace.Star * "=" * WhiteSpace.Star * Expression);  // NOTE: "=" is _not_ an assignment operator here
-            ArrayLiteralExpression.SetProduction("[" * (WhiteSpace.Star * Expression).Star * WhiteSpace.Star * "]");
+            BlockExpression.SetProduction("{" * Expression.Star * "}");   // No left-recursion thanks to '{'
+            ObjectDefinitionExpression.SetProduction(TypeSpecifier * ObjectName * "=" * Expression);  // NOTE: "=" is _not_ an assignment operator here
+            ArrayLiteralExpression.SetProduction("\\[" * Expression.Star * "\\]");
             ObjectUseExpression.SetProduction(ObjectName);    // Literals are handled by 'name resolution'
-            IfExpression.SetProduction("if" * WhiteSpace.Star * Expression * WhiteSpace.Star * Expression * (WhiteSpace.Star * "else" * Expression).Optional);  // FIXME: if should be an operator
-            WhileExpression.SetProduction("while" * WhiteSpace.Star * Expression * WhiteSpace.Star * Expression * (WhiteSpace.Star * "else" * Expression).Optional);    // the same here?
-            LoopControlExpression.SetProduction(("break".Token() + "continue") * (WhiteSpace.Star * Expression * (WhiteSpace.Star * DecimalNumberLiteral).Optional).Optional);
+            IfExpression.SetProduction("if" * Expression * Expression * ("else" * Expression).Optional);  // FIXME: if should be an operator
+            WhileExpression.SetProduction("while" * Expression * Expression * ("else" * Expression).Optional);    // the same here?
+            LoopControlExpression.SetProduction(("break".Token() + "continue") * (Expression * DecimalNumberLiteral.Optional).Optional);
         }
 
         #endregion

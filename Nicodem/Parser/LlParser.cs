@@ -49,11 +49,12 @@ namespace Nicodem.Parser
 			st.Push(new ParseState(dfa.Start, 0, input));
 
 			while(st.Any()) {
-				var node = st.Peek().State;
-				var it = st.Peek().Iterator;
+				var parseState = st.Peek();
+				var node = parseState.State;
+				var it = parseState.Iterator;
                 TSymbol currentSymbol = (it != word.End) ? it.Current.Symbol : eof;
 
-                if(node.Accepting > 0 && _grammar.Follow[term].Contains(currentSymbol)) {
+                if(node.Accepting > 0 && (currentSymbol.Equals(eof) || _grammar.Follow[term].Contains(currentSymbol))) {
                     accepted = true;
 					var parsedChildren = children.ToList();
 					parsedChildren.Reverse();
@@ -67,28 +68,30 @@ namespace Nicodem.Parser
 				}
 
 				var trans = node.Transitions;
-				for(int i = st.Peek().TransitionIndex; i < trans.Count; i++) {
+				var ind = parseState.TransitionIndex;
+				for(; ind < trans.Count; ind++) {
 
-                    if(_grammar.InFirstPlus(trans[i].Key, currentSymbol)) {
-						if(_grammar.IsTerminal(trans[i].Key)) {
+                    if(_grammar.InFirstPlus(trans[ind].Key, currentSymbol)) {
+						if(_grammar.IsTerminal(trans[ind].Key)) {
 
-							children.Push(new ParseLeaf<TSymbol>(it.Current.Fragment, currentSymbol));
-							st.Push(new ParseState(trans[i].Value, 0, it.Next()));
+                            children.Push(new ParseLeaf<TSymbol>(it != word.End ? it.Current.Fragment : null, currentSymbol)); // TODO It would be better to have special END fragment
+							st.Push(new ParseState(trans[ind].Value, 0, it.Next()));
 							break;
 						} else {
-							IEnumerator<ParseResult<TSymbol>> resultIt = ParseTerm(trans[i].Key, word, it).GetEnumerator();
+							IEnumerator<ParseResult<TSymbol>> resultIt = ParseTerm(trans[ind].Key, word, it).GetEnumerator();
                             resultIt.MoveNext();
                             if(resultIt.Current) { // TODO else and look at the furthest parsed
                                 children.Push(resultIt.Current.Tree);
-                                st.Push(new ParseState(trans[i].Value, 0, resultIt.Current.Iterator, resultIt));
+                                st.Push(new ParseState(trans[ind].Value, 0, resultIt.Current.Iterator, resultIt));
                                 break;
                             }
 						}
 					}
 				}
+				parseState.TransitionIndex = ind;
 
 				// could not find next parsing transition
-				if(node == st.Peek().State) { 
+				if(ind >= trans.Count) { 
 					if(st.Peek().Iterator > furthestParsed.Iterator) {
 						var newFurthestParsed = children.ToList();
 						newFurthestParsed.Reverse();
@@ -102,7 +105,7 @@ namespace Nicodem.Parser
                 yield break;
 			} else {
 				var branch = new ParseBranch<TSymbol>(
-					GetFragmentRange(input.Current.Fragment, furthestParsed.Children.Last().Fragment), 
+					input != word.End ? GetFragmentRange(input.Current.Fragment, furthestParsed.Children.Last().Fragment) : null, 
 						term, 
 						_grammar.Productions[term][0],  // TODO could not parse any productions
 						furthestParsed.Children);
@@ -138,10 +141,10 @@ namespace Nicodem.Parser
 		}
 
 		/* --- data types ----- */
-		private struct ParseState
+		private class ParseState
 		{
 			public DfaState<TSymbol> State { get; private set; } 
-			public int TransitionIndex { get; private set; }
+			public int TransitionIndex { get; set; }
 			public MemoizedInput<IParseTree<TSymbol>>.Iterator Iterator { get; private set; }
             // used when function may return multiple ok results during one call
 			public IEnumerator<ParseResult<TSymbol>> NextPossibleResult { get; private set; } 
@@ -150,7 +153,6 @@ namespace Nicodem.Parser
                 int transitionIndex, 
                 MemoizedInput<IParseTree<TSymbol>>.Iterator iterator, 
 				IEnumerator<ParseResult<TSymbol>> nextPossibleResult = null)
-				: this()
 			{
 				State = state;
 				TransitionIndex = transitionIndex;

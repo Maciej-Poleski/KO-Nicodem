@@ -131,6 +131,10 @@ Global
 		$5.AfterDelegateDeclarationParameterComma = True
 		$5.NewParentheses = False
 		$5.SpacesBeforeBrackets = False
+		$5.MethodCallArgumentWrapping = WrapIfTooLong
+		$5.MethodDeclarationParameterWrapping = WrapIfTooLong
+		$5.IndexerDeclarationParameterWrapping = WrapIfTooLong
+		$5.IndexerArgumentWrapping = WrapIfTooLong
 		$5.inheritsSet = Mono
 		$5.inheritsScope = text/x-csharp
 		$5.scope = text/x-csharp

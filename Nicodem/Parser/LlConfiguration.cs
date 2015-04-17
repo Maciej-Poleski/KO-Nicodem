@@ -1,52 +1,57 @@
 ﻿using System;
-using Strilanc.Value;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Nicodem.Parser
 {
-	public struct LlConfiguration<TSymbol> : IEquatable<LlConfiguration<TSymbol>> where TSymbol : ISymbol<TSymbol>
+    public class LlConfiguration<TSymbol> : IEquatable<LlConfiguration<TSymbol>> where TSymbol : ISymbol<TSymbol>
 	{
-		public readonly TSymbol label; 
-		private Stack<DfaState<TSymbol> > stack;
+        public readonly TSymbol label; 
+        public readonly ImmutableList<DfaState<TSymbol> > stack = ImmutableList.Create<DfaState<TSymbol> >();
 
 		public LlConfiguration(TSymbol label) {
 			this.label = label;
-			stack = new Stack<DfaState<TSymbol> > ();
 		}
 
-		public LlConfiguration(TSymbol label, Stack<DfaState<TSymbol>> stack) {
-			this.label = label;
-			this.stack = stack;
+        public LlConfiguration(TSymbol label, Stack<DfaState<TSymbol>> stack) {
+            this.label = label;
+            var array = stack.ToArray();
+            Array.Reverse(array);
+
+            foreach (var state in array) {
+                this.stack = this.stack.Add(state);
+            }
+        }
+
+        public LlConfiguration(TSymbol label, ImmutableList<DfaState<TSymbol> > stack) {
+            this.label = label;
+            this.stack = stack;
+        }
+
+        public LlConfiguration<TSymbol> Push(DfaState<TSymbol> state) {
+            return new LlConfiguration<TSymbol>(label, stack.Add(state));
 		}
 
-		public void Push(DfaState<TSymbol> state)
-		{
-			stack.Push (state);
-		}
-
-		// Performs shallow copy of the stack
-		public Stack<DfaState<TSymbol>> copyOfStack() {
-			var copy = new Stack<DfaState<TSymbol>> ();
-			var array = stack.ToArray ();
-			Array.Reverse (array);
-			foreach (var state in array) {
-				copy.Push (state);
-			}
-			return copy;
-		}
-
-		public DfaState<TSymbol> Pop() {
-			return stack.Pop ();
+        public LlConfiguration<TSymbol> Pop() {
+            return new LlConfiguration<TSymbol>(label, stack.RemoveAt(stack.Count - 1));
 		}
 
 		public DfaState<TSymbol> Peek() {
-			return stack.Peek();
+            return stack[stack.Count - 1];
 		}
 
 		public int Count() {
 			return stack.Count;
 		}
+
+        // Performs shallow copy of the stack
+        public Stack<DfaState<TSymbol>> copyOfStack() {
+            var copy = new Stack<DfaState<TSymbol>> ();
+            foreach (var state in stack) {
+                copy.Push (state);
+            }
+            return copy;
+        }
 
 		public bool Subsumes(LlConfiguration<TSymbol> configuration)
 		{
@@ -54,14 +59,12 @@ namespace Nicodem.Parser
 				|| this.stack.Count > configuration.Count())
 				return false;
 
-			var firstStack = this.stack.ToArray();
-			Array.Reverse (firstStack);
+			var firstStack = this.stack;
 
-			var secondStack = this.stack.ToArray();
-			Array.Reverse (secondStack);
+            var secondStack = configuration.stack;
 
-			for (int i = 0; i < firstStack.Length; i++) {
-				if (firstStack [i] != secondStack [i])
+            for (int i = 0; i < firstStack.Count; i++) {
+				if (firstStack [i] != secondStack[i])
 					return false;
 			}
 

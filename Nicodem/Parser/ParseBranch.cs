@@ -5,7 +5,7 @@ using Nicodem.Source;
 
 namespace Nicodem.Parser
 {
-	internal class ParseBranch<TSymbol> : IParseTree<TSymbol>
+	public class ParseBranch<TSymbol> : IParseTree<TSymbol>
 		where TSymbol:ISymbol<TSymbol>
 	{
 		public IFragment Fragment { get; private set; }

@@ -4,7 +4,7 @@ using Nicodem.Source;
 
 namespace Nicodem.Parser
 {
-	internal class ParseLeaf<TSymbol> : IParseTree<TSymbol> where TSymbol : ISymbol<TSymbol>
+	public class ParseLeaf<TSymbol> : IParseTree<TSymbol> where TSymbol : ISymbol<TSymbol>
 	{
 		public TSymbol Symbol { get; private set; }
 		public IFragment Fragment { get; private set; }
