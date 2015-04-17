@@ -11,8 +11,9 @@ namespace Nicodem.Parser
 		internal IDictionary<TSymbol, Dfa<TSymbol>> Automatons { get; private set; }
 		internal IDictionary<uint, IProduction<TSymbol>> WhichProduction { get; private set; } // accepting state marker -> production
 		internal ISet<TSymbol> Nullable { get; private set; }
-		internal IDictionary<TSymbol, ISet<TSymbol>> First { get; private set; }
-		internal IDictionary<TSymbol, ISet<TSymbol>> Follow { get; private set; }
+		internal IDictionary<TSymbol, ISet<TSymbol>> _First { get; private set; }
+        internal FirstSet<TSymbol> First { get; private set; }
+        internal IDictionary<TSymbol, ISet<TSymbol>> Follow { get; private set; }
         internal bool HasLeftRecursion { get; private set; }
 		// a dictionary which for each symbol stores a list of all the states s.t. there exists edge labelled by this symbol to the given state.
 		internal IDictionary<TSymbol, List<DfaState<TSymbol>>> TargetStatesDictionary { get; private set; }
@@ -22,9 +23,10 @@ namespace Nicodem.Parser
         // returns true if word belongs to the FIRST+ set for given term
 		internal bool InFirstPlus(TSymbol term, TSymbol word)
 		{
-			if(!First.ContainsKey (term)){
+			/*if(!First.ContainsKey (term)){
 				return false;
-			} else if(First[term].Contains(word)) {
+			} else*/
+            if(First[term].Contains(word)) {
 				return true;
 			} else {
 				return Nullable.Contains(term) && Follow.ContainsKey(term) && Follow[term].Contains(word);

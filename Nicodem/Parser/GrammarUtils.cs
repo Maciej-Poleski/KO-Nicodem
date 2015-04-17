@@ -187,7 +187,83 @@ namespace Nicodem.Parser
 			return nullable;
 		}
 
-		public static Dictionary<TSymbol, ISet<TSymbol>> ComputeFollow (IDictionary<TSymbol, Dfa<TSymbol>> automatons, ISet<TSymbol> nullable, IDictionary<TSymbol, ISet<TSymbol>> first)
+        public static Dictionary<TSymbol, ISet<TSymbol>> ComputeFollow (IDictionary<TSymbol, Dfa<TSymbol>> automatons, ISet<TSymbol> nullable, FirstSet<TSymbol> first)
+        {
+            var follow = new Dictionary<TSymbol, ISet<TSymbol>>();
+            var queue = new Queue<DfaState<TSymbol>>();
+            // for accepting state s it stores A - nonterminal whose automaton contains s.
+            var lhsForAccStates = new Dictionary<DfaState<TSymbol>, TSymbol>();
+            var predecessors = ComputePredecessors(automatons);
+            var acceptingStates = new Dictionary<Dfa<TSymbol>,List<DfaState<TSymbol>>> ();
+
+            foreach (var dfa in automatons.Values)
+                acceptingStates [dfa] = GetAllAcceptingStates (dfa);
+
+            foreach(var kv in automatons) {
+                var dfa = kv.Value;
+                var lhsT = kv.Key;
+                foreach(var accstate in acceptingStates[dfa])
+                    lhsForAccStates[accstate] = lhsT;
+            }
+
+            bool changes = true;
+            // While there are any changes
+            while(changes) {
+                changes = false;
+                // Enqueue all accepting states from all automatons
+                foreach(var dfa in automatons.Values)
+                    foreach(var accstate in acceptingStates[dfa])
+                        queue.Enqueue(accstate);
+
+                while(queue.Count > 0) {
+                    var state = queue.Dequeue();
+                    // compute Follow set in the state i.e. the set-sum of 
+                    // Follow sets of all symbols from its outgoing edges.
+                    var followSetSum = new HashSet<TSymbol>();
+                    foreach(var kv in state.Transitions) {
+                        // symbol on the outgoing edge
+                        var outT = kv.Key;
+                        // copy all symbols from First set
+                        foreach(var s in first[outT])
+                            followSetSum.Add(s);
+                        // if the outT is nullable, copy also all symbols from its Follow set.
+                        if(nullable.Contains(outT) && follow.ContainsKey(outT))
+                            foreach(var s in follow[outT])
+                                followSetSum.Add(s);
+                    }
+
+                    // Additionally, if state is an accepting state in the dfa for production A -> dfa(E),
+                    // we should add to followSetSum all the symbols from Follow(A).
+                    if(state.Accepting > 0) {
+                        // lhsT=A in production A->E
+                        var lhsT = lhsForAccStates[state];
+                        if(follow.ContainsKey(lhsT))
+                            foreach(var s in follow[lhsT])
+                                followSetSum.Add(s);
+                    }
+
+                    // For all symbols on ingoing edges update their
+                    // follow sets adding symbols from followSetSum.
+                    foreach(var kv in predecessors[state]) {
+                        // symbol on the ingoing edge
+                        var inT = kv.Key;
+                        if (!follow.ContainsKey (inT))
+                            follow [inT] = new HashSet<TSymbol> ();
+
+                        foreach(var s in followSetSum)
+                            if(!follow[inT].Contains(s)) {
+                                changes = true;
+                                follow[inT].Add(s);
+                            }
+
+                        queue.Enqueue(kv.Value);
+                    }
+                }//end while queue not empty
+            }//end while there are no changes
+            return follow;
+        }
+
+		public static Dictionary<TSymbol, ISet<TSymbol>> _ComputeFollow (IDictionary<TSymbol, Dfa<TSymbol>> automatons, ISet<TSymbol> nullable, IDictionary<TSymbol, ISet<TSymbol>> first)
 		{
 			var follow = new Dictionary<TSymbol, ISet<TSymbol>>();
 			var queue = new Queue<DfaState<TSymbol>>();
@@ -264,9 +340,14 @@ namespace Nicodem.Parser
 			return follow;
 		}
 
+        // FIRST(A) = { B \in Sigma : A ->* B\beta }
+        public static FirstSet<TSymbol> ComputeFirst(IDictionary<TSymbol, Dfa<TSymbol>> automatons, ISet<TSymbol> nullable)
+        {
+            return new FirstSet<TSymbol>(automatons, nullable);
+        }
 
 		// FIRST(A) = { B \in Sigma : A ->* B\beta }
-		public static IDictionary<TSymbol, ISet<TSymbol>> ComputeFirst(IDictionary<TSymbol, Dfa<TSymbol>> automatons, ISet<TSymbol> nullable)
+		public static IDictionary<TSymbol, ISet<TSymbol>> _ComputeFirst(IDictionary<TSymbol, Dfa<TSymbol>> automatons, ISet<TSymbol> nullable)
 		{
 			// declare local vars
 			var first = new Dictionary<TSymbol, ISet<TSymbol>>();
