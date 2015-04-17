@@ -62,10 +62,22 @@ namespace Nicodem.Parser
 			HasLeftRecursion = GrammarUtils<TSymbol>.HasLeftRecursion(Automatons, Nullable);
 			TargetStatesDictionary = GrammarUtils<TSymbol>.computeTargetStatesDictionary (Automatons);
 			AccStateOwnerDictionary = GrammarUtils<TSymbol>.computeAccStateOwnerDictionary (Automatons);
-		}
+        }
+            
+        // TODO(jbrzeski): Please add implementation.
+        public List<LlConfiguration<TSymbol>> OutgoingEpsiEdges(LlConfiguration<TSymbol> llconf)
+        {
+            throw new NotImplementedException();
+        }
+
+        // Indexed by beginnings of terminal ranges.
+        public List<KeyValuePair<TSymbol,LlConfiguration<TSymbol>>> OutgoingTerminalEdges(LlConfiguration<TSymbol> llconf)
+        {
+            throw new NotImplementedException();
+        }
 
 		// for a given LlConfiguration the function computes list of edges to all other possible LlConfigurations.
-		public List<KeyValuePair<TSymbol?,LlConfiguration<TSymbol>>> OutgoingEdges(LlConfiguration<TSymbol> llconf) {
+		public List<KeyValuePair<TSymbol?,LlConfiguration<TSymbol>>> _OutgoingEdges(LlConfiguration<TSymbol> llconf) {
 			if (llconf.Count() == 0) {
 				// If intially the stack is empty we cannot figure out next edges, so return an empty list.
 				return new List<KeyValuePair<TSymbol?, LlConfiguration<TSymbol>>> ();

@@ -37,15 +37,10 @@ namespace Nicodem.Parser
 
             // TODO: DFA-Transitions representation? - intervals vs (all) edges
             // TODO: what about AlphabetClass and all TSymbol enumeration?
-
             foreach (var conf in curState) {
-                foreach(KeyValuePair<TSymbol?,LlConfiguration<TSymbol>> edge in grammar.OutgoingEdges(conf)) {
-                    if (edge.Key == null)
-                        continue;
-                    TSymbol symbol = (TSymbol) edge.Key;
-                    if (nextStates[symbol] == null) {
-                        nextStates[symbol] = new HashSet<LlConfiguration<TSymbol>>();
-                    }
+                foreach(KeyValuePair<TSymbol,LlConfiguration<TSymbol>> edge in grammar.OutgoingTerminalEdges(conf)) {
+                    TSymbol symbol = edge.Key;
+                    nextStates[symbol] = nextStates[symbol] ?? new HashSet<LlConfiguration<TSymbol>>();
                     nextStates[symbol].Add(edge.Value);
                 }
             }
