@@ -19,17 +19,21 @@ namespace Nicodem.Parser
             Array.Reverse(array);
 
             foreach (var state in array) {
-                this.stack.Add(state);
+                this.stack = this.stack.Add(state);
             }
         }
 
-		public void Push(DfaState<TSymbol> state)
-		{
-            stack.Add(state);
+        public LlConfiguration(TSymbol label, ImmutableList<DfaState<TSymbol> > stack) {
+            this.label = label;
+            this.stack = stack;
+        }
+
+        public LlConfiguration<TSymbol> Push(DfaState<TSymbol> state) {
+            return new LlConfiguration<TSymbol>(label, stack.Add(state));
 		}
 
-        public ImmutableList<DfaState<TSymbol> > Pop() {
-            return stack.RemoveAt(stack.Count - 1);
+        public LlConfiguration<TSymbol> Pop() {
+            return new LlConfiguration<TSymbol>(label, stack.RemoveAt(stack.Count - 1));
 		}
 
 		public DfaState<TSymbol> Peek() {
