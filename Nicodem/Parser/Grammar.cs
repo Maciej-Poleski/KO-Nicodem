@@ -11,8 +11,9 @@ namespace Nicodem.Parser
 		internal IDictionary<TSymbol, Dfa<TSymbol>> Automatons { get; private set; }
 		internal IDictionary<uint, IProduction<TSymbol>> WhichProduction { get; private set; } // accepting state marker -> production
 		internal ISet<TSymbol> Nullable { get; private set; }
-		internal IDictionary<TSymbol, ISet<TSymbol>> First { get; private set; }
-		internal IDictionary<TSymbol, ISet<TSymbol>> Follow { get; private set; }
+		internal IDictionary<TSymbol, ISet<TSymbol>> _First { get; private set; }
+        internal FirstSet<TSymbol> First { get; private set; }
+        internal IDictionary<TSymbol, ISet<TSymbol>> Follow { get; private set; }
         internal bool HasLeftRecursion { get; private set; }
 		// a dictionary which for each symbol stores a list of all the states s.t. there exists edge labelled by this symbol to the given state.
 		internal IDictionary<TSymbol, List<DfaState<TSymbol>>> TargetStatesDictionary { get; private set; }
@@ -22,12 +23,19 @@ namespace Nicodem.Parser
         // returns true if word belongs to the FIRST+ set for given term
 		internal bool InFirstPlus(TSymbol term, TSymbol word)
 		{
-			return First[term].Contains(word) || (Nullable.Contains(term) && Follow[term].Contains(word));
+			/*if(!First.ContainsKey (term)){
+				return false;
+			} else*/
+            if(First[term].Contains(word)) {
+				return true;
+			} else {
+				return Nullable.Contains(term) && Follow.ContainsKey(term) && Follow[term].Contains(word);
+			}
 		}
 
 		internal bool IsTerminal(TSymbol term)
 		{
-			return Productions[term].Length == 0;
+			return !(Productions.ContainsKey(term)) || Productions[term].Length == 0;
 		}
 
 		public Grammar(TSymbol start, IDictionary<TSymbol, IProduction<TSymbol>[]> productions)
@@ -56,16 +64,63 @@ namespace Nicodem.Parser
 			HasLeftRecursion = GrammarUtils<TSymbol>.HasLeftRecursion(Automatons, Nullable);
 			TargetStatesDictionary = GrammarUtils<TSymbol>.computeTargetStatesDictionary (Automatons);
 			AccStateOwnerDictionary = GrammarUtils<TSymbol>.computeAccStateOwnerDictionary (Automatons);
-		}
+        }
+            
+        public List<LlConfiguration<TSymbol>> OutgoingEpsiEdges(LlConfiguration<TSymbol> llconf)
+        {
+            if (llconf.Count() == 0) {
+                // If intially the stack is empty we cannot figure out next edges, so return an empty list.
+                return new List<LlConfiguration<TSymbol>> ();
+            }
+
+            var topState = llconf.stack[llconf.stack.Count-1];
+            var transitions = topState.Transitions;
+            var result = new List<LlConfiguration<TSymbol>>();
+            foreach (var kv in transitions) {
+                var symbol = kv.Key;
+                var targetState = kv.Value;
+                var newllconf = llconf.Pop(); // a copy without top state
+                if (!IsTerminal(symbol)) {
+                    newllconf = newllconf.Push(targetState);
+                    newllconf = newllconf.Push(Automatons[symbol].Start);
+                    result.Add(newllconf);
+                }
+            }
+
+            if (topState.Accepting > 0) {
+                // We also add a separate epsilon-edge for the situation in which
+                // top state is accepting state for some nonterminal's automaton and
+                // we don't move forward but just pop the top state from the stack.
+                // then we consider two cases: when the stack is empty and when it's not.
+                if (llconf.Count () == 1) {
+                    // prevSymbol is a nonterminal whose DFA contains topState (and topState is accepting)
+                    var prevSymbol = AccStateOwnerDictionary [topState];
+                    var newllconf = llconf.Pop(); // a copy without top state
+                    // browse the list of target states for the prevSymbol and for each of them create
+                    // a separate configuration with the stack containing the given state.
+                    foreach (var targetState in TargetStatesDictionary[prevSymbol]) {
+                        result.Add (newllconf.Push(targetState));
+                    }
+                } else {
+                    result.Add (llconf.Pop());
+                }
+            }
+
+            return result;
+        }
+
+        // TODO(jbrzeski): Please add implementation.
+        // Indexed by beginnings of terminal ranges.
+        public List<KeyValuePair<TSymbol,LlConfiguration<TSymbol>>> OutgoingTerminalEdges(LlConfiguration<TSymbol> llconf)
+        {
+            throw new NotImplementedException();
+        }
 
 		// for a given LlConfiguration the function computes list of edges to all other possible LlConfigurations.
-		public List<KeyValuePair<TSymbol?,LlConfiguration<TSymbol>>> OutgoingEdges(LlConfiguration<TSymbol> llconf) {
-			if (llconf.Count() == 0) {
-				// If intially the stack is empty we cannot figure out next edges, so return an empty list.
-				return new List<KeyValuePair<TSymbol?, LlConfiguration<TSymbol>>> ();
-			}
+		public List<KeyValuePair<TSymbol?,LlConfiguration<TSymbol>>> _OutgoingEdges(LlConfiguration<TSymbol> llconf) {
 
-			var topState = llconf.Pop ();
+
+            var topState = llconf.stack[llconf.stack.Count-1];
 			var transitions = topState.Transitions;
 			var result = new List<KeyValuePair<TSymbol?,LlConfiguration<TSymbol>>>();
 
@@ -89,30 +144,7 @@ namespace Nicodem.Parser
 				result.Add (newEdge);
 			}
 
-			if (topState.Accepting > 0) {
-				// We also add a separate epsilon-edge for the situation in which
-				// top state is accepting state for some nonterminal's automaton and
-				// we don't move forward but just pop the top state from the stack.
-				// then we consider two cases: when the stack is empty and when it's not. 
-				if (llconf.Count () == 0) {
-					// prevSymbol is a nonterminal whose DFA contains topState (and topState is accepting)
-					var prevSymbol = AccStateOwnerDictionary [topState];
-					// browse the list of target states for the prevSymbol and for each of them create
-					// a separate configuration with the stack containing the given state.
-					foreach (var targetState in TargetStatesDictionary[prevSymbol]) {
-						var newStack = new Stack<DfaState<TSymbol>> ();
-						newStack.Push (targetState);
-						var newLlConf = new LlConfiguration<TSymbol> (llconf.label, newStack);
-						var newEdge = new KeyValuePair<TSymbol?, LlConfiguration<TSymbol>> (null, newLlConf);
-						result.Add (newEdge);
-					}
-				} else {
-					var newStack = llconf.copyOfStack (); // shallow copy of the stack
-					var newLlConf = new LlConfiguration<TSymbol> (llconf.label, newStack);
-					var newEdge = new KeyValuePair<TSymbol?, LlConfiguration<TSymbol>> (null, newLlConf);
-					result.Add (newEdge);
-				}
-			}
+
 			return result;
 		}
 

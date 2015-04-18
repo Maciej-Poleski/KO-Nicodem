@@ -38,7 +38,7 @@ namespace Nicodem.Semantics.AST
 
         public override void BuildNode<TSymbol>(IParseTree<TSymbol> parseTree)
         {
-            throw new System.NotImplementedException();
+            Name = parseTree.Fragment.GetOriginText();
         }
 
         #endregion

@@ -9,40 +9,34 @@ namespace Nicodem.Semantics.AST
 	class FunctionNode : Node
 	{
 		public string Name { get; set; }
-        public IEnumerable<ParameterNode> Parameters { get { return parameters; } }
+        public IEnumerable<ParameterNode> Parameters { get; set; }
 		public TypeNode Type { get; set; }
 		public ExpressionNode Body { get; set; }
-
-        private LinkedList<ParameterNode> parameters;
 
         // ----- Constructor -----
 
         public FunctionNode(){
-            parameters = new LinkedList<ParameterNode>();
-            //Type = new TypeNode();
-            //Body = new ExpressionNode();
         }
 
         // ----- Methods -----
 
         #region implemented abstract members of Node
 
-        private void getParameters<TSymbol>(IParseTree<TSymbol> parseTree) where TSymbol:ISymbol<TSymbol> {
+        private IEnumerable<ParameterNode> getParameters<TSymbol>(IParseTree<TSymbol> parseTree) where TSymbol:ISymbol<TSymbol> {
+            var parList = new LinkedList<ParameterNode>();
             var node = (ParseBranch<TSymbol>)parseTree;
             var childs = node.Children.GetEnumerator();
             while (childs.MoveNext()) {
                 var par = new ParameterNode();
                 par.BuildNode(childs.Current);
-                parameters.AddLast(par);
+                parList.AddLast(par);
                 childs.MoveNext(); // skip ',' if present
             }
+            return parList;
         }
 
         private TypeNode getType<TSymbol>(IParseTree<TSymbol> parseTree) where TSymbol:ISymbol<TSymbol> {
-            return null;
-        }
 
-        private ExpressionNode getBody<TSymbol>(IParseTree<TSymbol> parseTree) where TSymbol:ISymbol<TSymbol> {
             return null;
         }
 
@@ -50,17 +44,16 @@ namespace Nicodem.Semantics.AST
         {
             var node = (ParseBranch<TSymbol>)parseTree;
             IParseTree<TSymbol>[] childs = node.Children.ToArray();
-            Debug.Assert(childs.Length == 7); 
             // name ( params ) -> type expr
-
+            Debug.Assert(childs.Length == 7); 
             // name from arg 0
             Name = childs[0].Fragment.GetOriginText();
             // parameters from arg 2
-            getParameters(childs[2]);
+            Parameters = getParameters(childs[2]);
             // type from arg 5
-            Type = getType(childs[5]);
+            Type = TypeNode.GetTypeNode(childs[5]);
             // body from arg 6
-            Body = getBody(childs[6]);
+            Body = ExpressionNode.GetExpressionNode(childs[6]);
         }
 
         #endregion

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Nicodem.Core;
 
 namespace Nicodem.Parser
@@ -8,14 +9,18 @@ namespace Nicodem.Parser
 	{
 
 		public IParseTree<TSymbol> Tree { get; private set; } 
-		public MemoizedInput<IParseTree<TSymbol>>.Iterator Iterator { get; private set; }
+		public MemoizedInput<IEnumerable<IParseTree<TSymbol>>>.Iterator Iterator { get; private set; }
+        public int InputOption { get; private set; }
+        public bool CanBacktrackOnInput { get; private set; }
 		private bool _ok;
 
-		public ParseResult(IParseTree<TSymbol> tree, MemoizedInput<IParseTree<TSymbol>>.Iterator iterator, bool ok = true)
+		public ParseResult(IParseTree<TSymbol> tree, MemoizedInput<IEnumerable<IParseTree<TSymbol>>>.Iterator iterator, int inputOption, bool canBacktrackOnInput, bool ok = true)
 			: this()
 		{
 			Tree = tree;
 			Iterator = iterator;
+            InputOption = inputOption;
+            CanBacktrackOnInput = canBacktrackOnInput;
 			_ok = ok;
 		}
 

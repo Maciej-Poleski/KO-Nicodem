@@ -1,23 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
+using Nicodem.Parser;
 using Nicodem.Semantics.Grammar;
 using NUnit.Framework;
 
 namespace Semantics.Tests.Grammar
 {
     [TestFixture]
-    class NicodemGrammarProductionsTests
+    internal class NicodemGrammarProductionsTests
     {
         [Test]
         public void GrammarConstructor()
         {
-            new Nicodem.Parser.Grammar<Symbol>(
+            new Grammar<Symbol>(
                 NicodemGrammarProductions.StartSymbol(),
                 NicodemGrammarProductions.MakeProductionsDictionaryForGrammarConstructor());
+        }
+
+        [Test]
+        public void WhiteSpacesAreCategories()
+        {
+            Assert.True(
+                NicodemGrammarProductions.TokenCategories.Intersect(NicodemGrammarProductions.WhiteSpaceTokenCategories)
+                    .SequenceEqual(NicodemGrammarProductions.WhiteSpaceTokenCategories));
         }
     }
 }

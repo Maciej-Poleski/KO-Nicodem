@@ -20,7 +20,7 @@ namespace Nicodem.Parser.Tests
 			});
 
 			var parser = new LlParser<CharSymbol>(grammar);
-			var emptyInput = new List<IParseTree<CharSymbol>>();
+			var emptyInput = new List<IEnumerable<IParseTree<CharSymbol>>>();
 
 			Assert.IsNotNull(parser.Parse(emptyInput));
 		}

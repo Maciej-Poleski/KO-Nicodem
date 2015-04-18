@@ -14,7 +14,7 @@ namespace Nicodem.Semantics.AST
 
         public override void BuildNode<TSymbol>(IParseTree<TSymbol> parseTree)
         {
-            throw new System.NotImplementedException();
+            // no work to do here
         }
 
         #endregion
