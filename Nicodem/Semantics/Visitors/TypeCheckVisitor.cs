@@ -38,7 +38,7 @@ namespace Nicodem.Semantics.Visitors
             }
         }
 
-        //+type is the last one element, if don't have set void
+        //type is the last one element, if don't have set void
         public override void Visit(BlockExpressionNode node)
         {
             base.Visit(node);
@@ -95,9 +95,10 @@ namespace Nicodem.Semantics.Visitors
             node.ExpressionType = node.Definition.Type;
         }
 
-        //+check if condition is bool and set common return type of Then and Else
+        //check if condition is bool and set common return type of Then and Else
         public override void Visit(IfNode node)
         {
+            base.Visit(node);
             if(NamedTypeNode.BoolType().Equals(node.Condition.ExpressionType))
                 throw new Exception("Inpropper type in if condition");
             if(!node.HasElse || node.Then.ExpressionType.Equals(node.Else.ExpressionType))
@@ -109,41 +110,68 @@ namespace Nicodem.Semantics.Visitors
         //check if while return type is the same as in loopControlNode return type
         public override void Visit(LoopControlNode node)
         {
-            //TYPE VALUE TYPE?
+            base.Visit(node);
+            //get proper while
+            var length = _stack_of_while_node.Count;
+            if (node.Depth > length)
+                throw new TypeCheckException("Improper depth.");
+            var while_elem = _stack_of_while_node[length - node.Depth];
+            if (while_elem.ExpressionType == null)
+                while_elem.ExpressionType = node.Value.ExpressionType;
+            else
+                if (!while_elem.ExpressionType.Equals(node.Value.ExpressionType))
+                    throw new TypeCheckException("Value Type is not correct for returned while type.");
         }
 
         //every arguments has the same type and set type to the arguements type
         public override void Visit(OperationNode node)
         {
             base.Visit(node);
-            //wszyscy takie same i typ przepisać
+            TypeNode argument_type = null;
+            foreach (var argument in node.Arguments)
+            {
+                if (argument_type != null && !argument_type.Equals(argument.ExpressionType))
+                    throw new TypeCheckException("Types are not the same.");
+                argument_type = argument.ExpressionType;
+            }
+            if (argument_type == null)
+                throw new TypeCheckException("Un recognized type of argument.");
+            node.ExpressionType = argument_type;
         }
 
         //write type the same as in array node and check if Left and Right have int type
         public override void Visit(SliceNode node)
         {
             base.Visit(node);
+            if (!NamedTypeNode.IntType().Equals(node.Left))
+                throw new TypeCheckException("Left is not int value.");
+            if (!NamedTypeNode.IntType().Equals(node.Right))
+                throw new TypeCheckException("Right is not int value.");
             node.ExpressionType = node.Array.ExpressionType;
-            //sprawdzić czy są inty
         }
 
         //value has the same type as definition and it is rewrite to my type
         public override void Visit(VariableDefNode node)
         {
             base.Visit(node);
-            //??
+            if (!node.Value.ExpressionType.Equals(node.VariableType))
+                throw new TypeCheckException("Value type not agree with VariableType");
+            node.ExpressionType = node.VariableType;
         }
 
         //rewerite type
         public override void Visit(VariableUseNode node)
         {
             base.Visit(node);
-            //??
+            node.ExpressionType = node.Definition.ExpressionType;
         }
 
-        //+check condtion type and set returned type as in if
+        //check condtion type and set returned type as in if
         public override void Visit(WhileNode node)
         {
+            _stack_of_while_node.Add(node);
+            base.Visit(node);
+            _stack_of_while_node.Remove(node);
             if(NamedTypeNode.BoolType().Equals(node.Condition.ExpressionType))
                 throw new Exception("Inpropper type in if condition");
             if(!node.HasElse || node.Body.ExpressionType.Equals(node.Else.ExpressionType))
