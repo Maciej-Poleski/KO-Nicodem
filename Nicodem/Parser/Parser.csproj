@@ -61,7 +61,6 @@
     <Compile Include="LlConfiguration.cs" />
     <Compile Include="LookaheadDfaBuilder.cs" />
     <Compile Include="LLStarParser.cs" />
-    <Compile Include="ParseResult.cs" />
     <Compile Include="ParserUtils.cs" />
     <Compile Include="IProduction.cs" />
     <Compile Include="FirstSet.cs" />
