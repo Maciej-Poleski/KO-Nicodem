@@ -547,7 +547,7 @@ namespace Nicodem.Semantics.Grammar
             Function.SetProduction(ObjectName * "\\("  * ParametersList * "\\)" * "\\-\\>" * TypeSpecifier * Expression);
             ParametersList.SetProduction(((ObjectDeclaration * ",").Star * ObjectDeclaration).Optional);
             ObjectDeclaration.SetProduction(TypeSpecifier * ObjectName);
-            TypeSpecifier.SetProduction(TypeName * ("mutable".Optional() * "\\[" * Expression * "\\]").Star * "mutable".Optional());
+            TypeSpecifier.SetProduction(TypeName * ("mutable".Optional() * "\\[" * Expression.Optional * "\\]").Star * "mutable".Optional());
             Expression.SetProduction(OperatorExpression);
             OperatorExpression.SetProduction(Operator17Expression);
             Operator17Expression.SetProduction(Operator16Expression);
