@@ -21,41 +21,5 @@ namespace Nicodem.Parser
 			}
 		}
 	}
-
-    internal struct InputPosition<TSymbol> where TSymbol : ISymbol<TSymbol>
-    {
-        public MemoizedInput<IEnumerable<IParseTree<TSymbol>>>.Iterator Iterator { get; private set; }
-        public int InputOption { get; private set; }
-        public bool BacktrackableInput { get; private set; }
-
-        public InputPosition(MemoizedInput<IEnumerable<IParseTree<TSymbol>>>.Iterator iterator, int inputOption, bool backtrackableInput = false)
-            : this()
-        {
-            Iterator = iterator;
-            InputOption = inputOption;
-            BacktrackableInput = backtrackableInput;
-        }
-    }
-
-    internal struct ParseResult<TSymbol> where TSymbol : ISymbol<TSymbol>
-    {
-
-        public IParseTree<TSymbol> Tree { get; private set; } 
-        public InputPosition<TSymbol> Position { get; private set; }
-        private bool _ok;
-
-        public ParseResult(IParseTree<TSymbol> tree, InputPosition<TSymbol> position, bool ok = true)
-            : this()
-        {
-            Tree = tree;
-            Position = Position;
-            _ok = ok;
-        }
-
-        public static implicit operator bool(ParseResult<TSymbol> result)
-        {
-            return result._ok;
-        }
-    }
 }
 
