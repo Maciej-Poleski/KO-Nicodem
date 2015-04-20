@@ -23,10 +23,10 @@ namespace Nicodem.Parser
         public IParseTree<TSymbol> Parse(IEnumerable<IEnumerable<IParseTree<TSymbol>>> word)
 		{
             var memoizedWord = new MemoizedInput<IEnumerable<IParseTree<TSymbol>>>(word);
-            var result = ParseTerm(_grammar.Start, memoizedWord, memoizedWord.Begin, 0, true).ElementAt(0);
+            var result = ParseTerm(_grammar.Start, memoizedWord, new InputPosition(memoizedWord.Begin, 0, true)).First();
 
             // whole input has to be eaten
-            if(result && result.Iterator == memoizedWord.End) {
+            if(result && result.Position.Iterator == memoizedWord.End) {
                 return result.Tree;
             } else {
                 return null;
@@ -34,7 +34,7 @@ namespace Nicodem.Parser
 		}
 
         // returns either a list of successfull parsed results or a singleton list with failure 
-        private IEnumerable<ParseResult<TSymbol>> ParseTerm(TSymbol term, MemoizedInput<IEnumerable<IParseTree<TSymbol>>> word, MemoizedInput<IEnumerable<IParseTree<TSymbol>>>.Iterator input, int inputOption, bool canBacktrackOnOption)
+        private IEnumerable<ParseResult> ParseTerm(TSymbol term, MemoizedInput<IEnumerable<IParseTree<TSymbol>>> word, InputPosition pos)
 		{
 			var dfa = _grammar.Automatons[term];
 			// stack for backtracking - <position in word, current state of appropriate DFA>
@@ -43,17 +43,13 @@ namespace Nicodem.Parser
             bool accepted = false;
 			var eof = ParserUtils<TSymbol>.GetEOF();
 
-			// the furthest in terms of position in the word parsed paths along with productions
-			var furthestParsed = new ParseScope(new List<IParseTree<TSymbol>>(), input, inputOption); // maybe used in the future for error handling
-
-            st.Push(new ParseState(dfa.Start, 0, input, inputOption, canBacktrackOnOption));
+            st.Push(new ParseState(dfa.Start, 0, pos));
 
 			while(st.Any()) {
 				var parseState = st.Peek();
 				var node = parseState.State;
-				var it = parseState.Iterator;
-                int opt = parseState.InputOption;
-                bool cbopt = parseState.CanBacktrackOnOption;
+				var it = parseState.Position.Iterator;
+                var opt = parseState.Position.InputOption;
                 TSymbol currentSymbol = (it != word.End) ? it.Current.ElementAt(opt).Symbol : eof;
 
                 if(node.Accepting > 0 && (currentSymbol.Equals(eof) || _grammar.Follow[term].Contains(currentSymbol))) {
@@ -61,12 +57,12 @@ namespace Nicodem.Parser
 					var parsedChildren = children.ToList();
 					parsedChildren.Reverse();
 					var parsedTree = new ParseBranch<TSymbol>(
-                        GetFragmentRange(input.Current.ElementAt(opt).Fragment, children.Peek().Fragment),
+                        GetFragmentRange(pos.Iterator.Current.ElementAt(opt).Fragment, children.Peek().Fragment),
 						term, 
 						_grammar.WhichProduction[node.Accepting], 
 						parsedChildren);
 
-					yield return new ParseResult<TSymbol>(parsedTree, it, opt, cbopt);
+                    yield return new ParseResult(parsedTree, parseState.Position);
 				}
 
 				var trans = node.Transitions;
@@ -77,14 +73,15 @@ namespace Nicodem.Parser
 						if(_grammar.IsTerminal(trans[ind].Key)) {
 
                             children.Push(new ParseLeaf<TSymbol>(it != word.End ? it.Current.ElementAt(opt).Fragment : null, currentSymbol)); // TODO It would be better to have special END fragment
-							st.Push(new ParseState(trans[ind].Value, 0, it.Next(), 0, true));
+                            st.Push(new ParseState(trans[ind].Value, 0, new InputPosition(it.Next(), 0, true)));
 							break;
 						} else {
-							IEnumerator<ParseResult<TSymbol>> resultIt = ParseTerm(trans[ind].Key, word, it, opt, cbopt).GetEnumerator();
+                            var inputPos = new InputPosition(it, opt);
+                            IEnumerator<ParseResult> resultIt = ParseTerm(trans[ind].Key, word, inputPos).GetEnumerator();
                             resultIt.MoveNext();
-                            if(resultIt.Current) { // TODO else and look at the furthest parsed
+                            if(resultIt.Current) {
                                 children.Push(resultIt.Current.Tree);
-                                st.Push(new ParseState(trans[ind].Value, 0, resultIt.Current.Iterator, resultIt.Current.InputOption, resultIt.Current.CanBacktrackOnInput, resultIt));
+                                st.Push(new ParseState(trans[ind].Value, 0, resultIt.Current.Position, resultIt));
                                 break;
                             }
 						}
@@ -94,11 +91,6 @@ namespace Nicodem.Parser
 
 				// could not find next parsing transition
 				if(ind >= trans.Count) { 
-					if(st.Peek().Iterator > furthestParsed.Iterator) {
-						var newFurthestParsed = children.ToList();
-						newFurthestParsed.Reverse();
-                        furthestParsed = new ParseScope(newFurthestParsed, st.Peek().Iterator, st.Peek().InputOption);
-					}
 					Backtrack(st, children, word);
 				}
 			}
@@ -106,12 +98,7 @@ namespace Nicodem.Parser
 			if(accepted) {
                 yield break;
 			} else {
-				var branch = new ParseBranch<TSymbol>(
-                    input != word.End ? GetFragmentRange(input.Current.ElementAt(inputOption).Fragment, furthestParsed.Children.Last().Fragment) : null, 
-						term, 
-						_grammar.Productions[term][0],  // TODO could not parse any productions
-						furthestParsed.Children);
-                yield return new ParseResult<TSymbol>(branch, furthestParsed.Iterator, furthestParsed.InputOption, false, false);
+                yield return new ParseResult(null, pos, false);
 			}
 		}
 
@@ -127,17 +114,23 @@ namespace Nicodem.Parser
 
                     var nextRes = state.NextPossibleResult.Current;
                     children.Push(nextRes.Tree);
-                    stack.Push(new ParseState(state.State, state.TransitionIndex, nextRes.Iterator, nextRes.InputOption, nextRes.CanBacktrackOnInput, state.NextPossibleResult));
-                    return;
-                } else if(state.CanBacktrackOnOption && !state.Iterator.Equals(word.End) && state.InputOption + 1 < state.Iterator.Current.Count()) {
-
-                    stack.Push(new ParseState(state.State, state.TransitionIndex, state.Iterator, state.InputOption + 1));
+                    stack.Push(
+                        new ParseState(state.State, 
+                        state.TransitionIndex, 
+                        new InputPosition(nextRes.Position.Iterator, nextRes.Position.InputOption, nextRes.Position.BacktrackableInput), 
+                        state.NextPossibleResult));
                     return;
                 } else if(state.TransitionIndex + 1 < state.State.Transitions.Count) {
 
-                    stack.Push(new ParseState(state.State, state.TransitionIndex + 1, state.Iterator, state.InputOption));
+                    stack.Push(new ParseState(state.State, state.TransitionIndex + 1, state.Position));
                     return;
-                }
+                } else if(state.Position.BacktrackableInput && 
+                    state.Position.Iterator != word.End && state.Position.InputOption + 1 < state.Position.Iterator.Current.Count()) 
+                {
+                    stack.Push(new ParseState(state.State, 0, 
+                        new InputPosition(state.Position.Iterator, state.Position.InputOption + 1, true)));
+                    return;
+                } 
 
             }
 		}
@@ -151,41 +144,56 @@ namespace Nicodem.Parser
 		{
 			public DfaState<TSymbol> State { get; private set; } 
 			public int TransitionIndex { get; set; }
-			public MemoizedInput<IEnumerable<IParseTree<TSymbol>>>.Iterator Iterator { get; private set; }
-            public int InputOption { get; private set; }
-            public bool CanBacktrackOnOption { get; private set; }
+            public InputPosition Position { get; private set; }
             // used when function may return multiple ok results during one call
-			public IEnumerator<ParseResult<TSymbol>> NextPossibleResult { get; private set; } 
+			public IEnumerator<ParseResult> NextPossibleResult { get; private set; } 
 
             public ParseState(DfaState<TSymbol> state, 
                 int transitionIndex, 
-                MemoizedInput<IEnumerable<IParseTree<TSymbol>>>.Iterator iterator, 
-                int inputOption = 0,
-                bool canBacktrackOnOption = false,
-				IEnumerator<ParseResult<TSymbol>> nextPossibleResult = null)
+                InputPosition position,
+				IEnumerator<ParseResult> nextPossibleResult = null)
 			{
 				State = state;
 				TransitionIndex = transitionIndex;
-				Iterator = iterator;
-                InputOption = inputOption;
-                CanBacktrackOnOption = canBacktrackOnOption;
+                Position = position;
                 NextPossibleResult = nextPossibleResult;
 			}
 		}
 
-		private class ParseScope
-		{
-			public List<IParseTree<TSymbol>> Children { get; set; }
-			public MemoizedInput<IEnumerable<IParseTree<TSymbol>>>.Iterator Iterator { get; set; }
-            public int InputOption;
+        private struct InputPosition
+        {
+            public MemoizedInput<IEnumerable<IParseTree<TSymbol>>>.Iterator Iterator { get; private set; }
+            public int InputOption { get; private set; }
+            public bool BacktrackableInput { get; private set; }
 
-            public ParseScope(List<IParseTree<TSymbol>> children, MemoizedInput<IEnumerable<IParseTree<TSymbol>>>.Iterator iterator, int inputOption)
-			{
-				Children = children;
-				Iterator = iterator;
+            public InputPosition(MemoizedInput<IEnumerable<IParseTree<TSymbol>>>.Iterator iterator, int inputOption, bool backtrackableInput = false)
+                : this()
+            {
+                Iterator = iterator;
                 InputOption = inputOption;
-			}
-		}
+                BacktrackableInput = backtrackableInput;
+            }
+        }
 
+        private struct ParseResult
+        {
+
+            public IParseTree<TSymbol> Tree { get; private set; } 
+            public InputPosition Position { get; private set; }
+            private bool _ok;
+
+            public ParseResult(IParseTree<TSymbol> tree, InputPosition position, bool ok = true)
+                : this()
+            {
+                Tree = tree;
+                Position = Position;
+                _ok = ok;
+            }
+
+            public static implicit operator bool(ParseResult result)
+            {
+                return result._ok;
+            }
+        }
 	}
 }

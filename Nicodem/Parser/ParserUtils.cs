@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
+using Nicodem.Core;
 
 namespace Nicodem.Parser
 {
-	public static class ParserUtils<TSymbol>
+	internal static class ParserUtils<TSymbol>
 		where TSymbol : ISymbol<TSymbol>
 	{
 		public static TSymbol GetEOF()

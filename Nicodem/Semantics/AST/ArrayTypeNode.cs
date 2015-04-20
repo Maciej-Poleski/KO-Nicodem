@@ -5,11 +5,12 @@ namespace Nicodem.Semantics.AST
 {
 	class ArrayTypeNode : TypeNode
 	{
-		public TypeNode ElementType { get; set; }
+		public TypeNode ElementType { get; set; } // type of elements of this arrays
 
-		public bool IsFixedSize { get; set; }
-		public int Length { get; set; }
-        
+		public bool IsFixedSize { get; set; } // TODO: currently all arrays are initialized as dynamic (not fixed sized)
+		//public int Length { get; set; } // TODO: currently lengths of arrays are not defined
+        public ExpressionNode LengthExpression { get; set; }
+
         #region implemented abstract members of Node
 
         public override void BuildNode<TSymbol>(IParseTree<TSymbol> parseTree)

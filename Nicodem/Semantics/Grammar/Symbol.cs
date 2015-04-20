@@ -9,6 +9,22 @@ namespace Nicodem.Semantics.Grammar
         public static readonly Symbol MinValue = new Symbol(int.MinValue);
         public static readonly Symbol EOF = new Symbol(-1);
 
+        #region ISymbol implementation
+
+        public string Description {
+            get {
+                throw new NotImplementedException();
+            }
+        }
+
+        bool ISymbol<Symbol>.IsTerminal {
+            get {
+                throw new NotImplementedException();
+            }
+        }
+
+        #endregion
+
         public bool IsTerminal
         {
             get { return !Production.IsNonterminalSymbol(this); }

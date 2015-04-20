@@ -12,6 +12,22 @@ namespace Nicodem.Parser.Tests
 			C = c;
 		}
 
+        #region ISymbol implementation
+
+        public string Description {
+            get {
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool IsTerminal {
+            get {
+                throw new NotImplementedException();
+            }
+        }
+
+        #endregion
+
 		#region IEquatable implementation
 
 		public bool Equals(CharSymbol other)

@@ -7,9 +7,9 @@ using Nicodem.Semantics.AST;
 
 namespace Nicodem.Semantics
 {
-	class SymbolTable
+    class SymbolTable<T> 
 	{
-		private Dictionary<String, Stack<VariableDefNode> > symbolTable = new Dictionary<string, Stack<VariableDefNode>>();
+        private Dictionary<String, Stack<T> > symbolTable = new Dictionary<string, Stack<T>>();
 		private Stack<int> blocks = new Stack<int>();
 		private Stack<String> variables = new Stack<String> ();
 		private int variableCounter = 0;
@@ -34,18 +34,18 @@ namespace Nicodem.Semantics
 			variableCounter = blocks.Pop ();
 		}
 
-		public void Insert (String name, VariableDefNode variable) 
+        public void Insert (String name, T variable) 
 		{
 			variableCounter++;
 			variables.Push (name);
 
 			if (!symbolTable.ContainsKey (name))
-				symbolTable [name] = new Stack<VariableDefNode> ();
+                symbolTable [name] = new Stack<T> ();
 
 			symbolTable [name].Push (variable);
 		}
 
-		public VariableDefNode LookUp (String name)
+        public T LookUp (String name)
 		{
 			if( !symbolTable.ContainsKey(name) )
 				throw new DefinitionNotFoundException();
