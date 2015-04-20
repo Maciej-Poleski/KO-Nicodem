@@ -22,7 +22,7 @@ namespace Nicodem.Semantics.AST
 
         public override void BuildNode<TSymbol>(IParseTree<TSymbol> parseTree)
         {
-            var node = (ParseBranch<TSymbol>)parseTree;
+            var node = ASTBuilder.AsBranch(parseTree);
             foreach(IParseTree<TSymbol> ch in node.Children){
                 var funNode = new FunctionNode();
                 funNode.BuildNode(ch);

@@ -44,7 +44,7 @@ namespace Nicodem.Semantics.AST
         // TypeSpecifier -> (TypeName * ("mutable".Optional() * "\\[" * Expression.Optional * "\\]").Star * "mutable".Optional());
         public static TypeNode GetTypeNode<TSymbol>(IParseTree<TSymbol> parseTree) where TSymbol:ISymbol<TSymbol>
         {
-            var node = (ParseBranch<TSymbol>)parseTree;
+            var node = ASTBuilder.AsBranch(parseTree);
             var childs = node.Children.Reverse().GetEnumerator();
             Debug.Assert(childs.MoveNext());
             return RecursiveResolveArrayType(childs);

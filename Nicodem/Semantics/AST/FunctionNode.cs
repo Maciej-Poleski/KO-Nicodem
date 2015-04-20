@@ -24,7 +24,7 @@ namespace Nicodem.Semantics.AST
 
         private IEnumerable<ParameterNode> getParameters<TSymbol>(IParseTree<TSymbol> parseTree) where TSymbol:ISymbol<TSymbol> {
             var parList = new LinkedList<ParameterNode>();
-            var node = (ParseBranch<TSymbol>)parseTree;
+            var node = ASTBuilder.AsBranch(parseTree);
             var childs = node.Children.GetEnumerator();
             while (childs.MoveNext()) {
                 var par = new ParameterNode();
@@ -42,7 +42,7 @@ namespace Nicodem.Semantics.AST
 
         public override void BuildNode<TSymbol>(IParseTree<TSymbol> parseTree)
         {
-            var node = (ParseBranch<TSymbol>)parseTree;
+            var node = ASTBuilder.AsBranch(parseTree);
             IParseTree<TSymbol>[] childs = node.Children.ToArray();
             // name ( params ) -> type expr
             Debug.Assert(childs.Length == 7); 

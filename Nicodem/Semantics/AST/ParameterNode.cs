@@ -15,7 +15,7 @@ namespace Nicodem.Semantics.AST
         // ObjectDeclaration.SetProduction(TypeSpecifier * ObjectName);
         public override void BuildNode<TSymbol>(IParseTree<TSymbol> parseTree)
         {
-            var node = (ParseBranch<TSymbol>)parseTree;
+            var node = ASTBuilder.AsBranch(parseTree);
             IParseTree<TSymbol>[] childs = node.Children.ToArray();
             // type name
             Debug.Assert(childs.Length == 2); 
