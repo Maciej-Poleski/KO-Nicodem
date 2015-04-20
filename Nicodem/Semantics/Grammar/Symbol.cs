@@ -11,28 +11,21 @@ namespace Nicodem.Semantics.Grammar
 
         #region ISymbol implementation
 
-        public string Description {
-            get {
-                throw new NotImplementedException();
-            }
+        public string Description
+        {
+            get { return NicodemGrammarProductions.GetSymbolName(this); }
         }
-
-        bool ISymbol<Symbol>.IsTerminal {
-            get {
-                throw new NotImplementedException();
-            }
-        }
-
-        #endregion
 
         public bool IsTerminal
         {
             get { return !Production.IsNonterminalSymbol(this); }
         }
 
+        #endregion
+
         private readonly int _category; // Symbol is in fact category of some Regular Expression in Lexer
 
-        public Symbol(int category)
+        internal Symbol(int category)
         {
             _category = category;
         }
@@ -44,7 +37,6 @@ namespace Nicodem.Semantics.Grammar
 
         public bool Equals(Symbol other)
         {
-            Debug.Assert((_category != other._category) || (IsTerminal == other.IsTerminal));
             return _category == other._category;
         }
 

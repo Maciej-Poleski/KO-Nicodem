@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Nicodem.Lexer;
 using Nicodem.Parser;
@@ -238,7 +239,19 @@ namespace Nicodem.Semantics.Grammar
 
             public static explicit operator Symbol(UniversalSymbol universalSymbol)
             {
-                return universalSymbol._symbol.ToSymbol();
+                var symbol = universalSymbol._symbol.ToSymbol();
+                if (universalSymbol._name == null && !symbol.IsTerminal)
+                {
+                    FixUniversalSymbolNames();
+                }
+                Debug.Assert(universalSymbol._name != null || symbol.IsTerminal);
+                if (!SymbolToName.ContainsKey(symbol))
+                {
+                    SymbolToName.Add(symbol, !symbol.IsTerminal ? universalSymbol._name: "Terminal");
+                    // I can privide regex for terminal symbols instead of "Terminal" if required
+                    // In general terminal symbols don't have to have a name
+                }
+                return symbol;
             }
 
             public static implicit operator UniversalSymbol(TokenCategory tokenCategory)
@@ -310,10 +323,21 @@ namespace Nicodem.Semantics.Grammar
             }
 
             private readonly ISymbol _symbol;
+            private string _name;
 
             private UniversalSymbol(ISymbol symbol)
             {
                 _symbol = symbol;
+            }
+
+            private static void FixUniversalSymbolNames()
+            {
+                foreach (var field in typeof (NicodemGrammarProductions).GetFields(BindingFlags.Static | BindingFlags.NonPublic))
+                {
+                    if (field.FieldType != typeof (UniversalSymbol)) continue;
+                    var universalSymbol = (UniversalSymbol) field.GetValue(null);
+                    universalSymbol._name = field.Name;
+                }
             }
 
             private class TokenCategorySymbol : ISymbol, IEquatable<TokenCategorySymbol>
@@ -485,6 +509,13 @@ namespace Nicodem.Semantics.Grammar
         {
             return Productions.ToDictionary(production => (Symbol) production.Key,
                 production => new IProduction<Symbol>[] {new Production((Symbol) production.Key, production.Value)});
+        }
+
+        private static readonly Dictionary<Symbol, string> SymbolToName=new Dictionary<Symbol, string>();
+
+        internal static string GetSymbolName(Symbol symbol)
+        {
+            return SymbolToName[symbol];
         }
 
         private static UniversalSymbol NewNonterminal()
