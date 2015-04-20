@@ -23,7 +23,7 @@ namespace Nicodem.Semantics.CST
 
             var lexer = new Nicodem.Lexer.Lexer(regExCategories.ToArray());
 
-            var tokens = lexer.Process(origin).ToList();
+            var tokens = lexer.ProcessBare(origin).ToList();
             var sanitizedTokens = tokens.Where(a => a.Item2.All(c => !forbidden.Contains(c)));
 
             var leafs = tokens.Select(r => r.Item2.Select(s => new ParseLeaf<Symbol>(r.Item1, new Symbol(s))));

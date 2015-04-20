@@ -121,7 +121,7 @@ namespace Lexer.Tests
         {
             var origin = new StringOrigin(s);
             return lexer
-                .Process(origin)
+                .ProcessBare(origin)
                 .Select(t => new Tuple<string, IEnumerable<int>>(origin.GetText(t.Item1), t.Item2));
         }
 

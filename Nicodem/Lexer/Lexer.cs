@@ -93,7 +93,7 @@ namespace Nicodem.Lexer
         ///     kategori - listę (<see cref="IEnumerable{int}" />) składającą się z indeksów tych elementów tablicy wyrażeń
         ///     regularnych (podanej w konstruktorze) które zostały dopasowane do danego wyrażenia regularnego.
         ///     Wynikiem jest ciąg kolejnych tokenów (<see cref="IFragment{TOrigin,TMemento,TLocation,TFragment}" />) na które
-        ///     udało się podzielić źródło. Jeżeli ostatni token (<code>EndLocation</code>) kończy się przed końcem źródła, to
+        ///     udało się podzielić źródło. Jeżeli ostatni token (<code>LastParsedLocation</code>) kończy się przed końcem źródła, to
         ///     znaczy że dalszej jego części nie udało się dopasować do żadnego wyrażenia regularnego.
         /// </summary>
         /// <param name="sourceOrigin">Źródło które będzie tokenizowane</param>
@@ -111,6 +111,7 @@ namespace Nicodem.Lexer
             var result = new List<Tuple<TFragment, IEnumerable<int>>>();
             var sourceReader = sourceOrigin.GetReader();
             var lastAcceptedLocation = sourceReader.CurrentLocation;
+            TLocation failedAtLocation;
             for (;;)
             {
                 var succeed = false;
@@ -149,17 +150,29 @@ namespace Nicodem.Lexer
                 }
                 else
                 {
+                    failedAtLocation = sourceReader.CurrentLocation;
                     break;
                 }
             }
-            return new TokenizerResult<TOrigin, TMemento, TLocation, TFragment>(result, lastAcceptedLocation);
+            return new TokenizerResult<TOrigin, TMemento, TLocation, TFragment>(result, lastAcceptedLocation,
+                failedAtLocation);
         }
 
-        public IEnumerable<Tuple<IFragment, IEnumerable<int>>> Process(Source.IOrigin origin)
+        public LexerResult Process(Source.IOrigin origin)
         {
             var result = Process<BareOrigin, ILocation, BareLocation, BareFragment>(new BareOrigin(origin));
-            return
-                result.Tokens.Select(tuple => new Tuple<IFragment, IEnumerable<int>>(tuple.Item1.Fragment, tuple.Item2));
+            return new LexerResult(
+                from tuple in result.Tokens
+                select new Tuple<IFragment, IEnumerable<int>>(tuple.Item1.Fragment, tuple.Item2),
+                result.LastParsedLocation._location,
+                result.FailedAtLocation._location
+                );
+        }
+
+        [Obsolete]
+        public IEnumerable<Tuple<IFragment, IEnumerable<int>>> ProcessBare(Source.IOrigin origin)
+        {
+            return Process(origin).Tokens;
         }
 
         #region CategoryDecompression
@@ -435,13 +448,15 @@ namespace Nicodem.Lexer
             where TLocation : ILocation<TOrigin, TMemento, TLocation, TFragment>
             where TFragment : IFragment<TOrigin, TMemento, TLocation, TFragment>
         {
-            private readonly TLocation _endLocation;
             private readonly IEnumerable<Tuple<TFragment, IEnumerable<int>>> _tokens;
+            private readonly TLocation _lastParsedLocation;
+            private readonly TLocation _failedAtLocation;
 
-            public TokenizerResult(IEnumerable<Tuple<TFragment, IEnumerable<int>>> tokens, TLocation endLocation)
+            public TokenizerResult(IEnumerable<Tuple<TFragment, IEnumerable<int>>> tokens, TLocation lastParsedLocation, TLocation failedAtLocation)
             {
                 _tokens = tokens;
-                _endLocation = endLocation;
+                _lastParsedLocation = lastParsedLocation;
+                _failedAtLocation = failedAtLocation;
             }
 
             /// <summary>
@@ -458,11 +473,19 @@ namespace Nicodem.Lexer
 
             /// <summary>
             ///     Położenie końca ostatniego dopasowanego tokenu ze źródła. Jeżeli nie jest ono końcem źródło - czegoś zaczynając od
-            ///     pozycji <code>EndLocation</code> nie udało się dopasować.
+            ///     pozycji <code>LastParsedLocation</code> nie udało się dopasować.
             /// </summary>
-            public TLocation EndLocation
+            public TLocation LastParsedLocation
             {
-                get { return _endLocation; }
+                get { return _lastParsedLocation; }
+            }
+
+            /// <summary>
+            ///     Location in origin just-after character which put Lexer in dead state.
+            /// </summary>
+            public TLocation FailedAtLocation
+            {
+                get { return _failedAtLocation; }
             }
         }
 

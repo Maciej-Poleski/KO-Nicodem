@@ -38,6 +38,7 @@
   <ItemGroup>
     <Compile Include="IDfa.cs" />
     <Compile Include="IDfaState.cs" />
+    <Compile Include="LexerResult.cs" />
     <Compile Include="RegExDfa.cs" />
     <Compile Include="DFAState.cs" />
     <Compile Include="DfaUtils.cs" />
