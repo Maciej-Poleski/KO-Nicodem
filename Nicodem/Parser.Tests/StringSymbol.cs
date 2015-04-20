@@ -10,6 +10,22 @@ namespace Nicodem.Parser.Tests
 		{
 			S = s;
 		}
+
+        #region ISymbol implementation
+
+        public string Description {
+            get {
+                throw new NotImplementedException();
+            }
+        }
+
+        public bool IsTerminal {
+            get {
+                throw new NotImplementedException();
+            }
+        }
+
+        #endregion
 			
 		public bool Equals(StringSymbol other)
 		{
