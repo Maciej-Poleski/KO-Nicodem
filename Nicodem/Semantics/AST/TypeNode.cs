@@ -23,10 +23,14 @@ namespace Nicodem.Semantics.AST
             if (ASTBuilder.EatSymbol("]", typeExpr)) { // if ] is present then create ArrayType
                 var resType = new ArrayTypeNode();
                 resType.IsConstant = !isMutable;
-                resType.IsFixedSize = true; // TODO: what about dynamic arrays?
-                resType.Length = ExpressionNode.EvalExpression(typeExpr.Current);
-                typeExpr.MoveNext();
-                Debug.Assert(ASTBuilder.EatSymbol("[", typeExpr));
+                resType.IsFixedSize = false; // we initialize all arrays as dynamic size
+                if (ASTBuilder.EatSymbol("[", typeExpr)) { // opening bracket, no length expression
+                    resType.LengthExpression = null;
+                } else { // length expression present
+                    resType.LengthExpression = ExpressionNode.GetExpressionNode(typeExpr.Current);
+                    typeExpr.MoveNext();
+                    Debug.Assert(ASTBuilder.EatSymbol("[", typeExpr)); // eat opening bracket
+                }
                 resType.ElementType = RecursiveResolveArrayType(typeExpr);
                 return resType;
             } else {
@@ -37,7 +41,7 @@ namespace Nicodem.Semantics.AST
             }
         }
 
-        // TypeSpecifier -> (TypeName * ("mutable".Optional() * "\\[" * Expression * "\\]").Star * "mutable".Optional());
+        // TypeSpecifier -> (TypeName * ("mutable".Optional() * "\\[" * Expression.Optional * "\\]").Star * "mutable".Optional());
         public static TypeNode GetTypeNode<TSymbol>(IParseTree<TSymbol> parseTree) where TSymbol:ISymbol<TSymbol>
         {
             var node = (ParseBranch<TSymbol>)parseTree;

@@ -15,12 +15,6 @@ namespace Nicodem.Semantics.AST
             throw new System.NotImplementedException();
         }
 
-        public static int EvalExpression<TSymbol>(IParseTree<TSymbol> parseTree) where TSymbol:ISymbol<TSymbol>
-        {
-            //TODO: implement compile time constant expression evaluation!
-            return 0;
-        }
-
         public override void BuildNode<TSymbol>(IParseTree<TSymbol> parseTree)
         {
             throw new System.NotImplementedException();
