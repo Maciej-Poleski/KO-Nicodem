@@ -11,6 +11,8 @@ namespace Nicodem.Backend.Representation
         // Conditional jump will depend on result of this computation
         public Node Condition { get; private set; }
 
+
+        // These are NOT in-tree parent-child connections (these links make cycles)
         public Node NextNodeIfTrue { get; private set; }
 
         public Node NextNodeIfFalse { get; private set; }

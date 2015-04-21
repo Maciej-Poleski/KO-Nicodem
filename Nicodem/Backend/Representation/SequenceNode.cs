@@ -11,6 +11,7 @@ namespace Nicodem.Backend.Representation
         public IReadOnlyList<Node> Sequence { get; private set; }
 
         // This is an unconditional jump after end of this sequence
+        // This is NOT in-tree parent-child connection (this link makes cycle)
         public Node NextNode { get; private set; }
     }
 }

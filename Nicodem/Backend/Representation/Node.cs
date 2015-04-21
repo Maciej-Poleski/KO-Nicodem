@@ -9,5 +9,6 @@ namespace Nicodem.Backend.Representation
 {
     public abstract class Node
     {
+        public Action<AbstractVisitor> Accept { get; private set; } // TODO implementation
     }
 }

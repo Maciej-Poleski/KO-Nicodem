@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nicodem.Backend.Representation
 {
-    class HardwareRegisterNode : RegisterNode
+    public class HardwareRegisterNode : RegisterNode
     {
     }
 }

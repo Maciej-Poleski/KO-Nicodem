@@ -221,7 +221,7 @@ namespace Nicodem.Semantics.Grammar
                 case SymbolInfo.LeftToRight:
                     return "-Operator-left";
                 case SymbolInfo.RightToLeft:
-                    return "Operator-right";
+                    return "-Operator-right";
             }
             Debug.Assert(false);
             return null;
@@ -339,7 +339,7 @@ namespace Nicodem.Semantics.Grammar
 
             public UniversalSymbol(SymbolInfo info)
             {
-                _symbol=new UnknownNonterminalSymbol();
+                _symbol = new UnknownNonterminalSymbol();
                 _info = info;
             }
 

@@ -11,6 +11,6 @@ namespace Nicodem.Backend.Representation
         // Function type depends on architecture. Adjust when Target will be in shape.
         public object Function { get; private set; }
 
-        public IReadOnlyList<LocationNode> Arguments { get; private set; }
+        public IReadOnlyList<Node> Arguments { get; private set; }
     }
 }
