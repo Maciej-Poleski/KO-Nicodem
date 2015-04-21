@@ -205,6 +205,28 @@ namespace Nicodem.Semantics.Grammar
 
         #region ProductionImplementation
 
+        private enum SymbolInfo
+        {
+            None,
+            LeftToRight,
+            RightToLeft,
+        }
+
+        private static string DescribeSymbolInfo(SymbolInfo info)
+        {
+            switch (info)
+            {
+                case SymbolInfo.None:
+                    return "";
+                case SymbolInfo.LeftToRight:
+                    return "-Operator-left";
+                case SymbolInfo.RightToLeft:
+                    return "Operator-right";
+            }
+            Debug.Assert(false);
+            return null;
+        }
+
         private class UniversalSymbol : IEquatable<UniversalSymbol>
         {
             public bool Equals(UniversalSymbol other)
@@ -247,7 +269,10 @@ namespace Nicodem.Semantics.Grammar
                 Debug.Assert(universalSymbol._name != null || symbol.IsTerminal);
                 if (!SymbolToName.ContainsKey(symbol))
                 {
-                    SymbolToName.Add(symbol, !symbol.IsTerminal ? universalSymbol._name: "Terminal");
+                    SymbolToName.Add(symbol,
+                        !symbol.IsTerminal
+                            ? universalSymbol._name + DescribeSymbolInfo(universalSymbol._info)
+                            : "Terminal");
                     // I can privide regex for terminal symbols instead of "Terminal" if required
                     // In general terminal symbols don't have to have a name
                 }
@@ -312,9 +337,10 @@ namespace Nicodem.Semantics.Grammar
                 get { return ((RegexSymbol) this).Optional; }
             }
 
-            public UniversalSymbol()
+            public UniversalSymbol(SymbolInfo info)
             {
-                _symbol = new UnknownNonterminalSymbol();
+                _symbol=new UnknownNonterminalSymbol();
+                _info = info;
             }
 
             private interface ISymbol
@@ -323,6 +349,7 @@ namespace Nicodem.Semantics.Grammar
             }
 
             private readonly ISymbol _symbol;
+            private readonly SymbolInfo _info;
             private string _name;
 
             private UniversalSymbol(ISymbol symbol)
@@ -518,15 +545,22 @@ namespace Nicodem.Semantics.Grammar
             return SymbolToName[symbol];
         }
 
-        private static UniversalSymbol NewNonterminal()
+        #region ProductionStuff
+
+        private static UniversalSymbol NewNonterminal(SymbolInfo info = SymbolInfo.None)
         {
-            return new UniversalSymbol();
+            return new UniversalSymbol(info);
         }
+
+        private const SymbolInfo LeftToRight = SymbolInfo.LeftToRight;
+        private const SymbolInfo RightToLeft = SymbolInfo.RightToLeft;
 
         private static void SetProduction(this UniversalSymbol that, RegexSymbol regexSymbol)
         {
-            Productions.Add(that,regexSymbol);
+            Productions.Add(that, regexSymbol);
         }
+
+        #endregion
 
         private static RegexSymbol MakeInfixOperatorExpressionRegex(UniversalSymbol operatorExpression, params string[] operators)
         {
@@ -549,23 +583,23 @@ namespace Nicodem.Semantics.Grammar
         private static UniversalSymbol LoopControlExpression = NewNonterminal();        // LoopControlNode
         private static UniversalSymbol AtomicExpression = NewNonterminal();             // above expressions
         private static UniversalSymbol Operator0Expression = NewNonterminal();          // atomic expression or parenthesized general expression
-        private static UniversalSymbol Operator1Expression = NewNonterminal();          // left-to-right scope resolution (unimplemented)
-        private static UniversalSymbol Operator2Expression = NewNonterminal();          // left-to-right ++ -- (postfix) function call, array subscript, slice subscript
-        private static UniversalSymbol Operator3Expression = NewNonterminal();          // right-to-left ++ -- + - ! ~ ((de)reference, new not implemented) prefix
-        private static UniversalSymbol Operator4Expression = NewNonterminal();          // left-to-right pointer to member, not implemented
-        private static UniversalSymbol Operator5Expression = NewNonterminal();          // left-to-right * / %
-        private static UniversalSymbol Operator6Expression = NewNonterminal();          // left-to-right + -
-        private static UniversalSymbol Operator7Expression = NewNonterminal();          // left-to-right << >>
-        private static UniversalSymbol Operator8Expression = NewNonterminal();          // left-to-right < <= > >=
-        private static UniversalSymbol Operator9Expression = NewNonterminal();          // left-to-right == !=
-        private static UniversalSymbol Operator10Expression = NewNonterminal();         // left-to-right &
-        private static UniversalSymbol Operator11Expression = NewNonterminal();         // left-to-right ^
-        private static UniversalSymbol Operator12Expression = NewNonterminal();         // left-to-right |
-        private static UniversalSymbol Operator13Expression = NewNonterminal();         // left-to-right &&
-        private static UniversalSymbol Operator14Expression = NewNonterminal();         // left-to-right ||
-        private static UniversalSymbol Operator15Expression = NewNonterminal();         // right-to-left = += -= *= /= %= <<= >>= &= ^= |=
-        private static UniversalSymbol Operator16Expression = NewNonterminal();         // right-to-left throw
-        private static UniversalSymbol Operator17Expression = NewNonterminal();         // left-to-right ,
+        private static UniversalSymbol Operator1Expression = NewNonterminal(LeftToRight);          // scope resolution (unimplemented)
+        private static UniversalSymbol Operator2Expression = NewNonterminal(LeftToRight);          // ++ -- (postfix) function call, array subscript, slice subscript
+        private static UniversalSymbol Operator3Expression = NewNonterminal(RightToLeft);          // ++ -- + - ! ~ ((de)reference, new not implemented) prefix
+        private static UniversalSymbol Operator4Expression = NewNonterminal(LeftToRight);          // pointer to member, not implemented
+        private static UniversalSymbol Operator5Expression = NewNonterminal(LeftToRight);          // * / %
+        private static UniversalSymbol Operator6Expression = NewNonterminal(LeftToRight);          // + -
+        private static UniversalSymbol Operator7Expression = NewNonterminal(LeftToRight);          // << >>
+        private static UniversalSymbol Operator8Expression = NewNonterminal(LeftToRight);          // < <= > >=
+        private static UniversalSymbol Operator9Expression = NewNonterminal(LeftToRight);          // == !=
+        private static UniversalSymbol Operator10Expression = NewNonterminal(LeftToRight);         // &
+        private static UniversalSymbol Operator11Expression = NewNonterminal(LeftToRight);         // ^
+        private static UniversalSymbol Operator12Expression = NewNonterminal(LeftToRight);         // |
+        private static UniversalSymbol Operator13Expression = NewNonterminal(LeftToRight);         // &&
+        private static UniversalSymbol Operator14Expression = NewNonterminal(LeftToRight);         // ||
+        private static UniversalSymbol Operator15Expression = NewNonterminal(RightToLeft);         // = += -= *= /= %= <<= >>= &= ^= |=
+        private static UniversalSymbol Operator16Expression = NewNonterminal(RightToLeft);         // throw (unimplemented)
+        private static UniversalSymbol Operator17Expression = NewNonterminal(LeftToRight);         // , (N/A)
         private static UniversalSymbol OperatorExpression = NewNonterminal();           // OperationNode
         private static UniversalSymbol Expression = NewNonterminal();
         private static UniversalSymbol ParametersList = NewNonterminal();               // NOTE: There is no such node in AST, flatten this
@@ -610,7 +644,7 @@ namespace Nicodem.Semantics.Grammar
                 );
             BlockExpression.SetProduction("{" * Expression.Star * "}");   // No left-recursion thanks to '{'
             ObjectDefinitionExpression.SetProduction(TypeSpecifier * ObjectName * "=" * Expression);  // NOTE: "=" is _not_ an assignment operator here
-            ArrayLiteralExpression.SetProduction("\\[" * Expression.Star * "\\]");
+            ArrayLiteralExpression.SetProduction("\\[" * (Expression * ",").Star * Expression.Optional * "\\]");
             ObjectUseExpression.SetProduction(ObjectName);    // Literals are handled by 'name resolution'
             IfExpression.SetProduction("if" * Expression * Expression * ("else" * Expression).Optional);  // FIXME: if should be an operator
             WhileExpression.SetProduction("while" * Expression * Expression * ("else" * Expression).Optional);    // the same here?
