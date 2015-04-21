@@ -8,6 +8,7 @@ namespace Nicodem.Parser
         Dictionary<HashSet<LlConfiguration<TSymbol>>,
         Dictionary<TSymbol,HashSet<LlConfiguration<TSymbol>>>> states;
         private Grammar<TSymbol> grammar;
+        private IDictionary<TSymbol, Dfa<TSymbol>> automatons; 
 
         public LookaheadDfaBuilder()
         {
@@ -58,17 +59,33 @@ namespace Nicodem.Parser
             throw new NotImplementedException();
         }
 
-        public LookaheadDfa<TSymbol> Build(Grammar<TSymbol> grammar, TSymbol initialSymbol, DfaState<TSymbol> initialState)
+        // Build requires Automatons explicitly, because at the moment of writing this code
+        // grammar.Automatons does not work.
+
+        public LookaheadDfa<TSymbol> Build(
+            Grammar<TSymbol> grammar,
+            TSymbol initialSymbol,
+            DfaState<TSymbol> initialState)
+        {
+            return Build(grammar, grammar.Automatons, initialSymbol, initialState);
+        }
+
+        public LookaheadDfa<TSymbol> Build(
+            Grammar<TSymbol> grammar, 
+            IDictionary<TSymbol, Dfa<TSymbol>> automatons,
+            TSymbol initialSymbol, 
+            DfaState<TSymbol> initialState)
         {
             states = new Dictionary<HashSet<LlConfiguration<TSymbol>>,Dictionary<TSymbol,HashSet<LlConfiguration<TSymbol>>>>();
 
             this.grammar = grammar;
+            this.automatons = automatons;
             var startingSet = new HashSet<LlConfiguration<TSymbol>>();
             foreach (var edge in initialState.Transitions) {
                 TSymbol decision = edge.Key;
                 var conf = new LlConfiguration<TSymbol>(decision);
                 conf.Push(edge.Value);
-                conf.Push(grammar.Automatons[decision].Start);
+                conf.Push(automatons[decision].Start);
                 startingSet.Add(conf);
             }
             AddEpsiEdges(startingSet);

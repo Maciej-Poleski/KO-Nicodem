@@ -8,7 +8,7 @@ namespace Nicodem.Parser
 	{
 		public TSymbol Start { get; private set; }
 		public IDictionary<TSymbol, IProduction<TSymbol>[]> Productions { get; private set; } 
-		internal IDictionary<TSymbol, Dfa<TSymbol>> Automatons { get; private set; }
+		public IDictionary<TSymbol, Dfa<TSymbol>> Automatons { get; private set; }
 		internal IDictionary<uint, IProduction<TSymbol>> WhichProduction { get; private set; } // accepting state marker -> production
 		internal ISet<TSymbol> Nullable { get; private set; }
 		internal IDictionary<TSymbol, ISet<TSymbol>> _First { get; private set; }

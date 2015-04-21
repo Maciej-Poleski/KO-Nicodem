@@ -2,6 +2,7 @@
 using Nicodem.Lexer;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Text;
 
 namespace Nicodem.Parser
 {
@@ -20,26 +21,38 @@ namespace Nicodem.Parser
 			}
 		}
 
+        private IReadOnlyList<DfaState<TSymbol>> ListReachableStatesAndEnsureInitialized(DfaState<TSymbol> start)
+        {
+            var queue = new Queue<DfaState<TSymbol>>();
+            var enqueued = new HashSet<DfaState<TSymbol>>();
+            queue.Enqueue(start);
+            enqueued.Add(start);
+            var result = new List<DfaState<TSymbol>>();
+            while (queue.Count > 0)
+            {
+                var s = queue.Dequeue();
+                result.Add(s);
+                if (s.Transitions == null)
+                {
+                    throw new ArgumentNullException("The state graph is not initialized.");
+                }
+                foreach (var i in s.Transitions)
+                {
+                    if (enqueued.Contains(i.Value))
+                    {
+                        continue;
+                    }
+                    queue.Enqueue(i.Value);
+                    enqueued.Add(i.Value);
+                }
+            }
+            return result;
+        }
+
 		public Dfa(DfaState<TSymbol> start)
 		{
 			Start = start;
-			var queue = new Queue<DfaState<TSymbol>>();
-			var enqueued = new HashSet<DfaState<TSymbol>>();
-			queue.Enqueue(start);
-			enqueued.Add(start);
-			while (queue.Count > 0) {
-				var s = queue.Dequeue();
-				if (s.Transitions == null) {
-					throw new ArgumentNullException("The state graph is not initialized.");
-				}
-				foreach (var i in s.Transitions) {
-					if (enqueued.Contains(i.Value)) {
-						continue;
-					}
-					queue.Enqueue(i.Value);
-					enqueued.Add(i.Value);
-				}
-			}
+            ListReachableStatesAndEnsureInitialized(start);
 		}
 			
 		public Dfa(DfaUtils.MinimizedDfa<TSymbol> lexerDfa)
@@ -110,6 +123,24 @@ namespace Nicodem.Parser
 				return new Dfa<TSymbol>(cur);
 			}
 		}
+
+        public override string ToString()
+        {
+            IReadOnlyList<DfaState<TSymbol>> states = ListReachableStatesAndEnsureInitialized(Start);
+            var builder = new StringBuilder();
+            int id = 0;
+            foreach (var state in states) {
+                builder.Append(id);
+                builder.Append(" =>");
+                foreach (var i in state.Transitions) {
+                    builder.Append(" ");
+                    // TODO(guspiel): finish debug string for Dfa.
+                }
+                id++;
+            }
+            return builder.ToString();
+        }
 	}
+
 }
 
