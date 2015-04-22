@@ -343,8 +343,7 @@ namespace Nicodem.Lexer
                 KeyValuePair<TSymbol, TLastDfaState>[] lastTransitions,
                 KeyValuePair<TSymbol, TNewDfaState>[] newTransitions)
             {
-                Debug.Assert(EqualityComparer<TSymbol>.Default.Equals(lastTransitions[0].Key, default(TSymbol)));
-                Debug.Assert(EqualityComparer<TSymbol>.Default.Equals(newTransitions[0].Key, default(TSymbol)));
+                Debug.Assert(EqualityComparer<TSymbol>.Default.Equals(lastTransitions[0].Key, newTransitions[0].Key));
                 int lastIndex = 0, newIndex = 0; // Zakładam że na pozycji 0 są znaki '\0'
                 var productTransitions =
                     new List<KeyValuePair<TSymbol, ProductDfaState<TSymbol>>>(Math.Max(lastTransitions.Length,

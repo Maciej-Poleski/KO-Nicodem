@@ -262,19 +262,14 @@ namespace Nicodem.Semantics.Grammar
             public static explicit operator Symbol(UniversalSymbol universalSymbol)
             {
                 var symbol = universalSymbol._symbol.ToSymbol();
-                if (universalSymbol._name == null && !symbol.IsTerminal)
+                if (universalSymbol._name == null)
                 {
                     FixUniversalSymbolNames();
                 }
                 Debug.Assert(universalSymbol._name != null || symbol.IsTerminal);
                 if (!SymbolToName.ContainsKey(symbol))
                 {
-                    SymbolToName.Add(symbol,
-                        !symbol.IsTerminal
-                            ? universalSymbol._name + DescribeSymbolInfo(universalSymbol._info)
-                            : "Terminal");
-                    // I can privide regex for terminal symbols instead of "Terminal" if required
-                    // In general terminal symbols don't have to have a name
+                    SymbolToName.Add(symbol, universalSymbol._name + DescribeSymbolInfo(universalSymbol._info));
                 }
                 return symbol;
             }
