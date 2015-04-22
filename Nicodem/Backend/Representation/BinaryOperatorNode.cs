@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Nicodem.Backend.Representation
+﻿namespace Nicodem.Backend.Representation
 {
     public enum BinaryOperatorType
     {
@@ -35,8 +29,13 @@ namespace Nicodem.Backend.Representation
 
     public class BinaryOperatorNode : OperatorNode<BinaryOperatorType>
     {
-        public Node LeftOperand { get; private set; }
+        public BinaryOperatorNode(BinaryOperatorType @operator, Node leftOperand, Node rightOperand) : base(@operator)
+        {
+            LeftOperand = leftOperand;
+            RightOperand = rightOperand;
+        }
 
+        public Node LeftOperand { get; private set; }
         public Node RightOperand { get; private set; }
     }
 }

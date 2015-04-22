@@ -44,6 +44,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{0332
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backend", "Backend\Backend.csproj", "{493808C4-AFCD-4D86-B72C-BABAA51F88C4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backend.Tests", "Backend.Tests\Backend.Tests.csproj", "{4C37FB6A-05DF-4D9A-9E54-9008E5962F7F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,6 +100,10 @@ Global
 		{493808C4-AFCD-4D86-B72C-BABAA51F88C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{493808C4-AFCD-4D86-B72C-BABAA51F88C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{493808C4-AFCD-4D86-B72C-BABAA51F88C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C37FB6A-05DF-4D9A-9E54-9008E5962F7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C37FB6A-05DF-4D9A-9E54-9008E5962F7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C37FB6A-05DF-4D9A-9E54-9008E5962F7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C37FB6A-05DF-4D9A-9E54-9008E5962F7F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -114,6 +120,7 @@ Global
 		{B0BC59FC-D28F-42B9-A4CC-5470287924B2} = {10DC7463-1E26-46A2-B827-4F2FAC2F28E9}
 		{BD83EE77-2811-480A-A732-BF52C011FC12} = {10DC7463-1E26-46A2-B827-4F2FAC2F28E9}
 		{493808C4-AFCD-4D86-B72C-BABAA51F88C4} = {03321013-8C3F-4627-8DDA-19E8F3AC7FD5}
+		{4C37FB6A-05DF-4D9A-9E54-9008E5962F7F} = {03321013-8C3F-4627-8DDA-19E8F3AC7FD5}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Source\Source.csproj

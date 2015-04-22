@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Nicodem.Backend.Representation
+﻿namespace Nicodem.Backend.Representation
 {
     public class AssignmentNode : Node
     {
+        public AssignmentNode(LocationNode target, LocationNode source)
+        {
+            Target = target;
+            Source = source;
+        }
+
         public LocationNode Target { get; private set; }
         public LocationNode Source { get; private set; }
     }

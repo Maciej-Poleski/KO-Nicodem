@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Nicodem.Backend.Representation
+﻿namespace Nicodem.Backend.Representation
 {
-    public class ConstantNode : Node
+    public class ConstantNode<TConstant> : Node
     {
+        public ConstantNode(TConstant value)
+        {
+            Value = value;
+        }
+
         // Value representation depends on architecture (and kind). Adjust when Target will be in shape.
-        public object Value { get; private set; }
+        public TConstant Value { get; private set; }
     }
 }

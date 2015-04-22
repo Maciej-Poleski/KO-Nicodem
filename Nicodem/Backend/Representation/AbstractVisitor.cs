@@ -28,15 +28,34 @@
             Visit(node as Node);
         }
 
-        public virtual void Visit(FunctionCallNode node)
+        public virtual void Visit<TFunction>(FunctionCallNode<TFunction> node)
         {
             Visit(node as Node);
         }
 
-        public virtual void Visit(ConstantNode node)
+        public virtual void Visit<TConstant>(ConstantNode<TConstant> node)
         {
             Visit(node as Node);
         }
+
+        public virtual void Visit<TOperator>(OperatorNode<TOperator> node)
+        {
+            Visit(node as Node);
+        }
+
+        #region OperatorNode subclasses
+
+        public virtual void Visit(UnaryOperatorNode node)
+        {
+            Visit(node as OperatorNode<UnaryOperatorType>);
+        }
+
+        public virtual void Visit(BinaryOperatorNode node)
+        {
+            Visit(node as OperatorNode<BinaryOperatorType>);
+        }
+
+        #endregion
 
         #region LocationNode subclasses
 
@@ -45,7 +64,7 @@
             Visit(node as LocationNode);
         }
 
-        public virtual void Visit(MemoryNode node)
+        public virtual void Visit<TAddress>(MemoryNode<TAddress> node)
         {
             Visit(node as LocationNode);
         }

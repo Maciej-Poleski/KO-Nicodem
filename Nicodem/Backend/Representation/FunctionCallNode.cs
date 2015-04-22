@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Nicodem.Backend.Representation
 {
-    public class FunctionCallNode : Node
+    public class FunctionCallNode<TFunction> : Node
     {
-        // Function type depends on architecture. Adjust when Target will be in shape.
-        public object Function { get; private set; }
+        public FunctionCallNode(TFunction function, IReadOnlyList<Node> arguments)
+        {
+            Function = function;
+            Arguments = arguments;
+        }
 
+        // Function type depends on architecture. Adjust when Target will be in shape.
+        public TFunction Function { get; private set; }
         public IReadOnlyList<Node> Arguments { get; private set; }
     }
 }

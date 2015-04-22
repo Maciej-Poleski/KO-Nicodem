@@ -41,7 +41,7 @@ namespace Nicodem.Backend.Representation
             node.Target.Accept(this);
         }
 
-        public override void Visit(FunctionCallNode node)
+        public override void Visit<TFunction>(FunctionCallNode<TFunction> node)
         {
             Visit(node as Node);
             foreach (var argument in node.Arguments)
@@ -50,10 +50,32 @@ namespace Nicodem.Backend.Representation
             }
         }
 
-        public override void Visit(ConstantNode node)
+        public override void Visit<TConstant>(ConstantNode<TConstant> node)
         {
             Visit(node as Node);
         }
+
+        public override void Visit<TOperator>(OperatorNode<TOperator> node)
+        {
+            Visit(node as Node);
+        }
+
+        #region OperatorNode subclasses
+
+        public override void Visit(UnaryOperatorNode node)
+        {
+            Visit(node as OperatorNode<UnaryOperatorType>);
+            node.Operand.Accept(this);
+        }
+
+        public override void Visit(BinaryOperatorNode node)
+        {
+            Visit(node as OperatorNode<BinaryOperatorType>);
+            node.LeftOperand.Accept(this);
+            node.RightOperand.Accept(this);
+        }
+
+        #endregion
 
         #region LocationNode subclasses
 
@@ -62,7 +84,7 @@ namespace Nicodem.Backend.Representation
             Visit(node as LocationNode);
         }
 
-        public override void Visit(MemoryNode node)
+        public override void Visit<TAddress>(MemoryNode<TAddress> node)
         {
             Visit(node as LocationNode);
         }

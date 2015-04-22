@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Nicodem.Backend.Representation
+﻿namespace Nicodem.Backend.Representation
 {
-    public class MemoryNode : LocationNode
+    public class MemoryNode<TAddress> : LocationNode
     {
+        public MemoryNode(TAddress address)
+        {
+            Address = address;
+        }
+
         // Address representation depends on architecture. Adjust when Target will be in shape.
-        public object Address { get; private set; }
+        public TAddress Address { get; private set; }
     }
 }
