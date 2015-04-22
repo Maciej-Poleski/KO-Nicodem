@@ -14,10 +14,12 @@ namespace Nicodem.Backend.Tests.Representation
                 new BinaryOperatorNode(BinaryOperatorType.Mul, new ConstantNode<int>(2), new ConstantNode<int>(2)));
 
             var printer = new BinaryOperatorPrinter();
-
             simpleExpression.Accept(printer);
-
             Assert.AreEqual("(2+(2*2))", printer.Result);
+
+            var counter = new NodeCounter();
+            simpleExpression.Accept(counter);
+            Assert.AreEqual(5, counter.Count);
         }
 
         private class BinaryOperatorPrinter : AbstractRecursiveVisitor
@@ -53,6 +55,16 @@ namespace Nicodem.Backend.Tests.Representation
                         return "*";
                 }
                 return "unknown";
+            }
+        }
+
+        private class NodeCounter : AbstractRecursiveVisitor
+        {
+            public int Count { get; private set; }
+
+            public override void Visit(Node node)
+            {
+                ++Count;
             }
         }
     }

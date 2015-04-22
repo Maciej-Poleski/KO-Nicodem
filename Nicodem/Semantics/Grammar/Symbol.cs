@@ -32,7 +32,11 @@ namespace Nicodem.Semantics.Grammar
 
         public int CompareTo(Symbol other)
         {
-            return _category - other._category;
+            if (this < other)
+            {
+                return -1;
+            }
+            return this == other ? 0 : 1;
         }
 
         public bool Equals(Symbol other)
@@ -42,7 +46,7 @@ namespace Nicodem.Semantics.Grammar
 
         public override string ToString()
         {
-            return string.Format("{0}{1}", IsTerminal ? "T" : "N", _category);
+            return string.Format("{0}{1} ({2})", IsTerminal ? "T" : "N", _category, Description);
         }
 
         public override bool Equals(object obj)
