@@ -60,6 +60,16 @@ namespace Nicodem.Parser.Tests
 			}
 		}
 		#endregion
+
+        public override string ToString()
+        {
+            if (Char.IsSymbol(C) || Char.IsLetterOrDigit(C)) { 
+                return "" + C;
+            }
+            else {
+                return "_" + (int)C;
+            }
+        }
 	}
 }
 

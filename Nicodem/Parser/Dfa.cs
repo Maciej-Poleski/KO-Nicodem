@@ -129,15 +129,16 @@ namespace Nicodem.Parser
             IReadOnlyList<DfaState<TSymbol>> states = ListReachableStatesAndEnsureInitialized(Start);
             var builder = new StringBuilder();
             int id = 0;
+            var ids = new Dictionary<DfaState<TSymbol>, int>();
+            foreach (var i in states) ids[i] = id++;
+
+            builder.Append("{");
             foreach (var state in states) {
-                builder.Append(id);
-                builder.Append(" =>");
-                foreach (var i in state.Transitions) {
-                    builder.Append(" ");
-                    // TODO(guspiel): finish debug string for Dfa.
-                }
-                id++;
+                builder.Append(state);
+                builder.Append("; ");
+                builder.AppendLine();
             }
+            builder.Append("}");
             return builder.ToString();
         }
 	}

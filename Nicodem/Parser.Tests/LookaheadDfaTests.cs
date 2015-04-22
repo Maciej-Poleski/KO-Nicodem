@@ -107,30 +107,34 @@ namespace Nicodem.Parser.Tests
             productions[new CharSymbol('E')] = new StringProduction[]{ 
 				new StringProduction('E', "a")
 			};
-            DfaState<CharSymbol> s1 = new DfaState<CharSymbol>();
-            DfaState<CharSymbol> s2 = new DfaState<CharSymbol>();
-            DfaState<CharSymbol> sError = new DfaState<CharSymbol>();
+            DfaState<CharSymbol> s1 = new DfaState<CharSymbol>("1");
+            DfaState<CharSymbol> s2 = new DfaState<CharSymbol>("2");
+            DfaState<CharSymbol> sError = new DfaState<CharSymbol>("error");
             var t1 = new List<KeyValuePair<CharSymbol, DfaState<CharSymbol>>> {
                 new KeyValuePair<CharSymbol, DfaState<CharSymbol>>(CharSymbol.MinValue, sError),
                 new KeyValuePair<CharSymbol, DfaState<CharSymbol>>(new CharSymbol('a'), s2),
                 new KeyValuePair<CharSymbol, DfaState<CharSymbol>>(new CharSymbol('b'), sError)
 
             };
-            var t2 = new List<KeyValuePair<CharSymbol, DfaState<CharSymbol>>>
-            {
+            var t2 = new List<KeyValuePair<CharSymbol, DfaState<CharSymbol>>> {
                 new KeyValuePair<CharSymbol, DfaState<CharSymbol>>(CharSymbol.MinValue, sError)
             };
-            var tError = new List<KeyValuePair<CharSymbol, DfaState<CharSymbol>>>
-            {
+            var tError = new List<KeyValuePair<CharSymbol, DfaState<CharSymbol>>> {
                 new KeyValuePair<CharSymbol, DfaState<CharSymbol>>(CharSymbol.MinValue, sError)
             };
             s1.Initialize(0, t1);
             s2.Initialize(1, t2);
             sError.Initialize(0, tError);
             var automatons = new Dictionary<CharSymbol, Dfa<CharSymbol>>();
+            //automatons[new CharSymbol(Char.MinValue)] = 
             automatons[new CharSymbol('E')] = new Dfa<CharSymbol>(s1);
+            foreach (var i in automatons) {
+                Console.WriteLine("dfa {0}: {1}", i.Key, i.Value.ToString());
+            }
             var grammar = new Grammar<CharSymbol>(new CharSymbol('E'), productions);
-            var ldfa = builder.Build(grammar, automatons, new CharSymbol('E'), s1);
+            grammar.InjectAutomatons(automatons);
+            var ldfa = builder.Build(grammar, new CharSymbol('E'), s1);
+            Console.WriteLine("Ldfa {0}", ldfa);
         }
     }
 }

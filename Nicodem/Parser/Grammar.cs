@@ -38,6 +38,12 @@ namespace Nicodem.Parser
 			return !(Productions.ContainsKey(term)) || Productions[term].Length == 0;
 		}
 
+        // For testing purposes only!
+        public void InjectAutomatons(Dictionary<TSymbol, Dfa<TSymbol>> automatons)
+        {
+            this.Automatons = automatons;
+        }
+
 		public Grammar(TSymbol start, IDictionary<TSymbol, IProduction<TSymbol>[]> productions)
 		{
 			Start = start;
