@@ -29,6 +29,8 @@ namespace Nicodem.Semantics.Visitors
             if (typeOfArray is ArrayTypeNode)
                 throw new TypeCheckException("Array don't have array type");
             var typeOfElementInArray = ((ArrayTypeNode)typeOfArray).ElementType;
+            if (typeOfElementInArray == null)
+                throw new TypeCheckException("Type of element in array is not set.");
             foreach (var expression in node.Elements)
             {
                 if (expression.ExpressionType == null)
@@ -36,6 +38,36 @@ namespace Nicodem.Semantics.Visitors
                 if (!typeOfElementInArray.Equals(expression.ExpressionType))
                     throw new TypeCheckException("Inpropper Type of element in array.");
             }
+        }
+
+        private HashSet<TypeNode> deduceType(string value)
+        {
+            HashSet<TypeNode> _set_of_types = new HashSet<TypeNode>();
+            bool out_bool;
+            if (Boolean.TryParse(value, out out_bool))
+                _set_of_types.Add(NamedTypeNode.BoolType());
+            byte out_byte;
+            if (Byte.TryParse(value, out out_byte))
+                _set_of_types.Add(NamedTypeNode.ByteType());
+            int out_int;
+            if (Int32.TryParse(value, out out_int))
+                _set_of_types.Add(NamedTypeNode.IntType());
+            char out_char;
+            if (Char.TryParse(value, out out_char))
+                _set_of_types.Add(NamedTypeNode.CharType());
+            return _set_of_types;
+        }
+
+        //try to find definition type on base of Value
+        public override void Visit(AtomNode node)
+        {
+            base.Visit(node);
+            if (node.Value == null)
+                throw new TypeCheckException("Value is not set.");
+            HashSet<TypeNode> deducedType = deduceType(node.Value);
+            if (!deducedType.Contains(node.VariableType))
+                throw new TypeCheckException("Type of Const is not consistent with deducated Type.");
+            node.ExpressionType = node.VariableType;
         }
 
         //type is the last one element, if don't have set void
@@ -46,21 +78,6 @@ namespace Nicodem.Semantics.Visitors
             foreach (var element in node.Elements)
                 last_element_type = element.ExpressionType;
             node.ExpressionType = last_element_type;
-        }
-
-        private TypeNode deduceType(object value)
-        {
-            throw new NotImplementedException();
-        }
-
-        //try to find definition type on base of Value
-        public override void Visit(ConstNode node)
-        {
-            base.Visit(node);
-            TypeNode deducedType = deduceType(node.Value);
-            if (!deducedType.Equals(node.VariableType))
-                throw new TypeCheckException("Type of Const is not consistent with deducated Type.");
-            node.ExpressionType = node.VariableType;
         }
 
         //check if number is int and rewrite ExpressionType to Array type
