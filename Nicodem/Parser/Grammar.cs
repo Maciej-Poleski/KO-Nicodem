@@ -108,46 +108,29 @@ namespace Nicodem.Parser
 
             return result;
         }
-
-        // TODO(jbrzeski): Please add implementation.
+			
         // Indexed by beginnings of terminal ranges.
         public List<KeyValuePair<TSymbol,LlConfiguration<TSymbol>>> OutgoingTerminalEdges(LlConfiguration<TSymbol> llconf)
         {
-            throw new NotImplementedException();
-        }
-
-		// for a given LlConfiguration the function computes list of edges to all other possible LlConfigurations.
-		public List<KeyValuePair<TSymbol?,LlConfiguration<TSymbol>>> _OutgoingEdges(LlConfiguration<TSymbol> llconf) {
-
-
-            var topState = llconf.stack[llconf.stack.Count-1];
+			var topState = llconf.stack[llconf.stack.Count-1];
 			var transitions = topState.Transitions;
-			var result = new List<KeyValuePair<TSymbol?,LlConfiguration<TSymbol>>>();
-
+			var resultDict = new SortedDictionary<TSymbol, LlConfiguration<TSymbol>> ();
 			foreach (var kv in transitions) {
 				var symbol = kv.Key;
 				var targetState = kv.Value;
-				var newStack = llconf.copyOfStack (); // shallow copy of the stack
-				TSymbol? newEdgeSymbol = null; // symbol on the edge to new LlConfiguration, epsilon == null
-
 				// topState---symbol-->targetState (we pop topState and push targetState)
 				if (IsTerminal (symbol)) {
-					newEdgeSymbol = symbol;
-					newStack.Push (targetState);
-				} else {
-					newStack.Push (targetState);
-					newStack.Push (Automatons [symbol].Start); //we also push start state of the symbol's automaton.
+					var newllconf = llconf.Pop(); // a copy without top state
+					newllconf = newllconf.Push(targetState);
+					resultDict.Add (symbol, newllconf);
 				}
-
-				var newLlConf = new LlConfiguration<TSymbol> (llconf.label, newStack);
-				var newEdge = new KeyValuePair<TSymbol?, LlConfiguration<TSymbol>> (newEdgeSymbol, newLlConf);
-				result.Add (newEdge);
 			}
-
-
+			var result = new List<KeyValuePair<TSymbol,LlConfiguration<TSymbol>>>();
+			foreach (var kv in resultDict) {
+				result.Add (kv);
+			}
 			return result;
-		}
-
+        }
 	}
 }
 
