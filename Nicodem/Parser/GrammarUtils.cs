@@ -166,8 +166,10 @@ namespace Nicodem.Parser
 					if(!nullable.Contains(startStatesLhs[state])){
 						var lhsT = startStatesLhs[state];
 						nullable.Add(lhsT);
-						foreach(var condState in conditional[lhsT]){
-							queue.Enqueue(condState);
+						if(conditional.ContainsKey(lhsT)){
+							foreach(var condState in conditional[lhsT]){
+								queue.Enqueue(condState);
+							}
 						}
 					}
 				} else {
