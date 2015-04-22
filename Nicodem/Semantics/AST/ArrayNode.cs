@@ -7,10 +7,6 @@ namespace Nicodem.Semantics.AST
 	class ArrayNode : ConstNode
 	{
 		public IEnumerable<ExpressionNode> Elements { get; set; }
-
-		public ArrayNode( TypeNode type ) : base( type )
-		{
-		}
         
         #region implemented abstract members of Node
 
@@ -20,6 +16,8 @@ namespace Nicodem.Semantics.AST
         }
 
         #endregion
+
+        public ArrayNode(TypeNode type) : base(type) { }
 
 		public override void Accept (AbstractVisitor visitor)
 		{

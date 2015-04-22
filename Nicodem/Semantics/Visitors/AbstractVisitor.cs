@@ -30,7 +30,6 @@ namespace Nicodem.Semantics.Visitors
 		}
 		#endregion
 
-
 		#region TypeNode direct children
 		public virtual void Visit(NamedTypeNode node) {
 			Visit (node as TypeNode);
@@ -45,11 +44,12 @@ namespace Nicodem.Semantics.Visitors
 			Visit (node as ConstNode);
 		}
 
-		public virtual void Visit(BlockExpressionNode node) {
-			Visit (node as ExpressionNode);
-		}
+        public virtual void Visit(AtomNode node)
+        {
+            Visit(node as ExpressionNode);
+        }
 
-		public virtual void Visit(ConstNode node) {
+		public virtual void Visit(BlockExpressionNode node) {
 			Visit (node as ExpressionNode);
 		}
 
