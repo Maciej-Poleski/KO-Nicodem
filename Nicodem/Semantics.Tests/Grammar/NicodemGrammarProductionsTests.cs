@@ -8,12 +8,23 @@ namespace Semantics.Tests.Grammar
     [TestFixture]
     internal class NicodemGrammarProductionsTests
     {
+        private static Grammar<Symbol> MakeGrammar()
+        {
+            return new Grammar<Symbol>(
+                NicodemGrammarProductions.StartSymbol(),
+                NicodemGrammarProductions.MakeProductionsDictionaryForGrammarConstructor());
+        }
+
         [Test]
         public void GrammarConstructor()
         {
-            new Grammar<Symbol>(
-                NicodemGrammarProductions.StartSymbol(),
-                NicodemGrammarProductions.MakeProductionsDictionaryForGrammarConstructor());
+            MakeGrammar();
+        }
+
+        [Test]
+        public void ParserConstructor()
+        {
+            new LLStarParser<Symbol>(MakeGrammar());
         }
 
         [Test]

@@ -32,11 +32,7 @@ namespace Nicodem.Semantics.Grammar
 
         public int CompareTo(Symbol other)
         {
-            if (this < other)
-            {
-                return -1;
-            }
-            return this == other ? 0 : 1;
+            return _category.CompareTo(other._category);
         }
 
         public bool Equals(Symbol other)
