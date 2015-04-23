@@ -38,6 +38,7 @@ namespace Nicodem.Semantics.Visitors
                 if (!typeOfElementInArray.Equals(expression.ExpressionType))
                     throw new TypeCheckException("Inpropper Type of element in array.");
             }
+            node.ExpressionType = node.VariableType;
         }
 
         private HashSet<TypeNode> deduceType(string value)
@@ -138,6 +139,7 @@ namespace Nicodem.Semantics.Visitors
             else
                 if (!while_elem.ExpressionType.Equals(node.Value.ExpressionType))
                     throw new TypeCheckException("Value Type is not correct for returned while type.");
+            node.ExpressionType = node.Value.ExpressionType;
         }
 
         //every arguments has the same type and set type to the arguements type
@@ -189,12 +191,20 @@ namespace Nicodem.Semantics.Visitors
             _stack_of_while_node.Add(node);
             base.Visit(node);
             _stack_of_while_node.Remove(node);
+            TypeNode _type_to_set;
             if(NamedTypeNode.BoolType().Equals(node.Condition.ExpressionType))
                 throw new Exception("Inpropper type in if condition");
             if(!node.HasElse || node.Body.ExpressionType.Equals(node.Else.ExpressionType))
-                node.ExpressionType = node.Body.ExpressionType;
+                _type_to_set = node.Body.ExpressionType;
             else
-                node.ExpressionType = NamedTypeNode.VoidType();
+                _type_to_set = NamedTypeNode.VoidType();
+            if (node.ExpressionType == null)
+                node.ExpressionType = _type_to_set;
+            else
+                if (!node.ExpressionType.Equals(_type_to_set))
+                    throw new Exception("Type of Body and Else is not correct with set type.");
+                else
+                    node.ExpressionType = _type_to_set;
         }
     }
 }
