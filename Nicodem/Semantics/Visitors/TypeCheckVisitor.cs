@@ -173,9 +173,9 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(VariableDefNode node)
         {
             base.Visit(node);
-            if (!TypeNode.Compare(node.Value.ExpressionType, node.VariableType))
+            if (!TypeNode.Compare(node.Value.ExpressionType, node.Type))
                 throw new TypeCheckException("Value type not agree with VariableType");
-            node.ExpressionType = node.VariableType;
+            node.ExpressionType = node.Type;
         }
 
         //rewerite type

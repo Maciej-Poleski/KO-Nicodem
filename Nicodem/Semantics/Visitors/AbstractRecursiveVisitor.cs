@@ -21,12 +21,6 @@ namespace Nicodem.Semantics.Visitors
 				parameter.Accept (this);
 		}
 
-		public override void Visit(ParameterNode node) 
-		{
-			base.Visit (node);
-			node.Type.Accept (this);
-		}
-
 		public override void Visit(ExpressionNode node) 
 		{
 			base.Visit (node);
@@ -109,12 +103,21 @@ namespace Nicodem.Semantics.Visitors
 				node.Right.Accept (this);
 		}
 
-		public override void Visit(VariableDefNode node)
+        public override void Visit(VariableDeclNode node)
+        {
+            base.Visit(node);
+            node.Type.Accept(this);
+        }
+
+        #region VariableDeclNode direct children
+
+        public override void Visit(VariableDefNode node)
 		{
 			base.Visit (node);
-			node.VariableType.Accept (this);
 			node.Value.Accept (this);
 		}
+
+        #endregion
 
 		public override void Visit(VariableUseNode node)
 		{

@@ -17,10 +17,6 @@ namespace Nicodem.Semantics.Visitors
 			Visit (node as Node);
 		}
 
-		public virtual void Visit(ParameterNode node) {
-			Visit (node as Node);
-		}
-
 		public virtual void Visit(TypeNode node) {
 			Visit (node as Node);
 		}
@@ -77,9 +73,19 @@ namespace Nicodem.Semantics.Visitors
 			Visit (node as ExpressionNode);
 		}
 
-		public virtual void Visit(VariableDefNode node) {
-			Visit (node as ExpressionNode);
-		}
+        public virtual void Visit(VariableDeclNode node)
+        {
+            Visit(node as ExpressionNode);
+        }
+
+	    #region VariableDeclNode direct children
+
+        public virtual void Visit(VariableDefNode node)
+        {
+            Visit(node as VariableDeclNode);
+        }
+
+	    #endregion
 
 		public virtual void Visit(VariableUseNode node) {
 			Visit (node as ExpressionNode);

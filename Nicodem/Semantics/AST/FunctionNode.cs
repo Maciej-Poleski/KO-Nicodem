@@ -9,7 +9,7 @@ namespace Nicodem.Semantics.AST
 	class FunctionNode : Node
 	{
 		public string Name { get; set; }
-        public IEnumerable<ParameterNode> Parameters { get; set; }
+        public IEnumerable<VariableDeclNode> Parameters { get; set; }
 		public TypeNode Type { get; set; }
 		public ExpressionNode Body { get; set; }
 
@@ -22,12 +22,12 @@ namespace Nicodem.Semantics.AST
 
         #region implemented abstract members of Node
 
-        private IEnumerable<ParameterNode> getParameters<TSymbol>(IParseTree<TSymbol> parseTree) where TSymbol:ISymbol<TSymbol> {
-            var parList = new LinkedList<ParameterNode>();
+        private IEnumerable<VariableDeclNode> getParameters<TSymbol>(IParseTree<TSymbol> parseTree) where TSymbol:ISymbol<TSymbol> {
+            var parList = new LinkedList<VariableDeclNode>();
             var node = ASTBuilder.AsBranch(parseTree);
             var childs = node.Children.GetEnumerator();
             while (childs.MoveNext()) {
-                var par = new ParameterNode();
+                var par = new VariableDeclNode();
                 par.BuildNode(childs.Current);
                 parList.AddLast(par);
                 childs.MoveNext(); // skip ',' if present

@@ -5,10 +5,12 @@ using System.Linq;
 
 namespace Nicodem.Semantics.AST
 {
-	class ParameterNode : Node
+	class VariableDeclNode : ExpressionNode
 	{
 		public string Name { get; set; }
 		public TypeNode Type { get; set; }
+
+        public bool NestedUse { get; set; }
         
         #region implemented abstract members of Node
 
