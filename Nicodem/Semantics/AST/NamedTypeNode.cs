@@ -34,6 +34,13 @@ namespace Nicodem.Semantics.AST
             return node;
         }
 
+        public static NamedTypeNode ByteType()
+        {
+            NamedTypeNode node = new NamedTypeNode();
+            node.Name = "byte";
+            return node;
+        }
+
         #region implemented abstract members of Node
 
         public override void BuildNode<TSymbol>(IParseTree<TSymbol> parseTree)

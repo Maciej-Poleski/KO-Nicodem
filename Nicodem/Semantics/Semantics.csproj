@@ -31,6 +31,8 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    
+    <Compile Include="AST\AtomNode.cs" />
     <Compile Include="ExpressionGraph\ReturnVertex.cs" />
     <Compile Include="ExpressionGraph\ConditionalJumpVertex.cs" />
     <Compile Include="ExpressionGraph\OneJumpVertex.cs" />

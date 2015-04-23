@@ -12,6 +12,7 @@ namespace Nicodem.Parser
 			var result = new List<DfaState<TSymbol>>();
 			var queue = new Queue<DfaState<TSymbol>>();
 			var visited = new HashSet<DfaState<TSymbol>>();
+			visited.Add (dfa.Start);
 			queue.Enqueue(dfa.Start);
 
 			while(queue.Count > 0) {
@@ -36,6 +37,7 @@ namespace Nicodem.Parser
 			foreach(var dfa in automatons.Values) {
 				var queue = new Queue<DfaState<TSymbol>>();
 				var visited = new HashSet<DfaState<TSymbol>>();
+				visited.Add (dfa.Start);
 				queue.Enqueue(dfa.Start);
 				while(queue.Count > 0) {
 					var state = queue.Dequeue();
@@ -64,6 +66,7 @@ namespace Nicodem.Parser
 				var owner = automaton.Key;
 				var queue = new Queue<DfaState<TSymbol>>();
 				var visited = new HashSet<DfaState<TSymbol>>();
+				visited.Add (dfa.Start);
 				queue.Enqueue(dfa.Start);
 				while(queue.Count > 0) {
 					var state = queue.Dequeue();
@@ -87,6 +90,7 @@ namespace Nicodem.Parser
 			foreach(var dfa in automatons.Values) {
 				var queue = new Queue<DfaState<TSymbol>>();
 				var visited = new HashSet<DfaState<TSymbol>>();
+				visited.Add (dfa.Start);
 				queue.Enqueue(dfa.Start);
 				while(queue.Count > 0) {
 					var state = queue.Dequeue();
@@ -144,6 +148,7 @@ namespace Nicodem.Parser
 			var conditional = new Dictionary<TSymbol, List<DfaState<TSymbol>>>();
 			var queue = new Queue<DfaState<TSymbol>>();
 			var nullable = new HashSet<TSymbol>();
+			var visited = new HashSet<DfaState<TSymbol>>();
 
 			foreach(var symbol in automatons.Keys){
 				startStatesLhs.Add(automatons[symbol].Start, symbol);
@@ -152,6 +157,7 @@ namespace Nicodem.Parser
 			// at the beginning enqueue all accepting states
 			foreach(var dfa in automatons.Values){
 				foreach(var accstate in GetAllAcceptingStates(dfa)){
+					visited.Add (accstate);
 					queue.Enqueue(accstate);
 				}
 			}
@@ -166,16 +172,24 @@ namespace Nicodem.Parser
 					if(!nullable.Contains(startStatesLhs[state])){
 						var lhsT = startStatesLhs[state];
 						nullable.Add(lhsT);
-						foreach(var condState in conditional[lhsT]){
-							queue.Enqueue(condState);
+						if(conditional.ContainsKey(lhsT)){
+							foreach(var condState in conditional[lhsT]){
+								if (!visited.Contains (condState)) {
+									visited.Add (condState);
+									queue.Enqueue (condState);
+								}
+							}
 						}
 					}
 				} else {
 					// else, get the state's predecessors and enqueue all which have edge
 					// to the state over a nullable symbol. Put the rest into the conditional lists.
 					foreach(var kv in predecessors[state]){
-						if(nullable.Contains(kv.Key))
-							queue.Enqueue(kv.Value);
+						if (nullable.Contains (kv.Key))
+						if (!visited.Contains (kv.Value)) {
+							visited.Add (kv.Value);
+							queue.Enqueue (kv.Value);
+						}
 						else {
 							if(!conditional.ContainsKey(kv.Key))
 								conditional.Add(kv.Key, new List<DfaState<TSymbol>>());
@@ -210,10 +224,13 @@ namespace Nicodem.Parser
             // While there are any changes
             while(changes) {
                 changes = false;
+				var visited = new HashSet<DfaState<TSymbol>>();
                 // Enqueue all accepting states from all automatons
-                foreach(var dfa in automatons.Values)
-                    foreach(var accstate in acceptingStates[dfa])
-                        queue.Enqueue(accstate);
+				foreach (var dfa in automatons.Values)
+					foreach (var accstate in acceptingStates[dfa]) {
+						visited.Add (accstate);
+						queue.Enqueue (accstate);
+					}
 
                 while(queue.Count > 0) {
                     var state = queue.Dequeue();
@@ -255,8 +272,10 @@ namespace Nicodem.Parser
                                 changes = true;
                                 follow[inT].Add(s);
                             }
-
-                        queue.Enqueue(kv.Value);
+						if (!visited.Contains (kv.Value)) {
+							visited.Add (kv.Value);
+							queue.Enqueue (kv.Value);
+						}
                     }
                 }//end while queue not empty
             }//end while there are no changes

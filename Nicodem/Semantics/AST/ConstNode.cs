@@ -3,12 +3,12 @@ using Nicodem.Parser;
 
 namespace Nicodem.Semantics.AST
 {
-	class ConstNode : ExpressionNode
+	abstract class ConstNode : ExpressionNode
 	{
 		public TypeNode VariableType { get; private set; }
 
 		// TODO value field
-		public object Value { get; set; }
+		public string Value { get; set; }
 
 		/// <summary>
 		/// The only way to construct this node.

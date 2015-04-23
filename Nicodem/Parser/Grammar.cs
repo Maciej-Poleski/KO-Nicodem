@@ -15,7 +15,8 @@ namespace Nicodem.Parser
         internal FirstSet<TSymbol> First { get; private set; }
         internal IDictionary<TSymbol, ISet<TSymbol>> Follow { get; private set; }
         internal bool HasLeftRecursion { get; private set; }
-		// a dictionary which for each symbol stores a list of all the states s.t. there exists edge labelled by this symbol to the given state.
+		// a dictionary which for a given symbol stores a list of all the states s.t. there exists edge labelled by this symbol to the given state.
+		// if a symbol does not occur on any edge, it isn't in the dictionary.
 		internal IDictionary<TSymbol, List<DfaState<TSymbol>>> TargetStatesDictionary { get; private set; }
 		// a dictionary which maps an accepting state to a symbol (nonterminal) whose DFA contains this state.
 		internal IDictionary<DfaState<TSymbol>, TSymbol> AccStateOwnerDictionary { get; private set; }
@@ -104,9 +105,11 @@ namespace Nicodem.Parser
                     var newllconf = llconf.Pop(); // a copy without top state
                     // browse the list of target states for the prevSymbol and for each of them create
                     // a separate configuration with the stack containing the given state.
-                    foreach (var targetState in TargetStatesDictionary[prevSymbol]) {
-                        result.Add (newllconf.Push(targetState));
-                    }
+					if (TargetStatesDictionary.ContainsKey (prevSymbol)) {
+						foreach (var targetState in TargetStatesDictionary[prevSymbol]) {
+							result.Add (newllconf.Push (targetState));
+						}
+					}
                 } else {
                     result.Add (llconf.Pop());
                 }

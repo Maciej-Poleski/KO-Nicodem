@@ -50,17 +50,17 @@ namespace Nicodem.Semantics.Visitors
 				child.Accept (this);
 		}
 
+        public override void Visit(AtomNode node)
+        {
+            base.Visit(node);
+            node.VariableType.Accept(this);
+        }
+
 		public override void Visit(BlockExpressionNode node)
 		{
 			base.Visit (node);
 			foreach (var child in node.Elements)
 				child.Accept (this);
-		}
-
-		public override void Visit(ConstNode node)
-		{
-			base.Visit (node);
-			node.VariableType.Accept (this);
 		}
 
 		public override void Visit(ElementNode node)
