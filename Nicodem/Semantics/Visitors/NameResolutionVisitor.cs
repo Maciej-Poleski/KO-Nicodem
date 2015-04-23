@@ -5,12 +5,12 @@ namespace Nicodem.Semantics.Visitors
 {
 	class NameResolutionVisitor : AbstractRecursiveVisitor
 	{
-        private SymbolTable<VariableDefNode> variableSymbolTable;
+        private SymbolTable<VariableDeclNode> variableSymbolTable;
         private SymbolTable<FunctionNode> functionSymbolTable;
 
 		public NameResolutionVisitor ()
 		{
-            variableSymbolTable = new SymbolTable<VariableDefNode> ();
+            variableSymbolTable = new SymbolTable<VariableDeclNode> ();
             functionSymbolTable = new SymbolTable<FunctionNode>();
 		}
 
