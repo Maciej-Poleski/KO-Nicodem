@@ -6,7 +6,7 @@ namespace Nicodem.Semantics.AST
 	class VariableUseNode : ExpressionNode
 	{
 		public string Name { get; set; }
-		public VariableDeclNode Definition { get; set; }
+		public VariableDeclNode Declaration { get; set; }
         
         #region implemented abstract members of Node
 

@@ -31,7 +31,7 @@ namespace Nicodem.Semantics.Visitors
 
 		public override void Visit (VariableUseNode node)
 		{
-            node.Definition = variableSymbolTable.LookUp (node.Name);
+            node.Declaration = variableSymbolTable.LookUp (node.Name);
 			base.Visit (node);
 		}
 

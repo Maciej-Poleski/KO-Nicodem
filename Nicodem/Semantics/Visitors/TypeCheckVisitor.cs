@@ -182,7 +182,7 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(VariableUseNode node)
         {
             base.Visit(node);
-            node.ExpressionType = node.Definition.ExpressionType;
+            node.ExpressionType = node.Declaration.ExpressionType;
         }
 
         //check condtion type and set returned type as in if

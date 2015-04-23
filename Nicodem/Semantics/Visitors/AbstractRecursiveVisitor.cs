@@ -122,7 +122,7 @@ namespace Nicodem.Semantics.Visitors
 		public override void Visit(VariableUseNode node)
 		{
 			base.Visit (node);
-			node.Definition.Accept (this);
+			node.Declaration.Accept (this);
 		}
 
 		public override void Visit(WhileNode node)
