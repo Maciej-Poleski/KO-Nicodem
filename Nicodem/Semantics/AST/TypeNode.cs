@@ -66,7 +66,7 @@ namespace Nicodem.Semantics.AST
                 return false;
             if (a is ArrayTypeNode && b is ArrayTypeNode)
             {
-                if (TypeNode.CompareTo(((ArrayTypeNode)a).ElementType, ((ArrayTypeNode)b).ElementType))
+                if (TypeNode.Compare(((ArrayTypeNode)a).ElementType, ((ArrayTypeNode)b).ElementType))
                     return true;
             }
             if (a is NamedTypeNode && b is NamedTypeNode)
