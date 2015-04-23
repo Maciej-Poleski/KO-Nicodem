@@ -31,6 +31,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AST\AtomNode.cs" />
     <Compile Include="Grammar\NicodemGrammarProductions.cs" />
     <Compile Include="Grammar\Production.cs" />
     <Compile Include="Grammar\Symbol.cs" />
@@ -83,7 +84,5 @@
       <Name>Source</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="CST\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>
