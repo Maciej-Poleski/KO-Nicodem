@@ -15,7 +15,7 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(FunctionNode node)
         {
             base.Visit(node);
-            if (node.Type.Equals(node.Body.ExpressionType))
+            if (TypeNode.Compare(node.Type, node.Body.ExpressionType))
                 throw new TypeCheckException("Body don't return the same type as set type.");
         }
 
@@ -35,7 +35,7 @@ namespace Nicodem.Semantics.Visitors
             {
                 if (expression.ExpressionType == null)
                     throw new TypeCheckException("Array contains value with not specified type.");
-                if (!typeOfElementInArray.Equals(expression.ExpressionType))
+                if (!TypeNode.Compare(typeOfElementInArray,expression.ExpressionType))
                     throw new TypeCheckException("Inpropper Type of element in array.");
             }
             node.ExpressionType = node.VariableType;
@@ -85,7 +85,7 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(ElementNode node)
         {
             base.Visit(node);
-            if (!NamedTypeNode.IntType().Equals(node.Index.ExpressionType))
+            if (!TypeNode.Compare(NamedTypeNode.IntType(),node.Index.ExpressionType))
                 throw new TypeCheckException("Index is not integer type.");
             node.ExpressionType = node.Array.ExpressionType;
         }
@@ -106,7 +106,7 @@ namespace Nicodem.Semantics.Visitors
             
             for (int i = 0; i < listOfFunctionArguments.Count; i++)
             {
-                if (!listOfFunctionArguments[i].Equals(listOfFunctionCallArguments[i]))
+                if (!TypeNode.Compare(listOfFunctionArguments[i].Type,listOfFunctionCallArguments[i].ExpressionType))
                     throw new Exception(String.Format("Argument {0} has inproper type.", i));
             }
 
@@ -117,9 +117,9 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(IfNode node)
         {
             base.Visit(node);
-            if(NamedTypeNode.BoolType().Equals(node.Condition.ExpressionType))
+            if(!TypeNode.Compare(NamedTypeNode.BoolType(), node.Condition.ExpressionType))
                 throw new Exception("Inpropper type in if condition");
-            if(!node.HasElse || node.Then.ExpressionType.Equals(node.Else.ExpressionType))
+            if(!node.HasElse || TypeNode.Compare(node.Then.ExpressionType, node.Else.ExpressionType))
                 node.ExpressionType = node.Then.ExpressionType;
             else
                 node.ExpressionType = NamedTypeNode.VoidType();
@@ -137,7 +137,7 @@ namespace Nicodem.Semantics.Visitors
             if (while_elem.ExpressionType == null)
                 while_elem.ExpressionType = node.Value.ExpressionType;
             else
-                if (!while_elem.ExpressionType.Equals(node.Value.ExpressionType))
+                if (!TypeNode.Compare(while_elem.ExpressionType, node.Value.ExpressionType))
                     throw new TypeCheckException("Value Type is not correct for returned while type.");
             node.ExpressionType = node.Value.ExpressionType;
         }
@@ -149,7 +149,7 @@ namespace Nicodem.Semantics.Visitors
             TypeNode argument_type = null;
             foreach (var argument in node.Arguments)
             {
-                if (argument_type != null && !argument_type.Equals(argument.ExpressionType))
+                if (argument_type != null && !TypeNode.Compare(argument_type, argument.ExpressionType))
                     throw new TypeCheckException("Types are not the same.");
                 argument_type = argument.ExpressionType;
             }
@@ -162,9 +162,9 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(SliceNode node)
         {
             base.Visit(node);
-            if (!NamedTypeNode.IntType().Equals(node.Left))
+            if (!TypeNode.Compare(NamedTypeNode.IntType(), node.Left.ExpressionType))
                 throw new TypeCheckException("Left is not int value.");
-            if (!NamedTypeNode.IntType().Equals(node.Right))
+            if (!TypeNode.Compare(NamedTypeNode.IntType(), node.Right.ExpressionType))
                 throw new TypeCheckException("Right is not int value.");
             node.ExpressionType = node.Array.ExpressionType;
         }
@@ -173,7 +173,7 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(VariableDefNode node)
         {
             base.Visit(node);
-            if (!node.Value.ExpressionType.Equals(node.VariableType))
+            if (!TypeNode.Compare(node.Value.ExpressionType, node.VariableType))
                 throw new TypeCheckException("Value type not agree with VariableType");
             node.ExpressionType = node.VariableType;
         }
@@ -192,16 +192,16 @@ namespace Nicodem.Semantics.Visitors
             base.Visit(node);
             _stack_of_while_node.Remove(node);
             TypeNode _type_to_set;
-            if(NamedTypeNode.BoolType().Equals(node.Condition.ExpressionType))
+            if(!TypeNode.Compare(NamedTypeNode.BoolType(), node.Condition.ExpressionType))
                 throw new Exception("Inpropper type in if condition");
-            if(!node.HasElse || node.Body.ExpressionType.Equals(node.Else.ExpressionType))
+            if(!node.HasElse || TypeNode.Compare(node.Body.ExpressionType, node.Else.ExpressionType))
                 _type_to_set = node.Body.ExpressionType;
             else
                 _type_to_set = NamedTypeNode.VoidType();
             if (node.ExpressionType == null)
                 node.ExpressionType = _type_to_set;
             else
-                if (!node.ExpressionType.Equals(_type_to_set))
+                if (!TypeNode.Compare(node.ExpressionType, _type_to_set))
                     throw new Exception("Type of Body and Else is not correct with set type.");
                 else
                     node.ExpressionType = _type_to_set;
