@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Nicodem.Backend.Representation
 {
@@ -8,6 +9,26 @@ namespace Nicodem.Backend.Representation
         {
             Sequence = sequence;
             NextNode = nextNode;
+        }
+
+        /// <summary>
+        ///     This constructor allows to postpone initialization of non-tree edge (target of unconditional jump after this
+        ///     seqence).
+        /// </summary>
+        public SequenceNode(IReadOnlyList<Node> sequence, out Action<Node> nextNodeSetter)
+        {
+            Sequence = sequence;
+            nextNodeSetter = node =>
+            {
+                if (NextNode == null)
+                {
+                    NextNode = node;
+                }
+                else
+                {
+                    throw new InvalidOperationException("NextNode property is already initialized");
+                }
+            };
         }
 
         public IReadOnlyList<Node> Sequence { get; private set; }
