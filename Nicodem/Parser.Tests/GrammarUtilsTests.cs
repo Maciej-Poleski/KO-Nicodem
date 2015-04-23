@@ -663,19 +663,19 @@ namespace Nicodem.Parser.Tests
         [Test]
         public void hasLeftRecursionNoRecursionTest()
         {
-            Assert.IsFalse(GrammarUtils<StringSymbol>.HasLeftRecursion(automatons, nullable));
+            Assert.IsNull(GrammarUtils<StringSymbol>.HasLeftRecursion(automatons, nullable));
         }
 
         [Test]
         public void hasLeftRecursionHasRecursionTest()
         {
-            Assert.IsTrue(GrammarUtils<StringSymbol>.HasLeftRecursion(automatons_lr, nullable_lr));
+            Assert.IsNotNull(GrammarUtils<StringSymbol>.HasLeftRecursion(automatons_lr, nullable_lr));
         }
 
         [Test]
         public void hasLeftRecursionOnNullableEdgesTest()
         {
-            Assert.IsTrue(GrammarUtils<StringSymbol>.HasLeftRecursion(automatons_lr_nullable, nullable_lr_nullable));
+            Assert.IsNotNull(GrammarUtils<StringSymbol>.HasLeftRecursion(automatons_lr_nullable, nullable_lr_nullable));
         }
 	}
 }

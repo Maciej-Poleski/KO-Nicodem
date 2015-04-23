@@ -410,46 +410,59 @@ namespace Nicodem.Parser
 		}
 
 
-        private static bool DepthFirstSearchOnSymbol(TSymbol symbol, Dictionary<DfaState<TSymbol>, int> color, IDictionary<TSymbol, Dfa<TSymbol>> automatons, ISet<TSymbol> nullable)
+        private static List<TSymbol> DepthFirstSearchOnSymbol(TSymbol symbol, Dictionary<DfaState<TSymbol>, int> color, IDictionary<TSymbol, Dfa<TSymbol>> automatons, ISet<TSymbol> nullable)
         {
             if (!automatons.ContainsKey(symbol))
-                return false;
+                return null;
             var automata = automatons[symbol];
-            return DepthFirstSearchOnState(automata.Start, color, automatons, nullable);
+            List<TSymbol> returnList = DepthFirstSearchOnState(automata.Start, color, automatons, nullable);
+            if (returnList != null)
+                returnList.Add(symbol);
+            return returnList;
         }
 
-        private static bool DepthFirstSearchOnState(DfaState<TSymbol> state, Dictionary<DfaState<TSymbol>, int> color, IDictionary<TSymbol, Dfa<TSymbol>> automatons, ISet<TSymbol> nullable)
+        private static List<TSymbol> DepthFirstSearchOnState(DfaState<TSymbol> state, Dictionary<DfaState<TSymbol>, int> color, IDictionary<TSymbol, Dfa<TSymbol>> automatons, ISet<TSymbol> nullable)
         {
 
             //check if is visited or not
             if (color.ContainsKey(state))
             {
                 if (color[state] == 1)
-                    return true;
+                    return new List<TSymbol>();
                 else
-                    return false;
+                    return null;
             }
 
             color[state] = 1;
+
+            List<TSymbol> returnList;
 
             foreach (var transition in state.Transitions)
             {
                 //for nullable keys go on the same automata
                 if (nullable.Contains(transition.Key))
                 {
-                    if (DepthFirstSearchOnState(transition.Value, color, automatons, nullable))
-                        return true;
+                    returnList = DepthFirstSearchOnState(transition.Value, color, automatons, nullable);
+                    if (returnList != null)
+                    {
+                        returnList.Add(transition.Key);
+                        return returnList;
+                    }
                 }
 
                 //for every key go on symbol
-                if (DepthFirstSearchOnSymbol(transition.Key, color, automatons, nullable))
-                    return true;
+                returnList = DepthFirstSearchOnSymbol(transition.Key, color, automatons, nullable);
+                if (returnList != null)
+                {
+                    returnList.Add(transition.Key);
+                    return returnList;
+                }
             }
 
 
             color[state] = 2;
 
-            return false;
+            return null;
         }
 
         /// <summary>
@@ -457,8 +470,8 @@ namespace Nicodem.Parser
         /// </summary>
         /// <param name="automatons">Automatons for grammatic</param>
         /// <param name="nullable">Nullable set in grammatic</param>
-        /// <returns></returns>
-        public static bool HasLeftRecursion(IDictionary<TSymbol, Dfa<TSymbol>> automatons, ISet<TSymbol> nullable)
+        /// <returns>If has no left recursion return null. If has return list of Symbols.</returns>
+        public static List<TSymbol> HasLeftRecursion(IDictionary<TSymbol, Dfa<TSymbol>> automatons, ISet<TSymbol> nullable)
         {
             //check if is nullable available
             if (nullable == null)
@@ -474,11 +487,15 @@ namespace Nicodem.Parser
             //try to search on every symbol
             foreach (var symbol in automatons.Keys)
             {
-                if (DepthFirstSearchOnSymbol(symbol, color, automatons, nullable))
-                    return true;
+                List<TSymbol> returnList = DepthFirstSearchOnSymbol(symbol, color, automatons, nullable);
+                if (returnList != null)
+                {
+                    returnList.Add(symbol);
+                    return returnList;
+                }
             }
 
-            return false;
+            return null;
         }
 			
 	}
