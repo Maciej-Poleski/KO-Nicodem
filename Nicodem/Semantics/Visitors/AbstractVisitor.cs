@@ -13,10 +13,6 @@ namespace Nicodem.Semantics.Visitors
 			Visit (node as Node);
 		}
 
-		public virtual void Visit(FunctionNode node) {
-			Visit (node as Node);
-		}
-
 		public virtual void Visit(TypeNode node) {
 			Visit (node as Node);
 		}
@@ -35,7 +31,13 @@ namespace Nicodem.Semantics.Visitors
 		}
 		#endregion
 
-		#region ExpressionNode direct children
+        #region ExpressionNode direct children
+
+        public virtual void Visit(FunctionDefinitionExpression node)
+        {
+            Visit(node as ExpressionNode);
+        }
+
 		public virtual void Visit(ArrayNode node) {
 			Visit (node as ConstNode);
 		}

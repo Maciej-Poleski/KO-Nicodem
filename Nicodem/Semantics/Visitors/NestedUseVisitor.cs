@@ -4,6 +4,9 @@ using Nicodem.Semantics.AST;
 
 namespace Nicodem.Semantics.Visitors
 {
+    /// <summary>
+    ///     Names of all variables must be resolved before use of this visitor.
+    /// </summary>
     internal class NestedUseVisitor : AbstractVisitor
     {
         public override void Visit(Node node)
@@ -22,17 +25,17 @@ namespace Nicodem.Semantics.Visitors
 
     internal class NestedUseVisitor1 : AbstractRecursiveVisitor
     {
-        private readonly Dictionary<VariableDeclNode, FunctionNode> _declToFunction =
-            new Dictionary<VariableDeclNode, FunctionNode>();
+        private readonly Dictionary<VariableDeclNode, FunctionDefinitionExpression> _declToFunction =
+            new Dictionary<VariableDeclNode, FunctionDefinitionExpression>();
 
-        private FunctionNode _currentFunction;
+        private FunctionDefinitionExpression _currentFunction;
 
-        internal IReadOnlyDictionary<VariableDeclNode, FunctionNode> DeclToFunction
+        internal IReadOnlyDictionary<VariableDeclNode, FunctionDefinitionExpression> DeclToFunction
         {
             get { return _declToFunction; }
         }
 
-        public override void Visit(FunctionNode node)
+        public override void Visit(FunctionDefinitionExpression node)
         {
             _currentFunction = node;
             base.Visit(node);
@@ -54,15 +57,15 @@ namespace Nicodem.Semantics.Visitors
     /// </summary>
     internal class NestedUseVisitor2 : AbstractRecursiveVisitor
     {
-        private readonly IReadOnlyDictionary<VariableDeclNode, FunctionNode> _declToFunction;
-        private FunctionNode _currentFunction;
+        private readonly IReadOnlyDictionary<VariableDeclNode, FunctionDefinitionExpression> _declToFunction;
+        private FunctionDefinitionExpression _currentFunction;
 
-        public NestedUseVisitor2(IReadOnlyDictionary<VariableDeclNode, FunctionNode> declToFunction)
+        public NestedUseVisitor2(IReadOnlyDictionary<VariableDeclNode, FunctionDefinitionExpression> declToFunction)
         {
             _declToFunction = declToFunction;
         }
 
-        public override void Visit(FunctionNode node)
+        public override void Visit(FunctionDefinitionExpression node)
         {
             _currentFunction = node;
             base.Visit(node);
@@ -81,6 +84,10 @@ namespace Nicodem.Semantics.Visitors
 
     public static partial class Extensions
     {
+        /// <summary>
+        ///     Names of all variables must be resolved before use of this visitor.
+        /// </summary>
+        /// <param name="node">Root of AST tree</param>
         internal static void FillInNestedUseFlag(this ProgramNode node)
         {
             node.Accept(new NestedUseVisitor());

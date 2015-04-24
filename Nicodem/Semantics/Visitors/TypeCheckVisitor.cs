@@ -12,10 +12,10 @@ namespace Nicodem.Semantics.Visitors
         List<WhileNode> _stack_of_while_node = new List<WhileNode>();
 
         //check if body returns the same as set type
-        public override void Visit(FunctionNode node)
+        public override void Visit(FunctionDefinitionExpression node)
         {
             base.Visit(node);
-            if (TypeNode.Compare(node.Type, node.Body.ExpressionType))
+            if (TypeNode.Compare(node.ResultType, node.Body.ExpressionType))
                 throw new TypeCheckException("Body don't return the same type as set type.");
         }
 
@@ -110,7 +110,7 @@ namespace Nicodem.Semantics.Visitors
                     throw new Exception(String.Format("Argument {0} has inproper type.", i));
             }
 
-            node.ExpressionType = node.Definition.Type;
+            node.ExpressionType = node.Definition.ResultType;
         }
 
         //check if condition is bool and set common return type of Then and Else

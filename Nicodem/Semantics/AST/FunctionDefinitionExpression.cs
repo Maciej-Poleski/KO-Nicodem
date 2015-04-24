@@ -6,16 +6,16 @@ using System.Diagnostics;
 
 namespace Nicodem.Semantics.AST
 {
-	class FunctionNode : Node
+	class FunctionDefinitionExpression : ExpressionNode
 	{
 		public string Name { get; set; }
         public IEnumerable<VariableDeclNode> Parameters { get; set; }
-		public TypeNode Type { get; set; }
+		public TypeNode ResultType { get; set; }
 		public ExpressionNode Body { get; set; }
 
         // ----- Constructor -----
 
-        public FunctionNode(){
+        public FunctionDefinitionExpression(){
         }
 
         // ----- Methods -----
@@ -51,7 +51,7 @@ namespace Nicodem.Semantics.AST
             // parameters from arg 2
             Parameters = getParameters(childs[2]);
             // type from arg 5
-            Type = TypeNode.GetTypeNode(childs[5]);
+            ResultType = TypeNode.GetTypeNode(childs[5]);
             // body from arg 6
             Body = ExpressionNode.GetExpressionNode(childs[6]);
         }
