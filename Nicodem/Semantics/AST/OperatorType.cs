@@ -3,7 +3,8 @@
 	enum OperatorType
 	{
 		// TODO insert types here
-		OT_PLUS = 0
+		OT_PLUS = 0,
+        OT_ASSIGNMENT
 	}
 }
 

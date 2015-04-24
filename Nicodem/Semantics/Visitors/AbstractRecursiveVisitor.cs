@@ -12,15 +12,6 @@ namespace Nicodem.Semantics.Visitors
 				child.Accept (this);
 		}
 
-		public override void Visit(FunctionNode node)
-		{
-			base.Visit (node);
-			node.Type.Accept (this);
-			node.Body.Accept (this);
-			foreach (var parameter in node.Parameters)
-				parameter.Accept (this);
-		}
-
 		public override void Visit(ExpressionNode node) 
 		{
 			base.Visit (node);
@@ -36,7 +27,17 @@ namespace Nicodem.Semantics.Visitors
 		}
 		#endregion
 
-		#region ExpressionNode direct children
+        #region ExpressionNode direct children
+
+        public override void Visit(FunctionDefinitionExpression node)
+        {
+            base.Visit(node);
+            node.ResultType.Accept(this);
+            node.Body.Accept(this);
+            foreach (var parameter in node.Parameters)
+                parameter.Accept(this);
+        }
+
 		public override void Visit(ArrayNode node)
 		{
 			base.Visit (node);
