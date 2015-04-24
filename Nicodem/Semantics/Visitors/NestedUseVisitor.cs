@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Nicodem.Semantics.AST;
 
 namespace Nicodem.Semantics.Visitors
@@ -47,6 +48,7 @@ namespace Nicodem.Semantics.Visitors
             {
                 throw new NotSupportedException("Variable declaration outside of function is currently not supported");
             }
+            Debug.Assert(!_declToFunction.ContainsKey(node));
             _declToFunction[node] = _currentFunction;
             base.Visit(node);
         }
