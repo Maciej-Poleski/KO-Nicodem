@@ -42,7 +42,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AST\Node.cs" />
     <Compile Include="AST\ProgramNode.cs" />
-    <Compile Include="AST\FunctionNode.cs" />
+    <Compile Include="AST\FunctionDefinitionExpression.cs" />
     <Compile Include="AST\VariableDeclNode.cs" />
     <Compile Include="AST\TypeNode.cs" />
     <Compile Include="AST\NamedTypeNode.cs" />
@@ -64,6 +64,7 @@
     <Compile Include="AST\ElementNode.cs" />
     <Compile Include="Visitors\AbstractVisitor.cs" />
     <Compile Include="Visitors\AbstractRecursiveVisitor.cs" />
+    <Compile Include="Visitors\FunctionSplitterVisitor.cs" />
     <Compile Include="Visitors\NestedUseVisitor.cs" />
     <Compile Include="Visitors\SymbolTable.cs" />
     <Compile Include="Visitors\DefinitionNotFoundException.cs" />
