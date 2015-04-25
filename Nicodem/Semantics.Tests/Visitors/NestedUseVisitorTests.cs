@@ -3,6 +3,7 @@ using System.Diagnostics;
 using Nicodem.Semantics.AST;
 using Nicodem.Semantics.Visitors;
 using NUnit.Framework;
+using Nicodem.Core;
 
 namespace Semantics.Tests.Visitors
 {
@@ -16,9 +17,18 @@ namespace Semantics.Tests.Visitors
         private const Mutablitity Constant = Mutablitity.Constant;
         private const Mutablitity Mutable = Mutablitity.Mutable;
 
-        [Test]
+        [TestFixtureSetUp]
+        public void init()
+        {
+            // We don't want message boxes in testing.
+            TestsTraceListener.Setup(() => Assert.Fail());
+        }
+
+        [Test, Timeout(1000)]
         public void NoNestedUses()
         {
+            Debug.Assert(false);
+            return;
             /* f(int mutable a, int mutable b) -> int
              * {
              *   int mutable c = -1
@@ -155,7 +165,7 @@ namespace Semantics.Tests.Visitors
             Assert.False(fBodyEx2.NestedUse);
         }
 
-        [Test]
+        [Test, Timeout(1000)]
         public void SimpleNestedUses()
         {
             /* f(int mutable a, int mutable b) -> int

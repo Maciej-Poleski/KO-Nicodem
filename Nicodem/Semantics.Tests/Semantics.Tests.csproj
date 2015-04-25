@@ -43,6 +43,10 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
+    <ProjectReference Include="..\Core.Tests\Core.Tests.csproj">
+      <Project>{2afac738-0f82-474d-a7c1-4db18d2ff0a9}</Project>
+      <Name>Core.Tests</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Parser\Parser.csproj">
       <Project>{DC9385D6-C37E-441F-8BAA-3B7EAEC2DA39}</Project>
       <Name>Parser</Name>
