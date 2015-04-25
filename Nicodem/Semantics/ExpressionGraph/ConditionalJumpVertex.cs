@@ -8,6 +8,7 @@ namespace Nicodem.Semantics.ExpressionGraph
 {
     class ConditionalJumpVertex
     {
-        Vertex TrueJump, FalseJump;
+        public Vertex TrueJump { get; set; }
+        public Vertex FalseJump { get; set; }
     }
 }
