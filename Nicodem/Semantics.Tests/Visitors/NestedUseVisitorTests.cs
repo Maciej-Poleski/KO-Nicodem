@@ -27,8 +27,6 @@ namespace Semantics.Tests.Visitors
         [Test, Timeout(1000)]
         public void NoNestedUses()
         {
-            Debug.Assert(false);
-            return;
             /* f(int mutable a, int mutable b) -> int
              * {
              *   int mutable c = -1
