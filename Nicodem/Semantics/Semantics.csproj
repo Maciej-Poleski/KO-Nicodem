@@ -78,12 +78,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <None Include="ClassDiagram1.cd" />
-    <None Include="ClassDiagram2.cd" />
-    <None Include="ClassDiagram3.cd" />
-    <None Include="ClassDiagram4.cd" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Lexer\Lexer.csproj">
       <Project>{3A107436-1EC7-48E3-BF42-5E5E50C259E7}</Project>
       <Name>Lexer</Name>
