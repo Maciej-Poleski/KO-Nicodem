@@ -74,6 +74,8 @@
     <Compile Include="AST\ASTBuilder.cs" />
     <Compile Include="CST\CSTBuilder.cs" />
     <Compile Include="Visitors\FunctionLocalVisitor.cs" />
+    <Compile Include="Backend\BackendBuilder.cs" />
+    <Compile Include="Backend\NodeBuilder.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -96,4 +98,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Backend\" />
+  </ItemGroup>
 </Project>

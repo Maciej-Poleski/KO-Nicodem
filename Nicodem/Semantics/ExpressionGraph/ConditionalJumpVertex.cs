@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Nicodem.Semantics.ExpressionGraph
 {
-    class ConditionalJumpVertex
+    class ConditionalJumpVertex : Vertex
     {
         public Vertex TrueJump { get; set; }
         public Vertex FalseJump { get; set; }
