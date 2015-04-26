@@ -43,7 +43,7 @@ namespace Nicodem.Semantics
 					Action<Brep.Node> trueAct = null;
 					Action<Brep.Node> falseAct = null;
 
-					newNode = new Brep.ConditionalJumpNode(condNode, trueAct, falseAct);
+					newNode = new Brep.ConditionalJumpNode(condNode, out trueAct, out falseAct);
 					HandleAction(trueAct, condVertex.TrueJump);
 					HandleAction(falseAct, condVertex.FalseJump);
 				} else if(expVertex is OneJumpVertex) {
@@ -54,7 +54,7 @@ namespace Nicodem.Semantics
 					var first = NodeBuilder.BuildNode(jumpVertex.Expression, function);
 
 					Action<Brep.Node> secondAct = null;
-					newNode = new Brep.SequenceNode(new List<Brep.Node>{first}, secondAct);
+					newNode = new Brep.SequenceNode(new List<Brep.Node>{first}, out secondAct);
 					HandleAction(secondAct, jumpVertex.Jump);
 				} else {
 
