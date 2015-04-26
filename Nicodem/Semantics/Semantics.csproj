@@ -32,6 +32,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AST\AtomNode.cs" />
+    <Compile Include="SideEffectExtractor.cs" />
     <Compile Include="ExpressionGraph\ReturnVertex.cs" />
     <Compile Include="ExpressionGraph\ConditionalJumpVertex.cs" />
     <Compile Include="ExpressionGraph\OneJumpVertex.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="AST\ElementNode.cs" />
     <Compile Include="Visitors\AbstractVisitor.cs" />
     <Compile Include="Visitors\AbstractRecursiveVisitor.cs" />
+    <Compile Include="Visitors\SideEffectExtractorVisitor.cs" />
     <Compile Include="Visitors\FunctionSplitterVisitor.cs" />
     <Compile Include="Visitors\NestedUseVisitor.cs" />
     <Compile Include="Visitors\SymbolTable.cs" />
@@ -75,7 +77,12 @@
     <Compile Include="CST\CSTBuilder.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
+    <None Include="ClassDiagram2.cd" />
+    <None Include="ClassDiagram3.cd" />
+    <None Include="ClassDiagram4.cd" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lexer\Lexer.csproj">
       <Project>{3A107436-1EC7-48E3-BF42-5E5E50C259E7}</Project>
