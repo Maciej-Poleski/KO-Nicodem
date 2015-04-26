@@ -1,11 +1,13 @@
 using Nicodem.Semantics.Visitors;
 using Nicodem.Parser;
+using Nicodem.Backend;
 
 namespace Nicodem.Semantics.AST
 {
 	class VariableDefNode : VariableDeclNode
 	{
 		public ExpressionNode Value { get; set; }
+		public Location VariableLocation { get; set; }
         
         #region implemented abstract members of Node
 
