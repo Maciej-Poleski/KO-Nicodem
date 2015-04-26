@@ -73,6 +73,7 @@
     <Compile Include="Visitors\TypeCheckVisitor.cs" />
     <Compile Include="AST\ASTBuilder.cs" />
     <Compile Include="CST\CSTBuilder.cs" />
+    <Compile Include="Visitors\FunctionLocalVisitor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -88,6 +89,10 @@
     <ProjectReference Include="..\Source\Source.csproj">
       <Project>{6078FFE3-28C8-4169-831D-E1D1AAFDD72F}</Project>
       <Name>Source</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Backend\Backend.csproj">
+      <Project>{493808C4-AFCD-4D86-B72C-BABAA51F88C4}</Project>
+      <Name>Backend</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

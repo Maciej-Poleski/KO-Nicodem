@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Nicodem.Semantics.Visitors;
 using Nicodem.Parser;
+using Nicodem.Backend;
 using System.Linq;
 using System.Diagnostics;
 
@@ -12,6 +13,7 @@ namespace Nicodem.Semantics.AST
         public IEnumerable<VariableDeclNode> Parameters { get; set; }
 		public TypeNode ResultType { get; set; }
 		public ExpressionNode Body { get; set; }
+		public Function BackendFunction { get; set; }
 
         // ----- Constructor -----
 
