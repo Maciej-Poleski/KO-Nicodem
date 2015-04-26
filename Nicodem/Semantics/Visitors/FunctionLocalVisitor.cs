@@ -8,7 +8,7 @@ namespace Nicodem.Semantics.Visitors
 	internal class FunctionLocalVisitor : AbstractRecursiveVisitor
 	{
 		private readonly Target target;
-		private Function function;
+		private Stack<Function> functions = new Stack<Function> ();
 
 		internal FunctionLocalVisitor(Target target) {
 			this.target = target;
@@ -17,15 +17,17 @@ namespace Nicodem.Semantics.Visitors
 		public override void Visit(FunctionDefinitionExpression node)
 		{
 			node.BackendFunction = target.CreateFunction ();
-			function = node.BackendFunction;
+			functions.Push (node.BackendFunction);
 
 			base.Visit(node);
+
+			functions.Pop ();
 		}
 
 		public override void Visit(VariableDefNode node)
 		{
 			if (node.NestedUse) {
-				function.AllocLocal ();
+				functions.Peek().AllocLocal ();
 			} else {
 				node.VariableLocation = new Temporary ();
 			}
