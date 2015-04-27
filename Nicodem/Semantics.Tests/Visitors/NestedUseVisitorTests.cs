@@ -65,17 +65,17 @@ namespace Semantics.Tests.Visitors
             };
             var gBodyEx2 = new OperatorNode
             {
-                Operator = OperatorType.OT_ASSIGNMENT,
+                Operator = OperatorType.ASSIGN,
                 Arguments = new ExpressionNode[] {gParamA.Use(), CharLiteral('a')}
             };
             var gBodyEx3 = new OperatorNode
             {
-                Operator = OperatorType.OT_ASSIGNMENT,
+                Operator = OperatorType.ASSIGN,
                 Arguments = new ExpressionNode[] {gParamE.Use(), BoolLiteral(false)}
             };
             var gBodyEx4 = new OperatorNode
             {
-                Operator = OperatorType.OT_ASSIGNMENT,
+                Operator = OperatorType.ASSIGN,
                 Arguments = new ExpressionNode[] {gBodyEx1.Use(), IntLiteral(3)}
             };
             var gBody = new BlockExpressionNode
@@ -116,22 +116,22 @@ namespace Semantics.Tests.Visitors
             var fBodyEx3 = gFunction;
             var fBodyEx4 = new OperatorNode
             {
-                Operator = OperatorType.OT_ASSIGNMENT,
+                Operator = OperatorType.ASSIGN,
                 Arguments = new ExpressionNode[] {fParamA.Use(), IntLiteral(1)}
             };
             var fBodyEx5 = new OperatorNode
             {
-                Operator = OperatorType.OT_ASSIGNMENT,
+                Operator = OperatorType.ASSIGN,
                 Arguments = new ExpressionNode[] {fParamB.Use(), IntLiteral(2)}
             };
             var fBodyEx6 = new OperatorNode
             {
-                Operator = OperatorType.OT_ASSIGNMENT,
+                Operator = OperatorType.ASSIGN,
                 Arguments = new ExpressionNode[] {fBodyEx1.Use(), IntLiteral(3)}
             };
             var fBodyEx7 = new OperatorNode
             {
-                Operator = OperatorType.OT_ASSIGNMENT,
+                Operator = OperatorType.ASSIGN,
                 Arguments = new ExpressionNode[] {fBodyEx2.Use(), ByteLiteral(4)}
             };
             var fBodyEx8 = fParamB.Use();
@@ -228,22 +228,22 @@ namespace Semantics.Tests.Visitors
             };
             var gBodyEx2 = new OperatorNode
             {
-                Operator = OperatorType.OT_ASSIGNMENT,
+                Operator = OperatorType.ASSIGN,
                 Arguments = new ExpressionNode[] {fParamA.Use(), IntLiteral(1)}
             };
             var gBodyEx3 = new OperatorNode
             {
-                Operator = OperatorType.OT_ASSIGNMENT,
+                Operator = OperatorType.ASSIGN,
                 Arguments = new ExpressionNode[] {gParamE.Use(), BoolLiteral(false)}
             };
             var gBodyEx4 = new OperatorNode
             {
-                Operator = OperatorType.OT_ASSIGNMENT,
+                Operator = OperatorType.ASSIGN,
                 Arguments = new ExpressionNode[] {gBodyEx1.Use(), IntLiteral(3)}
             };
             var gBodeEx5 = new OperatorNode
             {
-                Operator = OperatorType.OT_ASSIGNMENT,
+                Operator = OperatorType.ASSIGN,
                 Arguments = new ExpressionNode[] {fVarD.Use(), IntLiteral(2)}
             };
             var gBody = new BlockExpressionNode
@@ -264,22 +264,22 @@ namespace Semantics.Tests.Visitors
             var fBodyEx3 = gFunction;
             var fBodyEx4 = new OperatorNode
             {
-                Operator = OperatorType.OT_ASSIGNMENT,
+                Operator = OperatorType.ASSIGN,
                 Arguments = new ExpressionNode[] {fParamA.Use(), IntLiteral(1)}
             };
             var fBodyEx5 = new OperatorNode
             {
-                Operator = OperatorType.OT_ASSIGNMENT,
+                Operator = OperatorType.ASSIGN,
                 Arguments = new ExpressionNode[] {fParamB.Use(), IntLiteral(2)}
             };
             var fBodyEx6 = new OperatorNode
             {
-                Operator = OperatorType.OT_ASSIGNMENT,
+                Operator = OperatorType.ASSIGN,
                 Arguments = new ExpressionNode[] {fBodyEx1.Use(), IntLiteral(3)}
             };
             var fBodyEx7 = new OperatorNode
             {
-                Operator = OperatorType.OT_ASSIGNMENT,
+                Operator = OperatorType.ASSIGN,
                 Arguments = new ExpressionNode[] {fBodyEx2.Use(), ByteLiteral(4)}
             };
             var fBodyEx8 = fParamB.Use();

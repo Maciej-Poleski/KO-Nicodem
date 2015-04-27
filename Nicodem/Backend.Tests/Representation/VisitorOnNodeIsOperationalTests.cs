@@ -10,8 +10,8 @@ namespace Nicodem.Backend.Tests.Representation
         public void ParseSimpleOperators()
         {
             // 2+2*2
-            var simpleExpression = new BinaryOperatorNode(BinaryOperatorType.Add, new ConstantNode<int>(2),
-                new BinaryOperatorNode(BinaryOperatorType.Mul, new ConstantNode<int>(2), new ConstantNode<int>(2)));
+            var simpleExpression = new AddOperatorNode(new ConstantNode<int>(2),
+                new MulOperatorNode(new ConstantNode<int>(2), new ConstantNode<int>(2)));
 
             var printer = new BinaryOperatorPrinter();
             simpleExpression.Accept(printer);
@@ -35,7 +35,7 @@ namespace Nicodem.Backend.Tests.Representation
             {
                 _result.Append('(');
                 node.LeftOperand.Accept(this);
-                _result.Append(ToString(node.Operator));
+                _result.Append(ToString(node as dynamic));
                 node.RightOperand.Accept(this);
                 _result.Append(')');
             }
@@ -45,15 +45,18 @@ namespace Nicodem.Backend.Tests.Representation
                 _result.Append(node.Value);
             }
 
-            private static string ToString(BinaryOperatorType type)
+            private static string ToString(AddOperatorNode ignored)
             {
-                switch (type)
-                {
-                    case BinaryOperatorType.Add:
-                        return "+";
-                    case BinaryOperatorType.Mul:
-                        return "*";
-                }
+                return "+";
+            }
+
+            private static string ToString(MulOperatorNode ignored)
+            {
+                return "*";
+            }
+
+            private static string ToString(object ignored)
+            {
                 return "unknown";
             }
         }

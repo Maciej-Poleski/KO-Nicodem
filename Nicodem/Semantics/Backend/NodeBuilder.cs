@@ -57,15 +57,16 @@ namespace Nicodem.Semantics
 			public Brep.Node Build(OperatorNode opNode)
 			{
 				// TODO not enaugh more operator types
+                // @ziemin: This whole class should be a visitor... but i like your idea
 				var leftArg = Build(opNode.Arguments.ElementAt(0) as dynamic);
 				var rightArg = Build(opNode.Arguments.ElementAt(1) as dynamic);
 
 				switch(opNode.Operator) {
 
-				case OperatorType.OT_ASSIGNMENT:
+				case OperatorType.ASSIGN:
 					throw new NotImplementedException();
-				case OperatorType.OT_PLUS:
-					return new Brep.BinaryOperatorNode(Brep.BinaryOperatorType.Add, leftArg, rightArg);
+				case OperatorType.PLUS:
+					return new Brep.AddOperatorNode(leftArg, rightArg);
 				}
 				throw new NotImplementedException();
 			}

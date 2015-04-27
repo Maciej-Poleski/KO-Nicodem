@@ -1,13 +1,13 @@
 ﻿namespace Nicodem.Backend.Representation
 {
-    public class MemoryNode<TAddress> : LocationNode
+    public class MemoryNode : LocationNode
     {
-        public MemoryNode(TAddress address)
+        public MemoryNode(Node address)
         {
             Address = address;
         }
 
-        // Address representation depends on architecture. Adjust when Target will be in shape.
-        public TAddress Address { get; private set; }
+        
+        public Node Address { get; private set; }
     }
 }

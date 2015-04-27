@@ -48,6 +48,7 @@
     <Compile Include="Representation\ConstantNode.cs" />
     <Compile Include="Representation\FunctionCallNode.cs" />
     <Compile Include="Representation\HardwareRegisterNode.cs" />
+    <Compile Include="Representation\IValuable.cs" />
     <Compile Include="Representation\LocationNode.cs" />
     <Compile Include="Representation\MemoryNode.cs" />
     <Compile Include="Representation\NodeMixin.cs" />
@@ -62,6 +63,8 @@
     <Compile Include="Function.cs" />
     <Compile Include="Local.cs" />
     <Compile Include="Target.cs" />
+    <Compile Include="Cover\InsnTile.cs" />
+    <Compile Include="Cover\Instruction.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -72,4 +75,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Folder Include="Cover\" />
+  </ItemGroup>
 </Project>

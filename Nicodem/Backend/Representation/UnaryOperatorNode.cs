@@ -1,21 +1,33 @@
 ﻿namespace Nicodem.Backend.Representation
 {
-    public enum UnaryOperatorType
+    public abstract class UnaryOperatorNode : OperatorNode
     {
-        // Arithmetic negation neg(a) -> -a
-        Neg,
-
-        BitNot,
-        LogNot
-    }
-
-    public class UnaryOperatorNode : OperatorNode<UnaryOperatorType>
-    {
-        public UnaryOperatorNode(UnaryOperatorType @operator, Node operand) : base(@operator)
+        protected UnaryOperatorNode(Node operand)
         {
             Operand = operand;
         }
 
         public Node Operand { get; private set; }
+    }
+
+    public class LogNotOperatorNode : UnaryOperatorNode
+    {
+        public LogNotOperatorNode(Node operand) : base(operand)
+        {
+        }
+    }
+
+    public class BinNotOperatorNode : UnaryOperatorNode
+    {
+        public BinNotOperatorNode(Node operand) : base(operand)
+        {
+        }
+    }
+
+    public class NegOperatorNode : UnaryOperatorNode
+    {
+        public NegOperatorNode(Node operand) : base(operand)
+        {
+        }
     }
 }

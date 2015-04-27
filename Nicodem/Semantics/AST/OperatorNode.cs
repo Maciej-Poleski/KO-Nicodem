@@ -1,13 +1,14 @@
 using System.Collections.Generic;
 using Nicodem.Semantics.Visitors;
 using Nicodem.Parser;
+using Nicodem.Semantics.AST;
 
 namespace Nicodem.Semantics.AST
 {
 	class OperatorNode : OperationNode
 	{
 		public OperatorType Operator { get; set; }
-        
+
         #region implemented abstract members of Node
 
         public static OperatorNode BuildUnaryOperator(string op, ExpressionNode arg)
@@ -16,7 +17,7 @@ namespace Nicodem.Semantics.AST
             var args = new LinkedList<ExpressionNode>();
             args.AddLast(arg);
             opNode.Arguments = args;
-            opNode.Operator = GetOperatorType(op);
+            opNode.Operator = OperatorTypeHelper.GetOperatorType(op);
             return opNode;
         }
 
@@ -26,13 +27,8 @@ namespace Nicodem.Semantics.AST
             args.AddLast(left);
             args.AddLast(right);
             opNode.Arguments = args;
-            opNode.Operator = GetOperatorType(op);
+            opNode.Operator = OperatorTypeHelper.GetOperatorType(op);
             return opNode;
-        }
-
-        public static OperatorType GetOperatorType(string text){
-            //TODO: implement getting OperatorType from textual representation
-            return OperatorType.OT_PLUS;
         }
 
         public override void BuildNode<TSymbol>(IParseTree<TSymbol> parseTree)

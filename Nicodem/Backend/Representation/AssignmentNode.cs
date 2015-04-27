@@ -2,13 +2,13 @@
 {
     public class AssignmentNode : Node
     {
-        public AssignmentNode(LocationNode target, LocationNode source)
+        public AssignmentNode(LocationNode target, Node source)
         {
             Target = target;
             Source = source;
         }
 
         public LocationNode Target { get; private set; }
-        public LocationNode Source { get; private set; }
+        public Node Source { get; private set; }
     }
 }

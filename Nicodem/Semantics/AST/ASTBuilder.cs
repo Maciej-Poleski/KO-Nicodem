@@ -64,12 +64,13 @@ namespace Nicodem.Semantics.AST
 
         public static string GetInformation<TSymbol>(ISymbol<TSymbol> symbol)
         {
+            Console.WriteLine("GET: " + symbol.Description+ " -> " + string.Join(",", symbol.Description.Split(new char[] { '-' }, 2)));
             return symbol.Description.Split(new char[] { '-' }, 2)[1];
         }
 
         public static bool IsLeftOperator<TSymbol>(ISymbol<TSymbol> symbol)
         {
-            return GetInformation(symbol) == "-Operator-left"; // == is equivalent to equals
+            return GetInformation(symbol) == "Operator-left"; // == is equivalent to equals
         }
 
         // ----- parse tree methods

@@ -22,8 +22,8 @@ namespace Nicodem.Semantics.Visitors
         private bool HasSideEffects(OperatorNode node)
         {
             switch (node.Operator) {
-                case OperatorType.OT_ASSIGNMENT: return true;
-                case OperatorType.OT_PLUS: return false;
+                case OperatorType.ASSIGN: return true;
+                case OperatorType.PLUS: return false;
                 default: throw new NotImplementedException();
             }
         }
@@ -47,7 +47,7 @@ namespace Nicodem.Semantics.Visitors
             base.Visit(node);
 
             switch (node.Operator) {
-                case OperatorType.OT_PLUS:
+                case OperatorType.PLUS:
                 // case OperatorType.OT_MINUS:
                 // ... 
                     var newArgs = new List<ExpressionNode>();
@@ -71,7 +71,7 @@ namespace Nicodem.Semantics.Visitors
                     node.Arguments = newArgs;
                     break;
 
-                case OperatorType.OT_ASSIGNMENT:
+                case OperatorType.ASSIGN:
                     // Do nothing. If node was a child, it would be extracted
                     // and this code would not be running. Therefore,
                     // node is a root. We accept side effects in roots.
