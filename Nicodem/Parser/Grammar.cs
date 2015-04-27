@@ -44,6 +44,8 @@ namespace Nicodem.Parser
         public void InjectAutomatons(Dictionary<TSymbol, Dfa<TSymbol>> automatons)
         {
             this.Automatons = automatons;
+            TargetStatesDictionary = GrammarUtils<TSymbol>.computeTargetStatesDictionary(Automatons);
+            AccStateOwnerDictionary = GrammarUtils<TSymbol>.computeAccStateOwnerDictionary(Automatons);
         }
 
 		public Grammar(TSymbol start, IDictionary<TSymbol, IProduction<TSymbol>[]> productions)

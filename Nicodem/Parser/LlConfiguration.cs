@@ -78,6 +78,23 @@ namespace Nicodem.Parser
 			return this.Subsumes (other) && other.Subsumes (this);
 		}
 		#endregion
+
+        private string StackString()
+        {
+            string r = "?";
+            bool first = true;
+            foreach (var state in stack) {
+                if (!first) r += ",";
+                first = false;
+                r += state;
+            }
+            return r;
+        }
+
+        public override string ToString()
+        {
+            return String.Format("C[{0}]({1})", label, StackString());
+        }
 	}
 }
 

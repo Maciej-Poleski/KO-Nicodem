@@ -4,14 +4,16 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 
 namespace Nicodem.Parser
 {
 	public class DfaState<TSymbol>
 		where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
 	{
-		public uint Accepting { get; private set; }
-		public IReadOnlyList<KeyValuePair<TSymbol, DfaState<TSymbol>>> Transitions { get; private set; }
+        public uint Accepting { get; private set; }
+        [DebuggerDisplay("{TransitionsString()}")]
+        public IReadOnlyList<KeyValuePair<TSymbol, DfaState<TSymbol>>> Transitions { get; private set; }
         public string Id { get; private set; } // For debugging purposes.
 
 		public DfaState()
@@ -24,7 +26,7 @@ namespace Nicodem.Parser
             this.Id = id;
         }
 
-		public void Initialize(uint accepting, IReadOnlyList<KeyValuePair<TSymbol, DfaState<TSymbol>>> transitions)
+        public void Initialize(uint accepting, IReadOnlyList<KeyValuePair<TSymbol, DfaState<TSymbol>>> transitions)
 		{
 			if (Transitions != null) {
 				throw new InvalidOperationException("DfaState may be initialized only once.");
@@ -38,19 +40,21 @@ namespace Nicodem.Parser
 			throw new NotImplementedException();
 		}
 
-        public override string ToString()
+        public string TransitionsString()
         {
             var builder = new StringBuilder();
-            builder.Append(Id);
-            builder.Append(" =>");
-            foreach (var i in Transitions)
-            {
+            foreach (var i in Transitions) {
                 builder.Append(" ");
                 builder.Append(i.Key);
                 builder.Append(":");
                 builder.Append(i.Value.Id);
             }
             return builder.ToString();
+        }
+
+        public override string ToString()
+        {
+            return Id;
         }
 	}
 }

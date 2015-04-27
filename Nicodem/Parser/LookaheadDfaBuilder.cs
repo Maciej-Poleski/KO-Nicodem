@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 
 namespace Nicodem.Parser
 {
@@ -69,7 +70,7 @@ namespace Nicodem.Parser
             foreach (var conf in curState) {
                 foreach(KeyValuePair<TSymbol,LlConfiguration<TSymbol>> edge in grammar.OutgoingTerminalEdges(conf)) {
                     TSymbol symbol = edge.Key;
-                    nextStates[symbol] = nextStates[symbol] ?? new State();
+                    if (!nextStates.ContainsKey(symbol)) nextStates[symbol] = new State();
                     nextStates[symbol].Add(edge.Value);
                 }
             }

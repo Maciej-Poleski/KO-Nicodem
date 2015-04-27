@@ -100,7 +100,7 @@ namespace Nicodem.Parser.Tests
 
         }
 
-        [Test]
+        [Test, Timeout(500)]
         public void LookaheadDfaVerySimpleTest()
         {
             var productions = new Dictionary<CharSymbol, IProduction<CharSymbol>[]>();
@@ -109,7 +109,7 @@ namespace Nicodem.Parser.Tests
 			};
             DfaState<CharSymbol> s1 = new DfaState<CharSymbol>("1");
             DfaState<CharSymbol> s2 = new DfaState<CharSymbol>("2");
-            DfaState<CharSymbol> sError = new DfaState<CharSymbol>("error");
+            DfaState<CharSymbol> sError = new DfaState<CharSymbol>("X");
             var t1 = new List<KeyValuePair<CharSymbol, DfaState<CharSymbol>>> {
                 new KeyValuePair<CharSymbol, DfaState<CharSymbol>>(CharSymbol.MinValue, sError),
                 new KeyValuePair<CharSymbol, DfaState<CharSymbol>>(new CharSymbol('a'), s2),
