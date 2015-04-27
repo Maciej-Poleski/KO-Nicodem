@@ -3,6 +3,7 @@ using Nicodem.Parser;
 
 namespace Nicodem.Semantics.AST
 {
+    // TODO - is this class needed?
 	abstract class ConstNode : ExpressionNode
 	{
 		public TypeNode VariableType { get; private set; }

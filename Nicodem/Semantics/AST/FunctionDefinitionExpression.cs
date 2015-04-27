@@ -9,25 +9,19 @@ namespace Nicodem.Semantics.AST
 {
 	class FunctionDefinitionExpression : ExpressionNode
 	{
-		public string Name { get; set; }
-        public IEnumerable<VariableDeclNode> Parameters { get; set; }
-		public TypeNode ResultType { get; set; }
-		public ExpressionNode Body { get; set; }
+        public string Name { get; set; } // set during AST construction
+        public IEnumerable<VariableDeclNode> Parameters { get; set; } // set during AST construction
+        public TypeNode ResultType { get; set; } // set during AST construction
+        public ExpressionNode Body { get; set; } // set during AST construction
 		public Function BackendFunction { get; set; }
-
-        // ----- Constructor -----
-
-        public FunctionDefinitionExpression(){
-        }
 
         // ----- Methods -----
 
         #region implemented abstract members of Node
 
-        private IEnumerable<VariableDeclNode> getParameters<TSymbol>(IParseTree<TSymbol> parseTree) where TSymbol:ISymbol<TSymbol> {
+        private IEnumerable<VariableDeclNode> GetParameters<TSymbol>(IParseTree<TSymbol> parseTree) where TSymbol:ISymbol<TSymbol> {
             var parList = new LinkedList<VariableDeclNode>();
-            var node = ASTBuilder.AsBranch(parseTree);
-            var childs = node.Children.GetEnumerator();
+            var childs = ASTBuilder.ChildrenEnumerator(parseTree);
             while (childs.MoveNext()) {
                 var par = new VariableDeclNode();
                 par.BuildNode(childs.Current);
@@ -37,21 +31,15 @@ namespace Nicodem.Semantics.AST
             return parList;
         }
 
-        private TypeNode getType<TSymbol>(IParseTree<TSymbol> parseTree) where TSymbol:ISymbol<TSymbol> {
-
-            return null;
-        }
-
         public override void BuildNode<TSymbol>(IParseTree<TSymbol> parseTree)
         {
-            var node = ASTBuilder.AsBranch(parseTree);
-            IParseTree<TSymbol>[] childs = node.Children.ToArray();
+            IParseTree<TSymbol>[] childs = ASTBuilder.ChildrenArray(parseTree);
             // name ( params ) -> type expr
             Debug.Assert(childs.Length == 7); 
             // name from arg 0
             Name = childs[0].Fragment.GetOriginText();
             // parameters from arg 2
-            Parameters = getParameters(childs[2]);
+            Parameters = GetParameters(childs[2]);
             // type from arg 5
             ResultType = TypeNode.GetTypeNode(childs[5]);
             // body from arg 6

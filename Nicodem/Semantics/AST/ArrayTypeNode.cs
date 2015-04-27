@@ -5,17 +5,21 @@ namespace Nicodem.Semantics.AST
 {
 	class ArrayTypeNode : TypeNode
 	{
-		public TypeNode ElementType { get; set; } // type of elements of this arrays
+        // type of elements of this arrays
+        public TypeNode ElementType { get; set; } // set during AST construction
 
-		public bool IsFixedSize { get; set; } // TODO: currently all arrays are initialized as dynamic (not fixed sized)
+        // TODO: currently all arrays are initialized as dynamic (not fixed sized)
+        public bool IsFixedSize { get; set; } // set during AST construction
 		//public int Length { get; set; } // TODO: currently lengths of arrays are not defined
-        public ExpressionNode LengthExpression { get; set; }
+        // there is only expression which can represent length
+        public ExpressionNode LengthExpression { get; set; } // set during AST construction
 
         #region implemented abstract members of Node
 
         public override void BuildNode<TSymbol>(IParseTree<TSymbol> parseTree)
         {
             // no work to do here
+            throw new System.NotImplementedException();
         }
 
         #endregion
