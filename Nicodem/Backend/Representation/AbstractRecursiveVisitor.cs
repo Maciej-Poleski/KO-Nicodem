@@ -84,7 +84,7 @@ namespace Nicodem.Backend.Representation
             Visit(node as LocationNode);
         }
 
-        public override void Visit<TAddress>(MemoryNode<TAddress> node)
+        public override void Visit(MemoryNode node)
         {
             Visit(node as LocationNode);
         }

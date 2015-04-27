@@ -64,7 +64,7 @@
             Visit(node as LocationNode);
         }
 
-        public virtual void Visit<TAddress>(MemoryNode<TAddress> node)
+        public virtual void Visit(MemoryNode node)
         {
             Visit(node as LocationNode);
         }

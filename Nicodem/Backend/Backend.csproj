@@ -48,6 +48,7 @@
     <Compile Include="Representation\ConstantNode.cs" />
     <Compile Include="Representation\FunctionCallNode.cs" />
     <Compile Include="Representation\HardwareRegisterNode.cs" />
+    <Compile Include="Representation\IValuable.cs" />
     <Compile Include="Representation\LocationNode.cs" />
     <Compile Include="Representation\MemoryNode.cs" />
     <Compile Include="Representation\NodeMixin.cs" />
