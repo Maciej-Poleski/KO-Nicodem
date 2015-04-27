@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Nicodem.Backend.Representation
+﻿namespace Nicodem.Backend.Representation
 {
     public abstract class AbstractRecursiveVisitor : AbstractVisitor
     {
@@ -55,7 +49,7 @@ namespace Nicodem.Backend.Representation
             Visit(node as Node);
         }
 
-        public override void Visit<TOperator>(OperatorNode<TOperator> node)
+        public override void Visit(OperatorNode node)
         {
             Visit(node as Node);
         }
@@ -64,16 +58,129 @@ namespace Nicodem.Backend.Representation
 
         public override void Visit(UnaryOperatorNode node)
         {
-            Visit(node as OperatorNode<UnaryOperatorType>);
+            Visit(node as OperatorNode);
             node.Operand.Accept(this);
         }
 
         public override void Visit(BinaryOperatorNode node)
         {
-            Visit(node as OperatorNode<BinaryOperatorType>);
+            Visit(node as OperatorNode);
             node.LeftOperand.Accept(this);
             node.RightOperand.Accept(this);
         }
+
+        #region UnaryOperatorNode subclasses
+
+        public override void Visit(NegOperatorNode node)
+        {
+            Visit(node as UnaryOperatorNode);
+        }
+
+        public override void Visit(BinNotOperatorNode node)
+        {
+            Visit(node as UnaryOperatorNode);
+        }
+
+        public override void Visit(LogNotOperatorNode node)
+        {
+            Visit(node as UnaryOperatorNode);
+        }
+
+        #endregion
+
+        #region BinaryOperatorNode subclasses
+
+        public override void Visit(AddOperatorNode node)
+        {
+            Visit(node as BinaryOperatorNode);
+        }
+
+        public override void Visit(SubOperatorNode node)
+        {
+            Visit(node as BinaryOperatorNode);
+        }
+
+        public override void Visit(MulOperatorNode node)
+        {
+            Visit(node as BinaryOperatorNode);
+        }
+
+        public override void Visit(DivOperatorNode node)
+        {
+            Visit(node as BinaryOperatorNode);
+        }
+
+        public override void Visit(ModOperatorNode node)
+        {
+            Visit(node as BinaryOperatorNode);
+        }
+
+        public override void Visit(ShlOperatorNode node)
+        {
+            Visit(node as BinaryOperatorNode);
+        }
+
+        public override void Visit(ShrOperatorNode node)
+        {
+            Visit(node as BinaryOperatorNode);
+        }
+
+        public override void Visit(LtOperatorNode node)
+        {
+            Visit(node as BinaryOperatorNode);
+        }
+
+        public override void Visit(LteOperatorNode node)
+        {
+            Visit(node as BinaryOperatorNode);
+        }
+
+        public override void Visit(GtOperatorNode node)
+        {
+            Visit(node as BinaryOperatorNode);
+        }
+
+        public override void Visit(GteOperatorNode node)
+        {
+            Visit(node as BinaryOperatorNode);
+        }
+
+        public override void Visit(EqOperatorNode node)
+        {
+            Visit(node as BinaryOperatorNode);
+        }
+
+        public override void Visit(NeqOperatorNode node)
+        {
+            Visit(node as BinaryOperatorNode);
+        }
+
+        public override void Visit(BitAndOperatorNode node)
+        {
+            Visit(node as BinaryOperatorNode);
+        }
+
+        public override void Visit(BitXorOperatorNode node)
+        {
+            Visit(node as BinaryOperatorNode);
+        }
+
+        public override void Visit(BitOrOperatorNode node)
+        {
+            Visit(node as BinaryOperatorNode);
+        }
+
+        public override void Visit(LogAndOperatorNode node)
+        {
+            Visit(node as BinaryOperatorNode);
+        }
+
+        public override void Visit(LogOrOperatorNode node)
+        {
+            Visit(node as BinaryOperatorNode);
+        }
+
+        #endregion
 
         #endregion
 
@@ -102,7 +209,9 @@ namespace Nicodem.Backend.Representation
         }
 
         #endregion
+
         #endregion
+
         #endregion
     }
 }
