@@ -62,9 +62,9 @@ namespace Nicodem.Semantics
 
 				switch(opNode.Operator) {
 
-				case OperatorType.OT_ASSIGNMENT:
+				case OperatorType.ASSIGN:
 					throw new NotImplementedException();
-				case OperatorType.OT_PLUS:
+				case OperatorType.PLUS:
 					return new Brep.BinaryOperatorNode(Brep.BinaryOperatorType.Add, leftArg, rightArg);
 				}
 				throw new NotImplementedException();

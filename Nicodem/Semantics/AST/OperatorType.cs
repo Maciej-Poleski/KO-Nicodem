@@ -5,7 +5,7 @@ namespace Nicodem.Semantics.AST
 	enum OperatorType
 	{
         // "= += -= *= /= %= <<= >>= &= ^= |="
-        OT_ASSIGNMENT = 0, // TODO: ASSIGN
+        ASSIGN = 0,
         PLUS_ASSIGN,
         MINUS_ASSIGN,
         MUL_ASSIGN,
@@ -38,7 +38,7 @@ namespace Nicodem.Semantics.AST
         BIT_SHIFT_UP,
         BIT_SHIFT_DOWN,
         // "+ -"
-        OT_PLUS, // TODO: PLUS
+        PLUS, // TODO: PLUS
         MINUS,
         // "* / %"
         MUL,
@@ -60,8 +60,8 @@ namespace Nicodem.Semantics.AST
     {
         private static Dictionary<string, OperatorType> opDict = new Dictionary<string, OperatorType>()
         {
-            {"=", OperatorType.OT_ASSIGNMENT},
-            {"+", OperatorType.OT_PLUS},
+            {"=", OperatorType.ASSIGN},
+            {"+", OperatorType.PLUS},
         };
 
         internal static OperatorType GetOperatorType(string text){
