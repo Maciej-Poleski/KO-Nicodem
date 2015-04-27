@@ -625,7 +625,7 @@ namespace Nicodem.Semantics.Grammar
             Operator5Expression.SetProduction(MakeInfixOperatorExpressionRegex(Operator4Expression, "* / %".Split(' ')));
             Operator4Expression.SetProduction(Operator3Expression);
             Operator3Expression.SetProduction(RegexSymbol.MakeUnion("++ -- + - ! ~".Split(' ')).Star * Operator2Expression);
-            Operator2Expression.SetProduction(Operator1Expression * (RegexSymbol.MakeUnion("\\+\\+", "\\-\\-") + ("(" * Expression.Star * ")") + ("\\[" * Expression * "\\]") + ("\\[" * Expression.Optional * "\\.\\." * Expression.Optional * "\\]")).Star);
+            Operator2Expression.SetProduction(Operator1Expression * (RegexSymbol.MakeUnion("\\+\\+", "\\-\\-") + ("(" * (Expression * ",").Star * Expression.Optional * ")") + ("\\[" * Expression * "\\]") + ("\\[" * Expression.Optional * "\\.\\." * Expression.Optional * "\\]")).Star);
             Operator1Expression.SetProduction(Operator0Expression);
             Operator0Expression.SetProduction(AtomicExpression + ("\\(" * Expression * "\\)"));
             AtomicExpression.SetProduction(
