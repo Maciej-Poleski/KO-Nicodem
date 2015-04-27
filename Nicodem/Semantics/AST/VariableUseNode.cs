@@ -5,14 +5,15 @@ namespace Nicodem.Semantics.AST
 {
 	class VariableUseNode : ExpressionNode
 	{
-		public string Name { get; set; }
+        public string Name { get; set; } // set during AST construction
 		public VariableDeclNode Declaration { get; set; }
         
         #region implemented abstract members of Node
 
         public override void BuildNode<TSymbol>(IParseTree<TSymbol> parseTree)
         {
-            throw new System.NotImplementedException();
+            // ObjectUseExpression -> ObjectName
+            Name = parseTree.Fragment.GetOriginText();
         }
 
         #endregion

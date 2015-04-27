@@ -7,8 +7,8 @@ namespace Nicodem.Semantics.AST
 {
 	class VariableDeclNode : ExpressionNode
 	{
-		public string Name { get; set; }
-		public TypeNode Type { get; set; }
+        public string Name { get; set; } // set during AST construction
+        public TypeNode Type { get; set; } // set during AST construction
 
         public bool NestedUse { get; set; }
         

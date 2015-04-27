@@ -8,6 +8,7 @@ using Nicodem.Semantics.Visitors;
 
 namespace Nicodem.Semantics.AST
 {
+    // TODO: when to use this class?
     class AtomNode : ConstNode
     {
 

@@ -10,6 +10,16 @@ namespace Nicodem.Semantics.AST
         
         #region implemented abstract members of Node
 
+        public static OperatorNode BuildUnaryOperator(string op, ExpressionNode arg)
+        {
+            var opNode = new OperatorNode();
+            var args = new LinkedList<ExpressionNode>();
+            args.AddLast(arg);
+            opNode.Arguments = args;
+            opNode.Operator = GetOperatorType(op);
+            return opNode;
+        }
+
         public static OperatorNode BuildBinaryOperator(string op, ExpressionNode left, ExpressionNode right){
             var opNode = new OperatorNode();
             var args = new LinkedList<ExpressionNode>();

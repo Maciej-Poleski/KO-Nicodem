@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Nicodem.Semantics.Visitors;
 using Nicodem.Parser;
 
@@ -5,9 +6,9 @@ namespace Nicodem.Semantics.AST
 {
 	class IfNode : ExpressionNode
 	{
-		public ExpressionNode Condition { get; set; }
-		public ExpressionNode Then { get; set; }
-		public ExpressionNode Else { get; set; }
+        public ExpressionNode Condition { get; set; } // set during AST construction
+        public ExpressionNode Then { get; set; } // set during AST construction
+        public ExpressionNode Else { get; set; } // set during AST construction
 
 		public bool HasElse { get { return !ReferenceEquals (Else, null); } }
         
@@ -15,7 +16,15 @@ namespace Nicodem.Semantics.AST
 
         public override void BuildNode<TSymbol>(IParseTree<TSymbol> parseTree)
         {
-            throw new System.NotImplementedException();
+            // IfExpression -> "if" Expression Expression ("else" Expression)?
+            var childs = ASTBuilder.ChildrenArray(parseTree);
+            Debug.Assert(childs.Length >= 3);
+            Condition = ExpressionNode.GetExpressionNode(childs[1]);
+            Then = ExpressionNode.GetExpressionNode(childs[2]);
+            if (childs.Length == 5)
+            {
+                Else = ExpressionNode.GetExpressionNode(childs[4]);
+            }
         }
 
         #endregion

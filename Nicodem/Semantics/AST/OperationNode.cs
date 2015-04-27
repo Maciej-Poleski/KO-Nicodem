@@ -5,6 +5,7 @@ using Nicodem.Parser;
 
 namespace Nicodem.Semantics.AST
 {
+    // TODO is this class needed?
 	class OperationNode : ExpressionNode
 	{
 		public IEnumerable<ExpressionNode> Arguments { get; set; }
@@ -13,6 +14,7 @@ namespace Nicodem.Semantics.AST
 
         public override void BuildNode<TSymbol>(IParseTree<TSymbol> parseTree)
         {
+            // nothing to do here
             throw new System.NotImplementedException();
         }
 

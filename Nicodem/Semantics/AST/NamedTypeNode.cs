@@ -5,7 +5,7 @@ namespace Nicodem.Semantics.AST
 {
 	class NamedTypeNode : TypeNode
 	{
-		public string Name { get; set; }
+        public string Name { get; set; } // set during AST construction
 
         public static NamedTypeNode VoidType(){
             NamedTypeNode node = new NamedTypeNode();

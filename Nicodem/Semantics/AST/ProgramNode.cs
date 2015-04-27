@@ -8,7 +8,7 @@ namespace Nicodem.Semantics.AST
 	{
         public IEnumerable<FunctionDefinitionExpression> Functions { get { return functions; } }
 
-        private LinkedList<FunctionDefinitionExpression> functions;
+        private LinkedList<FunctionDefinitionExpression> functions; // set during AST construction
 
         // ----- Constructor -----
 

@@ -4,6 +4,7 @@ using Nicodem.Parser;
 
 namespace Nicodem.Semantics.AST
 {
+    // TODO: how to use this?
 	class ArrayNode : ConstNode
 	{
 		public IEnumerable<ExpressionNode> Elements { get; set; }

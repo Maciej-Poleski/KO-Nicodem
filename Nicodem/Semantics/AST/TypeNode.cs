@@ -8,7 +8,7 @@ namespace Nicodem.Semantics.AST
 {
 	abstract class TypeNode : Node
 	{
-		public bool IsConstant { get; set; }
+        public bool IsConstant { get; set; } // set during AST construction
         
         #region implemented abstract members of Node
 
