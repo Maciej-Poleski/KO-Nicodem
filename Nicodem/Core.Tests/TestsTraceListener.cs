@@ -4,35 +4,27 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NUnit.Framework;
 
 namespace Nicodem.Core
 {
     public class TestsTraceListener : TraceListener
     {
-        public delegate void FailTest();
-
-        private FailTest failTest;
-
-        private TestsTraceListener(FailTest failTest)
-        {
-            this.failTest = failTest;
-        }
-
-        public static void Setup(FailTest failTest)
+        public static void Setup()
         {
             Debug.Listeners.Clear();
             Debug.Listeners.Add(new ConsoleTraceListener());
-            Debug.Listeners.Add(new TestsTraceListener(failTest));
+            Debug.Listeners.Add(new TestsTraceListener());
         }
 
         public override void Write(string message)
         {
-            failTest();
+            Assert.Fail();
         }
 
         public override void WriteLine(string message)
         {
-            failTest();
+            Assert.Fail();
         }
     }
 }

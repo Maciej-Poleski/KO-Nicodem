@@ -21,7 +21,7 @@ namespace Semantics.Tests.Visitors
         public void init()
         {
             // We don't want message boxes in testing.
-            TestsTraceListener.Setup(() => Assert.Fail());
+            TestsTraceListener.Setup();
         }
 
         [Test, Timeout(1000)]
