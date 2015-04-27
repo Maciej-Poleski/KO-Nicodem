@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyDescription ("")]
 [assembly: AssemblyConfiguration ("")]
 [assembly: AssemblyCompany ("")]
-[assembly: AssemblyProduct ("")]
+[assembly: AssemblyProduct("")]
 [assembly: AssemblyCopyright ("patryk")]
 [assembly: AssemblyTrademark ("")]
 [assembly: AssemblyCulture ("")]

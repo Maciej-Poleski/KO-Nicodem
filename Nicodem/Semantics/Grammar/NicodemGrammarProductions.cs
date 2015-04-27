@@ -45,6 +45,11 @@ namespace Nicodem.Semantics.Grammar
 
         private struct TokenCategory : IEquatable<TokenCategory>
         {
+            public override string ToString()
+            {
+                return string.Format("{1}: {0}", Regex, Category);
+            }
+
             public bool Equals(TokenCategory other)
             {
                 return Category == other.Category && string.Equals(Regex, other.Regex);
@@ -98,7 +103,8 @@ namespace Nicodem.Semantics.Grammar
             {
                 if (_tokenCategoryAttributionLock)
                 {
-                    throw new InvalidOperationException("Nonterminals are already assigned, cannot make new terminal symbol");
+                    throw new InvalidOperationException(
+                        "Nonterminals are already assigned, cannot make new terminal symbol");
                 }
                 var result = new TokenCategory(NextSymbolId++, regex);
                 Categories.Add(result);
@@ -138,7 +144,7 @@ namespace Nicodem.Semantics.Grammar
 
             public static RegexSymbol operator *(TokenCategory left, string right)
             {
-                return (RegexSymbol) left * (RegexSymbol) right;
+                return left*(RegexSymbol) right;
             }
 
             public RegexSymbol Optional
@@ -192,8 +198,8 @@ namespace Nicodem.Semantics.Grammar
 
         // Literal values (atomic expression)
         private static TokenCategory DecimalNumberLiteral = "[:digit:]+"; // Only decimal number literals for now
-        private static TokenCategory CharacterLiteral = "'(\\[:print:])|(^')'";
-        private static TokenCategory StringLiteral = "\"(^((^\\)\"))*(^\\)\"";
+        private static TokenCategory CharacterLiteral = "'(\\\\[:print:])|(^')'";
+        private static TokenCategory StringLiteral = "\"(\\\\.|^\")*\"";
             // String literal is delimited by not escaped " character
         private static TokenCategory BooleanLiteral = "true|false";
         // Inject 'name resolution' functionality with above literals families to avoid ambiguity
@@ -637,9 +643,9 @@ namespace Nicodem.Semantics.Grammar
                 WhileExpression +
                 LoopControlExpression
                 );
-            BlockExpression.SetProduction("{" * Expression.Star * "}");   // No left-recursion thanks to '{'
-            ObjectDefinitionExpression.SetProduction(TypeSpecifier * ObjectName * "=" * Expression);  // NOTE: "=" is _not_ an assignment operator here
-            ArrayLiteralExpression.SetProduction("\\[" * (Expression * ",").Star * Expression.Optional * "\\]");
+            BlockExpression.SetProduction("\\{" * Expression.Star * "\\}");   // No left-recursion thanks to '{'
+            ObjectDefinitionExpression.SetProduction(TypeSpecifier * ObjectName * "\\=" * Expression);  // NOTE: "=" is _not_ an assignment operator here
+            ArrayLiteralExpression.SetProduction("\\[" * (Expression * "\\,").Star * Expression.Optional * "\\]");
             ObjectUseExpression.SetProduction(ObjectName);    // Literals are handled by 'name resolution'
             IfExpression.SetProduction("if" * Expression * Expression * ("else" * Expression).Optional);  // FIXME: if should be an operator
             WhileExpression.SetProduction("while" * Expression * Expression * ("else" * Expression).Optional);    // the same here?
