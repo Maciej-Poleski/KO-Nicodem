@@ -38,16 +38,16 @@ namespace Nicodem.Semantics.Visitors
         {
             base.Visit(node);
 
+			if (!ReferenceEquals(node.Parameters, null))
+				foreach (var parameter in node.Parameters)
+					if (!ReferenceEquals(parameter, null))
+						parameter.Accept(this);
+
 			if (!ReferenceEquals(node.ResultType, null))
 				node.ResultType.Accept(this);
 
 			if (!ReferenceEquals(node.Body, null))
 				node.Body.Accept(this);
-            
-			if (!ReferenceEquals(node.Parameters, null))
-				foreach (var parameter in node.Parameters)
-					if (!ReferenceEquals(parameter, null))
-						parameter.Accept(this);
         }
 
 		public override void Visit(ArrayNode node)
@@ -160,13 +160,6 @@ namespace Nicodem.Semantics.Visitors
 		}
 
         #endregion
-
-		public override void Visit(VariableUseNode node)
-		{
-			base.Visit (node);
-			if (!ReferenceEquals(node.Declaration, null))
-				node.Declaration.Accept (this);
-		}
 
 		public override void Visit(WhileNode node)
 		{
