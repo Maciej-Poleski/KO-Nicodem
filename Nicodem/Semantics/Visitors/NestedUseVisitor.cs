@@ -38,8 +38,10 @@ namespace Nicodem.Semantics.Visitors
 
         public override void Visit(FunctionDefinitionExpression node)
         {
+            var tmp = _currentFunction;
             _currentFunction = node;
             base.Visit(node);
+            _currentFunction = tmp;
         }
 
         public override void Visit(VariableDeclNode node)
@@ -69,8 +71,10 @@ namespace Nicodem.Semantics.Visitors
 
         public override void Visit(FunctionDefinitionExpression node)
         {
+            var tmp = _currentFunction;
             _currentFunction = node;
             base.Visit(node);
+            _currentFunction = tmp;
         }
 
         public override void Visit(VariableUseNode node)
