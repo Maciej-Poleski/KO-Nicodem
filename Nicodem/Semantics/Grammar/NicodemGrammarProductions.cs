@@ -33,16 +33,6 @@ namespace Nicodem.Semantics.Grammar
 
         private static bool _tokenCategoryAttributionLock = false;
 
-        private static string EscapeRawStringForRegex(string s)
-        {
-            var result=new StringBuilder();
-            foreach (var c in s)
-            {
-                result.Append('\\').Append(c);
-            }
-            return result.ToString();
-        }
-
         private struct TokenCategory : IEquatable<TokenCategory>
         {
             public override string ToString()
@@ -162,6 +152,7 @@ namespace Nicodem.Semantics.Grammar
         /// <returns></returns>
         private static TokenCategory Token(this string token)
         {
+            token = EscapeEre(token);
             if (TokenCategory.ImplicitTokenCategories.ContainsKey(token))
             {
                 return TokenCategory.ImplicitTokenCategories[token];
@@ -192,10 +183,6 @@ namespace Nicodem.Semantics.Grammar
         // Type
         private static TokenCategory TypeName = "(^[:space:])+";
 
-        // TODO operators (remember - left recursion is forbidden)
-        // using T(this string) extension to shorten code
-        // NOTE Done using implicit categories
-
         // Literal values (atomic expression)
         private static TokenCategory DecimalNumberLiteral = "[:digit:]+"; // Only decimal number literals for now
         private static TokenCategory CharacterLiteral = "'(\\\\[:print:])|(^')'";
@@ -207,6 +194,31 @@ namespace Nicodem.Semantics.Grammar
 
         #endregion ExplicitTokens
 
+        #region RE tools
+
+        private static IEnumerable<char> EscapeEre1(IEnumerable<char> re)
+        {
+            const string special = ".[\\(*+?{|^$";
+            var first = re.Take(1).ToArray();
+            if (first.Length == 0)
+            {
+                return "";
+            }
+            var prefix = "";
+            if (special.Contains(first[0]))
+            {
+                prefix = "\\";
+            }
+            prefix += first[0];
+            return ((IEnumerable<char>)prefix).Concat(EscapeEre1(re.Skip(1)));
+        }
+
+        private static string EscapeEre(string re)
+        {
+            return new string(EscapeEre1(re).ToArray());
+        }
+
+        #endregion
 
 
         #region ProductionImplementation
@@ -565,7 +577,7 @@ namespace Nicodem.Semantics.Grammar
 
         private static RegexSymbol MakeInfixOperatorExpressionRegex(UniversalSymbol operatorExpression, params string[] operators)
         {
-            var operatorsRegex = RegexSymbol.MakeUnion(operators.Select(EscapeRawStringForRegex));
+            var operatorsRegex = RegexSymbol.MakeUnion(operators);
             return operatorExpression * (operatorsRegex * operatorExpression).Star;
         }
 
@@ -610,10 +622,10 @@ namespace Nicodem.Semantics.Grammar
         static NicodemGrammarProductions()
         {
             Program.SetProduction(Function.Star);
-            Function.SetProduction(ObjectName * "\\("  * ParametersList * "\\)" * "\\-\\>" * TypeSpecifier * Expression);
+            Function.SetProduction(ObjectName * "("  * ParametersList * ")" * "->" * TypeSpecifier * Expression);
             ParametersList.SetProduction(((ObjectDeclaration * ",").Star * ObjectDeclaration).Optional);
             ObjectDeclaration.SetProduction(TypeSpecifier * ObjectName);
-            TypeSpecifier.SetProduction(TypeName * ("mutable".Optional() * "\\[" * Expression.Optional * "\\]").Star * "mutable".Optional());
+            TypeSpecifier.SetProduction(TypeName * ("mutable".Optional() * "[" * Expression.Optional * "]").Star * "mutable".Optional());
             Expression.SetProduction(OperatorExpression);
             OperatorExpression.SetProduction(Operator17Expression);
             Operator17Expression.SetProduction(Operator16Expression);
@@ -631,9 +643,9 @@ namespace Nicodem.Semantics.Grammar
             Operator5Expression.SetProduction(MakeInfixOperatorExpressionRegex(Operator4Expression, "* / %".Split(' ')));
             Operator4Expression.SetProduction(Operator3Expression);
             Operator3Expression.SetProduction(RegexSymbol.MakeUnion("++ -- + - ! ~".Split(' ')).Star * Operator2Expression);
-            Operator2Expression.SetProduction(Operator1Expression * (RegexSymbol.MakeUnion("\\+\\+", "\\-\\-") + ("(" * (Expression * ",").Star * Expression.Optional * ")") + ("\\[" * Expression * "\\]") + ("\\[" * Expression.Optional * "\\.\\." * Expression.Optional * "\\]")).Star);
+            Operator2Expression.SetProduction(Operator1Expression * (RegexSymbol.MakeUnion("++", "--") + ("(" * (Expression * ",").Star * Expression.Optional * ")") + ("[" * Expression * "]") + ("[" * Expression.Optional * ".." * Expression.Optional * "]")).Star);
             Operator1Expression.SetProduction(Operator0Expression);
-            Operator0Expression.SetProduction(AtomicExpression + ("\\(" * Expression * "\\)"));
+            Operator0Expression.SetProduction(AtomicExpression + ("(" * Expression * ")"));
             AtomicExpression.SetProduction(
                 BlockExpression +
                 ObjectDefinitionExpression +
@@ -643,9 +655,9 @@ namespace Nicodem.Semantics.Grammar
                 WhileExpression +
                 LoopControlExpression
                 );
-            BlockExpression.SetProduction("\\{" * Expression.Star * "\\}");   // No left-recursion thanks to '{'
-            ObjectDefinitionExpression.SetProduction(TypeSpecifier * ObjectName * "\\=" * Expression);  // NOTE: "=" is _not_ an assignment operator here
-            ArrayLiteralExpression.SetProduction("\\[" * (Expression * "\\,").Star * Expression.Optional * "\\]");
+            BlockExpression.SetProduction("{" * Expression.Star * "}");   // No left-recursion thanks to '{'
+            ObjectDefinitionExpression.SetProduction(TypeSpecifier * ObjectName * "=" * Expression);  // NOTE: "=" is _not_ an assignment operator here
+            ArrayLiteralExpression.SetProduction("[" * (Expression * ",").Star * Expression.Optional * "]");
             ObjectUseExpression.SetProduction(ObjectName);    // Literals are handled by 'name resolution'
             IfExpression.SetProduction("if" * Expression * Expression * ("else" * Expression).Optional);  // FIXME: if should be an operator
             WhileExpression.SetProduction("while" * Expression * Expression * ("else" * Expression).Optional);    // the same here?
