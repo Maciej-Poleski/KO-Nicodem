@@ -9,8 +9,8 @@ namespace Nicodem.Backend
 		readonly RegisterNode temporaryRegister = new TemporaryNode ();
 		readonly Func<RegisterNode, Node, IEnumerable<Instruction>> instructionBuilder;
 
-		Type Type { get; private set; }
-		IEnumerable<InsnTile> Children { get; private set; }
+		public Type Type { get; private set; }
+		public IEnumerable<InsnTile> Children { get; private set; }
 
 		public InsnTile(Type type, IEnumerable<InsnTile> children, Func<RegisterNode, Node, IEnumerable<Instruction>> instructionBuilder) {
 			Type = type;
