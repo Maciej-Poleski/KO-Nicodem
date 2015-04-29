@@ -107,7 +107,7 @@ namespace Nicodem.Semantics.Visitors
         }
 
         //check if body returns the same as set type
-        public override void Visit(FunctionDefinitionExpression node)
+        public override void Visit(FunctionDefinitionNode node)
         {
             base.Visit(node);
             if (TypeNode.Compare(node.ResultType, node.Body.ExpressionType))

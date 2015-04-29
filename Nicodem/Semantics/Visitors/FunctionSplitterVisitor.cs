@@ -5,14 +5,14 @@ namespace Nicodem.Semantics.Visitors
 {
     internal class FunctionSplitterVisitor : AbstractRecursiveVisitor
     {
-        private readonly List<FunctionDefinitionExpression> _functions = new List<FunctionDefinitionExpression>();
+        private readonly List<FunctionDefinitionNode> _functions = new List<FunctionDefinitionNode>();
 
-        internal IReadOnlyList<FunctionDefinitionExpression> Functions
+        internal IReadOnlyList<FunctionDefinitionNode> Functions
         {
             get { return _functions; }
         }
 
-        public override void Visit(FunctionDefinitionExpression node)
+        public override void Visit(FunctionDefinitionNode node)
         {
             _functions.Add(node);
             base.Visit(node);
@@ -21,7 +21,7 @@ namespace Nicodem.Semantics.Visitors
 
     public static partial class Extensions
     {
-        internal static IReadOnlyCollection<FunctionDefinitionExpression> GetAllFunctionDefinitions(
+        internal static IReadOnlyCollection<FunctionDefinitionNode> GetAllFunctionDefinitions(
             this ProgramNode node)
         {
             var visitor = new FunctionSplitterVisitor();

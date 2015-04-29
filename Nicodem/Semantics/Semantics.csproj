@@ -63,7 +63,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AST\Node.cs" />
     <Compile Include="AST\ProgramNode.cs" />
-    <Compile Include="AST\FunctionDefinitionExpression.cs" />
+    <Compile Include="AST\FunctionDefinitionNode.cs" />
     <Compile Include="AST\VariableDeclNode.cs" />
     <Compile Include="AST\TypeNode.cs" />
     <Compile Include="AST\NamedTypeNode.cs" />

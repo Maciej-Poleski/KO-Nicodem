@@ -26,17 +26,17 @@ namespace Nicodem.Semantics.Visitors
 
     internal class NestedUseVisitor1 : AbstractRecursiveVisitor
     {
-        private readonly Dictionary<VariableDeclNode, FunctionDefinitionExpression> _declToFunction =
-            new Dictionary<VariableDeclNode, FunctionDefinitionExpression>();
+        private readonly Dictionary<VariableDeclNode, FunctionDefinitionNode> _declToFunction =
+            new Dictionary<VariableDeclNode, FunctionDefinitionNode>();
 
-        private FunctionDefinitionExpression _currentFunction;
+        private FunctionDefinitionNode _currentFunction;
 
-        internal IReadOnlyDictionary<VariableDeclNode, FunctionDefinitionExpression> DeclToFunction
+        internal IReadOnlyDictionary<VariableDeclNode, FunctionDefinitionNode> DeclToFunction
         {
             get { return _declToFunction; }
         }
 
-        public override void Visit(FunctionDefinitionExpression node)
+        public override void Visit(FunctionDefinitionNode node)
         {
             var tmp = _currentFunction;
             _currentFunction = node;
@@ -61,15 +61,15 @@ namespace Nicodem.Semantics.Visitors
     /// </summary>
     internal class NestedUseVisitor2 : AbstractRecursiveVisitor
     {
-        private readonly IReadOnlyDictionary<VariableDeclNode, FunctionDefinitionExpression> _declToFunction;
-        private FunctionDefinitionExpression _currentFunction;
+        private readonly IReadOnlyDictionary<VariableDeclNode, FunctionDefinitionNode> _declToFunction;
+        private FunctionDefinitionNode _currentFunction;
 
-        public NestedUseVisitor2(IReadOnlyDictionary<VariableDeclNode, FunctionDefinitionExpression> declToFunction)
+        public NestedUseVisitor2(IReadOnlyDictionary<VariableDeclNode, FunctionDefinitionNode> declToFunction)
         {
             _declToFunction = declToFunction;
         }
 
-        public override void Visit(FunctionDefinitionExpression node)
+        public override void Visit(FunctionDefinitionNode node)
         {
             var tmp = _currentFunction;
             _currentFunction = node;

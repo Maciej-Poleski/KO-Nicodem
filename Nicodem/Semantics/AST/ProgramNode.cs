@@ -6,17 +6,17 @@ namespace Nicodem.Semantics.AST
 {
 	class ProgramNode : Node
 	{
-        public IEnumerable<FunctionDefinitionExpression> Functions { get { return functions; } }
+        public IEnumerable<FunctionDefinitionNode> Functions { get { return functions; } }
 
-        private LinkedList<FunctionDefinitionExpression> functions; // set during AST construction
+        private LinkedList<FunctionDefinitionNode> functions; // set during AST construction
 
         // ----- Constructor -----
 
         public ProgramNode(){
-            functions = new LinkedList<FunctionDefinitionExpression>();
+            functions = new LinkedList<FunctionDefinitionNode>();
         }
 
-	    public ProgramNode(LinkedList<FunctionDefinitionExpression> functions)
+	    public ProgramNode(LinkedList<FunctionDefinitionNode> functions)
 	    {
 	        this.functions = functions;
 	    }
@@ -29,7 +29,7 @@ namespace Nicodem.Semantics.AST
         {
             var node = ASTBuilder.AsBranch(parseTree);
             foreach(IParseTree<TSymbol> ch in node.Children){
-                var funNode = new FunctionDefinitionExpression();
+                var funNode = new FunctionDefinitionNode();
                 funNode.BuildNode(ch);
                 functions.AddLast(funNode);
             }

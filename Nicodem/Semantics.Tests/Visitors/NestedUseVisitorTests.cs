@@ -82,7 +82,7 @@ namespace Semantics.Tests.Visitors
             {
                 Elements = new ExpressionNode[] {gBodyEx1, gBodyEx2, gBodyEx3, gBodyEx4}
             };
-            var gFunction = new FunctionDefinitionExpression
+            var gFunction = new FunctionDefinitionNode
             {
                 Name = "g",
                 Parameters = new[] {gParamA, gParamE},
@@ -141,7 +141,7 @@ namespace Semantics.Tests.Visitors
                     new ExpressionNode[]
                     {fBodyEx1, fBodyEx2, fBodyEx3, fBodyEx4, fBodyEx5, fBodyEx6, fBodyEx7, fBodyEx8}
             };
-            var fFunction = new FunctionDefinitionExpression
+            var fFunction = new FunctionDefinitionNode
             {
                 Name = "f",
                 Parameters = new[] {fParamA, fParamB},
@@ -150,7 +150,7 @@ namespace Semantics.Tests.Visitors
             };
 
             // Program
-            var program = new ProgramNode(new LinkedList<FunctionDefinitionExpression>(new[] {fFunction}));
+            var program = new ProgramNode(new LinkedList<FunctionDefinitionNode>(new[] {fFunction}));
 
             program.FillInNestedUseFlag();
 
@@ -250,7 +250,7 @@ namespace Semantics.Tests.Visitors
             {
                 Elements = new ExpressionNode[] {gBodyEx1, gBodyEx2, gBodyEx3, gBodyEx4, gBodeEx5}
             };
-            var gFunction = new FunctionDefinitionExpression
+            var gFunction = new FunctionDefinitionNode
             {
                 Name = "g",
                 Parameters = new[] {gParamG, gParamE},
@@ -289,7 +289,7 @@ namespace Semantics.Tests.Visitors
                     new ExpressionNode[]
                     {fBodyEx1, fBodyEx2, fBodyEx3, fBodyEx4, fBodyEx5, fBodyEx6, fBodyEx7, fBodyEx8}
             };
-            var fFunction = new FunctionDefinitionExpression
+            var fFunction = new FunctionDefinitionNode
             {
                 Name = "f",
                 Parameters = new[] {fParamA, fParamB},
@@ -298,7 +298,7 @@ namespace Semantics.Tests.Visitors
             };
 
             // Program
-            var program = new ProgramNode(new LinkedList<FunctionDefinitionExpression>(new[] {fFunction}));
+            var program = new ProgramNode(new LinkedList<FunctionDefinitionNode>(new[] {fFunction}));
 
             program.FillInNestedUseFlag();
 

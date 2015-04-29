@@ -35,7 +35,7 @@ namespace Nicodem.Semantics.Visitors
         private bool HasSideEffects(VariableUseNode node) { return false; }
         private bool HasSideEffects(BlockExpressionNode node) { return false; }
         // TODO(guspiel): I'm not sure about FunctionDefinitionExpression.
-        private bool HasSideEffects(FunctionDefinitionExpression node) { return true; } 
+        private bool HasSideEffects(FunctionDefinitionNode node) { return true; } 
         private bool HasSideEffects(SliceNode node) { return false; }
         private bool HasSideEffects(WhileNode node) { return false; }
         // HasSideEffects should NOT be implemented for ExpressionNode. 

@@ -14,7 +14,7 @@ namespace Nicodem.Semantics.Visitors
 			this.target = target;
 		}
 
-		public override void Visit(FunctionDefinitionExpression node)
+		public override void Visit(FunctionDefinitionNode node)
 		{
 			node.BackendFunction = target.CreateFunction ();
 			functions.Push (node.BackendFunction);

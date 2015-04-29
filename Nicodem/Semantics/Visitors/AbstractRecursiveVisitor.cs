@@ -34,7 +34,7 @@ namespace Nicodem.Semantics.Visitors
 
         #region ExpressionNode direct children
 
-        public override void Visit(FunctionDefinitionExpression node)
+        public override void Visit(FunctionDefinitionNode node)
         {
             base.Visit(node);
 

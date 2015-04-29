@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace Nicodem.Semantics.AST
 {
-	class FunctionDefinitionExpression : ExpressionNode
+	class FunctionDefinitionNode : ExpressionNode
 	{
         public string Name { get; set; } // set during AST construction
         public IEnumerable<VariableDeclNode> Parameters { get; set; } // set during AST construction

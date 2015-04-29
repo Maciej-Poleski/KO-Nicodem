@@ -33,7 +33,7 @@ namespace Nicodem.Semantics.Visitors
 
         #region ExpressionNode direct children
 
-        public virtual void Visit(FunctionDefinitionExpression node)
+        public virtual void Visit(FunctionDefinitionNode node)
         {
             Visit(node as ExpressionNode);
         }

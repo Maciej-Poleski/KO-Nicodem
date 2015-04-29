@@ -8,7 +8,7 @@ namespace Nicodem.Semantics.AST
 	{
 		public string Name { get; set; }
 		public IEnumerable<ExpressionNode> Arguments { get; set; }
-        public FunctionDefinitionExpression Definition { get; set; }
+        public FunctionDefinitionNode Definition { get; set; }
 
         #region implemented abstract members of Node
 

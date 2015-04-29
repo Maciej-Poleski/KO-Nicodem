@@ -6,12 +6,12 @@ namespace Nicodem.Semantics.Visitors
 	class NameResolutionVisitor : AbstractRecursiveVisitor
 	{
         private SymbolTable<VariableDeclNode> variableSymbolTable;
-        private SymbolTable<FunctionDefinitionExpression> functionSymbolTable;
+        private SymbolTable<FunctionDefinitionNode> functionSymbolTable;
 
 		public NameResolutionVisitor ()
 		{
             variableSymbolTable = new SymbolTable<VariableDeclNode> ();
-            functionSymbolTable = new SymbolTable<FunctionDefinitionExpression>();
+            functionSymbolTable = new SymbolTable<FunctionDefinitionNode>();
 		}
 
 		public override void Visit (BlockExpressionNode node)
@@ -35,7 +35,7 @@ namespace Nicodem.Semantics.Visitors
 			base.Visit (node);
 		}
 
-        public override void Visit (FunctionDefinitionExpression node)
+        public override void Visit (FunctionDefinitionNode node)
         {
             functionSymbolTable.Insert (node.Name, node);
             base.Visit (node);
