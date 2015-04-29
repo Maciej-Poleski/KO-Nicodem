@@ -412,16 +412,13 @@ namespace Nicodem.Parser
 
         private static List<TSymbol> DepthFirstSearchOnSymbol(TSymbol symbol, Dictionary<DfaState<TSymbol>, int> color, IDictionary<TSymbol, Dfa<TSymbol>> automatons, ISet<TSymbol> nullable)
         {
-            if (!automatons.ContainsKey(symbol))
+            if (!automatons.ContainsKey(symbol) || symbol.IsTerminal)
                 return null;
             var automata = automatons[symbol];
-            List<TSymbol> returnList = DepthFirstSearchOnState(automata.Start, color, automatons, nullable);
-            if (returnList != null)
-                returnList.Add(symbol);
-            return returnList;
+            return DepthFirstSearchOnState(symbol, automata.Start, color, automatons, nullable);
         }
 
-        private static List<TSymbol> DepthFirstSearchOnState(DfaState<TSymbol> state, Dictionary<DfaState<TSymbol>, int> color, IDictionary<TSymbol, Dfa<TSymbol>> automatons, ISet<TSymbol> nullable)
+        private static List<TSymbol> DepthFirstSearchOnState(TSymbol symbol, DfaState<TSymbol> state, Dictionary<DfaState<TSymbol>, int> color, IDictionary<TSymbol, Dfa<TSymbol>> automatons, ISet<TSymbol> nullable)
         {
 
             //check if is visited or not
@@ -442,7 +439,7 @@ namespace Nicodem.Parser
                 //for nullable keys go on the same automata
                 if (nullable.Contains(transition.Key))
                 {
-                    returnList = DepthFirstSearchOnState(transition.Value, color, automatons, nullable);
+                    returnList = DepthFirstSearchOnState(transition.Key, transition.Value, color, automatons, nullable);
                     if (returnList != null)
                     {
                         returnList.Add(transition.Key);

@@ -14,7 +14,14 @@ namespace Nicodem.Parser
 		internal IDictionary<TSymbol, ISet<TSymbol>> _First { get; private set; }
         internal FirstSet<TSymbol> First { get; private set; }
         internal IDictionary<TSymbol, ISet<TSymbol>> Follow { get; private set; }
-        internal bool HasLeftRecursion { get; private set; }
+        internal bool HasLeftRecursion {
+            get {
+                if (SymbolListLeftRecursion == null)
+                    return false;
+                else
+                    return true;
+            }
+        }
         internal List<TSymbol> SymbolListLeftRecursion { get; private set; }
 		// a dictionary which for a given symbol stores a list of all the states s.t. there exists edge labelled by this symbol to the given state.
 		// if a symbol does not occur on any edge, it isn't in the dictionary.
@@ -72,10 +79,6 @@ namespace Nicodem.Parser
 			First = GrammarUtils<TSymbol>.ComputeFirst (Automatons, Nullable);
 			Follow = GrammarUtils<TSymbol>.ComputeFollow (Automatons, Nullable, First);
             SymbolListLeftRecursion = GrammarUtils<TSymbol>.HasLeftRecursion(Automatons, Nullable);
-            if (SymbolListLeftRecursion == null)
-                HasLeftRecursion = false;
-            else
-                HasLeftRecursion = true;
 			TargetStatesDictionary = GrammarUtils<TSymbol>.computeTargetStatesDictionary (Automatons);
 			AccStateOwnerDictionary = GrammarUtils<TSymbol>.computeAccStateOwnerDictionary (Automatons);
         }
