@@ -11,13 +11,6 @@ namespace Nicodem.Semantics.Visitors
     {
         List<WhileNode> _stack_of_while_node = new List<WhileNode>();
 
-        //check if body returns the same as set type
-        public override void Visit(FunctionDefinitionExpression node)
-        {
-            base.Visit(node);
-            if (TypeNode.Compare(node.ResultType, node.Body.ExpressionType))
-                throw new TypeCheckException("Body don't return the same type as set type.");
-        }
 
         //check if it is array type
         public override void Visit(ArrayNode node)
@@ -113,16 +106,25 @@ namespace Nicodem.Semantics.Visitors
             node.ExpressionType = node.Definition.ResultType;
         }
 
+        //check if body returns the same as set type
+        public override void Visit(FunctionDefinitionExpression node)
+        {
+            base.Visit(node);
+            if (TypeNode.Compare(node.ResultType, node.Body.ExpressionType))
+                throw new TypeCheckException("Body don't return the same type as set type.");
+            node.ExpressionType = NamedTypeNode.VoidType();
+        }
+
         //check if condition is bool and set common return type of Then and Else
         public override void Visit(IfNode node)
         {
             base.Visit(node);
             if(!TypeNode.Compare(NamedTypeNode.BoolType(), node.Condition.ExpressionType))
                 throw new Exception("Inpropper type in if condition");
-            if(!node.HasElse || TypeNode.Compare(node.Then.ExpressionType, node.Else.ExpressionType))
-                node.ExpressionType = node.Then.ExpressionType;
-            else
+            if(!node.HasElse || !TypeNode.Compare(node.Then.ExpressionType, node.Else.ExpressionType))
                 node.ExpressionType = NamedTypeNode.VoidType();
+            else
+                node.ExpressionType = node.Then.ExpressionType;
         }
 
         //check if while return type is the same as in loopControlNode return type
@@ -169,6 +171,12 @@ namespace Nicodem.Semantics.Visitors
             node.ExpressionType = node.Array.ExpressionType;
         }
 
+        public override void Visit(VariableDeclNode node)
+        {
+            base.Visit(node);
+            node.ExpressionType = node.Type;
+        }
+
         //value has the same type as definition and it is rewrite to my type
         public override void Visit(VariableDefNode node)
         {
@@ -194,10 +202,10 @@ namespace Nicodem.Semantics.Visitors
             TypeNode _type_to_set;
             if(!TypeNode.Compare(NamedTypeNode.BoolType(), node.Condition.ExpressionType))
                 throw new Exception("Inpropper type in if condition");
-            if(!node.HasElse || TypeNode.Compare(node.Body.ExpressionType, node.Else.ExpressionType))
-                _type_to_set = node.Body.ExpressionType;
-            else
+            if(!node.HasElse || !TypeNode.Compare(node.Body.ExpressionType, node.Else.ExpressionType))
                 _type_to_set = NamedTypeNode.VoidType();
+            else
+                _type_to_set = node.Body.ExpressionType;
             if (node.ExpressionType == null)
                 node.ExpressionType = _type_to_set;
             else
