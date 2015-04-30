@@ -15,10 +15,11 @@ namespace Nicodem.Parser
         [DebuggerDisplay("{TransitionsString()}")]
         public IReadOnlyList<KeyValuePair<TSymbol, DfaState<TSymbol>>> Transitions { get; private set; }
         public string Id { get; private set; } // For debugging purposes.
+        private static int nextDebugId = 0;
 
 		public DfaState()
         {
-            this.Id = ".";
+            this.Id = "" + (nextDebugId++);
         }
 
         public DfaState(string id)

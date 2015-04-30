@@ -74,7 +74,7 @@ namespace Nicodem.Parser
 				foreach (var i in s1.Transitions) {
 					if (!states.ContainsKey(i.Value)) {
 						states[i.Value] = new DfaState<TSymbol>();
-						accepting[states[i.Value]] = s1.Accepting;
+						accepting[states[i.Value]] = i.Value.Accepting;
 						transitions[states[i.Value]] = new List<KeyValuePair<TSymbol, DfaState<TSymbol>>>();
 						queue.Enqueue(i.Value);
 					}
