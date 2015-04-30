@@ -11,7 +11,7 @@
 
         public override string ToString()
         {
-			return Name;//string.Format("Hardware Register <{0}>", Name);
+			return string.Format("Hardware Register <{0}>", Name);
         }
     }
 }

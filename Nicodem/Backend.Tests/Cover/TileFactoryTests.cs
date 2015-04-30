@@ -48,9 +48,9 @@ namespace Nicodem.Backend.Tests
 			updateMapping (instructions, dict);
 
 			var got = cover (instructions, dict);
-			const string expected = 
-				"mov rax, rbx\n" + 
-				"mov xxx, rax\n";
+			var expected = 
+				"mov " + RAX + ", " + RBX + "\n" +
+				"mov " + RSpecial + ", " + RAX + "\n";
 
 			Assert.AreEqual (expected, got);
 		}
@@ -70,9 +70,9 @@ namespace Nicodem.Backend.Tests
 			updateMapping (instructions, dict);
 
 			var got = cover (instructions, dict);
-			const string expected = 
-				"add rax, rbx\n" + 
-				"mov xxx, rax\n";
+			var expected = 
+				"add " + RAX + ", " + RBX + "\n" +
+				"mov " + RSpecial + ", " + RAX + "\n";
 
 			Assert.AreEqual (expected, got);
 		}
@@ -95,9 +95,9 @@ namespace Nicodem.Backend.Tests
 			updateMapping (instructions, dict);
 
 			var got = cover (instructions, dict);
-			const string expected = 
-				"lea rax, [rbx + rcx]\n" + 
-				"mov xxx, rax\n";
+			var expected = 
+				"lea " + RAX + ", [" + RBX + " + " + RCX + "]\n" +
+				"mov " + RSpecial + ", " + RAX + "\n";
 
 			Assert.AreEqual (expected, got);
 		}
