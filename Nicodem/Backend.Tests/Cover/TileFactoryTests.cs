@@ -10,12 +10,20 @@ namespace Nicodem.Backend.Tests
 		public override string ToString () {
 			return "RAX";
 		}
+
+	    public RaxRegister() : base("RAX")
+	    {
+	    }
 	}
 
 	class RdxRegister : HardwareRegisterNode {
 		public override string ToString () {
 			return "RDX";
 		}
+
+	    public RdxRegister() : base("RDX")
+	    {
+	    }
 	}
 
 	[TestFixture]
