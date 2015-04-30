@@ -16,13 +16,13 @@ namespace Nicodem.Parser.Tests
 
         public string Description {
             get {
-                throw new NotImplementedException();
+				return "test_symbol: " + C.ToString();
             }
         }
 
         public bool IsTerminal {
             get {
-                throw new NotImplementedException();
+				return !char.IsUpper(C);
             }
         }
 
