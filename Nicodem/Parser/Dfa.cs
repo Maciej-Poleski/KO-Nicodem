@@ -10,6 +10,7 @@ namespace Nicodem.Parser
 	public class Dfa<TSymbol>
 		where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
 	{
+        /// <value>Starting state of this DFA.</value>
 		public DfaState<TSymbol> Start { get; private set; }
 
 		private static uint MaxAmbiguityHandler(uint leftState, uint rightState)
@@ -136,7 +137,7 @@ namespace Nicodem.Parser
             foreach (var state in states) {
                 builder.Append(state);
                 builder.Append("; ");
-                builder.AppendLine();
+                //builder.AppendLine();
             }
             builder.Append("}");
             return builder.ToString();
