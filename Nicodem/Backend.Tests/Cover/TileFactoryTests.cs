@@ -9,11 +9,11 @@ namespace Nicodem.Backend.Tests
 	[TestFixture]
 	public class TileFactoryTests
 	{
-		static readonly HardwareRegisterNode RSpecial = new HardwareRegisterNode("Rxx");
+		static readonly HardwareRegisterNode RSpecial = new HardwareRegisterNode("xxx");
 
-		static readonly HardwareRegisterNode RAX = new HardwareRegisterNode("RAX");
-		static readonly HardwareRegisterNode RBX = new HardwareRegisterNode("RBX");
-		static readonly HardwareRegisterNode RCX = new HardwareRegisterNode("RCX");
+		static readonly HardwareRegisterNode RAX = new HardwareRegisterNode("rax");
+		static readonly HardwareRegisterNode RBX = new HardwareRegisterNode("rbx");
+		static readonly HardwareRegisterNode RCX = new HardwareRegisterNode("rcx");
 
 		static void updateMapping( IEnumerable<Instruction> instructions,
 			IDictionary<RegisterNode, HardwareRegisterNode> mapping)
@@ -49,8 +49,8 @@ namespace Nicodem.Backend.Tests
 
 			var got = cover (instructions, dict);
 			const string expected = 
-				"MOV RAX RBX\n" + 
-				"MOV Rxx RAX\n";
+				"mov rax, rbx\n" + 
+				"mov xxx, rax\n";
 
 			Assert.AreEqual (expected, got);
 		}
@@ -71,8 +71,33 @@ namespace Nicodem.Backend.Tests
 
 			var got = cover (instructions, dict);
 			const string expected = 
-				"ADD RAX RBX\n" + 
-				"MOV Rxx RAX\n";
+				"add rax, rbx\n" + 
+				"mov xxx, rax\n";
+
+			Assert.AreEqual (expected, got);
+		}
+
+		[Test]
+		public void Test_LEA_Reg_Reg_Reg() {
+			var dst = new TemporaryNode ();
+			var src1 = new TemporaryNode ();
+			var src2 = new TemporaryNode ();
+			var plus = new AddOperatorNode (src1, src2);
+			var node = new AssignmentNode (dst, new MemoryNode (plus));
+
+			var tile = TileFactory.LEA_Reg_Reg_Reg ();
+			var instructions = tile.Cover (node);
+
+			var dict = new Dictionary<RegisterNode, HardwareRegisterNode> ();
+			dict.Add (dst, RAX);
+			dict.Add (src1, RBX);
+			dict.Add (src2, RCX);
+			updateMapping (instructions, dict);
+
+			var got = cover (instructions, dict);
+			const string expected = 
+				"lea rax, [rbx + rcx]\n" + 
+				"mov xxx, rax\n";
 
 			Assert.AreEqual (expected, got);
 		}
