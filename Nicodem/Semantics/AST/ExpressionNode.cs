@@ -62,7 +62,7 @@ namespace Nicodem.Semantics.AST
         public static ExpressionNode ParseOperator2<TSymbol>(IEnumerator<IParseTree<TSymbol>> opExpr) where TSymbol : ISymbol<TSymbol>
         {
             // O2 -> O1 (     "++" | "--"
-            //           |    "(" E* ")"
+            //           |    "(" (E ",")* E? ")"
             //           |    "[" E "]"
             //           |    "[" E? ".." E? "]"
             //          )*
@@ -78,9 +78,9 @@ namespace Nicodem.Semantics.AST
                         var args = new LinkedList<ExpressionNode>();
                         while (!ASTBuilder.EatSymbol("(", opExpr))
                         {
+                            ASTBuilder.EatSymbol(",", opExpr); // eat ',' before arg - remember f(x,y,z,) case
                             args.AddFirst(GetExpressionNode(opExpr.Current));
-                            opExpr.MoveNext(); // move to next param
-                            ASTBuilder.EatSymbol(",", opExpr); // eat ',' if present
+                            opExpr.MoveNext(); // move to next param with ','
                         }
                         var res = new FunctionCallNode();
                         res.Arguments = args;
