@@ -165,32 +165,80 @@ namespace Nicodem.Semantics.Grammar
             }
         }
 
+        /// <summary>
+        /// Remove words with op as infix from language
+        /// </summary>
+        private static string RemoveInfixes(this string token, params string[] op)
+        {
+            return "((" + token + ")" + "&(^(" + string.Join("|", op.Select(t => "(.*(" + t + ").*)")) + ")))";
+        }
+
+        private static string RemoveCases(this string token, params string[] cases)
+        {
+            return "((" + token + ")" + "&(^(" + string.Join("|", cases) + ")))";
+        }
+
+        private static string RemoveCases(this string token, params TokenCategory[] cases)
+        {
+            return RemoveCases(token, cases.Select(c => c.Regex).ToArray());
+        }
+
         #endregion
 
         #region ExplicitTokens
 
+        private const string OperatorsPool =
+            @"\( \) \-> , mutable \[ \] = \+= \-= \*= /= %= <<= >>= &= \^= \|= \|\| && \| \^ & == != < <= > >= << >> \+ \- \* / % \+\+ \-\- ! ~ \.\. { } if else while break continue";
+
+        private static readonly string[] PreparedOperators = OperatorsPool.Split(' ');
+
         // Comments
-        private static TokenCategory LineCommentCStyle = "//(^\n)*\n";
-        private static TokenCategory LineCommentShortStyle = "`(^(\n|`))*\n";
-        private static TokenCategory ShortComment = "`(^(\n|`))*`";
+        private static readonly TokenCategory LineCommentCStyle = "//(^\n)*\n";
+        private static readonly TokenCategory LineCommentShortStyle = "`(^(\n|`))*\n";
+        private static readonly TokenCategory ShortComment = "`(^(\n|`))*`";
 
         // Space
-        private static TokenCategory Space = "[:space:]+";
+        private static readonly TokenCategory Space = "[:space:]+";
 
         // WhiteSpace set
-        private static TokenCategory[] _whitespaceTokenCategories = {LineCommentCStyle, LineCommentShortStyle, ShortComment, Space};
+        private static readonly TokenCategory[] _whitespaceTokenCategories = {LineCommentCStyle, LineCommentShortStyle, ShortComment, Space};
 
-        // Type
-        private static TokenCategory TypeName = "(^[:space:])+";
+        // Name (for type and objects)
+        private const string NameBase = "(^[:space:])+";
+        private static readonly string NameWithoutOperators = NameBase.RemoveInfixes(PreparedOperators);
 
         // Literal values (atomic expression)
-        private static TokenCategory DecimalNumberLiteral = "[:digit:]+"; // Only decimal number literals for now
-        private static TokenCategory CharacterLiteral = "'(\\\\[:print:])|(^')'";
-        private static TokenCategory StringLiteral = "\"(\\\\.|^\")*\"";
-            // String literal is delimited by not escaped " character
-        private static TokenCategory BooleanLiteral = "true|false";
-        // Inject 'name resolution' functionality with above literals families to avoid ambiguity
-        private static TokenCategory ObjectName = "(^[:space:])+";
+        private static readonly TokenCategory DecimalNumberLiteral = "[:digit:]+"; // Only decimal number literals for now
+        private static readonly TokenCategory CharacterLiteral = "'(\\\\[:print:])|(^')'";
+        private static readonly TokenCategory StringLiteral = "\"(\\\\.|^\")*\"";
+        // String literal is delimited by not escaped " character
+        private static readonly TokenCategory BooleanLiteral = "true|false";
+
+        private static readonly TokenCategory[] Literals =
+        {
+            DecimalNumberLiteral, CharacterLiteral, StringLiteral,
+            BooleanLiteral
+        };
+
+        private static readonly string NameWithoutOperatorsAndValues = RemoveCases(NameWithoutOperators, Literals);
+
+        private static readonly TokenCategory TypeName = NameWithoutOperatorsAndValues;
+        private static readonly TokenCategory ObjectName = TypeName;    // Important - get the same symbol
+        
+
+        /// <summary>
+        /// This function can be used to obtain all operators defined in language
+        /// </summary>
+        /// <returns></returns>
+        internal static string ImplicitTokens()
+        {
+            var r=new StringBuilder();
+            foreach (var key in TokenCategory.ImplicitTokenCategories.Keys)
+            {
+                r.Append(key).Append(' ');
+            }
+            return r.ToString();
+        }
 
         #endregion ExplicitTokens
 
@@ -198,7 +246,10 @@ namespace Nicodem.Semantics.Grammar
 
         private static IEnumerable<char> EscapeEre1(IEnumerable<char> re)
         {
-            const string special = ".[\\(*+?{|^$";
+            // const string special = ".[\\(*+?{|^$";
+            // workaround of regex parser strange grammar rules see #48
+            // POSIX conforming version is above
+            const string special = ".[]\\()*+?|^$-";
             var first = re.Take(1).ToArray();
             if (first.Length == 0)
             {
@@ -489,6 +540,12 @@ namespace Nicodem.Semantics.Grammar
                 return MakeUnion((IEnumerable<string>) tokens);
             }
 
+            public static RegexSymbol MakeUnion(params TokenCategory[] tokens)
+            {
+                var regexes = tokens.Select(t => ((RegexSymbol) t)._regexSymbol()).ToArray();
+                return new RegexSymbol(() => RegExFactory.Union(regexes));
+            }
+
             public static RegexSymbol MakeUnion(IEnumerable<string> tokens)
             {
                 var enumerable = tokens as string[] ?? tokens.ToArray();
@@ -658,7 +715,7 @@ namespace Nicodem.Semantics.Grammar
             BlockExpression.SetProduction("{" * Expression.Star * "}");   // No left-recursion thanks to '{'
             ObjectDefinitionExpression.SetProduction(TypeSpecifier * ObjectName * "=" * Expression);  // NOTE: "=" is _not_ an assignment operator here
             ArrayLiteralExpression.SetProduction("[" * (Expression * ",").Star * Expression.Optional * "]");
-            ObjectUseExpression.SetProduction(ObjectName);    // Literals are handled by 'name resolution'
+            ObjectUseExpression.SetProduction(ObjectName + RegexSymbol.MakeUnion(Literals));
             IfExpression.SetProduction("if" * Expression * Expression * ("else" * Expression).Optional);  // FIXME: if should be an operator
             WhileExpression.SetProduction("while" * Expression * Expression * ("else" * Expression).Optional);    // the same here?
             LoopControlExpression.SetProduction(("break".Token() + "continue") * (Expression * DecimalNumberLiteral.Optional).Optional);
