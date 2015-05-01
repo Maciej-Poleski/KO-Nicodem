@@ -299,5 +299,65 @@ namespace Nicodem.Parser.Tests
             var ll = new LlConfiguration<CharSymbol>(chSym, stack);
             Assert.AreEqual(ll.Pop().Count(), 1);
         }
+
+		// ------ test subsumes ------
+		[Test]
+		public void LLConfSubsumesDiffLabelTest()
+		{
+			CharSymbol chSymA = new CharSymbol('A');
+			var llA = new LlConfiguration<CharSymbol>(chSymA);
+
+			CharSymbol chSymB = new CharSymbol('B');
+			var llB = new LlConfiguration<CharSymbol>(chSymB);
+
+			bool result = llA.Subsumes (llB);
+
+			Assert.AreEqual(false, result);
+		}
+
+		[Test]
+		public void LLConfSubsumesEqualLabelTest()
+		{
+			CharSymbol chSymA = new CharSymbol('A');
+			var llA = new LlConfiguration<CharSymbol>(chSymA);
+
+			CharSymbol chSymB = new CharSymbol('A');
+			var llB = new LlConfiguration<CharSymbol>(chSymB);
+
+			bool result = llA.Subsumes (llB);
+
+			Assert.AreEqual(true, result);
+		}
+
+		[Test]
+		public void LLConfSubsumesTrueTest()
+		{
+			CharSymbol chSym = new CharSymbol('A');
+			var llA = new LlConfiguration<CharSymbol>(chSym);
+			var llB = new LlConfiguration<CharSymbol>(chSym);
+
+			llA = llA.Push (states["A1"]).Push(states["A2"]);
+			llB = llB.Push (states ["A1"]).Push (states ["A2"]).Push (states ["A3"]);
+
+			bool result = llA.Subsumes (llB);
+
+			Assert.AreEqual(true, result);
+		}
+
+		[Test]
+		public void LLConfSubsumesFalseTest()
+		{
+			CharSymbol chSym = new CharSymbol('A');
+			var llA = new LlConfiguration<CharSymbol>(chSym);
+			var llB = new LlConfiguration<CharSymbol>(chSym);
+
+			llA = llA.Push (states["A1"]).Push(states["B2"]);
+			llB = llB.Push (states ["A1"]).Push (states ["A2"]).Push (states ["A3"]);
+
+			bool result = llA.Subsumes (llB);
+
+			Assert.AreEqual(false, result);
+		}
+			
     }
 }
