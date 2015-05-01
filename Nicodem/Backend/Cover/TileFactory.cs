@@ -117,8 +117,8 @@ namespace Nicodem.Backend.Cover
 		public static Tile LEA_Reg_Reg_Reg() {
 			return new Tile (typeof(AssignmentNode),
 				new[] {
+					makeTile<RegisterNode>(),
 					makeTile<MemoryNode>(
-						makeTile<RegisterNode>(),
 						makeTile<AddOperatorNode>(
 							makeTile<RegisterNode>(),
 							makeTile<RegisterNode>()
