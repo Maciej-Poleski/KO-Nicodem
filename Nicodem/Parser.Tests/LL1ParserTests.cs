@@ -35,6 +35,16 @@ namespace Nicodem.Parser.Tests
 			Assert.IsNotNull(resLeaf);
 			Assert.AreEqual(resLeaf.Symbol, new CharSymbol('$'));
 		}
+
+		[Test]
+		public void ValidProgramsTests()
+		{
+			var twoProdGrammar = new SimpleTwoProds();
+			var parser = new LlParser<CharSymbol>(twoProdGrammar.Grammar);
+			foreach(var prog in twoProdGrammar.ValidPrograms) {
+				Assert.NotNull(parser.Parse(prog.Item2), prog.Item1);
+			}
+		}
 	}
 }
 

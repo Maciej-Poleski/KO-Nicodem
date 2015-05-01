@@ -14,8 +14,9 @@ namespace Nicodem.Parser.Tests
 		Grammar<TSymbol> Grammar { get; }
 
 		GrammarType Type { get; }
-		IEnumerable<ParseLeaf<TSymbol>> ValidPrograms { get; }
-		IEnumerable<ParseLeaf<TSymbol>> InvalidPrograms { get; }
+		// Tuple<Description, Code>
+		Tuple<String, IEnumerable<ParseLeaf<TSymbol>>>[] ValidPrograms { get; }
+		Tuple<String, IEnumerable<ParseLeaf<TSymbol>>>[] InvalidPrograms { get; }
 	}
 }
 

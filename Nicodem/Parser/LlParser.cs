@@ -61,7 +61,7 @@ namespace Nicodem.Parser
 						_grammar.WhichProduction[node.Accepting], 
 						parsedChildren);
 
-					yield return new ParseResult<TSymbol>(parsedTree, parseState.Iterator);
+					yield return new ParseResult<TSymbol>(parsedTree, it);
 				}
 
 				var trans = node.Transitions;
@@ -72,7 +72,7 @@ namespace Nicodem.Parser
 						if(trans[ind].Key.IsTerminal) {
 
                             children.Push(new ParseLeaf<TSymbol>(it != word.End ? it.Current.Fragment : null, currentSymbol)); // TODO It would be better to have special END fragment
-                            st.Push(new ParseState(trans[ind].Value, 0, it.Next()));
+							st.Push(new ParseState(trans[ind].Value, 0, it != word.End ? it.Next() : word.End));
 							break;
 						} else {
 							IEnumerator<ParseResult<TSymbol>> resultIt = ParseTerm(trans[ind].Key, word, it).GetEnumerator();
@@ -127,6 +127,9 @@ namespace Nicodem.Parser
 		}
 
 		private static IFragment GetFragmentRange(IFragment begin, IFragment end) {
+			if(begin == null || end == null) { // TODO handle it better
+				return new OriginFragment(null, new OriginPosition(), new OriginPosition());
+			}
 			return new OriginFragment(begin.Origin, begin.GetBeginOriginPosition(), end.GetEndOriginPosition());
 		}
 
