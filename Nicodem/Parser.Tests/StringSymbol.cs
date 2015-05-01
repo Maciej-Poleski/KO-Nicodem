@@ -5,6 +5,9 @@ namespace Nicodem.Parser.Tests
 	public struct StringSymbol : ISymbol<StringSymbol>
 	{
 		internal String S { get; private set; }
+
+		// Every non terminal symbol should start with an uppercase letter
+		// All others denote terminals
 		internal StringSymbol (String s)
 			: this()
 		{
@@ -15,7 +18,7 @@ namespace Nicodem.Parser.Tests
 
         public string Description {
             get {
-                throw new NotImplementedException();
+				return "StringSymbol-" + S;
             }
         }
 

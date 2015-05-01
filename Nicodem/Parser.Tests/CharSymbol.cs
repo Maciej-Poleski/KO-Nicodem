@@ -6,6 +6,8 @@ namespace Nicodem.Parser.Tests
 	{
 		internal char C { get; private set; }
 
+		// Every non terminal symbol should be an uppercase letter
+		// All others denote terminals
 		internal CharSymbol(char c)
 			: this()
 		{
@@ -16,7 +18,7 @@ namespace Nicodem.Parser.Tests
 
         public string Description {
             get {
-				return "test_symbol: " + C.ToString();
+				return "CharSymbol-" + C.ToString();
             }
         }
 
