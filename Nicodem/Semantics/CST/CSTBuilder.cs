@@ -21,7 +21,8 @@ namespace Nicodem.Semantics.CST
                               NicodemGrammarProductions.MakeProductionsDictionaryForGrammarConstructor());
 
             var parser = new LLStarParser<Symbol>(grammar);
-            var cst = parser.Parse(leafs);
+            // var cst = parser.Parse(leafs); TODO - change input type for parser!!!
+			IParseTree<Symbol> cst = null;
 
             return cst;
         }

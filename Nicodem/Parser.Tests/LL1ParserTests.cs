@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Nicodem.Lexer;
 using NUnit.Framework;
@@ -20,9 +21,19 @@ namespace Nicodem.Parser.Tests
 			});
 
 			var parser = new LlParser<CharSymbol>(grammar);
-			var emptyInput = new List<IEnumerable<IParseTree<CharSymbol>>>();
+			var emptyInput = new List<ParseLeaf<CharSymbol>>();
 
-			Assert.IsNotNull(parser.Parse(emptyInput));
+			var res = parser.Parse(emptyInput);
+			Assert.IsNotNull(res);
+
+			var resAsBranch = res as ParseBranch<CharSymbol>;
+			Assert.IsNotNull(resAsBranch);
+			Assert.AreEqual(resAsBranch.Children.Count(), 1);
+			Assert.AreEqual(resAsBranch.Symbol, start);
+
+			var resLeaf = resAsBranch.Children.ElementAt(0) as ParseLeaf<CharSymbol>;
+			Assert.IsNotNull(resLeaf);
+			Assert.AreEqual(resLeaf.Symbol, new CharSymbol('$'));
 		}
 	}
 }
