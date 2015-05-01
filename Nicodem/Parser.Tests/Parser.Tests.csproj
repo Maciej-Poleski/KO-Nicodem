@@ -51,6 +51,8 @@
     <Compile Include="StringSymbol.cs" />
     <Compile Include="GrammarTests.cs" />
     <Compile Include="CharSymbol.cs" />
+    <Compile Include="GrammarExamples\GrammarExample.cs" />
+    <Compile Include="GrammarExamples\LL1\SimpleTwoProds.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">
@@ -63,5 +65,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="GrammarExamples\" />
+    <Folder Include="GrammarExamples\LL1\" />
   </ItemGroup>
 </Project>
