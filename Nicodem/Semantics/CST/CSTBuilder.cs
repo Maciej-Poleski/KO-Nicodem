@@ -4,6 +4,7 @@ using Nicodem.Parser;
 using Nicodem.Semantics.Grammar;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 using Nicodem.Source;
 
 namespace Nicodem.Semantics.CST
@@ -14,15 +15,18 @@ namespace Nicodem.Semantics.CST
         {
             var sanitizedTokens = SanitizedTokens(origin);
 
-            var leafs = sanitizedTokens.Select(r => r.Item2.Select(s => new ParseLeaf<Symbol>(r.Item1, new Symbol(s))));
+			// Assume every list from tupple is of size 1 !!!
+			var leafs = sanitizedTokens.Select(r => {
+				Debug.Assert(r.Item2.Count() == 1);
+				return new ParseLeaf<Symbol>(r.Item1, new Symbol(r.Item2.ElementAt(0)));
+			});
 
             var grammar = new Grammar<Symbol>(
                               NicodemGrammarProductions.StartSymbol(),
                               NicodemGrammarProductions.MakeProductionsDictionaryForGrammarConstructor());
 
             var parser = new LLStarParser<Symbol>(grammar);
-            // var cst = parser.Parse(leafs); TODO - change input type for parser!!!
-			IParseTree<Symbol> cst = null;
+            var cst = parser.Parse(leafs);
 
             return cst;
         }
