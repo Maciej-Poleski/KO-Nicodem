@@ -21,5 +21,26 @@ namespace Nicodem.Parser
 			}
 		}
 	}
+
+	internal struct ParseResult<TSymbol> where TSymbol : ISymbol<TSymbol>
+    {
+
+        public MemoizedInput<ParseLeaf<TSymbol>>.Iterator Iterator { get; private set; }
+        public IParseTree<TSymbol> Tree { get; private set; } 
+        private bool _ok;
+
+		public ParseResult(IParseTree<TSymbol> tree, MemoizedInput<ParseLeaf<TSymbol>>.Iterator iterator, bool ok = true)
+            : this()
+        {
+            Tree = tree;
+            Iterator = iterator;
+            _ok = ok;
+        }
+
+		public static implicit operator bool(ParseResult<TSymbol> result)
+        {
+            return result._ok;
+        }
+    }
 }
 

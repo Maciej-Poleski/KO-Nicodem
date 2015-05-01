@@ -21,7 +21,7 @@ namespace Nicodem.Parser.Tests
 
         public bool IsTerminal {
             get {
-                throw new NotImplementedException();
+				return !(!string.IsNullOrEmpty(S) && char.IsUpper(S[0]));
             }
         }
 

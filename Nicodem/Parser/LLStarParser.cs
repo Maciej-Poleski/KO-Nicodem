@@ -19,31 +19,19 @@ namespace Nicodem.Parser
             _grammar = grammar;
 		}
 
-        public IParseTree<TSymbol> Parse(IEnumerable<IEnumerable<IParseTree<TSymbol>>> word)
+        public IParseTree<TSymbol> Parse(IEnumerable<ParseLeaf<TSymbol>> word)
 		{
-            var conf = new InputConfiguration<IParseTree<TSymbol>>(word);
-            do {
-                var wordOpt = new List<IParseTree<TSymbol>>();
-                int i = 0;
-                foreach(var token in word) {
-                    wordOpt.Add(token.ElementAt(conf.Conf[i].Item1));
-                    i++;
-                }
-                var memoizedWord = new MemoizedInput<IParseTree<TSymbol>>(wordOpt);
-                var result = ParseTerm(_grammar.Start, memoizedWord, memoizedWord.Begin);
-                // whole input has to be eaten
-                if(result && result.Iterator == memoizedWord.End) {
-                    return result.Tree;
-                } 
-
-                i++;
-                conf.Next();
-            } while(!conf.Turned);
-
-            return null;
+            var memoizedWord = new MemoizedInput<ParseLeaf<TSymbol>>(word);
+            var result = ParseTerm(_grammar.Start, memoizedWord, memoizedWord.Begin);
+            // whole input has to be eaten
+			if(result && result.Iterator == memoizedWord.End) {
+				return result.Tree;
+			} else {
+            	return null;
+			}
 		}
 
-		private ParseResult ParseTerm(TSymbol term, MemoizedInput<IParseTree<TSymbol>> word, MemoizedInput<IParseTree<TSymbol>>.Iterator input)
+		private ParseResult<TSymbol> ParseTerm(TSymbol term, MemoizedInput<ParseLeaf<TSymbol>> word, MemoizedInput<ParseLeaf<TSymbol>>.Iterator input)
 		{
 			var dfa = _grammar.Automatons[term];
 			var children = new List<IParseTree<TSymbol>>(); 
@@ -66,7 +54,7 @@ namespace Nicodem.Parser
 						_grammar.WhichProduction[state.Accepting], 
 						children);
 
-					return new ParseResult(parsedTree, it);
+					return new ParseResult<TSymbol>(parsedTree, it);
 				}
 
 				var lookIt = it;
@@ -104,15 +92,15 @@ namespace Nicodem.Parser
 			}
 		}
 
-		private ParseResult ReturnError(TSymbol term, IList<IParseTree<TSymbol>> children, 
-				MemoizedInput<IParseTree<TSymbol>>.Iterator input, MemoizedInput<IParseTree<TSymbol>>.Iterator currentIt)
+		private ParseResult<TSymbol> ReturnError(TSymbol term, IList<IParseTree<TSymbol>> children, 
+				MemoizedInput<ParseLeaf<TSymbol>>.Iterator input, MemoizedInput<ParseLeaf<TSymbol>>.Iterator currentIt)
 		{
 			var branch = new ParseBranch<TSymbol>(
 				GetFragmentRange(input.Current.Fragment, children.Last().Fragment), 
 					term, 
 					_grammar.Productions[term][0],  // TODO could not parse any productions
 					children);
-			return new ParseResult(branch, currentIt, false);
+			return new ParseResult<TSymbol>(branch, currentIt, false);
 		}
 
 		private static IFragment GetFragmentRange(IFragment begin, IFragment end) {
@@ -124,62 +112,6 @@ namespace Nicodem.Parser
 		{
 			return transitions.FirstOrDefault(kv => kv.Key.Equals(edge)).Value;
 		}
-
-        private class InputConfiguration<T>
-        {
-            public List<Tuple<int,int>> Conf { get; private set; }
-            public bool Turned { get; private set; }
-
-            public InputConfiguration(IEnumerable<IEnumerable<T>> input)
-            {
-                Turned = false;
-                Conf = new List<Tuple<int, int>>();
-                foreach(var l in input) {
-                    Conf.Add(new Tuple<int,int>(0, l.Count()));
-                }
-            }
-
-            public void Next()
-            {
-                for (int i = 0; i < Conf.Count; i++) {
-                    Conf[i] = new Tuple<int, int>(Conf[i].Item1 + 1, Conf[i].Item2);
-                    if (Conf[i].Item1 > 0) {
-                        break;
-                    } else if (i == Conf.Count - 1) {
-                        Turned = true;
-                    }
-                }
-            }
-
-            public void Reset()
-            {
-                Turned = false;
-                for (int i = 0; i < Conf.Count; i++) {
-                    Conf[i] = new Tuple<int, int>(0, Conf[i].Item2);
-                }
-            }
-        }
-
-        private struct ParseResult
-        {
-
-            public IParseTree<TSymbol> Tree { get; private set; } 
-            public MemoizedInput<IParseTree<TSymbol>>.Iterator Iterator { get; private set; }
-            private bool _ok;
-
-            public ParseResult(IParseTree<TSymbol> tree, MemoizedInput<IParseTree<TSymbol>>.Iterator iterator, bool ok = true)
-                : this()
-            {
-                Tree = tree;
-                Iterator = iterator;
-                _ok = ok;
-            }
-
-            public static implicit operator bool(ParseResult result)
-            {
-                return result._ok;
-            }
-        }
 	}
 }
 
