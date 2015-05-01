@@ -9,6 +9,8 @@ namespace Nicodem.Parser
         public readonly TSymbol label; 
         public readonly ImmutableList<DfaState<TSymbol> > stack = ImmutableList.Create<DfaState<TSymbol> >();
 
+        // ----- constructors -----
+
 		public LlConfiguration(TSymbol label) {
 			this.label = label;
 		}
@@ -27,6 +29,8 @@ namespace Nicodem.Parser
             this.label = label;
             this.stack = stack;
         }
+
+        // ----- methods -----
 
         public LlConfiguration<TSymbol> Push(DfaState<TSymbol> state) {
             return new LlConfiguration<TSymbol>(label, stack.Add(state));
@@ -78,6 +82,8 @@ namespace Nicodem.Parser
 			return this.Subsumes (other) && other.Subsumes (this);
 		}
 		#endregion
+
+        // ----- printing -----
 
         private string StackString()
         {

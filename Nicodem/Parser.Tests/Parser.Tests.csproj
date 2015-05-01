@@ -46,6 +46,7 @@
     <Compile Include="LookaheadDfaTests.cs" />
     <Compile Include="StringProduction.cs" />
     <Compile Include="LL1ParserTests.cs" />
+    <Compile Include="LLConfigurationTests.cs" />
     <Compile Include="GrammarUtilsTests.cs" />
     <Compile Include="StringSymbol.cs" />
     <Compile Include="GrammarTests.cs" />
