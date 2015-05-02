@@ -155,7 +155,12 @@ namespace Nicodem.Lexer
 					List<RegEx<char>> chars = new List<RegEx<char>> ();
 					char ch;
 					while ((ch = Peek ()) != ']') {
-						chars.Add (SingleChar (ch));
+						if (ch.Equals('\\')){
+							Accept ("]");
+							chars.Add(SingleChar(']'));
+						}
+						else
+							chars.Add (SingleChar (ch));
 					}
 					atom = RegExFactory.Union (chars.ToArray ());
 				} else {
