@@ -160,8 +160,6 @@ namespace Nicodem.Lexer
 					List<RegEx<char>> chars = new List<RegEx<char>> ();
 					char ch;
 					while ((ch = Peek ()) != ']') {
-						if (specialCharacters.Contains ("" + ch))
-							throw new ParseError ("Non-special character expected.");
 						chars.Add (SingleChar (ch));
 					}
 					atom = RegExFactory.Union (chars.ToArray ());
