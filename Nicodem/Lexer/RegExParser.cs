@@ -1,197 +1,213 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Nicodem.Lexer
 {
 
-    public class ParseError : Exception
-    {
-        public ParseError() : base()
-        {
-        }
-    }
+	public class ParseError : Exception
+	{
+		public ParseError (String msg) : base (msg)
+		{
+		}
+	}
 
-    public static class RegExParser
-    {
+	public static class RegExParser
+	{
 
-        private static String regEx;
-        private static int head;
-        private static readonly String specialCharacters = "()[].*+|^-\\";
+		private static String regEx;
+		private static int head;
+		private static readonly String specialCharacters = "()[].*+&|^-\\";
 
-        public static RegEx<char> Parse(String regEx)
-        {
-            RegExParser.head = 0;
-            RegExParser.regEx = regEx;
+		public static RegEx<char> Parse (String regEx)
+		{
+			RegExParser.head = 0;
+			RegExParser.regEx = regEx;
 
-            var result = ParseUnion();
-            if (HasNext())
-                throw new ParseError();
+			var result = ParseBinaryOperators ();
+			if (HasNext ())
+				throw new ParseError ("Cannot parse the whole input string.");
 
-            return Sanitize(result);
-        }
+			return Sanitize (result);
+		}
 
-        private static RegEx<char> Sanitize(RegEx<char> result)
-        {
-            return RegExFactory.Intersection(result, RegExFactory.Star(CharactersClasses.print));
-        }
+		private static RegEx<char> Sanitize (RegEx<char> result)
+		{
+			return RegExFactory.Intersection (result, RegExFactory.Star (CharactersClasses.print));
+		}
 
-        private static RegEx<char> SingleChar(char c)
-        {
-            return RegExFactory.Range(c, (char)(c + 1));
-        }
+		private static RegEx<char> SingleChar (char c)
+		{
+			return RegExFactory.Range (c, (char)(c + 1));
+		}
 
-        private static char Peek()
-        {
-            if (!HasNext())
-                throw new ParseError();
-            return regEx[head++];
-        }
+		private static char Peek ()
+		{
+			if (!HasNext ())
+				throw new ParseError ("Peek error.");
+			return regEx [head++];
+		}
 
-        private static bool HasNext()
-        {
-            return (head < regEx.Length);
-        }
+		private static bool HasNext ()
+		{
+			return (head < regEx.Length);
+		}
 
-        private static void Accept(String s)
-        {
-            if (!HasPrefix(s))
-                throw new ParseError();
-            Eat(s.Length);
-        }
+		private static void Accept (String s)
+		{
+			if (!HasPrefix (s))
+				throw new ParseError ("Accept error.");
+			Eat (s.Length);
+		}
 
-        private static void Eat(int howMany)
-        {
-            if (head + howMany > regEx.Length)
-                throw new ParseError();
-            head += howMany;
-        }
+		private static void Eat (int howMany)
+		{
+			if (head + howMany > regEx.Length)
+				throw new ParseError ("Eat error.");
+			head += howMany;
+		}
 
-        private static bool HasPrefix(String s)
-        {
-            if (head + s.Length > regEx.Length)
-                return false;
-            return regEx.Substring(head, s.Length).Equals(s);
-        }
+		private static bool HasPrefix (String s)
+		{
+			if (head + s.Length > regEx.Length)
+				return false;
+			return regEx.Substring (head, s.Length).Equals (s);
+		}
 
-        private static RegEx<char> ParseUnion()
-        {
-            var left = ParseConcat();
-            if (HasPrefix("|")) {
-                Eat(1);
+		private static RegEx<char> ParseBinaryOperators ()
+		{
+			var left = ParseConcat ();
+			bool union = false, intersection = false;
 
-                var right = ParseUnion();
+			union |= HasPrefix("|");
+			intersection |= HasPrefix("&");
 
-                if (right == null)
-                    throw new ParseError();
+			if (union || intersection) {
+				Eat (1);
+				var right = ParseBinaryOperators ();
 
-                return RegExFactory.Union(left, right);
-            }
+				if (right == null)
+					throw new ParseError ("Missed one of the union/intersection argument.");
 
-            return left;
-        }
+				return (union ? RegExFactory.Union (left, right) : RegExFactory.Intersection(left, right));
+			}
 
-        private static RegEx<char> ParseConcat()
-        {
-            var left = ParseStar();
+			return left;
+		}
 
-            if (left == null)
-                return null;
+		private static RegEx<char> ParseConcat ()
+		{
+			var left = ParseStar ();
 
-            var right = ParseConcat();
+			if (left == null)
+				return null;
 
-            if (right != null)
-                return RegExFactory.Concat(left, right);
+			var right = ParseConcat ();
 
-            return left;
-        }
+			if (right != null)
+				return RegExFactory.Concat (left, right);
 
-        private static RegEx<char> ParseStar()
-        {
-            var left = ParseAtom();
+			return left;
+		}
 
-            if (HasPrefix("*") || HasPrefix("+")) {
-                bool star = false;
+		private static RegEx<char> ParseStar ()
+		{
+			var left = ParseAtom ();
 
-                while (HasPrefix("*") || HasPrefix("+")) {
-                    star |= HasPrefix("+");
-                    Eat(1);
-                }
+			if (HasPrefix ("*") || HasPrefix ("+")) {
+				bool star = false;
 
-                if (left == null)
-                    throw new ParseError();
+				while (HasPrefix ("*") || HasPrefix ("+")) {
+					star |= HasPrefix ("+");
+					Eat (1);
+				}
 
-                return (star ? RegExFactory.Concat(left, RegExFactory.Star(left)) : RegExFactory.Star(left));
-            } 
+				if (left == null)
+					throw new ParseError ("Unassigned +/-.");
 
-            return left;
-        }
+				return (star ? RegExFactory.Concat (left, RegExFactory.Star (left)) : RegExFactory.Star (left));
+			} 
 
-        private static RegEx<char> ParseAtom()
-        {
-            if (HasPrefix("[")) {
-                Eat(1);
+			return left;
+		}
 
-                if (HasPrefix(":digit:]")) {
-                    Eat(8);
-                    return CharactersClasses.digit;
-                } else {
-                    if (HasPrefix(":print:]")) {
-                        Eat(8);
-                        return CharactersClasses.print;
-                    } else if (HasPrefix(":space:]")) {
-                        Eat(8);
-                        return CharactersClasses.space;
-                    }
-                }
-				    
-                var a = Peek();
-                Accept("-");
-                var b = Peek();
-                Accept("]");
-                return RegExFactory.Range(a, (char)((int)b + 1));
-            }
+		private static RegEx<char> ParseAtom ()
+		{
+			if (HasPrefix ("[")) {
+				Eat (1);
 
-            if (HasPrefix(".")) {
-                Eat(1);
-                return RegExFactory.All<char>();
-            }
+				bool complement = false;
 
-            if (HasPrefix("(")) {
-                Eat(1);
-                var node = ParseUnion();
-                if (node == null)
-                    throw new ParseError();
-                Accept(")");
-                return node;
-            }
+				if (HasPrefix ("^")) {
+					Eat (1);
+					complement = true;
+				}
 
-            if (HasPrefix("^")) {
-                Eat(1);
-                var node = ParseAtom();
-                if (node == null)
-                    throw new ParseError();
-                return RegExFactory.Complement(node);
-            }
+				RegEx<char> atom = null;
 
-            if (HasPrefix("\\")) {
-                Eat(1);
-                char a = Peek();
+				if (HasPrefix (":digit:]")) {
+					Eat (8);
+					atom = CharactersClasses.digit;
+				} else {
+					if (HasPrefix (":print:]")) {
+						Eat (8);
+						atom = CharactersClasses.print;
+					} else if (HasPrefix (":space:]")) {
+						Eat (8);
+						atom = CharactersClasses.space;
+					}
+				}
 
-                if (!specialCharacters.Contains("" + a))
-                    throw new ParseError();
-                return SingleChar(a);
-            }
+				if (atom == null)
+					throw new ParseError ("Invalid class name.");
 
-            if (HasNext()) {
-                var a = Peek();
-                if (specialCharacters.Contains("" + a)) { 
-                    --head;
-                    return null;
-                }
-                return SingleChar(a);
-            }
+				if (complement)
+					return RegExFactory.Intersection (RegExFactory.Range ((char)0), RegExFactory.Complement (atom));
+				else
+					return atom;
+			}
 
-            return null;
-        }
-    }
+			if (HasPrefix (".")) {
+				Eat (1);
+				return RegExFactory.Range ((char)0);
+			}
+
+			if (HasPrefix ("(")) {
+				Eat (1);
+				var node = ParseBinaryOperators ();
+				if (node == null)
+					throw new ParseError ("Parentheses around the null expression.");
+				Accept (")");
+				return node;
+			}
+
+			if (HasPrefix ("^")) {
+				Eat (1);
+				var node = ParseAtom ();
+				if (node == null)
+					throw new ParseError ("Unassigned ^.");
+				return RegExFactory.Complement (node);
+			}
+
+			if (HasPrefix ("\\")) {
+				Eat (1);
+				char a = Peek ();
+
+				if (!specialCharacters.Contains ("" + a))
+					throw new ParseError ("Special character required.");
+				return SingleChar (a);
+			}
+
+			if (HasNext ()) {
+				var a = Peek ();
+				if (specialCharacters.Contains ("" + a)) { 
+					--head;
+					return null;
+				}
+				return SingleChar (a);
+			}
+
+			return null;
+		}
+	}
 }
     
