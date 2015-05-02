@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Collections.Generic;
 using Nicodem.Lexer;
@@ -7,8 +8,14 @@ using NUnit.Framework;
 namespace Nicodem.Parser.Tests
 {
 	[TestFixture]
-	public class LL1ParserTests
+	public class ParsersTests
 	{
+		private GrammarExample[] _grammars = new GrammarExample[]
+		{
+			new SimpleTwoProds(),
+			new ABCSeqGrammar(),
+		};
+
 		[Test]
 		public void EmptyGrammarTest()
 		{
@@ -36,13 +43,34 @@ namespace Nicodem.Parser.Tests
 			Assert.AreEqual(resLeaf.Symbol, new CharSymbol('$'));
 		}
 
+
 		[Test]
-		public void ValidProgramsTests()
+		public void LL1ValidProgramsTests()
 		{
-			var twoProdGrammar = new SimpleTwoProds();
-			var parser = new LlParser<CharSymbol>(twoProdGrammar.Grammar);
-			foreach(var prog in twoProdGrammar.ValidPrograms) {
-				Assert.NotNull(parser.Parse(prog.Item2), prog.Item1);
+			var ll1s = _grammars.Where(k => k.Type.Equals(GrammarType.LL1));
+
+			foreach(var ge in ll1s) {
+				Debug.WriteLine("Testing valid programs for grammar: " + ge.Name);
+				var parser = new LlParser<CharSymbol>(ge.Grammar);
+
+				foreach(var prog in ge.ValidPrograms) {
+					Assert.NotNull(parser.Parse(prog.Item2), ge.Name + ": " + prog.Item1);
+				}
+			}
+		}
+
+		[Test]
+		public void LL1InValidProgramsTests()
+		{
+			var ll1s = _grammars.Where(k => k.Type.Equals(GrammarType.LL1));
+
+			foreach(var ge in ll1s) {
+				Debug.WriteLine("Testing invalid programs for grammar: " + ge.Name);
+				var parser = new LlParser<CharSymbol>(ge.Grammar);
+
+				foreach(var prog in ge.InvalidPrograms) {
+					Assert.IsNull(parser.Parse(prog.Item2), ge.Name + ": " + prog.Item1);
+				}
 			}
 		}
 	}
