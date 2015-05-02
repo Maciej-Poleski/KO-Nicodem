@@ -55,7 +55,7 @@ namespace Nicodem.Lexer
 		private static void Accept (String s)
 		{
 			if (!HasPrefix (s))
-				throw new ParseError ("Accept error.");
+				throw new ParseError (s + " expected, but not found.");
 			Eat (s.Length);
 		}
 
@@ -78,8 +78,8 @@ namespace Nicodem.Lexer
 			var left = ParseConcat ();
 			bool union = false, intersection = false;
 
-			union |= HasPrefix("|");
-			intersection |= HasPrefix("&");
+			union |= HasPrefix ("|");
+			intersection |= HasPrefix ("&");
 
 			if (union || intersection) {
 				Eat (1);
@@ -88,7 +88,7 @@ namespace Nicodem.Lexer
 				if (right == null)
 					throw new ParseError ("Missed one of the union/intersection argument.");
 
-				return (union ? RegExFactory.Union (left, right) : RegExFactory.Intersection(left, right));
+				return (union ? RegExFactory.Union (left, right) : RegExFactory.Intersection (left, right));
 			}
 
 			return left;
@@ -144,21 +144,29 @@ namespace Nicodem.Lexer
 
 				RegEx<char> atom = null;
 
-				if (HasPrefix (":digit:]")) {
-					Eat (8);
-					atom = CharactersClasses.digit;
-				} else {
-					if (HasPrefix (":print:]")) {
-						Eat (8);
+				if (HasPrefix (":")) {	
+					if (HasPrefix (":digit:"))
+						atom = CharactersClasses.digit;
+					if (HasPrefix (":print:"))
 						atom = CharactersClasses.print;
-					} else if (HasPrefix (":space:]")) {
-						Eat (8);
+					if (HasPrefix (":space:"))
 						atom = CharactersClasses.space;
-					}
+					if (atom == null)
+						throw new ParseError ("Invalid class name.");
+					Eat (7);
 				}
 
-				if (atom == null)
-					throw new ParseError ("Invalid class name.");
+				if (atom == null) {
+					List<RegEx<char>> chars = new List<RegEx<char>> ();
+					char ch;
+					while ((ch = Peek ()) != ']') {
+						if (specialCharacters.Contains ("" + ch))
+							throw new ParseError ("Non-special character expected.");
+						chars.Add (SingleChar (ch));
+					}
+					atom = RegExFactory.Union (chars.ToArray ());
+				} else
+					Accept ("]");
 
 				if (complement)
 					return RegExFactory.Intersection (RegExFactory.Range ((char)0), RegExFactory.Complement (atom));
