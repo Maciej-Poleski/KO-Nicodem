@@ -336,7 +336,7 @@ namespace Nicodem.Parser.Tests
 			var llA = new LlConfiguration<CharSymbol>(chSym);
 			var llB = new LlConfiguration<CharSymbol>(chSym);
 
-			llA = llA.Push (states["A1"]).Push(states["A2"]);
+			llA = llA.Push (states["A2"]).Push(states["A3"]);
 			llB = llB.Push (states ["A1"]).Push (states ["A2"]).Push (states ["A3"]);
 
 			bool result = llA.Subsumes (llB);
@@ -351,7 +351,7 @@ namespace Nicodem.Parser.Tests
 			var llA = new LlConfiguration<CharSymbol>(chSym);
 			var llB = new LlConfiguration<CharSymbol>(chSym);
 
-			llA = llA.Push (states["A1"]).Push(states["B2"]);
+			llA = llA.Push (states["B2"]).Push(states["A3"]);
 			llB = llB.Push (states ["A1"]).Push (states ["A2"]).Push (states ["A3"]);
 
 			bool result = llA.Subsumes (llB);
