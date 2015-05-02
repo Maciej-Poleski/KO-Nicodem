@@ -195,7 +195,7 @@ namespace Nicodem.Semantics.Grammar
         // Comments
         private static readonly TokenCategory LineCommentCStyle = "//[^\n]*\n";
         private static readonly TokenCategory LineCommentShortStyle = "`[^\n`]*\n";
-        private static readonly TokenCategory ShortComment = "`(^(\n|`))*`";
+        private static readonly TokenCategory ShortComment = "`[^\n`]*`";
 
         // Space
         private static readonly TokenCategory Space = "[:space:]+";
