@@ -144,17 +144,12 @@ namespace Nicodem.Lexer
 
 				RegEx<char> atom = null;
 
-				if (HasPrefix (":")) {	
-					if (HasPrefix (":digit:"))
-						atom = CharactersClasses.digit;
-					if (HasPrefix (":print:"))
-						atom = CharactersClasses.print;
-					if (HasPrefix (":space:"))
-						atom = CharactersClasses.space;
-					if (atom == null)
-						throw new ParseError ("Invalid class name.");
-					Eat (7);
-				}
+				if (HasPrefix (":digit:"))
+					atom = CharactersClasses.digit;
+				if (HasPrefix (":print:"))
+					atom = CharactersClasses.print;
+				if (HasPrefix (":space:"))
+					atom = CharactersClasses.space;
 
 				if (atom == null) {
 					List<RegEx<char>> chars = new List<RegEx<char>> ();
@@ -163,8 +158,10 @@ namespace Nicodem.Lexer
 						chars.Add (SingleChar (ch));
 					}
 					atom = RegExFactory.Union (chars.ToArray ());
-				} else
+				} else {
+					Eat (7);
 					Accept ("]");
+				}
 
 				if (complement)
 					return RegExFactory.Intersection (RegExFactory.Range ((char)0), RegExFactory.Complement (atom));
