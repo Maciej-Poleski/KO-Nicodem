@@ -188,7 +188,7 @@ namespace Nicodem.Semantics.Grammar
         #region ExplicitTokens
 
         private const string OperatorsPool =
-            @"\( \) \-> , mutable \[ \] = \+= \-= \*= /= %= <<= >>= &= \^= \|= \|\| && \| \^ & == != < <= > >= << >> \+ \- \* / % \+\+ \-\- ! ~ \.\. { } if else while break continue";
+            @"\( \) \-> , mutable \[ \] = \+= \-= \*= /= %= <<= >>= \&= \^= \|= \|\| \&\& \| \^ \& == != < <= > >= << >> \+ \- \* / % \+\+ \-\- ! ~ \.\. { } if else while break continue";
 
         private static readonly string[] PreparedOperators = OperatorsPool.Split(' ');
 
