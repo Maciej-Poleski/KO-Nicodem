@@ -188,14 +188,14 @@ namespace Nicodem.Semantics.Grammar
         #region ExplicitTokens
 
         private const string OperatorsPool =
-            @"\( \) \-> , mutable \[ \] = \+= \-= \*= /= %= <<= >>= &= \^= \|= \|\| && \| \^ & == != < <= > >= << >> \+ \- \* / % \+\+ \-\- ! ~ \.\. { } if else while break continue";
+            @"\( \) \-> , mutable \[ \] = \+= \-= \*= /= %= <<= >>= \&= \^= \|= \|\| \&\& \| \^ \& == != < <= > >= << >> \+ \- \* / % \+\+ \-\- ! ~ \.\. { } if else while break continue";
 
         private static readonly string[] PreparedOperators = OperatorsPool.Split(' ');
 
         // Comments
-        private static readonly TokenCategory LineCommentCStyle = "//(^\n)*\n";
-        private static readonly TokenCategory LineCommentShortStyle = "`(^(\n|`))*\n";
-        private static readonly TokenCategory ShortComment = "`(^(\n|`))*`";
+        private static readonly TokenCategory LineCommentCStyle = "//[^\n]*\n";
+        private static readonly TokenCategory LineCommentShortStyle = "`[^\n`]*\n";
+        private static readonly TokenCategory ShortComment = "`[^\n`]*`";
 
         // Space
         private static readonly TokenCategory Space = "[:space:]+";
@@ -204,13 +204,13 @@ namespace Nicodem.Semantics.Grammar
         private static readonly TokenCategory[] _whitespaceTokenCategories = {LineCommentCStyle, LineCommentShortStyle, ShortComment, Space};
 
         // Name (for type and objects)
-        private const string NameBase = "(^[:space:])+";
+        private const string NameBase = "[^:space:]+";
         private static readonly string NameWithoutOperators = NameBase.RemoveInfixes(PreparedOperators);
 
         // Literal values (atomic expression)
         private static readonly TokenCategory DecimalNumberLiteral = "[:digit:]+"; // Only decimal number literals for now
-        private static readonly TokenCategory CharacterLiteral = "'(\\\\[:print:])|(^')'";
-        private static readonly TokenCategory StringLiteral = "\"(\\\\.|^\")*\"";
+        private static readonly TokenCategory CharacterLiteral = "'(\\\\[:print:])|[^']'";
+        private static readonly TokenCategory StringLiteral = "\"((\\\\.)|[^\"])*\"";
         // String literal is delimited by not escaped " character
         private static readonly TokenCategory BooleanLiteral = "true|false";
 
@@ -246,10 +246,7 @@ namespace Nicodem.Semantics.Grammar
 
         private static IEnumerable<char> EscapeEre1(IEnumerable<char> re)
         {
-            // const string special = ".[\\(*+?{|^$";
-            // workaround of regex parser strange grammar rules see #48
-            // POSIX conforming version is above
-            const string special = ".[]\\()*+?|^$-";
+            const string special = ".[]\\()*+?|^$-&";
             var first = re.Take(1).ToArray();
             if (first.Length == 0)
             {

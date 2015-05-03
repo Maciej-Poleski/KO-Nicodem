@@ -68,7 +68,7 @@ namespace Nicodem.Parser
             var secondStack = configuration.stack;
 
             for (int i = 0; i < firstStack.Count; i++) {
-				if (firstStack [i] != secondStack[i])
+				if (firstStack [firstStack.Count-i-1] != secondStack[secondStack.Count-i-1])
 					return false;
 			}
 
