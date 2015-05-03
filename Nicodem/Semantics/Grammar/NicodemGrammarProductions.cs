@@ -246,7 +246,7 @@ namespace Nicodem.Semantics.Grammar
 
         private static IEnumerable<char> EscapeEre1(IEnumerable<char> re)
         {
-            const string special = ".[]\\()*+?|^$-";
+            const string special = ".[]\\()*+?|^$-&";
             var first = re.Take(1).ToArray();
             if (first.Length == 0)
             {
