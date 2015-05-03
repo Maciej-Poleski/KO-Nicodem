@@ -14,6 +14,11 @@ namespace Nicodem.Parser.Tests
 		{
 			new SimpleTwoProds(),
 			new ABCSeqGrammar(),
+			//new AssignementGrammar(),
+			new SimpleSyntax(),
+			new AddSeqGrammar(),
+			new BlocksGrammar(),
+			new AssignementTwoGrammar(),
 		};
 
 		[Test]
@@ -50,7 +55,7 @@ namespace Nicodem.Parser.Tests
 			var ll1s = _grammars.Where(k => k.Type.Equals(GrammarType.LL1));
 
 			foreach(var ge in ll1s) {
-				Debug.WriteLine("Testing valid programs for grammar: " + ge.Name);
+				Debug.WriteLine("LL1 Testing valid programs for grammar: " + ge.Name);
 				var parser = new LlParser<CharSymbol>(ge.Grammar);
 
 				foreach(var prog in ge.ValidPrograms) {
@@ -65,7 +70,67 @@ namespace Nicodem.Parser.Tests
 			var ll1s = _grammars.Where(k => k.Type.Equals(GrammarType.LL1));
 
 			foreach(var ge in ll1s) {
-				Debug.WriteLine("Testing invalid programs for grammar: " + ge.Name);
+				Debug.WriteLine("LL1 Testing invalid programs for grammar: " + ge.Name);
+				var parser = new LlParser<CharSymbol>(ge.Grammar);
+
+				foreach(var prog in ge.InvalidPrograms) {
+					Assert.IsNull(parser.Parse(prog.Item2), ge.Name + ": " + prog.Item1);
+				}
+			}
+		}
+
+		[Test]
+		public void LL2ValidProgramsTests()
+		{
+			var ll1s = _grammars.Where(k => k.Type.Equals(GrammarType.LL2));
+
+			foreach(var ge in ll1s) {
+				Debug.WriteLine("LL2 Testing valid programs for grammar: " + ge.Name);
+				var parser = new LlParser<CharSymbol>(ge.Grammar);
+
+				foreach(var prog in ge.ValidPrograms) {
+					Assert.NotNull(parser.Parse(prog.Item2), ge.Name + ": " + prog.Item1);
+				}
+			}
+		}
+
+		[Test]
+		public void LL2InvalidProgramsTests()
+		{
+			var ll1s = _grammars.Where(k => k.Type.Equals(GrammarType.LL2));
+
+			foreach(var ge in ll1s) {
+				Debug.WriteLine("LL2 Testing invalid programs for grammar: " + ge.Name);
+				var parser = new LlParser<CharSymbol>(ge.Grammar);
+
+				foreach(var prog in ge.InvalidPrograms) {
+					Assert.IsNull(parser.Parse(prog.Item2), ge.Name + ": " + prog.Item1);
+				}
+			}
+		}
+
+		[Test]
+		public void OTHERValidProgramsTests()
+		{
+			var ll1s = _grammars.Where(k => k.Type.Equals(GrammarType.OTHER));
+
+			foreach(var ge in ll1s) {
+				Debug.WriteLine("OTHER Testing valid programs for grammar: " + ge.Name);
+				var parser = new LlParser<CharSymbol>(ge.Grammar);
+
+				foreach(var prog in ge.ValidPrograms) {
+					Assert.NotNull(parser.Parse(prog.Item2), ge.Name + ": " + prog.Item1);
+				}
+			}
+		}
+
+		[Test]
+		public void OTHERInvalidProgramsTests()
+		{
+			var ll1s = _grammars.Where(k => k.Type.Equals(GrammarType.OTHER));
+
+			foreach(var ge in ll1s) {
+				Debug.WriteLine("OTHER Testing invalid programs for grammar: " + ge.Name);
 				var parser = new LlParser<CharSymbol>(ge.Grammar);
 
 				foreach(var prog in ge.InvalidPrograms) {

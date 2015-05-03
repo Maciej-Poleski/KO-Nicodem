@@ -4,14 +4,16 @@ namespace Nicodem.Parser.Tests
 {
 	internal struct CharSymbol : ISymbol<CharSymbol>
 	{
-		internal char C { get; private set; }
+		public char C { get; private set; }
+		public string Name { get; private set; }
 
 		// Every non terminal symbol should be an uppercase letter
 		// All others denote terminals
-		internal CharSymbol(char c)
+		internal CharSymbol(char c, string name = "")
 			: this()
 		{
 			C = c;
+			Name = name;
 		}
 
         #region ISymbol implementation
@@ -34,7 +36,7 @@ namespace Nicodem.Parser.Tests
 
 		public bool Equals(CharSymbol other)
 		{
-			return C == other.C;
+			return C.Equals(other.C);
 		}
 
 		#endregion

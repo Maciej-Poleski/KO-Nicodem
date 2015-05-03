@@ -18,6 +18,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <Commandlineparameters>DEBUG;</Commandlineparameters>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -59,6 +60,11 @@
     <Compile Include="ParsersTests.cs" />
     <Compile Include="GrammarExamples\ProductionBuilder.cs" />
     <Compile Include="GrammarExamples\LL1\ABCSeqGrammar.cs" />
+    <Compile Include="GrammarExamples\LL2\BlocksGrammar.cs" />
+    <Compile Include="GrammarExamples\LL2\AssignementGrammar.cs" />
+    <Compile Include="GrammarExamples\LL2\AssignementTwoGrammar.cs" />
+    <Compile Include="GrammarExamples\LL2\AddSeqGrammar.cs" />
+    <Compile Include="GrammarExamples\OTHER\SimpleSyntax.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">
@@ -75,5 +81,7 @@
   <ItemGroup>
     <Folder Include="GrammarExamples\" />
     <Folder Include="GrammarExamples\LL1\" />
+    <Folder Include="GrammarExamples\LL2\" />
+    <Folder Include="GrammarExamples\OTHER\" />
   </ItemGroup>
 </Project>

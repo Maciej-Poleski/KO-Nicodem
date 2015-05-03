@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
@@ -102,27 +103,28 @@ namespace Nicodem.Parser
 
         private static void Backtrack(Stack<ParseState> stack, Stack<IParseTree<TSymbol>> children)
 		{
+			Console.WriteLine("Backtrack");
             while(stack.Any()) {
                 var state = stack.Pop();
-                if(children.Any()) {
-                    children.Pop();
-                }
 
-                if(state.NextPossibleResult != null && state.NextPossibleResult.MoveNext()) {
+				if(state.NextPossibleResult != null && state.NextPossibleResult.MoveNext()) {
 
-                    var nextRes = state.NextPossibleResult.Current;
-                    children.Push(nextRes.Tree);
-                    stack.Push(
-                        new ParseState(state.State, 
-                        state.TransitionIndex, 
-						nextRes.Iterator, 
-                        state.NextPossibleResult));
-                    return;
-                } else if(state.TransitionIndex + 1 < state.State.Transitions.Count) {
+					children.Pop();
+					var nextRes = state.NextPossibleResult.Current;
+					children.Push(nextRes.Tree);
+					stack.Push(
+						new ParseState(state.State, 
+							0, 
+							nextRes.Iterator, 
+							state.NextPossibleResult));
+					break;
+				} else if(state.TransitionIndex + 1 < state.State.Transitions.Count) {
 
 					stack.Push(new ParseState(state.State, state.TransitionIndex + 1, state.Iterator));
-                    return;
-                } 
+					break;
+				} else if(children.Any()) {
+	                children.Pop();
+				}
             }
 		}
 
