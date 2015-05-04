@@ -69,6 +69,7 @@
     <Compile Include="Cover\TileFactory\TileFactory_BinaryOperators.cs" />
     <Compile Include="Cover\TileFactory\TileFactory_UnaryOperators.cs" />
     <Compile Include="Cover\TileFactory\TileFactory_Assignment.cs" />
+    <Compile Include="Cover\TileFactory\TileFactory_Comparison.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
