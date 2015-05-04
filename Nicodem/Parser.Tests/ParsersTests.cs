@@ -14,7 +14,7 @@ namespace Nicodem.Parser.Tests
 		{
 			new SimpleTwoProds(),
 			new ABCSeqGrammar(),
-			//new AssignementGrammar(),
+			new AssignementGrammar(),
 			new SimpleSyntax(),
 			new AddSeqGrammar(),
 			new BlocksGrammar(),
@@ -63,6 +63,12 @@ namespace Nicodem.Parser.Tests
 				}
 			}
 		}
+
+        [Test]
+        public void AssignementGrammarTest()
+        {
+            new LlParser<CharSymbol>(new AssignementGrammar().Grammar);
+        }
 
 		[Test]
 		public void LL1InValidProgramsTests()
