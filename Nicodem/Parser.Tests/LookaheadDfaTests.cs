@@ -88,25 +88,25 @@ namespace Nicodem.Parser.Tests
              */
         }
 
-        [Test]
+        //[Test]
         public void LookaheadDfaOneLevelTest()
         {
 
         }
 
-        [Test]
+        //[Test]
         public void LookaheadDfaMoreComplexTest()
         {
 
         }
 
-        [Test, Timeout(500)]
+        [Test, Timeout(230)]
         public void LookaheadDfaVerySimpleTest()
         {
             var productions = new Dictionary<CharSymbol, IProduction<CharSymbol>[]>();
             productions[new CharSymbol('E')] = new StringProduction[]{ 
 				new StringProduction('E', "a")
-			};
+			}; // production: E -> a
             DfaState<CharSymbol> s1 = new DfaState<CharSymbol>("1");
             DfaState<CharSymbol> s2 = new DfaState<CharSymbol>("2");
             DfaState<CharSymbol> sError = new DfaState<CharSymbol>("X");
@@ -114,7 +114,6 @@ namespace Nicodem.Parser.Tests
                 new KeyValuePair<CharSymbol, DfaState<CharSymbol>>(CharSymbol.MinValue, sError),
                 new KeyValuePair<CharSymbol, DfaState<CharSymbol>>(new CharSymbol('a'), s2),
                 new KeyValuePair<CharSymbol, DfaState<CharSymbol>>(new CharSymbol('b'), sError)
-
             };
             var t2 = new List<KeyValuePair<CharSymbol, DfaState<CharSymbol>>> {
                 new KeyValuePair<CharSymbol, DfaState<CharSymbol>>(CharSymbol.MinValue, sError)
