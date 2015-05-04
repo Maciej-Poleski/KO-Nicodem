@@ -7,29 +7,54 @@ namespace Nicodem.Parser
 {
     public class LookaheadDfaBuilder<TSymbol> where TSymbol : struct, ISymbol<TSymbol>
     {
-        private class State : HashSet<LlConfiguration<TSymbol>> { }
+        /// <summary>Class representing state of LookaheadDFA - set of LLConfigurations.</summary>
+        private class State : HashSet<LlConfiguration<TSymbol>> { 
+            static int nextId = 0;
+            int stateId;
+            public State() : base() {
+                stateId = nextId++;
+                Console.WriteLine("state " + stateId);
+            }
+            public override String ToString(){
+                return "state " + stateId + ": " + string.Join(", ", this);
+            }
+        }
 
+        // ----------- fields -----------
+
+        /// <summary>
+        /// Dictionary with transitions of currently built LookaheadDFA. From one State you can go
+        /// with several edges - TSymbols, each leading you to a new State.
+        /// </summary>
         Dictionary<State, Dictionary<TSymbol, State>> states;
+        /// <summary>Currently used grammar.</summary>
         private Grammar<TSymbol> grammar;
+
+        // ----------- constructor -----------
 
         public LookaheadDfaBuilder() { }
 
+        // ----------- private methods -----------
+
         private void AddEpsiEdges(State s)
         {
+            Console.WriteLine("AddEpsi for " + s); // DEBUG
             var queue = new Queue<LlConfiguration<TSymbol>>();
             foreach (var conf in s) queue.Enqueue(conf);
             s.Clear();
-            while (queue.Count > 0) {
+            while (queue.Count > 0) { // expand states in BFS manner
                 var conf = queue.Dequeue();
                 if (!s.Add(conf)) continue;
                 foreach (var next in grammar.OutgoingEpsiEdges(conf)) {
                     queue.Enqueue(next);
                 }
             }
+            Console.WriteLine("DONE --> " + s); // DEBUG
         }
 
         private void FilterSubsumedConfigs(State state)
         {
+            Console.WriteLine("FilterSubsumedConfigs for " + state); // DEBUG
             var subsumedConfs = new HashSet<LlConfiguration<TSymbol>>();
             foreach (var conf1 in state) {
                 foreach (var conf2 in state) {
@@ -38,6 +63,7 @@ namespace Nicodem.Parser
                 }
             }
             foreach (var subsumed in subsumedConfs) state.Remove(subsumed);
+            Console.WriteLine("DONE --> " + state); // DEBUG
         }
 
         private List<TSymbol?> GetDecisions(State s) {
@@ -55,19 +81,23 @@ namespace Nicodem.Parser
             return GetDecisions(state).Count < 2;
         }
 
-        private void Dfs(State curState){
-            if (states.ContainsKey(curState))
+        /// <summary>
+        /// Recursively builds lookaheadDFA. Check what states are available from this state and if
+        /// they are not already built - call recursively.
+        /// </summary>
+        private void RecursiveDfsBuild(State curState){
+            if (states.ContainsKey(curState)) // state already built
                 return;
 
-            if (IsAccepting(curState)) {
+            if (IsAccepting(curState)) { // accepting state, nothing to do here
                 return;
             }
 
-            var nextStates = new Dictionary<TSymbol, State>();
+            var nextStates = new Dictionary<TSymbol, State>(); // transitions for this state
 
             // TODO: DFA-Transitions representation? - intervals vs (all) edges
             // TODO: what about AlphabetClass and all TSymbol enumeration?
-            foreach (var conf in curState) {
+            foreach (var conf in curState) { // go through llconfigurations present in this state
                 foreach(KeyValuePair<TSymbol,LlConfiguration<TSymbol>> edge in grammar.OutgoingTerminalEdges(conf)) {
                     TSymbol symbol = edge.Key;
                     if (!nextStates.ContainsKey(symbol)) nextStates[symbol] = new State();
@@ -80,7 +110,7 @@ namespace Nicodem.Parser
             }
             states[curState] = nextStates;
             foreach (var nState in nextStates.Values) {
-                Dfs(nState);
+                RecursiveDfsBuild(nState);
             }
         }
 
@@ -99,31 +129,40 @@ namespace Nicodem.Parser
             return new LookaheadDfa<TSymbol>(dfaStates[startingState], null /* TODO */);
         }
 
+        // ----------- public methods -----------
+
+        /// <summary>
+        /// Build the lookahead DFA for the given symbol and the given state from its productions DFA. Aim for
+        /// this LookaheadDFA is to give parser an answer - which edge to choose in symbol DFA during parsing.
+        /// </summary>
         public LookaheadDfa<TSymbol> Build(
             Grammar<TSymbol> grammar, 
             TSymbol initialSymbol, 
             DfaState<TSymbol> initialState)
         {
+            // initialize
             states = new Dictionary<State,Dictionary<TSymbol,State>>();
-
             this.grammar = grammar;
+            // create starting set
             var startingSet = new State();
-            foreach (var edge in initialState.Transitions) {
-                TSymbol decision = edge.Key;
-                var stack = ImmutableList.Create<DfaState<TSymbol>>();
-                if (grammar.Automatons.ContainsKey(decision)) {
-                    stack = stack.Add(edge.Value);
-                    stack = stack.Add(grammar.Automatons[decision].Start);
+            foreach (var edge in initialState.Transitions) { // for every decision (edge) add starting llconfig
+                TSymbol decision = edge.Key; // label of DFA edge - possible decision
+                var stack = ImmutableList.Create<DfaState<TSymbol>>(); // empty stack: '?'
+                if (grammar.Automatons.ContainsKey(decision)) { // non-terminal
+                    stack = stack.Add(edge.Value); // add target - state in which you would be if you go with this edge
+                    stack = stack.Add(grammar.Automatons[decision].Start); // enter this symbol automaton
                     startingSet.Add(new LlConfiguration<TSymbol>(decision, stack));
-                } else {
+                } else { // terminal - no automaton
                     stack = stack.Add(edge.Value);
                     startingSet.Add(new LlConfiguration<TSymbol>(decision, stack));
                 }
             }
+            Console.WriteLine("STARTING STATE -> " + startingSet); // DEBUG
+            // complement starting state by epsi edges
             AddEpsiEdges(startingSet);
-
-            Dfs(startingSet);
-
+            // expand starting state to the whole LookaheadDFA
+            RecursiveDfsBuild(startingSet);
+            // convert result to LookaheadDfa class
             return BuildDfa(startingSet);
         }
     }

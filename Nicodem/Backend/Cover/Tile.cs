@@ -2,24 +2,24 @@
 using System.Collections.Generic;
 using Nicodem.Backend.Representation;
 
-namespace Nicodem.Backend
+namespace Nicodem.Backend.Cover
 {
-	public class InsnTile
+	public class Tile
 	{
 		readonly RegisterNode temporaryRegister = new TemporaryNode ();
 		readonly Func<RegisterNode, Node, IEnumerable<Instruction>> instructionBuilder;
 
 		public Type Type { get; private set; }
-		public IEnumerable<InsnTile> Children { get; private set; }
+		public IEnumerable<Tile> Children { get; private set; }
 
-		public InsnTile(Type type, IEnumerable<InsnTile> children, Func<RegisterNode, Node, IEnumerable<Instruction>> instructionBuilder) {
+		public Tile(Type type, IEnumerable<Tile> children, Func<RegisterNode, Node, IEnumerable<Instruction>> instructionBuilder) {
 			Type = type;
 			Children = children;
 			this.instructionBuilder = instructionBuilder;
 		}
 
 		public IEnumerable<Instruction> Cover(Node node) {
-			throw new NotImplementedException ();
+			return instructionBuilder (temporaryRegister, node);
 		}
 	}
 }

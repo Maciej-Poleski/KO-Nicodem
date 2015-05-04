@@ -18,6 +18,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <Commandlineparameters>DEBUG;</Commandlineparameters>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -41,15 +42,29 @@
       <Project>{024A2111-4B19-44D7-917E-8514CF632469}</Project>
       <Name>System.Collections.Immutable</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Source\Source.csproj">
+      <Project>{6078FFE3-28C8-4169-831D-E1D1AAFDD72F}</Project>
+      <Name>Source</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LookaheadDfaTests.cs" />
     <Compile Include="StringProduction.cs" />
-    <Compile Include="LL1ParserTests.cs" />
+    <Compile Include="LLConfigurationTests.cs" />
     <Compile Include="GrammarUtilsTests.cs" />
     <Compile Include="StringSymbol.cs" />
     <Compile Include="GrammarTests.cs" />
     <Compile Include="CharSymbol.cs" />
+    <Compile Include="GrammarExamples\GrammarExample.cs" />
+    <Compile Include="GrammarExamples\LL1\SimpleTwoProds.cs" />
+    <Compile Include="ParsersTests.cs" />
+    <Compile Include="GrammarExamples\ProductionBuilder.cs" />
+    <Compile Include="GrammarExamples\LL1\ABCSeqGrammar.cs" />
+    <Compile Include="GrammarExamples\LL2\BlocksGrammar.cs" />
+    <Compile Include="GrammarExamples\LL2\AssignementGrammar.cs" />
+    <Compile Include="GrammarExamples\LL2\AssignementTwoGrammar.cs" />
+    <Compile Include="GrammarExamples\LL2\AddSeqGrammar.cs" />
+    <Compile Include="GrammarExamples\OTHER\SimpleSyntax.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">
@@ -62,5 +77,11 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="GrammarExamples\" />
+    <Folder Include="GrammarExamples\LL1\" />
+    <Folder Include="GrammarExamples\LL2\" />
+    <Folder Include="GrammarExamples\OTHER\" />
   </ItemGroup>
 </Project>

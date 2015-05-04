@@ -4,25 +4,29 @@ namespace Nicodem.Parser.Tests
 {
 	internal struct CharSymbol : ISymbol<CharSymbol>
 	{
-		internal char C { get; private set; }
+		public char C { get; private set; }
+		public string Name { get; private set; }
 
-		internal CharSymbol(char c)
+		// Every non terminal symbol should be an uppercase letter
+		// All others denote terminals
+		internal CharSymbol(char c, string name = "")
 			: this()
 		{
 			C = c;
+			Name = name;
 		}
 
         #region ISymbol implementation
 
         public string Description {
             get {
-                throw new NotImplementedException();
+				return "CharSymbol-" + C.ToString();
             }
         }
 
         public bool IsTerminal {
             get {
-                throw new NotImplementedException();
+				return !char.IsUpper(C);
             }
         }
 
@@ -32,7 +36,7 @@ namespace Nicodem.Parser.Tests
 
 		public bool Equals(CharSymbol other)
 		{
-			return C == other.C;
+			return C.Equals(other.C);
 		}
 
 		#endregion

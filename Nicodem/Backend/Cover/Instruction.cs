@@ -1,22 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
+using Nicodem.Backend.Representation;
 
-namespace Nicodem.Backend
+namespace Nicodem.Backend.Cover
 {
 	public class Instruction
 	{
-		// TODO
-		public object RegisterUsed { get { throw new NotImplementedException (); } }
+		readonly Func<IReadOnlyDictionary<RegisterNode, HardwareRegisterNode>, String> instructionBuilder;
 
-		// TODO
-		public object RegisterDefined { get { throw new NotImplementedException (); } }
+		public Instruction (
+			Func<IReadOnlyDictionary<RegisterNode, HardwareRegisterNode>, String> builder,
+			IEnumerable<RegisterNode> used,
+			IEnumerable<RegisterNode> defined) : this (builder, used, defined, false) 
+		{}
 
-		// TODO
-		public bool IsCopyInstruction { get { throw new NotImplementedException (); } }
+		public Instruction (
+			Func<IReadOnlyDictionary<RegisterNode, HardwareRegisterNode>, String> builder,
+			IEnumerable<RegisterNode> used,
+			IEnumerable<RegisterNode> defined,
+			bool copyInstruction)
+		{
+			instructionBuilder = builder;
+			RegistersUsed = used;
+			RegistersDefined = defined;
+			IsCopyInstruction = copyInstruction;
+		}
 
-		// TODO
-		public string ToString(IReadOnlyDictionary<object, object> registerMapping) {
-			throw new NotImplementedException ();
+		public IEnumerable<RegisterNode> RegistersUsed { get; private set; }
+		public IEnumerable<RegisterNode> RegistersDefined { get; private set; }
+		public bool IsCopyInstruction { get; private set; }
+
+		public string ToString(IReadOnlyDictionary<RegisterNode, HardwareRegisterNode> registerMapping) {
+			return instructionBuilder (registerMapping) + "\n";
 		}
 	}
 }

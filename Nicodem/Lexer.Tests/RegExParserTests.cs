@@ -37,6 +37,23 @@ namespace Lexer.Tests
         }
 
         [Test]
+        public void TestNotAllowedCharacters()
+        {
+            var result = RegExParser.Parse("[^ab]");
+            var regEx = RegExFactory.Intersection (RegExFactory.Range ((char)0), RegExFactory.Complement (RegExFactory.Union(RegExFactory.Range('a', 'b'), RegExFactory.Range('b', 'c'))));
+
+            Assert.AreEqual(result, RegExFactory.Intersection(regEx, RegExFactory.Star(CharactersClasses.print)));
+        }
+
+        [Test]
+        public void TestIntersection()
+        {
+            var result = RegExParser.Parse("a&b&c");
+			var regEx = RegExFactory.Intersection(RegExFactory.Range('a', 'b'), RegExFactory.Range('b', 'c'), RegExFactory.Range('c', 'd'));
+            Assert.AreEqual(result, RegExFactory.Intersection(regEx, RegExFactory.Star(CharactersClasses.print)));
+        }
+
+        [Test]
         public void TestStars()
         {
             var result = RegExParser.Parse("(a******b********)***");
@@ -63,8 +80,8 @@ namespace Lexer.Tests
         [Test]
         public void TestAllAtOnce()
         {
-            var result = RegExParser.Parse("(^(a|(b|c)*))[a-f]");
-            var regEx = RegExFactory.Concat(RegExFactory.Complement(RegExFactory.Union(RegExFactory.Range('a', 'b'), RegExFactory.Star(RegExFactory.Union(RegExFactory.Range('b', 'c'), RegExFactory.Range('c', 'd'))))), RegExFactory.Range('a', 'g'));
+            var result = RegExParser.Parse("(^(a|(b|c)*))[^:space:]");
+            var regEx = RegExFactory.Concat(RegExFactory.Complement(RegExFactory.Union(RegExFactory.Range('a', 'b'), RegExFactory.Star(RegExFactory.Union(RegExFactory.Range('b', 'c'), RegExFactory.Range('c', 'd'))))),  RegExFactory.Intersection (RegExFactory.Range ((char)0), RegExFactory.Complement (CharactersClasses.space)));
             Assert.AreEqual(result, RegExFactory.Intersection(regEx, RegExFactory.Star(CharactersClasses.print)));
         }
 

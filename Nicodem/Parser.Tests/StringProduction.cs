@@ -20,6 +20,12 @@ namespace Nicodem.Parser.Tests
 			Lhs = new CharSymbol(symbol);
 			Rhs = RegEx<char>.Convert<CharSymbol>(RegExParser.Parse(production), c => new CharSymbol(c));
 		}
+
+		public StringProduction(CharSymbol symbol, string production)
+		{
+			Lhs = symbol;
+			Rhs = RegEx<char>.Convert<CharSymbol>(RegExParser.Parse(production), c => new CharSymbol(c));
+		}
 	}
 }
 

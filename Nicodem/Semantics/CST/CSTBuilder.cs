@@ -4,17 +4,22 @@ using Nicodem.Parser;
 using Nicodem.Semantics.Grammar;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 using Nicodem.Source;
 
 namespace Nicodem.Semantics.CST
 {
     public static class CSTBuilder
     {
-        internal static IParseTree<Symbol> build(Source.IOrigin origin)
+        internal static IParseTree<Symbol> Build(Source.IOrigin origin)
         {
             var sanitizedTokens = SanitizedTokens(origin);
 
-            var leafs = sanitizedTokens.Select(r => r.Item2.Select(s => new ParseLeaf<Symbol>(r.Item1, new Symbol(s))));
+			// Assume every list from tupple is of size 1 !!!
+			var leafs = sanitizedTokens.Select(r => {
+				Debug.Assert(r.Item2.Count() == 1);
+				return new ParseLeaf<Symbol>(r.Item1, new Symbol(r.Item2.ElementAt(0)));
+			});
 
             var grammar = new Grammar<Symbol>(
                               NicodemGrammarProductions.StartSymbol(),

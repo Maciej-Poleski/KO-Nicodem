@@ -63,8 +63,9 @@
     <Compile Include="Function.cs" />
     <Compile Include="Local.cs" />
     <Compile Include="Target.cs" />
-    <Compile Include="Cover\InsnTile.cs" />
     <Compile Include="Cover\Instruction.cs" />
+    <Compile Include="Cover\Tile.cs" />
+    <Compile Include="Cover\TileFactory.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
