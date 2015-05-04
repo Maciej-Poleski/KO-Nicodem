@@ -264,7 +264,7 @@ namespace Nicodem.Lexer
         {
             var result = new ProductDfaBuilder<TLastDfaState, TNewDfaState, TSymbol>(handler).Build(lastDfa.Start,
                 newDfa.Start);
-            DfaStatesNotNullConcpetCheck<TSymbol>.CheckDfaStatesNotNull(result);
+            DfaStatesConcpetCheck<TSymbol>.CheckDfaStates(result);
             return result;
         }
 
@@ -280,7 +280,7 @@ namespace Nicodem.Lexer
             var result =
                 MakeProductDfa<TLastDfa, TLastDfaState, TNewDfa, TNewDfaState, TSymbol>(lastDfa, newDfa, handler)
                     .Minimized<ProductDfa<TSymbol>, ProductDfaState<TSymbol>, TSymbol>();
-            DfaStatesNotNullConcpetCheck<TSymbol>.CheckDfaStatesNotNull(result);
+            DfaStatesConcpetCheck<TSymbol>.CheckDfaStates(result);
             return result;
         }
 
@@ -431,7 +431,7 @@ namespace Nicodem.Lexer
         {
             var result = new ProductDfa<TSymbol> {_start = ProductDfaState<TSymbol>.MakeDeadState()}
                     .Minimized<ProductDfa<TSymbol>, ProductDfaState<TSymbol>, TSymbol>();
-            DfaStatesNotNullConcpetCheck<TSymbol>.CheckDfaStatesNotNull(result);
+            DfaStatesConcpetCheck<TSymbol>.CheckDfaStates(result);
             return result;
 
         }
@@ -440,18 +440,18 @@ namespace Nicodem.Lexer
 
         #region DfaConceptsChecks
 
-        internal class DfaStatesNotNullConcpetCheck<TSymbol> where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
+        internal class DfaStatesConcpetCheck<TSymbol> where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
         {
             private readonly HashSet<IDfaState<TSymbol>> _visitedStates = new HashSet<IDfaState<TSymbol>>();
 
-            private DfaStatesNotNullConcpetCheck()
+            private DfaStatesConcpetCheck()
             {
             }
 
             [Conditional("DEBUG")]
-            internal static void CheckDfaStatesNotNull(IDfa<TSymbol> dfa)
+            internal static void CheckDfaStates(IDfa<TSymbol> dfa)
             {
-                new DfaStatesNotNullConcpetCheck<TSymbol>().Check(dfa.Start);
+                new DfaStatesConcpetCheck<TSymbol>().Check(dfa.Start);
             }
 
             private void Check(IDfaState<TSymbol> state)
@@ -465,6 +465,10 @@ namespace Nicodem.Lexer
                 _visitedStates.Add(state);
                 Debug.Assert(state.Transitions != null);
                 Debug.Assert(state.Transitions.Count > 0);
+                for (var i = 1; i < state.Transitions.Count; i++)
+                {
+                    Debug.Assert(state.Transitions[i - 1].Key.CompareTo(state.Transitions[i].Key) < 0);
+                }
                 foreach (var transition in state.Transitions)
                 {
                     Check(transition.Value);

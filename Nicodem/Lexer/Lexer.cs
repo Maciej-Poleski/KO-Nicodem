@@ -47,7 +47,7 @@ namespace Nicodem.Lexer
                 return;
             }
             var lastDfa = MakeRegexDfa(regexCategories[0], 1).Minimized<RegExDfa<char>, DFAState<char>, char>();
-            DfaUtils.DfaStatesNotNullConcpetCheck<char>.CheckDfaStatesNotNull(lastDfa);
+            DfaUtils.DfaStatesConcpetCheck<char>.CheckDfaStates(lastDfa);
             for (uint i = 1; i < regexCategories.Length; ++i)
             {
                 lastDfa =
@@ -83,7 +83,7 @@ namespace Nicodem.Lexer
         private static RegExDfa<char> MakeRegexDfa(RegEx<char> regex, uint category)
         {
             var result = new RegExDfa<char>(regex, category);
-            DfaUtils.DfaStatesNotNullConcpetCheck<char>.CheckDfaStatesNotNull(result);
+            DfaUtils.DfaStatesConcpetCheck<char>.CheckDfaStates(result);
             return result;
         }
 
