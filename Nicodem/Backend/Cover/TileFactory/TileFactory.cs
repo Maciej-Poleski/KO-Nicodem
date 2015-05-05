@@ -33,7 +33,7 @@ namespace Nicodem.Backend.Cover
 
 		public static Tile ConstTile<T>() {
 			return new Tile (typeof(ConstantNode<T>),
-				new[] { },
+				new Tile[] { },
 				(regNode, node) => {
 					var root = node as ConstantNode<T>;
 					return new[] {
