@@ -70,6 +70,11 @@
     <Compile Include="Cover\TileFactory\TileFactory_UnaryOperators.cs" />
     <Compile Include="Cover\TileFactory\TileFactory_Assignment.cs" />
     <Compile Include="Cover\TileFactory\TileFactory_Comparison.cs" />
+    <Compile Include="Representation\ConditionalJumpToLabel.cs" />
+    <Compile Include="Representation\UnconditionalJumpToLabel.cs" />
+    <Compile Include="Representation\LabelFactory.cs" />
+    <Compile Include="Representation\LabelNode.cs" />
+    <Compile Include="Trace\TraceBuilder.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -83,5 +88,6 @@
   <ItemGroup>
     <Folder Include="Cover\" />
     <Folder Include="Cover\TileFactory\" />
+    <Folder Include="Trace\" />
   </ItemGroup>
 </Project>
