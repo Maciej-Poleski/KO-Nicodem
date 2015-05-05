@@ -51,21 +51,6 @@ namespace Nicodem.Backend.Cover
 			);
 		}
 
-		static Tile makeBinopConstConstTile<T>( string mnemonik )
-			where T : BinaryOperatorNode
-		{
-			return makeBinopTile<T, ConstantNode<long>, ConstantNode<long> > (
-				(regNode, root, left, right) => new[] {
-					new Instruction (
-						map => string.Format ("mov {0}, {1}", map [regNode], left),
-						use (regNode), define (regNode)),
-					new Instruction (
-						map => string.Format ("{0} {1}, {2}", mnemonik, map [regNode], right),
-						use (regNode), define (regNode))
-				}
-			);
-		}
-
 		public static class Add 
 		{
 			public static readonly string Mnemonik = "add";
@@ -90,11 +75,6 @@ namespace Nicodem.Backend.Cover
 
 			public static Tile MemConst() {
 				throw new NotImplementedException();
-			}
-
-			// imm64 + imm64
-			public static Tile ConstConst() {
-				return makeBinopConstConstTile<AddOperatorNode> (Add.Mnemonik);
 			}
 		}
 
@@ -122,10 +102,6 @@ namespace Nicodem.Backend.Cover
 
 			public static Tile MemConst() {
 				throw new NotImplementedException();
-			}
-
-			public static Tile ConstConst() {
-				return makeBinopConstConstTile<SubOperatorNode> (Sub.Mnemonik);
 			}
 		}
 
@@ -183,12 +159,10 @@ namespace Nicodem.Backend.Cover
 		{
 			public static readonly string Mnemonik = "xor";
 
-			// xor( reg64, reg64 )
 			public static Tile RegReg() {
 				return makeBinopRegRegTile<BitXorOperatorNode> (BitXor.Mnemonik);
 			}
 
-			// xor( reg64, imm64 )
 			public static Tile RegConst() {
 				return makeBinopRegConstTile<BitXorOperatorNode> (BitXor.Mnemonik);
 			}
@@ -198,12 +172,10 @@ namespace Nicodem.Backend.Cover
 		{
 			public static readonly string Mnemonik = "and";
 
-			// and reg64, reg64
 			public static Tile RegReg() {
 				return makeBinopRegRegTile<LogAndOperatorNode> (LogAnd.Mnemonik);
 			}
 
-			// and reg64, imm64
 			public static Tile RegConst() {
 				return makeBinopRegConstTile<LogAndOperatorNode> (LogAnd.Mnemonik);
 			}
@@ -213,12 +185,10 @@ namespace Nicodem.Backend.Cover
 		{
 			public static readonly string Mnemonik = "or";
 
-			// or reg64, reg64
 			public static Tile RegReg() {
 				return makeBinopRegRegTile<LogOrOperatorNode> (LogOr.Mnemonik);
 			}
 
-			// or reg64, imm64
 			public static Tile RegConst() {
 				return makeBinopRegConstTile<LogOrOperatorNode> (LogOr.Mnemonik);
 			}
