@@ -65,7 +65,11 @@
     <Compile Include="Target.cs" />
     <Compile Include="Cover\Instruction.cs" />
     <Compile Include="Cover\Tile.cs" />
-    <Compile Include="Cover\TileFactory.cs" />
+    <Compile Include="Cover\TileFactory\TileFactory.cs" />
+    <Compile Include="Cover\TileFactory\TileFactory_BinaryOperators.cs" />
+    <Compile Include="Cover\TileFactory\TileFactory_UnaryOperators.cs" />
+    <Compile Include="Cover\TileFactory\TileFactory_Assignment.cs" />
+    <Compile Include="Cover\TileFactory\TileFactory_Comparison.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -78,5 +82,6 @@
   -->
   <ItemGroup>
     <Folder Include="Cover\" />
+    <Folder Include="Cover\TileFactory\" />
   </ItemGroup>
 </Project>
