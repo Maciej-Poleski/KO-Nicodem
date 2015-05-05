@@ -7,7 +7,7 @@ namespace Nicodem.Backend.Representation
 	{
 		private static int counter = 0;
 
-		public static LabelNode Label ()
+		public static LabelNode NextLabel ()
 		{
 			++counter;
 			return new LabelNode ("label" + counter);
