@@ -9,15 +9,9 @@ namespace Nicodem.Backend.Cover
 		{
 			return makeBinopTile<T, RegisterNode, RegisterNode> (
 				(regNode, root, left, right) => new[] {
-					new Instruction (
-						map => string.Format ("xor {0}, {0}", map [regNode]),
-						use (regNode), define (regNode)),
-					new Instruction (
-						map => string.Format ("cmp {0}, {1}", map [left], map [right]),
-						use (left, right), define ()),
-					new Instruction (
-						map => string.Format ("{0} {1}, 1", mnemonik, map [regNode]),
-						use (regNode), define (regNode))
+					InstructionFactory.Xor (regNode, regNode),
+					InstructionFactory.Cmp (left, right),
+					InstructionFactory.Cmov (mnemonik, regNode, 1L)
 				}
 			);
 		}
@@ -27,15 +21,9 @@ namespace Nicodem.Backend.Cover
 		{
 			return makeBinopTile<T, RegisterNode, ConstantNode<long>> (
 				(regNode, root, left, right) => new[] {
-					new Instruction (
-						map => string.Format ("xor {0}, {0}", map [regNode]),
-						use (regNode), define (regNode)),
-					new Instruction (
-						map => string.Format ("cmp {0}, {1}", map [left], right.Value),
-						use (left), define ()),
-					new Instruction (
-						map => string.Format ("{0} {1}, 1", mnemonik, map [regNode]),
-						use (regNode), define (regNode))
+					InstructionFactory.Xor (regNode, regNode),
+					InstructionFactory.Cmp (left, right),
+					InstructionFactory.Cmov (mnemonik, regNode, 1L)
 				}
 			);
 		}
@@ -45,22 +33,18 @@ namespace Nicodem.Backend.Cover
 		{
 			return makeBinopTile<T, ConstantNode<long>, ConstantNode<long>> (
 				(regNode, root, left, right) => new[] {
-					new Instruction (
-						map => string.Format ("xor {0}, {0}", map [regNode]),
-						use (regNode), define (regNode)),
+					InstructionFactory.Xor (regNode, regNode),
 					new Instruction (
 						map => string.Format ("cmp {0}, {1}", left.Value, right.Value),
 						use (), define ()),
-					new Instruction (
-						map => string.Format ("{0} {1}, 1", mnemonik, map [regNode]),
-						use (regNode), define (regNode))
+					InstructionFactory.Cmov (mnemonik, regNode, 1L)
 				}
 			);
 		}
 
 		public static class Lt
 		{
-			public static readonly string Mnemonik = "cmovl";
+			public static readonly string Mnemonik = "l";
 
 			public static Tile RegReg() {
 				return makeCmpRegRegTile<LtOperatorNode> (Lt.Mnemonik);
@@ -77,7 +61,7 @@ namespace Nicodem.Backend.Cover
 
 		public static class Le
 		{
-			public static readonly string Mnemonik = "cmovle";
+			public static readonly string Mnemonik = "le";
 
 			public static Tile RegReg() {
 				return makeCmpRegRegTile<LteOperatorNode> (Le.Mnemonik);
@@ -94,7 +78,7 @@ namespace Nicodem.Backend.Cover
 
 		public static class Gt
 		{
-			public static readonly string Mnemonik = "cmovg";
+			public static readonly string Mnemonik = "g";
 
 			public static Tile RegReg() {
 				return makeCmpRegRegTile<GtOperatorNode> (Gt.Mnemonik);
@@ -111,7 +95,7 @@ namespace Nicodem.Backend.Cover
 
 		public static class Ge
 		{
-			public static readonly string Mnemonik = "cmovge";
+			public static readonly string Mnemonik = "ge";
 
 			public static Tile RegReg() {
 				return makeCmpRegRegTile<GteOperatorNode> (Ge.Mnemonik);
@@ -128,7 +112,7 @@ namespace Nicodem.Backend.Cover
 
 		public static class Eq
 		{
-			public static readonly string Mnemonik = "cmove";
+			public static readonly string Mnemonik = "e";
 
 			public static Tile RegReg() {
 				return makeCmpRegRegTile<EqOperatorNode> (Eq.Mnemonik);
@@ -145,7 +129,7 @@ namespace Nicodem.Backend.Cover
 
 		public static class Neq
 		{
-			public static readonly string Mnemonik = "cmovne";
+			public static readonly string Mnemonik = "ne";
 
 			public static Tile RegReg() {
 				return makeCmpRegRegTile<NeqOperatorNode> (Neq.Mnemonik);

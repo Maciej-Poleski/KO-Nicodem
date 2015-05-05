@@ -175,38 +175,72 @@ namespace Nicodem.Backend.Cover
 
 		#region jump
 
-		static Instruction jump( string jump_type, string label ) {
+		public static Instruction Jump( string cond_type, string label ) {
 			return new Instruction (
-				map => string.Format ("j{0} {1}", jump_type, label),
+				map => string.Format ("j{0} {1}", cond_type, label),
 				use (), define ());
 		}
 
 		public static Instruction Jmp( string label ) {
-			return jump ("mp", label);
+			return Jump ("mp", label);
 		}
 
 		public static Instruction Jle( string label ) {
-			return jump ("le", label);
+			return Jump ("le", label);
 		}
 
 		public static Instruction Jl( string label ) {
-			return jump ("l", label);
+			return Jump ("l", label);
 		}
 
 		public static Instruction Jge( string label ) {
-			return jump ("ge", label);
+			return Jump ("ge", label);
 		}
 
 		public static Instruction Jg( string label ) {
-			return jump ("g", label);
+			return Jump ("g", label);
 		}
 
 		public static Instruction Je( string label ) {
-			return jump ("e", label);
+			return Jump ("e", label);
 		}
 
 		public static Instruction Jne( string label ) {
-			return jump ("ne", label);
+			return Jump ("ne", label);
+		}
+
+		#endregion
+
+		#region cmovxx
+
+		public static Instruction Cmov<T>( string cond_type, RegisterNode reg, T c ) {
+			return new Instruction (
+				map => string.Format ("cmov{0} {1}, {2}", cond_type, map[reg], c),
+				use (reg), define (reg));
+		}
+
+		public static Instruction Cmovle<T>( RegisterNode reg, T c ) {
+			return Cmov ("le", reg, c);
+		}
+
+		public static Instruction Cmovl<T>( RegisterNode reg, T c ) {
+			return Cmov ("l", reg, c);
+		}
+
+		public static Instruction Cmovge<T>( RegisterNode reg, T c ) {
+			return Cmov ("ge", reg, c);
+		}
+
+		public static Instruction Cmovg<T>( RegisterNode reg, T c ) {
+			return Cmov ("g", reg, c);
+		}
+
+		public static Instruction Cmove<T>( RegisterNode reg, T c ) {
+			return Cmov ("e", reg, c);
+		}
+
+		public static Instruction Cmovne<T>( RegisterNode reg, T c ) {
+			return Cmov ("ne", reg, c);
 		}
 
 		#endregion
