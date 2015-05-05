@@ -31,6 +31,20 @@ namespace Nicodem.Backend.Cover
 			return new Tile (typeof(T), children, noInstructions ());
 		}
 
+		public static Tile ConstTile<T>() {
+			return new Tile (typeof(ConstantNode<T>),
+				new Tile[] { },
+				(regNode, node) => {
+					var root = node as ConstantNode<T>;
+					return new[] {
+						new Instruction(
+							map => string.Format("mov {0}, {1}", map[regNode], root.Value),
+							use(regNode), define(regNode))
+					};
+				}
+			);
+		}
+
 		public static class Lea
 		{
 			// lea dst, [reg1 + val1 * reg2 + val2]
