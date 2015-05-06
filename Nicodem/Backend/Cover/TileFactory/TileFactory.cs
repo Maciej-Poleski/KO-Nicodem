@@ -70,7 +70,20 @@ namespace Nicodem.Backend.Cover
 				Assign.MemReg_Reg(),
 				Assign.MemReg_Const(),
 				Assign.MemConst_Reg(),
-				Assign.MemConst_Const()
+				Assign.MemConst_Const(),
+
+				Jump.Cond_RegReg_Eq(),
+				Jump.Cond_RegReg_Neq(),
+				Jump.Cond_RegReg_Lt(),
+				Jump.Cond_RegReg_Le(),
+				Jump.Cond_RegReg_Gt(),
+				Jump.Cond_RegReg_Ge(),
+				Jump.Cond_RegConst_Eq<long>(),
+				Jump.Cond_RegConst_Neq<long>(),
+				Jump.Cond_RegConst_Lt<long>(),
+				Jump.Cond_RegConst_Le<long>(),
+				Jump.Cond_RegConst_Gt<long>(),
+				Jump.Cond_RegConst_Ge<long>()
 			};
 		}
 

@@ -175,37 +175,37 @@ namespace Nicodem.Backend.Cover
 
 		#region jump
 
-		public static Instruction Jump( string cond_type, string label ) {
+		public static Instruction Jump( string cond_type, LabelNode label ) {
 			return new Instruction (
-				map => string.Format ("j{0} {1}", cond_type, label),
+				map => string.Format ("j{0} {1}", cond_type, label.Label),
 				use (), define ());
 		}
 
-		public static Instruction Jmp( string label ) {
+		public static Instruction Jmp( LabelNode label ) {
 			return Jump ("mp", label);
 		}
 
-		public static Instruction Jle( string label ) {
+		public static Instruction Jle( LabelNode label ) {
 			return Jump ("le", label);
 		}
 
-		public static Instruction Jl( string label ) {
+		public static Instruction Jl( LabelNode label ) {
 			return Jump ("l", label);
 		}
 
-		public static Instruction Jge( string label ) {
+		public static Instruction Jge( LabelNode label ) {
 			return Jump ("ge", label);
 		}
 
-		public static Instruction Jg( string label ) {
+		public static Instruction Jg( LabelNode label ) {
 			return Jump ("g", label);
 		}
 
-		public static Instruction Je( string label ) {
+		public static Instruction Je( LabelNode label ) {
 			return Jump ("e", label);
 		}
 
-		public static Instruction Jne( string label ) {
+		public static Instruction Jne( LabelNode label ) {
 			return Jump ("ne", label);
 		}
 

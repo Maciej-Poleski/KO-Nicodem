@@ -27,7 +27,7 @@ namespace Nicodem.Backend
 			return trace;
 		}
 
-		private static Node GetLabel (Node node)
+		private static LabelNode GetLabel (Node node)
 		{
 			if (node == null)
 				return epilog;

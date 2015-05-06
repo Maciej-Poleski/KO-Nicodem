@@ -1,13 +1,10 @@
-﻿using System;
-
-namespace Nicodem.Backend.Representation
+﻿namespace Nicodem.Backend.Representation
 {
 	public class UnconditionalJumpToLabelNode : Node
 	{
+		public LabelNode NextNode { get; private set; }
 
-		public Node NextNode { get; private set; }
-
-		public UnconditionalJumpToLabelNode (Node nextNode)
+		public UnconditionalJumpToLabelNode (LabelNode nextNode)
 		{
 			NextNode = nextNode;
 		}

@@ -76,6 +76,7 @@
     <Compile Include="Representation\LabelNode.cs" />
     <Compile Include="Trace\TraceBuilder.cs" />
     <Compile Include="Cover\TileFactory\InstructionFactory.cs" />
+    <Compile Include="Cover\TileFactory\TileFactory_Jumps.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
