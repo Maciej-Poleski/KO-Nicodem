@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Nicodem.Lexer;
 
 namespace Nicodem.Parser
 {
@@ -436,6 +437,8 @@ namespace Nicodem.Parser
 
             foreach (var transition in state.Transitions)
             {
+                if (IsDead(transition.Value))
+                    continue;
                 //for nullable keys go on the same automata
                 if (nullable.Contains(transition.Key))
                 {
@@ -494,7 +497,12 @@ namespace Nicodem.Parser
 
             return null;
         }
-			
+
+        internal static bool IsDead(DfaState<TSymbol> state)
+        {
+            var deadTransition = new[] { new KeyValuePair<TSymbol, DfaState<TSymbol>>(RegExDfa<TSymbol>.MinSymbol<TSymbol>(), state) };
+            return state.Accepting == 0 && state.Transitions.Count == 1 && state.Transitions[0].Equals(deadTransition[0]);
+        }
 	}
 }
 
