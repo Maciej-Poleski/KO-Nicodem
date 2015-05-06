@@ -47,6 +47,7 @@
     <Compile Include="Cover\TileFactoryTests.cs" />
     <Compile Include="Cover\TileFactoryTests_Jump.cs" />
     <Compile Include="Cover\TileFactoryTestUtils.cs" />
+    <Compile Include="Cover\TileFactoryTests_Comparison.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

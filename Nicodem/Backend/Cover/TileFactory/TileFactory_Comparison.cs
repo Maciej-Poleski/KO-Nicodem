@@ -1,147 +1,112 @@
 ﻿using Nicodem.Backend.Representation;
+using System.Collections.Generic;
+using System;
 
 namespace Nicodem.Backend.Cover
 {
 	public static partial class TileFactory
 	{
-		static Tile makeCmpRegRegTile<T>( string mnemonik ) 
-			where T : BinaryOperatorNode
+		public static class Compare
 		{
-			return makeBinopTile<T, RegisterNode, RegisterNode> (
-				(regNode, root, left, right) => new[] {
-					InstructionFactory.Xor (regNode, regNode),
-					InstructionFactory.Cmp (left, right),
-					InstructionFactory.Cmov (mnemonik, regNode, 1L)
-				}
-			);
-		}
+			static Tile compare<T,L,R>( Func<RegisterNode,T,L,R,IEnumerable<Instruction>> tileBuilder )
+				where T : BinaryOperatorNode
+				where L : Node
+				where R : Node
+			{
+				return new Tile (typeof(T),
+					new [] {
+						makeTile<L>(),
+						makeTile<R>()
+					},
+					(regNode, node) => {
+						var root = node as T;
+						var cond_l = root.LeftOperand as L;
+						var cond_r = root.RightOperand as R;
 
-		static Tile makeCmpRegConstTile<T>( string mnemonik ) 
-			where T : BinaryOperatorNode
-		{
-			return makeBinopTile<T, RegisterNode, ConstantNode<long>> (
-				(regNode, root, left, right) => new[] {
-					InstructionFactory.Xor (regNode, regNode),
-					InstructionFactory.Cmp (left, right),
-					InstructionFactory.Cmov (mnemonik, regNode, 1L)
-				}
-			);
-		}
-
-		static Tile makeCmpConstConstTile<T>( string mnemonik ) 
-			where T : BinaryOperatorNode
-		{
-			return makeBinopTile<T, ConstantNode<long>, ConstantNode<long>> (
-				(regNode, root, left, right) => new[] {
-					InstructionFactory.Xor (regNode, regNode),
-					new Instruction (
-						map => string.Format ("cmp {0}, {1}", left.Value, right.Value),
-						use (), define ()),
-					InstructionFactory.Cmov (mnemonik, regNode, 1L)
-				}
-			);
-		}
-
-		public static class Lt
-		{
-			public static readonly string Mnemonik = "l";
-
-			public static Tile RegReg() {
-				return makeCmpRegRegTile<LtOperatorNode> (Lt.Mnemonik);
+						return tileBuilder(regNode, root, cond_l, cond_r);
+					}
+				);
 			}
 
-			public static Tile RegConst() {
-				return makeCmpRegConstTile<LtOperatorNode> (Lt.Mnemonik);
+			#region reg - reg
+
+			static Tile compareRegReg<T>( string cond_type ) 
+				where T : BinaryOperatorNode
+			{
+				return compare<T,RegisterNode,RegisterNode> (
+					(regNode, root, left, right) => new[] {
+						InstructionFactory.Xor (regNode, regNode),
+						InstructionFactory.Cmp (left, right),
+						InstructionFactory.Cmov (cond_type, regNode, 1L)
+					}
+				);
 			}
 
-			public static Tile ConstConst() {
-				return makeCmpConstConstTile<LtOperatorNode> (Lt.Mnemonik);
-			}
-		}
-
-		public static class Le
-		{
-			public static readonly string Mnemonik = "le";
-
-			public static Tile RegReg() {
-				return makeCmpRegRegTile<LteOperatorNode> (Le.Mnemonik);
+			public static Tile RegReg_Lt() {
+				return compareRegReg<LtOperatorNode> ("l");
 			}
 
-			public static Tile RegConst() {
-				return makeCmpRegConstTile<LteOperatorNode> (Le.Mnemonik);
+			public static Tile RegReg_Le() {
+				return compareRegReg<LteOperatorNode> ("le");
 			}
 
-			public static Tile ConstConst() {
-				return makeCmpConstConstTile<LteOperatorNode> (Le.Mnemonik);
-			}
-		}
-
-		public static class Gt
-		{
-			public static readonly string Mnemonik = "g";
-
-			public static Tile RegReg() {
-				return makeCmpRegRegTile<GtOperatorNode> (Gt.Mnemonik);
+			public static Tile RegReg_Gt() {
+				return compareRegReg<GtOperatorNode> ("g");
 			}
 
-			public static Tile RegConst() {
-				return makeCmpRegConstTile<GtOperatorNode> (Gt.Mnemonik);
+			public static Tile RegReg_Ge() {
+				return compareRegReg<GteOperatorNode> ("ge");
 			}
 
-			public static Tile ConstConst() {
-				return makeCmpConstConstTile<GtOperatorNode> (Gt.Mnemonik);
-			}
-		}
-
-		public static class Ge
-		{
-			public static readonly string Mnemonik = "ge";
-
-			public static Tile RegReg() {
-				return makeCmpRegRegTile<GteOperatorNode> (Ge.Mnemonik);
+			public static Tile RegReg_Eq() {
+				return compareRegReg<EqOperatorNode> ("e");
 			}
 
-			public static Tile RegConst() {
-				return makeCmpRegConstTile<GteOperatorNode> (Ge.Mnemonik);
+			public static Tile RegReg_Neq() {
+				return compareRegReg<NeqOperatorNode> ("ne");
 			}
 
-			public static Tile ConstConst() {
-				return makeCmpConstConstTile<GteOperatorNode> (Ge.Mnemonik);
-			}
-		}
+			#endregion
 
-		public static class Eq
-		{
-			public static readonly string Mnemonik = "e";
+			#region reg - const
 
-			public static Tile RegReg() {
-				return makeCmpRegRegTile<EqOperatorNode> (Eq.Mnemonik);
-			}
-
-			public static Tile RegConst() {
-				return makeCmpRegConstTile<EqOperatorNode> (Eq.Mnemonik);
-			}
-
-			public static Tile ConstConst() {
-				return makeCmpConstConstTile<EqOperatorNode> (Eq.Mnemonik);
-			}
-		}
-
-		public static class Neq
-		{
-			public static readonly string Mnemonik = "ne";
-
-			public static Tile RegReg() {
-				return makeCmpRegRegTile<NeqOperatorNode> (Neq.Mnemonik);
+			static Tile compareRegConst<T, C>( string cond_type ) 
+				where T : BinaryOperatorNode
+			{
+				return compare<T,RegisterNode,ConstantNode<C>> (
+					(regNode, root, left, right) => new[] {
+						InstructionFactory.Xor (regNode, regNode),
+						InstructionFactory.Cmp (left, right),
+						InstructionFactory.Cmov (cond_type, regNode, 1L)
+					}
+				);
 			}
 
-			public static Tile RegConst() {
-				return makeCmpRegConstTile<NeqOperatorNode> (Neq.Mnemonik);
+			public static Tile RegConst_Lt<C>() {
+				return compareRegConst<LtOperatorNode, C> ("l");
 			}
 
-			public static Tile ConstConst() {
-				return makeCmpConstConstTile<NeqOperatorNode> (Neq.Mnemonik);
+			public static Tile RegConst_Le<C>() {
+				return compareRegConst<LteOperatorNode, C> ("le");
 			}
+
+			public static Tile RegConst_Gt<C>() {
+				return compareRegConst<GtOperatorNode, C> ("g");
+			}
+
+			public static Tile RegConst_Ge<C>() {
+				return compareRegConst<GteOperatorNode, C> ("ge");
+			}
+
+			public static Tile RegConst_Eq<C>() {
+				return compareRegConst<EqOperatorNode, C> ("e");
+			}
+
+			public static Tile RegConst_Neq<C>() {
+				return compareRegConst<NeqOperatorNode, C> ("ne");
+			}
+
+			#endregion
 		}
 	}
 }
