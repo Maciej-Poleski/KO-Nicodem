@@ -10,7 +10,7 @@ namespace Nicodem.Backend.Tests
 {
 	[TestFixture]
 	public class TileFactoryTests
-	{
+	{/*
 		static readonly HardwareRegisterNode RSpecial = new HardwareRegisterNode("xxx");
 
 		static readonly HardwareRegisterNode RAX = new HardwareRegisterNode("rax");
@@ -268,7 +268,7 @@ namespace Nicodem.Backend.Tests
 				"mov " + RSpecial + ", " + RAX + "\n";
 
 			Assert.AreEqual (expected, got);
-		}
+		}*/
 	}
 }
 
