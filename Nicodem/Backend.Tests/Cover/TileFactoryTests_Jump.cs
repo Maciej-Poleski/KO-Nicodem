@@ -43,7 +43,7 @@ namespace Nicodem.Backend.Tests
 
 			var got = TileFactoryTestUtils.getASM (instructions, map);
 			var expected = "cmp " + TileFactoryTestUtils.RAX + ", " + TileFactoryTestUtils.RBX + "\n" +
-				"j" + cond_type + lbl.Label;
+				"j" + cond_type + " " + lbl.Label;
 
 			Assert.AreEqual (expected, got);
 		}
@@ -74,7 +74,7 @@ namespace Nicodem.Backend.Tests
 
 			var got = TileFactoryTestUtils.getASM (instructions, map);
 			var expected = "cmp " + TileFactoryTestUtils.RAX + ", 10\n" +
-			               "j" + cond_type + lbl.Label;
+			               "j" + cond_type + " " + lbl.Label;
 
 			Assert.AreEqual (expected, got);
 		}
