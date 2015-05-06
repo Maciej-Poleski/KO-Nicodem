@@ -39,11 +39,8 @@ namespace Nicodem.Backend
 
 		private static void DfsVisit (Node node)
 		{
-			if (!assigned [node]) {
-				assigned [node] = true;
-				trace.Add (GetLabel (node));
-			} else
-				return;
+			assigned [node] = true;
+			trace.Add (GetLabel (node));
 			
 			if (node is ConditionalJumpNode) {
 				var conditionalJump = node as ConditionalJumpNode;
@@ -52,7 +49,7 @@ namespace Nicodem.Backend
 				var otherNode = conditionalJump.NextNodeIfFalse;
 				var condition = conditionalJump.Condition;
 
-				if (assigned [conditionalJump.NextNodeIfTrue]) {
+				if (conditionalJump.NextNodeIfTrue == null || assigned [conditionalJump.NextNodeIfTrue]) {
 					condition = new NegOperatorNode (condition);
 					otherNode = conditionalJump.NextNodeIfTrue;
 					nextNode = conditionalJump.NextNodeIfFalse;
