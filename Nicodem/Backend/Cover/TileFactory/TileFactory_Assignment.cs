@@ -8,11 +8,79 @@ namespace Nicodem.Backend.Cover
 		{
 			#region Destination - Reg
 
+			// reg1 = reg2 + const
+			public static Tile Reg_AddConst() {
+				return new Tile (typeof(AssignmentNode),
+					new[] { 
+						makeTile<RegisterNode> (),
+						makeTile<AddOperatorNode> (
+							makeTile<RegisterNode> (),
+							makeTile<ConstantNode<long>> ()
+						)
+					},
+					(regNode, node) => {
+						var root = node as AssignmentNode;
+						var reg1 = root.Target as RegisterNode;
+						var addop = root.Source as AddOperatorNode;
+						var reg2 = addop.LeftOperand as RegisterNode;
+						var val = addop.RightOperand as ConstantNode<long>;
+
+						// reg = reg + 1 -> reg++
+						if (reg1 == reg2 && val.Value == 1L) {
+							return new[] {
+								InstructionFactory.Inc (reg1),
+								InstructionFactory.Move (regNode, reg1)
+							};
+						} else {
+							return new[] {
+								InstructionFactory.Move (reg1, reg2),  // r = left
+								InstructionFactory.Add (reg1, val),    // r = left + right
+								InstructionFactory.Move (regNode, reg1)
+							};
+						}
+					}
+				);
+			}
+
+			// reg1 = reg2 - const
+			public static Tile Reg_SubConst() {
+				return new Tile (typeof(AssignmentNode),
+					new[] { 
+						makeTile<RegisterNode> (),
+						makeTile<SubOperatorNode> (
+							makeTile<RegisterNode> (),
+							makeTile<ConstantNode<long>> ()
+						)
+					},
+					(regNode, node) => {
+						var root = node as AssignmentNode;
+						var reg1 = root.Target as RegisterNode;
+						var subop = root.Source as SubOperatorNode;
+						var reg2 = subop.LeftOperand as RegisterNode;
+						var val = subop.RightOperand as ConstantNode<long>;
+
+						// reg = reg - 1 -> reg--
+						if (reg1 == reg2 && val.Value == 1L) {
+							return new[] {
+								InstructionFactory.Dec (reg1),
+								InstructionFactory.Move (regNode, reg1)
+							};
+						} else {
+							return new[] {
+								InstructionFactory.Move (reg1, reg2),  // r = left
+								InstructionFactory.Sub (reg1, val),    // r = left - right
+								InstructionFactory.Move (regNode, reg1)
+							};
+						}
+					}
+				);
+			}
+
 			public static Tile Reg_Reg() {
 				return new Tile (typeof(AssignmentNode),
 					new[] { 
-						makeTile<RegisterNode>(),
-						makeTile<RegisterNode>()
+						makeTile<RegisterNode> (),
+						makeTile<RegisterNode> ()
 					},
 					(regNode, node) => {
 						var root = node as AssignmentNode;
@@ -20,10 +88,8 @@ namespace Nicodem.Backend.Cover
 						var source = root.Source as RegisterNode;
 
 						return new [] {
-							new Instruction (
-								map => string.Format("mov {0}, {1}", map[target], map[source]),
-								use(target, source), define(target), true),
-							copyToTemporary( regNode, target )
+							InstructionFactory.Move (target, source),
+							InstructionFactory.Move (regNode, target)
 						};
 					}
 				);
@@ -32,8 +98,8 @@ namespace Nicodem.Backend.Cover
 			public static Tile Reg_Const() {
 				return new Tile (typeof(AssignmentNode),
 					new[] { 
-						makeTile<RegisterNode>(),
-						makeTile<ConstantNode<long>>()
+						makeTile<RegisterNode> (),
+						makeTile<ConstantNode<long>> ()
 					},
 					(regNode, node) => {
 						var root = node as AssignmentNode;
@@ -42,17 +108,13 @@ namespace Nicodem.Backend.Cover
 
 						if (valNode.Value == 0L) {
 							return new [] {
-								new Instruction (
-									map => string.Format("xor {0}, {0}", map[target]),
-									use(target), define(target)),
-								copyToTemporary( regNode, target )
+								InstructionFactory.Xor (target, target),
+								InstructionFactory.Move (regNode, target)
 							};
 						} else {
 							return new [] {
-								new Instruction (
-									map => string.Format("mov {0}, {1}", map[target], valNode.Value),
-									use(target), define(target)),
-								copyToTemporary( regNode, target )
+								InstructionFactory.Move (target, valNode),
+								InstructionFactory.Move (regNode, target)
 							};
 						}
 					}
@@ -77,7 +139,7 @@ namespace Nicodem.Backend.Cover
 							new Instruction (
 								map => string.Format ("mov {0}, [{1}]", map [dst], map [src]),
 								use (dst, src), define (dst)),
-							copyToTemporary (regNode, dst)
+							InstructionFactory.Move (regNode, dst)
 						};
 					}
 				);
@@ -101,7 +163,7 @@ namespace Nicodem.Backend.Cover
 							new Instruction (
 								map => string.Format ("mov {0}, [{1}]", map [dst], addr.Value),
 								use (dst), define (dst)),
-							copyToTemporary (regNode, dst)
+							InstructionFactory.Move (regNode, dst)
 						};
 					}
 				);

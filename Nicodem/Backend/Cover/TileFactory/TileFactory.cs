@@ -18,29 +18,67 @@ namespace Nicodem.Backend.Cover
 			return nodes;
 		}
 
-		static Instruction copyToTemporary( RegisterNode temporary, RegisterNode source ) {
-			return new Instruction (
-				map => string.Format ("mov {0}, {1}", map[temporary], map[source]),
-				use (temporary, source), 
-				define (temporary), 
-				true
-			);
-		}
-
 		static Tile makeTile<T>(params Tile[] children) {
 			return new Tile (typeof(T), children, noInstructions ());
+		}
+
+		public static IEnumerable<Tile> GetTiles() {
+			return new[] {
+				ConstTile<long>(),
+
+				Add.RegReg(),
+				Add.RegConst<long>(),
+				Sub.RegReg(),
+				Sub.RegConst<long>(),
+				Shl.RegConst<long>(),
+				Shr.RegConst<long>(),
+				BitXor.RegReg(),
+				BitXor.RegConst<long>(),
+				LogAnd.RegReg(),
+				LogAnd.RegConst<long>(),
+				LogOr.RegReg(),
+				LogOr.RegConst<long>(),
+
+				BinNot.Reg(),
+				Neg.Reg(),
+
+				Lt.RegReg(),
+				Lt.RegConst(),
+				Lt.ConstConst(),
+				Le.RegReg(),
+				Le.RegConst(),
+				Le.ConstConst(),
+				Gt.RegReg(),
+				Gt.RegConst(),
+				Gt.ConstConst(),
+				Ge.RegReg(),
+				Ge.RegConst(),
+				Ge.ConstConst(),
+				Eq.RegReg(),
+				Eq.RegConst(),
+				Eq.ConstConst(),
+				Neq.RegReg(),
+				Neq.RegConst(),
+				Neq.ConstConst(),
+
+				Assign.Reg_Reg(),
+				Assign.Reg_Const(),
+				Assign.Reg_MemReg(),
+				Assign.Reg_MemConst(),
+				Assign.Reg_AddConst(),
+				Assign.Reg_SubConst(),
+				Assign.MemReg_Reg(),
+				Assign.MemReg_Const(),
+				Assign.MemConst_Reg(),
+				Assign.MemConst_Const()
+			};
 		}
 
 		public static Tile ConstTile<T>() {
 			return new Tile (typeof(ConstantNode<T>),
 				new Tile[] { },
-				(regNode, node) => {
-					var root = node as ConstantNode<T>;
-					return new[] {
-						new Instruction(
-							map => string.Format("mov {0}, {1}", map[regNode], root.Value),
-							use(regNode), define(regNode))
-					};
+				(regNode, node) => new[] {
+					InstructionFactory.Move (regNode, node as ConstantNode<T>)
 				}
 			);
 		}
@@ -73,7 +111,7 @@ namespace Nicodem.Backend.Cover
 								new Instruction (
 									map => string.Format("lea {0}, [{1}*{2}]", map[dst], map[mul_reg], mul_val.Value),
 									use(dst, mul_reg), define(dst)),
-								copyToTemporary( regNode, dst )
+								InstructionFactory.Move( regNode, dst )
 							};
 						case 3L:
 						case 5L:
@@ -82,21 +120,21 @@ namespace Nicodem.Backend.Cover
 								new Instruction (
 									map => string.Format("lea {0}, [{1}+{1}*{2}]", map[dst], map[mul_reg], mul_val.Value - 1L),
 									use(dst, mul_reg), define(dst)),
-								copyToTemporary( regNode, dst )
+								InstructionFactory.Move( regNode, dst )
 							};
 						case 1L:
 							return new [] {
 								new Instruction (
 									map => string.Format("mov {0}, {1}", map[dst], map[mul_reg]),
 									use(dst, mul_reg), define(dst), true),
-								copyToTemporary( regNode, dst )
+								InstructionFactory.Move( regNode, dst )
 							};
 						case 0L:
 							return new [] {
 								new Instruction (
 									map => string.Format("xor {0}, {0}", map[dst]),
 									use(dst), define(dst)),
-								copyToTemporary( regNode, dst )
+								InstructionFactory.Move( regNode, dst )
 							};
 						default:
 							return null; // TODO copy from multiply
@@ -136,7 +174,7 @@ namespace Nicodem.Backend.Cover
 							new Instruction (
 								map => string.Format ("lea {0}, [{1}+{2}*{3}+{4}]", map [dst], map [reg1], map[mul_reg], mul_val.Value, val2.Value),
 								use (dst, mul_reg), define (dst)),
-							copyToTemporary (regNode, dst)
+							InstructionFactory.Move (regNode, dst)
 						};
 					}
 				);
@@ -167,7 +205,7 @@ namespace Nicodem.Backend.Cover
 								map => string.Format("lea {0}, [{1} + {2}]", map[dst], map[mem_add_1], map[mem_add_2]),
 								use(dst, mem_add_1, mem_add_2), define(dst)),
 
-							copyToTemporary( regNode, dst )
+							InstructionFactory.Move( regNode, dst )
 						};
 					}
 				);
