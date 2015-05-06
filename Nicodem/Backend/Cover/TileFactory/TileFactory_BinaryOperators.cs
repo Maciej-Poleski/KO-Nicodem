@@ -25,63 +25,28 @@ namespace Nicodem.Backend.Cover
 			);
 		}
 
-		static Tile makeBinopRegRegTile<T>( string mnemonik ) 
-			where T : BinaryOperatorNode
-		{
-			return makeBinopTile<T, RegisterNode, RegisterNode> (
-				(regNode, root, left, right) => new[] {
-					new Instruction (
-						map => string.Format ("{0} {1}, {2}", mnemonik, map [left], map [right]),
-						use (left, right), define (left)),
-					copyToTemporary (regNode, left)
-				}
-			);
-		}
-
-		static Tile makeBinopRegConstTile<T>( string mnemonik )
-			where T : BinaryOperatorNode
-		{
-			return makeBinopTile<T, RegisterNode, ConstantNode<long>> (
-				(regNode, root, left, right) => new[] {
-					new Instruction (
-						map => string.Format ("{0} {1}, {2}", mnemonik, map [left], right.Value),
-						use (left), define (left)),
-					copyToTemporary (regNode, left)
-				}
-			);
-		}
-
-		static Tile makeBinopConstConstTile<T>( string mnemonik )
-			where T : BinaryOperatorNode
-		{
-			return makeBinopTile<T, ConstantNode<long>, ConstantNode<long> > (
-				(regNode, root, left, right) => new[] {
-					new Instruction (
-						map => string.Format ("mov {0}, {1}", map [regNode], left),
-						use (regNode), define (regNode)),
-					new Instruction (
-						map => string.Format ("{0} {1}, {2}", mnemonik, map [regNode], right),
-						use (regNode), define (regNode))
-				}
-			);
-		}
-
 		public static class Add 
 		{
-			public static readonly string Mnemonik = "add";
-
-			// add reg64, reg64
 			public static Tile RegReg() {
-				return makeBinopRegRegTile<AddOperatorNode> (Add.Mnemonik);
+				return makeBinopTile<AddOperatorNode, RegisterNode, RegisterNode> (
+					(regNode, root, left, right) => new[] {
+						InstructionFactory.Move (regNode, left),  // res = left
+						InstructionFactory.Add (regNode, right)   // res = left + right
+					}
+				);
 			}
 
 			public static Tile RegMem() {
 				throw new NotImplementedException();
 			}
 
-			// add reg64, imm64
-			public static Tile RegConst() {
-				return makeBinopRegConstTile<AddOperatorNode> (Add.Mnemonik);
+			public static Tile RegConst<T>() {
+				return makeBinopTile<AddOperatorNode, RegisterNode, ConstantNode<T>> (
+					(regNode, root, left, right) => new[] {
+						InstructionFactory.Move (regNode, left),  // res = left
+						InstructionFactory.Add (regNode, right)   // res = left + right
+					}
+				);
 			}
 
 			public static Tile MemReg() {
@@ -90,30 +55,31 @@ namespace Nicodem.Backend.Cover
 
 			public static Tile MemConst() {
 				throw new NotImplementedException();
-			}
-
-			// imm64 + imm64
-			public static Tile ConstConst() {
-				return makeBinopConstConstTile<AddOperatorNode> (Add.Mnemonik);
 			}
 		}
 
 		public static class Sub
 		{
-			public static readonly string Mnemonik = "sub";
-
-			// sub reg64, reg64
 			public static Tile RegReg() {
-				return makeBinopRegRegTile<SubOperatorNode> (Sub.Mnemonik);
+				return makeBinopTile<SubOperatorNode, RegisterNode, RegisterNode> (
+					(regNode, root, left, right) => new[] {
+						InstructionFactory.Move (regNode, left),  // res = left
+						InstructionFactory.Sub (regNode, right)   // res = left - right
+					}
+				);
 			}
 
 			public static Tile RegMem() {
 				throw new NotImplementedException();
 			}
-
-			// sub reg64, imm64
-			public static Tile RegConst() {
-				return makeBinopRegConstTile<SubOperatorNode> (Sub.Mnemonik);
+				
+			public static Tile RegConst<T>() {
+				return makeBinopTile<SubOperatorNode, RegisterNode, ConstantNode<T>> (
+					(regNode, root, left, right) => new[] {
+						InstructionFactory.Move (regNode, left),  // res = left
+						InstructionFactory.Sub (regNode, right)   // res = left - right
+					}
+				);
 			}
 
 			public static Tile MemReg() {
@@ -123,16 +89,10 @@ namespace Nicodem.Backend.Cover
 			public static Tile MemConst() {
 				throw new NotImplementedException();
 			}
-
-			public static Tile ConstConst() {
-				return makeBinopConstConstTile<SubOperatorNode> (Sub.Mnemonik);
-			}
 		}
 
 		public static class Mul
 		{
-			public static readonly string Mnemonik = "imul";
-
 			public static Tile RegReg() {
 				return makeBinopTile<MulOperatorNode, RegisterNode, RegisterNode> (
 					(regNode, root, left, right) => new[] {
@@ -155,20 +115,34 @@ namespace Nicodem.Backend.Cover
 
 		public static class Div
 		{
-			public static readonly string Mnemonik = "idiv";
 		}
 
 		public static class Mod
 		{
-			public static readonly string Mnemonik = "idiv";
 		}
 
 		public static class Shl
 		{
+			public static Tile RegConst<T>() {
+				return makeBinopTile<ShlOperatorNode, RegisterNode, ConstantNode<T>> (
+					(regNode, root, left, right) => new[] {
+						InstructionFactory.Move (regNode, left),  // res = left
+						InstructionFactory.Shl (regNode, right)   // res = left << right
+					}
+				);
+			}
 		}
 
 		public static class Shr
 		{
+			public static Tile RegConst<T>() {
+				return makeBinopTile<ShrOperatorNode, RegisterNode, ConstantNode<T>> (
+					(regNode, root, left, right) => new[] {
+						InstructionFactory.Move (regNode, left),  // res = left
+						InstructionFactory.Shr (regNode, right)   // res = left >> right
+					}
+				);
+			}
 		}
 
 		public static class BitAnd
@@ -181,46 +155,64 @@ namespace Nicodem.Backend.Cover
 
 		public static class BitXor
 		{
-			public static readonly string Mnemonik = "xor";
-
-			// xor( reg64, reg64 )
 			public static Tile RegReg() {
-				return makeBinopRegRegTile<BitXorOperatorNode> (BitXor.Mnemonik);
+				return makeBinopTile<BitXorOperatorNode, RegisterNode, RegisterNode> (
+					(regNode, root, left, right) => new[] {
+						InstructionFactory.Move (regNode, left),  // res = left
+						InstructionFactory.Xor (regNode, right)   // res = xor(left, right)
+					}
+				);
 			}
 
-			// xor( reg64, imm64 )
-			public static Tile RegConst() {
-				return makeBinopRegConstTile<BitXorOperatorNode> (BitXor.Mnemonik);
+			public static Tile RegConst<T>() {
+				return makeBinopTile<BitXorOperatorNode, RegisterNode, ConstantNode<T>> (
+					(regNode, root, left, right) => new[] {
+						InstructionFactory.Move (regNode, left),  // res = left
+						InstructionFactory.Xor (regNode, right)   // res = xor(left, right)
+					}
+				);
 			}
 		}
 
 		public static class LogAnd
 		{
-			public static readonly string Mnemonik = "and";
-
-			// and reg64, reg64
 			public static Tile RegReg() {
-				return makeBinopRegRegTile<LogAndOperatorNode> (LogAnd.Mnemonik);
+				return makeBinopTile<LogAndOperatorNode, RegisterNode, RegisterNode> (
+					(regNode, root, left, right) => new[] {
+						InstructionFactory.Move (regNode, left),  // res = left
+						InstructionFactory.And (regNode, right)   // res = left && right
+					}
+				);
 			}
 
-			// and reg64, imm64
-			public static Tile RegConst() {
-				return makeBinopRegConstTile<LogAndOperatorNode> (LogAnd.Mnemonik);
+			public static Tile RegConst<T>() {
+				return makeBinopTile<LogAndOperatorNode, RegisterNode, ConstantNode<T>> (
+					(regNode, root, left, right) => new[] {
+						InstructionFactory.Move (regNode, left),  // res = left
+						InstructionFactory.And (regNode, right)   // res = left && right
+					}
+				);
 			}
 		}
 
 		public static class LogOr
 		{
-			public static readonly string Mnemonik = "or";
-
-			// or reg64, reg64
 			public static Tile RegReg() {
-				return makeBinopRegRegTile<LogOrOperatorNode> (LogOr.Mnemonik);
+				return makeBinopTile<LogOrOperatorNode, RegisterNode, RegisterNode> (
+					(regNode, root, left, right) => new[] {
+						InstructionFactory.Move (regNode, left),  // res = left
+						InstructionFactory.Or (regNode, right)    // res = left || right
+					}
+				);
 			}
 
-			// or reg64, imm64
-			public static Tile RegConst() {
-				return makeBinopRegConstTile<LogOrOperatorNode> (LogOr.Mnemonik);
+			public static Tile RegConst<T>() {
+				return makeBinopTile<LogOrOperatorNode, RegisterNode, ConstantNode<T>> (
+					(regNode, root, left, right) => new[] {
+						InstructionFactory.Move (regNode, left),  // res = left
+						InstructionFactory.Or (regNode, right)   // res = left || right
+					}
+				);
 			}
 		}
 	}
