@@ -45,6 +45,8 @@
     <Compile Include="Representation\VisitorOnNodeIsOperationalTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Cover\TileFactoryTests.cs" />
+    <Compile Include="Cover\TileFactoryTests_Jump.cs" />
+    <Compile Include="Cover\TileFactoryTestUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

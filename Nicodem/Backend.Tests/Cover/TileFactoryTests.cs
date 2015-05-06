@@ -11,30 +11,6 @@ namespace Nicodem.Backend.Tests
 	[TestFixture]
 	public class TileFactoryTests
 	{/*
-		static readonly HardwareRegisterNode RSpecial = new HardwareRegisterNode("xxx");
-
-		static readonly HardwareRegisterNode RAX = new HardwareRegisterNode("rax");
-		static readonly HardwareRegisterNode RBX = new HardwareRegisterNode("rbx");
-		static readonly HardwareRegisterNode RCX = new HardwareRegisterNode("rcx");
-
-		static void updateMapping( IEnumerable<Instruction> instructions,
-			IDictionary<RegisterNode, HardwareRegisterNode> mapping)
-		{
-			foreach (var ins in instructions)
-				foreach (var reg in ins.RegistersUsed)
-					if (!mapping.Keys.Contains(reg))
-						mapping.Add (reg, RSpecial);
-		}
-
-		static string cover( IEnumerable<Instruction> instructions, 
-			IReadOnlyDictionary<RegisterNode, HardwareRegisterNode> mapping)
-		{
-			var coverBuilder = new StringBuilder ();
-			foreach (var instruction in instructions)
-				coverBuilder.Append (instruction.ToString (mapping));
-			return coverBuilder.ToString ();
-		}
-
 		static void testBinop_RegReg<T>( Func<TemporaryNode, TemporaryNode, T> fun, Tile tile, string mnemonik )
 			where T : BinaryOperatorNode
 		{
