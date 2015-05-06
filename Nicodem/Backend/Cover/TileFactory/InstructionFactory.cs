@@ -213,34 +213,68 @@ namespace Nicodem.Backend.Cover
 
 		#region cmovxx
 
-		public static Instruction Cmov<T>( string cond_type, RegisterNode reg, T c ) {
+		public static Instruction Cmov( string cond_type, RegisterNode reg1, RegisterNode reg2 ) {
 			return new Instruction (
-				map => string.Format ("cmov{0} {1}, {2}", cond_type, map[reg], c),
+				map => string.Format ("cmov{0} {1}, {2}", cond_type, map[reg1], map[reg2]),
+				use (reg1, reg2), define (reg1));
+		}
+
+		public static Instruction Cmovle( RegisterNode reg1, RegisterNode reg2 ) {
+			return Cmov ("le", reg1, reg2);
+		}
+
+		public static Instruction Cmovl( RegisterNode reg1, RegisterNode reg2 ) {
+			return Cmov ("l", reg1, reg2);
+		}
+
+		public static Instruction Cmovge( RegisterNode reg1, RegisterNode reg2 ) {
+			return Cmov ("ge", reg1, reg2);
+		}
+
+		public static Instruction Cmovg( RegisterNode reg1, RegisterNode reg2 ) {
+			return Cmov ("g", reg1, reg2);
+		}
+
+		public static Instruction Cmove( RegisterNode reg1, RegisterNode reg2 ) {
+			return Cmov ("e", reg1, reg2);
+		}
+
+		public static Instruction Cmovne( RegisterNode reg1, RegisterNode reg2 ) {
+			return Cmov ("ne", reg1, reg2);
+		}
+
+		#endregion
+
+		#region setxx
+
+		public static Instruction Set( string cond_type, RegisterNode reg ) {
+			return new Instruction (
+				map => string.Format ("set{0} {1}", cond_type, map [reg]),
 				use (reg), define (reg));
 		}
 
-		public static Instruction Cmovle<T>( RegisterNode reg, T c ) {
-			return Cmov ("le", reg, c);
+		public static Instruction Setle( RegisterNode reg ) {
+			return Set ("le", reg);
 		}
 
-		public static Instruction Cmovl<T>( RegisterNode reg, T c ) {
-			return Cmov ("l", reg, c);
+		public static Instruction Setl( RegisterNode reg ) {
+			return Set ("l", reg);
 		}
 
-		public static Instruction Cmovge<T>( RegisterNode reg, T c ) {
-			return Cmov ("ge", reg, c);
+		public static Instruction Setge( RegisterNode reg ) {
+			return Set ("ge", reg);
 		}
 
-		public static Instruction Cmovg<T>( RegisterNode reg, T c ) {
-			return Cmov ("g", reg, c);
+		public static Instruction Setg( RegisterNode reg ) {
+			return Set ("g", reg);
 		}
 
-		public static Instruction Cmove<T>( RegisterNode reg, T c ) {
-			return Cmov ("e", reg, c);
+		public static Instruction Sete( RegisterNode reg ) {
+			return Set ("e", reg);
 		}
 
-		public static Instruction Cmovne<T>( RegisterNode reg, T c ) {
-			return Cmov ("ne", reg, c);
+		public static Instruction Setne( RegisterNode reg ) {
+			return Set ("ne", reg);
 		}
 
 		#endregion

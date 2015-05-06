@@ -35,9 +35,8 @@ namespace Nicodem.Backend.Cover
 			{
 				return compare<T,RegisterNode,RegisterNode> (
 					(regNode, root, left, right) => new[] {
-						InstructionFactory.Xor (regNode, regNode),
 						InstructionFactory.Cmp (left, right),
-						InstructionFactory.Cmov (cond_type, regNode, 1L)
+						InstructionFactory.Set (cond_type, regNode)
 					}
 				);
 			}
@@ -75,9 +74,8 @@ namespace Nicodem.Backend.Cover
 			{
 				return compare<T,RegisterNode,ConstantNode<C>> (
 					(regNode, root, left, right) => new[] {
-						InstructionFactory.Xor (regNode, regNode),
 						InstructionFactory.Cmp (left, right),
-						InstructionFactory.Cmov (cond_type, regNode, 1L)
+						InstructionFactory.Set (cond_type, regNode)
 					}
 				);
 			}

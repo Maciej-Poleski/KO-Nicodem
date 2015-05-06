@@ -25,9 +25,8 @@ namespace Nicodem.Backend.Tests
 
 			var got = TileFactoryTestUtils.getASM (instructions, map);
 			var expected = 
-				"xor " + TileFactoryTestUtils.SPECIAL + ", " + TileFactoryTestUtils.SPECIAL + "\n" +
 				"cmp " + TileFactoryTestUtils.RAX + ", " + TileFactoryTestUtils.RBX + "\n" +
-				"cmov" + cond_type + " " + TileFactoryTestUtils.SPECIAL + ", 1\n";
+				"set" + cond_type + " " + TileFactoryTestUtils.SPECIAL + "\n";
 
 			Assert.AreEqual (expected, got);
 		}
@@ -57,9 +56,8 @@ namespace Nicodem.Backend.Tests
 
 			var got = TileFactoryTestUtils.getASM (instructions, map);
 			var expected = 
-				"xor " + TileFactoryTestUtils.SPECIAL + ", " + TileFactoryTestUtils.SPECIAL + "\n" +
 				"cmp " + TileFactoryTestUtils.RAX + ", 15\n" +
-				"cmov" + cond_type + " " + TileFactoryTestUtils.SPECIAL + ", 1\n";
+				"set" + cond_type + " " + TileFactoryTestUtils.SPECIAL + "\n";
 
 			Assert.AreEqual (expected, got);
 		}

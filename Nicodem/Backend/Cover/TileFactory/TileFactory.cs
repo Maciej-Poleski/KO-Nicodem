@@ -66,6 +66,7 @@ namespace Nicodem.Backend.Cover
 				Assign.MemConst_Reg(),
 				Assign.MemConst_Const(),
 
+				Jump.Unconditional(),
 				Jump.Cond_RegReg_Eq(),
 				Jump.Cond_RegReg_Neq(),
 				Jump.Cond_RegReg_Lt(),
