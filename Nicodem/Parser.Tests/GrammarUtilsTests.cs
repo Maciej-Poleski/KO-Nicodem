@@ -267,12 +267,12 @@ namespace Nicodem.Parser.Tests
              */
             automatons_lr = new Dictionary<StringSymbol, Dfa<StringSymbol>>();
 
-            //init automatons
-            automatons_lr[openbracket] = CreateDummyAcceptingDfa();
-            automatons_lr[closebracket] = CreateDummyAcceptingDfa();
-            automatons_lr[add] = CreateDummyAcceptingDfa();
-            automatons_lr[subtract] = CreateDummyAcceptingDfa();
-            automatons_lr[multiply] = CreateDummyAcceptingDfa();
+            //init automatons null for terminals
+            //automatons_lr[openbracket] = CreateDummyAcceptingDfa();
+            //automatons_lr[closebracket] = CreateDummyAcceptingDfa();
+            //automatons_lr[add] = CreateDummyAcceptingDfa();
+            //automatons_lr[subtract] = CreateDummyAcceptingDfa();
+            //automatons_lr[multiply] = CreateDummyAcceptingDfa();
 
             //nullable
             nullable_lr = CreateSet();
@@ -373,12 +373,12 @@ namespace Nicodem.Parser.Tests
              */
             automatons_lr_nullable = new Dictionary<StringSymbol, Dfa<StringSymbol>>();
 
-            //init automatons
-            automatons_lr_nullable[openbracket] = CreateDummyAcceptingDfa();
-            automatons_lr_nullable[closebracket] = CreateDummyAcceptingDfa();
-            automatons_lr_nullable[add] = CreateDummyAcceptingDfa();
-            automatons_lr_nullable[subtract] = CreateDummyAcceptingDfa();
-            automatons_lr_nullable[multiply] = CreateDummyAcceptingDfa();
+            //init automatons null for terminals
+            //automatons_lr_nullable[openbracket] = CreateDummyAcceptingDfa();
+            //automatons_lr_nullable[closebracket] = CreateDummyAcceptingDfa();
+            //automatons_lr_nullable[add] = CreateDummyAcceptingDfa();
+            //automatons_lr_nullable[subtract] = CreateDummyAcceptingDfa();
+            //automatons_lr_nullable[multiply] = CreateDummyAcceptingDfa();
 
             //nullable
             nullable_lr_nullable = CreateSet();
