@@ -4,7 +4,7 @@ namespace Nicodem.Backend.Representation
 {
     public abstract class Node : IValuable
     {
-        private TemporaryNode _value;
+        protected TemporaryNode _value;
 
         protected Node()
         {
@@ -14,7 +14,7 @@ namespace Nicodem.Backend.Representation
         public Action<AbstractVisitor> Accept { get; private set; }
 
         // I can move it down inheritance hierarchy
-        public RegisterNode Value
+        public virtual RegisterNode Value
         {
             get { return _value ?? (_value = new TemporaryNode()); }
         }
