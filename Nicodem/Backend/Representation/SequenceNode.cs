@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Nicodem.Backend.Representation
 {
@@ -11,6 +12,9 @@ namespace Nicodem.Backend.Representation
             Sequence = sequence;
             NextNode = nextNode;
 			_value = value;
+			if(_value == null) {
+				_value = sequence.Last().Value as TemporaryNode;
+			}
         }
 
         /// <summary>
@@ -32,6 +36,9 @@ namespace Nicodem.Backend.Representation
                 }
             };
 			_value = value;
+			if(value == null) {
+				_value = sequence.Last().Value as TemporaryNode;
+			}
         }
 
         public IReadOnlyList<Node> Sequence { get; private set; }
