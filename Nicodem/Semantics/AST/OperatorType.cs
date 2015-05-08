@@ -2,6 +2,7 @@
 
 namespace Nicodem.Semantics.AST
 {
+	// Binary operators first!
 	enum OperatorType
 	{
         // "= += -= *= /= %= <<= >>= &= ^= |="

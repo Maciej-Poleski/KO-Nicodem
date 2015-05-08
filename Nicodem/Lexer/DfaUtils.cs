@@ -61,6 +61,12 @@ namespace Nicodem.Lexer
             }
 		}
 
+		private static int CompareByKey<TDfa, TDfaState, TSymbol>(KeyValuePair<TSymbol, MinimizedDfaState<TSymbol>> a, KeyValuePair<TSymbol, MinimizedDfaState<TSymbol>> b)
+			where TDfa : AbstractDfa<TDfaState, TSymbol> where TDfaState : AbstractDfaState<TDfaState, TSymbol> where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
+		{
+			return a.Key.CompareTo(b.Key);
+		}
+
 		private static MinimizedDfa<TSymbol> BuildNewDfa<TDfa, TDfaState, TSymbol> (TDfa dfa, PartitionRefinement<TDfaState> partition, IList<TDfaState> stateList) 
 			where TDfa : AbstractDfa<TDfaState, TSymbol> where TDfaState : AbstractDfaState<TDfaState, TSymbol> where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
 		{
@@ -106,6 +112,8 @@ namespace Nicodem.Lexer
 					var newEdge = new KeyValuePair<TSymbol, MinimizedDfaState<TSymbol>>(edge.Key, simpleStateToMinimizedState[edge.Value]);
 					newTransitions.Add (newEdge);
 				}
+
+				newTransitions.Sort (CompareByKey<TDfa, TDfaState, TSymbol>);
 
 				minimizedState._transitions = newTransitions.ToArray();
 

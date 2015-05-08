@@ -65,7 +65,18 @@
     <Compile Include="Target.cs" />
     <Compile Include="Cover\Instruction.cs" />
     <Compile Include="Cover\Tile.cs" />
-    <Compile Include="Cover\TileFactory.cs" />
+    <Compile Include="Cover\TileFactory\TileFactory.cs" />
+    <Compile Include="Cover\TileFactory\TileFactory_BinaryOperators.cs" />
+    <Compile Include="Cover\TileFactory\TileFactory_UnaryOperators.cs" />
+    <Compile Include="Cover\TileFactory\TileFactory_Assignment.cs" />
+    <Compile Include="Cover\TileFactory\TileFactory_Comparison.cs" />
+    <Compile Include="Representation\ConditionalJumpToLabel.cs" />
+    <Compile Include="Representation\UnconditionalJumpToLabel.cs" />
+    <Compile Include="Representation\LabelFactory.cs" />
+    <Compile Include="Representation\LabelNode.cs" />
+    <Compile Include="Trace\TraceBuilder.cs" />
+    <Compile Include="Cover\TileFactory\InstructionFactory.cs" />
+    <Compile Include="Cover\TileFactory\TileFactory_Jumps.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -78,5 +89,7 @@
   -->
   <ItemGroup>
     <Folder Include="Cover\" />
+    <Folder Include="Cover\TileFactory\" />
+    <Folder Include="Trace\" />
   </ItemGroup>
 </Project>

@@ -30,4 +30,32 @@
         {
         }
     }
+
+    public class UnaryPlusOperatorNode : UnaryOperatorNode
+    {
+        public UnaryPlusOperatorNode(Node operand) : base(operand)
+        {
+        }
+    }
+
+    public class UnaryMinusOperatorNode : UnaryOperatorNode
+    {
+        public UnaryMinusOperatorNode(Node operand) : base(operand)
+        {
+        }
+    }
+
+    public class IncOperatorNode : UnaryOperatorNode
+    {
+        public IncOperatorNode(Node operand) : base(operand)
+        {
+        }
+    }
+
+    public class DecOperatorNode : UnaryOperatorNode
+    {
+        public DecOperatorNode(Node operand) : base(operand)
+        {
+        }
+    }
 }

@@ -35,7 +35,7 @@
             node.Target.Accept(this);
         }
 
-        public override void Visit<TFunction>(FunctionCallNode<TFunction> node)
+        public override void Visit(FunctionCallNode node)
         {
             Visit(node as Node);
             foreach (var argument in node.Arguments)

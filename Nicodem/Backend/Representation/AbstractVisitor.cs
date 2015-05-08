@@ -28,7 +28,7 @@
             Visit(node as Node);
         }
 
-        public virtual void Visit<TFunction>(FunctionCallNode<TFunction> node)
+        public virtual void Visit(FunctionCallNode node)
         {
             Visit(node as Node);
         }

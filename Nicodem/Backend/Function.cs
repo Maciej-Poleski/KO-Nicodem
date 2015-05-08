@@ -1,4 +1,5 @@
 ﻿using System;
+using Nicodem.Backend.Representation;
 
 namespace Nicodem.Backend
 {
@@ -8,9 +9,21 @@ namespace Nicodem.Backend
 		{
 		}
 
-		public Local AllocLocal() {
+		public Local AllocLocal()
+		{
 			return new Local();
 		}
+
+		public Node AccessLocal(Local local)
+		{
+			throw new NotImplementedException();
+		}
+
+		public SequenceNode FunctionCall(Temporary[] args, Temporary result)
+		{
+			throw new NotImplementedException();
+		}
+
 	}
 }
 
