@@ -22,7 +22,7 @@ namespace Nicodem.Compiler
             var tokenized = CSTBuilder.SanitizedTokens(inputFile);
             foreach (var tuple in tokenized)
             {
-                Console.Write(tuple.Item1.GetOriginText());
+                Console.Write("\""+tuple.Item1.GetOriginText()+"\" ");
             }
         }
     }

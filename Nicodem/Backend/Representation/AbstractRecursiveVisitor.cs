@@ -38,10 +38,6 @@
         public override void Visit(FunctionCallNode node)
         {
             Visit(node as Node);
-            foreach (var argument in node.Arguments)
-            {
-                argument.Accept(this);
-            }
         }
 
         public override void Visit<TConstant>(ConstantNode<TConstant> node)

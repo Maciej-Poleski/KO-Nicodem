@@ -46,7 +46,14 @@ namespace Nicodem.Semantics.CST
 
             var lexer = new Lexer.Lexer(regExCategories.ToArray());
 
-            var tokens = lexer.ProcessBare(origin).ToList();
+            var tokenizerResult = lexer.Process(origin);
+            // TODO improve error handling
+            if (tokenizerResult.LastParsedLocation != tokenizerResult.FailedAtLocation)
+            {
+                Console.WriteLine("Syntax error:");
+                Console.WriteLine(tokenizerResult.FailedAtLocation.ToString());
+            }
+            var tokens = tokenizerResult.Tokens.ToArray();
             var sanitizedTokens = tokens.Where(a => a.Item2.All(c => !forbidden.Contains(c)));
             return sanitizedTokens;
         }

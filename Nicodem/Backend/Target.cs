@@ -8,7 +8,9 @@ namespace Nicodem.Backend
 		}
 
 		public Function CreateFunction() {
-			return new Function();
+            throw new NotImplementedException();
+			// return new Function();
+            // FIXME You must provide local/temporary variables bitmap
 		}
 	}
 }

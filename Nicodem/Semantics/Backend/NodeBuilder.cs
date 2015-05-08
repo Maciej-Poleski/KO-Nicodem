@@ -50,7 +50,8 @@ namespace Nicodem.Semantics
 				foreach(var arg in funCallNode.Arguments) {
 					args.Add(Build(arg as dynamic));
 				}
-				return new Brep.FunctionCallNode(funCallNode.Definition.BackendFunction, args);
+                // FIXME This is not a place for argument passing !!! (argument passing is in Function)
+				return new Brep.FunctionCallNode(funCallNode.Definition.BackendFunction);
 			}
 
 			public Brep.Node Build(OperatorNode opNode)
