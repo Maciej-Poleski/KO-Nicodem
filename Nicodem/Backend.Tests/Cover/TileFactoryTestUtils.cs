@@ -26,9 +26,10 @@ namespace Nicodem.Backend.Tests
 			IDictionary<RegisterNode, HardwareRegisterNode> mapping)
 		{
 			foreach (var ins in instructions)
-				foreach (var reg in ins.RegistersUsed)
-					if (!mapping.Keys.Contains(reg))
+				foreach (var reg in ins.RegistersUsed) {
+					if (!mapping.Keys.Contains (reg))
 						mapping.Add (reg, rspecial);
+				}
 		}
 
 		public static string getASM( IEnumerable<Instruction> instructions, 
