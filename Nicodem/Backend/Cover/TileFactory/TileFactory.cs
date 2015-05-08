@@ -41,8 +41,12 @@ namespace Nicodem.Backend.Cover
 				LogOr.RegReg(),
 				LogOr.RegConst<long>(),
 
-				BinNot.Reg(),
-				Neg.Reg(),
+				Unop.Inc_Reg(),
+				Unop.Dec_Reg(),
+				Unop.Plus_Reg(),
+				Unop.Minus_Reg(),
+				Unop.Neg_Reg(),
+				Unop.BinNot_Reg(),
 
 				Compare.RegReg_Eq(),
 				Compare.RegReg_Neq(),
