@@ -49,6 +49,7 @@
     <Compile Include="Cover\TileFactoryTestUtils.cs" />
     <Compile Include="Cover\TileFactoryTests_Comparison.cs" />
     <Compile Include="Cover\TileFactoryTests_UnaryOperators.cs" />
+    <Compile Include="Cover\TileFactoryTests_BinaryOperators.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
