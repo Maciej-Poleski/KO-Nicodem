@@ -48,6 +48,7 @@
     <Compile Include="Cover\TileFactoryTests_Jump.cs" />
     <Compile Include="Cover\TileFactoryTestUtils.cs" />
     <Compile Include="Cover\TileFactoryTests_Comparison.cs" />
+    <Compile Include="Cover\TileFactoryTests_UnaryOperators.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
