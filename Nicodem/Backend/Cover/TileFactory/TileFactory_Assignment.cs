@@ -121,76 +121,26 @@ namespace Nicodem.Backend.Cover
 				);
 			}
 
-			public static Tile Reg_MemReg() {
-				return new Tile (typeof(AssignmentNode),
-					new[] {
-						makeTile<RegisterNode> (),
-						makeTile<MemoryNode> (
-							makeTile<RegisterNode> ()
-						)
-					},
-					(regNode, node) => {
-						var root = node as AssignmentNode;
-						var dst = root.Target as RegisterNode;
-						var mem = root.Source as MemoryNode;
-						var src = mem.Address as RegisterNode;
-
-						return new[] {
-							new Instruction (
-								map => string.Format ("mov {0}, [{1}]", map [dst], map [src]),
-								use (dst, src), define (dst)),
-							InstructionFactory.Move (regNode, dst)
-						};
-					}
-				);
-			}
-
-			public static Tile Reg_MemConst() {
-				return new Tile (typeof(AssignmentNode),
-					new[] {
-						makeTile<RegisterNode> (),
-						makeTile<MemoryNode> (
-							makeTile<ConstantNode<long>> ()
-						)
-					},
-					(regNode, node) => {
-						var root = node as AssignmentNode;
-						var dst = root.Target as RegisterNode;
-						var mem = root.Source as MemoryNode;
-						var addr = mem.Address as ConstantNode<long>;
-
-						return new[] {
-							new Instruction (
-								map => string.Format ("mov {0}, [{1}]", map [dst], addr.Value),
-								use (dst), define (dst)),
-							InstructionFactory.Move (regNode, dst)
-						};
-					}
-				);
-			}
-
 			#endregion
 
 			#region Destination - Memory Reg
 
 			public static Tile MemReg_Reg() {
 				return new Tile (typeof(AssignmentNode),
-					new[] { 
-						makeTile<MemoryNode>(
-							makeTile<RegisterNode>()
+					new[] {
+						makeTile<MemoryNode> (
+							makeTile<RegisterNode> ()
 						),
-						makeTile<RegisterNode>()
+						makeTile<RegisterNode> ()
 					},
 					(regNode, node) => {
 						var root = node as AssignmentNode;
 						var mem = root.Target as MemoryNode;
 						var dst = mem.Address as RegisterNode;
 						var src = root.Source as RegisterNode;
-
-						return new [] {
-							new Instruction (
-								map => string.Format("mov [{0}], {1}", map[dst], map[src]),
-								use(dst, src), define())
+						return new[] {
+							InstructionFactory.MoveToMemory (dst, src),
+							InstructionFactory.Move (regNode, src)
 						};
 					}
 				);
@@ -199,10 +149,10 @@ namespace Nicodem.Backend.Cover
 			public static Tile MemReg_Const() {
 				return new Tile (typeof(AssignmentNode),
 					new[] { 
-						makeTile<MemoryNode>(
-							makeTile<RegisterNode>()
+						makeTile<MemoryNode> (
+							makeTile<RegisterNode> ()
 						),
-						makeTile<ConstantNode<long>>()
+						makeTile<ConstantNode<long>> ()
 					},
 					(regNode, node) => {
 						var root = node as AssignmentNode;
@@ -211,9 +161,8 @@ namespace Nicodem.Backend.Cover
 						var src = root.Source as ConstantNode<long>;
 
 						return new [] {
-							new Instruction (
-								map => string.Format("mov [{0}], {1}", map[dst], src.Value),
-								use(dst), define())
+							InstructionFactory.MoveToMemory (dst, src),
+							InstructionFactory.Move (regNode, src)
 						};
 					}
 				);
@@ -226,10 +175,10 @@ namespace Nicodem.Backend.Cover
 			public static Tile MemConst_Reg() {
 				return new Tile (typeof(AssignmentNode),
 					new[] { 
-						makeTile<MemoryNode>(
-							makeTile<ConstantNode<long>>()
+						makeTile<MemoryNode> (
+							makeTile<ConstantNode<long>> ()
 						),
-						makeTile<RegisterNode>()
+						makeTile<RegisterNode> ()
 					},
 					(regNode, node) => {
 						var root = node as AssignmentNode;
@@ -238,9 +187,8 @@ namespace Nicodem.Backend.Cover
 						var src = root.Source as RegisterNode;
 
 						return new [] {
-							new Instruction (
-								map => string.Format("mov [{0}], {1}", dst.Value, map[src]),
-								use(src), define())
+							InstructionFactory.MoveToMemory (dst, src),
+							InstructionFactory.Move (regNode, src)
 						};
 					}
 				);
@@ -261,9 +209,8 @@ namespace Nicodem.Backend.Cover
 						var src = root.Source as ConstantNode<long>;
 
 						return new [] {
-							new Instruction (
-								map => string.Format("mov [{0}], {1}", dst.Value, src.Value),
-								use(), define())
+							InstructionFactory.MoveToMemory (dst, src),
+							InstructionFactory.Move (regNode, src)
 						};
 					}
 				);

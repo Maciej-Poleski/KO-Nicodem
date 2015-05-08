@@ -25,6 +25,8 @@ namespace Nicodem.Backend.Cover
 		public static IEnumerable<Tile> GetTiles() {
 			return new[] {
 				ConstTile<long>(),
+				MemAccessTile(),
+				MemAccessTile<long>(),
 
 				Add.RegReg(),
 				Add.RegConst<long>(),
@@ -57,8 +59,6 @@ namespace Nicodem.Backend.Cover
 
 				Assign.Reg_Reg(),
 				Assign.Reg_Const(),
-				Assign.Reg_MemReg(),
-				Assign.Reg_MemConst(),
 				Assign.Reg_AddConst(),
 				Assign.Reg_SubConst(),
 				Assign.MemReg_Reg(),
@@ -87,6 +87,36 @@ namespace Nicodem.Backend.Cover
 				new Tile[] { },
 				(regNode, node) => new[] {
 					InstructionFactory.Move (regNode, node as ConstantNode<T>)
+				}
+			);
+		}
+
+		public static Tile MemAccessTile() {
+			return new Tile (typeof(MemoryNode),
+				new [] {
+					makeTile<RegisterNode> ()
+				},
+				(regNode, node) => {
+					var root = node as MemoryNode;
+					var reg = root.Address as RegisterNode;
+					return new[] {
+						InstructionFactory.MoveFromMemory (regNode, reg)
+					};
+				}
+			);
+		}
+
+		public static Tile MemAccessTile<T>() {
+			return new Tile (typeof(MemoryNode),
+				new [] {
+					makeTile<ConstantNode<T>> ()
+				},
+				(regNode, node) => {
+					var root = node as MemoryNode;
+					var add = root.Address as ConstantNode<T>;
+					return new[] {
+						InstructionFactory.MoveFromMemory (regNode, add)
+					};
 				}
 			);
 		}

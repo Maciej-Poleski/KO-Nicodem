@@ -36,10 +36,6 @@ namespace Nicodem.Backend.Cover
 				);
 			}
 
-			public static Tile RegMem() {
-				throw new NotImplementedException();
-			}
-
 			public static Tile RegConst<T>() {
 				return makeBinopTile<AddOperatorNode, RegisterNode, ConstantNode<T>> (
 					(regNode, root, left, right) => new[] {
@@ -47,14 +43,6 @@ namespace Nicodem.Backend.Cover
 						InstructionFactory.Add (regNode, right)   // res = left + right
 					}
 				);
-			}
-
-			public static Tile MemReg() {
-				throw new NotImplementedException();
-			}
-
-			public static Tile MemConst() {
-				throw new NotImplementedException();
 			}
 		}
 
@@ -68,10 +56,6 @@ namespace Nicodem.Backend.Cover
 					}
 				);
 			}
-
-			public static Tile RegMem() {
-				throw new NotImplementedException();
-			}
 				
 			public static Tile RegConst<T>() {
 				return makeBinopTile<SubOperatorNode, RegisterNode, ConstantNode<T>> (
@@ -80,14 +64,6 @@ namespace Nicodem.Backend.Cover
 						InstructionFactory.Sub (regNode, right)   // res = left - right
 					}
 				);
-			}
-
-			public static Tile MemReg() {
-				throw new NotImplementedException();
-			}
-
-			public static Tile MemConst() {
-				throw new NotImplementedException();
 			}
 		}
 

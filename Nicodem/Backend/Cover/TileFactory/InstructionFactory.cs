@@ -13,6 +13,18 @@ namespace Nicodem.Backend.Cover
 			return nodes;
 		}
 
+		static Instruction binopInstruction( string mnemonik, RegisterNode dst, RegisterNode src ) {
+			return new Instruction (
+				map => string.Format ("{0} {1}, {2}", mnemonik, map [dst], map [src]),
+				use (dst, src), define (dst));
+		}
+
+		static Instruction binopInstruction<T>( string mnemonik, RegisterNode dst, ConstantNode<T> c ) {
+			return new Instruction (
+				map => string.Format ("{0} {1}, {2}", mnemonik, map [dst], c.Value),
+				use (dst), define (dst));
+		}
+
 		#region mov
 
 		public static Instruction Move( RegisterNode dst, RegisterNode src ) {
@@ -27,15 +39,53 @@ namespace Nicodem.Backend.Cover
 				use (dst), define (dst));
 		}
 
+		#region from memory
+
+		public static Instruction MoveFromMemory( RegisterNode dst, RegisterNode src ) {
+			return new Instruction (
+				map => string.Format ("mov {0}, [{1}]", map [dst], map [src]),
+				use (src, dst), define (dst));
+		}
+
+		public static Instruction MoveFromMemory<T>( RegisterNode dst, ConstantNode<T> c ) {
+			return new Instruction (
+				map => string.Format ("mov {0}, [{1}]", map [dst], c.Value),
+				use (dst), define (dst));
+		}
+
+		#endregion
+
+		#region to memory
+
+		public static Instruction MoveToMemory( RegisterNode dst, RegisterNode src ) {
+			return new Instruction (
+				map => string.Format ("mov [{0}], {1}", map [dst], map [src]),
+				use (src, dst), define ());
+		}
+
+		public static Instruction MoveToMemory<T>( RegisterNode dst, ConstantNode<T> val ) {
+			return new Instruction (
+				map => string.Format ("mov [{0}], {1}", map [dst], val.Value),
+				use (dst), define ());
+		}
+
+		public static Instruction MoveToMemory<T>( ConstantNode<T> c, RegisterNode src ) {
+			return new Instruction (
+				map => string.Format ("mov [{0}], {1}", c.Value, map [src]),
+				use (src), define ());
+		}
+
+		public static Instruction MoveToMemory<T>( ConstantNode<T> addr, ConstantNode<T> val ) {
+			return new Instruction (
+				map => string.Format ("mov [{0}], {1}", addr.Value, val.Value),
+				use (), define ());
+		}
+
+		#endregion
+
 		#endregion
 
 		#region add, sub, mul, xor, and, or
-
-		static Instruction binopInstruction( string mnemonik, RegisterNode dst, RegisterNode src ) {
-			return new Instruction (
-				map => string.Format ("{0} {1}, {2}", mnemonik, map [dst], map [src]),
-				use (dst, src), define (dst));
-		}
 
 		public static Instruction Add( RegisterNode dst, RegisterNode src ) {
 			return binopInstruction ("add", dst, src);
@@ -51,12 +101,6 @@ namespace Nicodem.Backend.Cover
 
 		public static Instruction Or( RegisterNode dst, RegisterNode src ) {
 			return binopInstruction ("or", dst, src);
-		}
-
-		static Instruction binopInstruction<T>( string mnemonik, RegisterNode dst, ConstantNode<T> c ) {
-			return new Instruction (
-				map => string.Format ("{0} {1}, {2}", mnemonik, map [dst], c.Value),
-				use (dst), define (dst));
 		}
 
 		public static Instruction Add<T>( RegisterNode dst, ConstantNode<T> c ) {
