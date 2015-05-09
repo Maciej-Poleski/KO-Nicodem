@@ -45,5 +45,9 @@ namespace Nicodem.Backend.Representation
         // This is an unconditional jump after end of this sequence
         // This is NOT in-tree parent-child connection (this link makes cycle)
         public Node NextNode { get; private set; }
+
+		public override Node[] GetChildren() {
+			return new Node[]{ NextNode };
+		}
     }
 }

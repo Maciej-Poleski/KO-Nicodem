@@ -9,10 +9,11 @@ namespace Nicodem.Backend.Cover
 		readonly RegisterNode temporaryRegister = new TemporaryNode ();
 		readonly Func<RegisterNode, Node, IEnumerable<Instruction>> instructionBuilder;
 
+		public int Cost { get; private set; }
 		public Type Type { get; private set; }
-		public IEnumerable<Tile> Children { get; private set; }
+		public Tile[] Children { get; private set; }
 
-		public Tile(Type type, IEnumerable<Tile> children, Func<RegisterNode, Node, IEnumerable<Instruction>> instructionBuilder) {
+		public Tile(Type type, Tile[] children, Func<RegisterNode, Node, IEnumerable<Instruction>> instructionBuilder) {
 			Type = type;
 			Children = children;
 			this.instructionBuilder = instructionBuilder;

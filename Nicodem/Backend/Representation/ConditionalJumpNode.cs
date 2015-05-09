@@ -47,5 +47,9 @@ namespace Nicodem.Backend.Representation
         // These are NOT in-tree parent-child connections (these links make cycles)
         public Node NextNodeIfTrue { get; private set; }
         public Node NextNodeIfFalse { get; private set; }
+
+		public override Node[] GetChildren() {
+			return new Node[]{ Condition, NextNodeIfTrue, NextNodeIfFalse };
+		}
     }
 }

@@ -10,6 +10,10 @@
 
         public Node LeftOperand { get; private set; }
         public Node RightOperand { get; private set; }
+
+		public override Node[] GetChildren() {
+			return new Node[]{ LeftOperand, RightOperand };
+		}
     }
 
     public class AddOperatorNode : BinaryOperatorNode

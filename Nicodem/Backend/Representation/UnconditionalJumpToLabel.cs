@@ -8,5 +8,9 @@
 		{
 			NextNode = nextNode;
 		}
+
+		public override Node[] GetChildren() {
+			return new Node[]{ NextNode };
+		}
 	}
 }

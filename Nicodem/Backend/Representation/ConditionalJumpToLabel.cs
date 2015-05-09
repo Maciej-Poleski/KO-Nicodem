@@ -11,5 +11,9 @@
 			Condition = condition;
 			NextNode = nextNode;
 		}
+
+		public override Node[] GetChildren() {
+			return new Node[]{ Condition, NextNode };
+		}
 	}
 }

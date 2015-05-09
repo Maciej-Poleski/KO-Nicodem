@@ -10,5 +10,9 @@
 
         public LocationNode Target { get; private set; }
         public Node Source { get; private set; }
+
+		public override Node[] GetChildren() {
+			return new Node[]{ Target, Source };
+		}
     }
 }

@@ -8,6 +8,10 @@
         }
 
         public Node Operand { get; private set; }
+
+		public override Node[] GetChildren() {
+			return new Node[]{ Operand };
+		}
     }
 
     public class LogNotOperatorNode : UnaryOperatorNode

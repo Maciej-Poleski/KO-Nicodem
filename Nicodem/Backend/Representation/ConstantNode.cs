@@ -9,5 +9,5 @@
 
         // Value representation depends on architecture (and kind). Adjust when Target will be in shape.
         public TConstant Value { get; private set; }
-    }
+	}
 }

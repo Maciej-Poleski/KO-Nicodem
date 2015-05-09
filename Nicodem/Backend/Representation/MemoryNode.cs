@@ -9,5 +9,9 @@
 
         
         public Node Address { get; private set; }
+
+		public override Node[] GetChildren() {
+			return new Node[]{ Address };
+		}
     }
 }
