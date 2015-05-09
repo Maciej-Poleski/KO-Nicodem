@@ -41,7 +41,35 @@ namespace Nicodem.Semantics
 
 			public Brep.Node Build(ConstNode constNode)
 			{
-				throw new NotImplementedException();
+				var type = constNode.VariableType as NamedTypeNode;
+				if(type == null) {
+					throw new InvalidOperationException("Constant can only be of a named type");
+				}
+
+				switch(type.Name) {
+				case "char":
+					return new Brep.ConstantNode<char>(constNode.Value[0]);
+				case "byte":
+					return new Brep.ConstantNode<byte>(Convert.ToByte(constNode.Value[0]));
+				case "int":
+					long res;
+					Int64.TryParse(constNode.Value, out res);
+					return new Brep.ConstantNode<long>(res);
+				case "bool":
+					if(constNode.Value.Equals("true")) {
+						return new Brep.ConstantNode<bool>(true);
+					} else if(constNode.Value.Equals("false")) {
+						return new Brep.ConstantNode<bool>(false);
+					} else {
+						throw new InvalidOperationException("Bool can be either true or false but not: " + constNode.Value);
+					}
+				case "void":
+					throw new InvalidOperationException("Constant cannot be void");
+
+				default:
+					throw new InvalidOperationException("No constant for a type with name: " + type.Name);
+				}
+
 			}
 
 			public Brep.Node Build(FunctionCallNode funCallNode)
