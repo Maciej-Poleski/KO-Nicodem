@@ -74,11 +74,17 @@ namespace Nicodem.Semantics
 
 			public Brep.Node Build(VariableDefNode defNode)
 			{
+				// FIXME - should I care about variable allocation myself here?
+				if(defNode.NestedUse) {
+					defNode.VariableLocation = function.AllocLocal();
+				} else {
+					defNode.VariableLocation = new B.Temporary(new Brep.TemporaryNode());
+				}
+
 				var expr = Build(defNode.Value as dynamic);
-				// FIXME - incorrect location? access local states that the variable is on stack???
-				// should I care about variable allocation during these phase myself?
 				var assignment = new Brep.AssignmentNode(
-					                 defNode.VariableLocation.AccessLocal(function), expr.Value);
+						function.AccessLocal(defNode.VariableLocation), expr.Value);
+
 				return new Brep.SequenceNode(new List<Brep.Node>{ expr, assignment }, null);
 			}
 
@@ -89,8 +95,7 @@ namespace Nicodem.Semantics
 					throw new InvalidOperationException("Cannot use undefined value");
 				}
 
-				// FIXME similiar problem as above
-				return definition.VariableLocation.AccessLocal(function);
+				return function.AccessLocal(definition.VariableLocation);
 			}
 
 			public Brep.Node Build(FunctionCallNode funCallNode)
