@@ -11,6 +11,8 @@
     <AssemblyName>Backend</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <ProductVersion>12.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -77,6 +79,8 @@
     <Compile Include="Trace\TraceBuilder.cs" />
     <Compile Include="Cover\TileFactory\InstructionFactory.cs" />
     <Compile Include="Cover\TileFactory\TileFactory_Jumps.cs" />
+    <Compile Include="Builder\InterferenceGraph.cs" />
+    <Compile Include="Builder\RegisterAllocator.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -91,5 +95,6 @@
     <Folder Include="Cover\" />
     <Folder Include="Cover\TileFactory\" />
     <Folder Include="Trace\" />
+    <Folder Include="Builder\" />
   </ItemGroup>
 </Project>
