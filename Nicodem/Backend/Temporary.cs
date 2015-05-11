@@ -1,10 +1,13 @@
-﻿using Nicodem.Backend.Representation;
+﻿using System;
+using Nicodem.Backend.Representation;
 
 namespace Nicodem.Backend
 {
+    // This class is candidate for removal. Try not to use if You can.
+    [Obsolete]
     public class Temporary : Location
     {
-        private readonly TemporaryNode _node;
+        private readonly RegisterNode _node;
 
         public Temporary()
         {
@@ -15,12 +18,12 @@ namespace Nicodem.Backend
         ///     Use this constructor to wrap existing instance of TemporaryNode
         /// </summary>
         /// <param name="nodeToWrap"></param>
-        public Temporary(TemporaryNode nodeToWrap)
+        public Temporary(RegisterNode nodeToWrap)
         {
             _node = nodeToWrap;
         }
 
-        public TemporaryNode Node
+        public RegisterNode Node
         {
             get { return _node; }
         }

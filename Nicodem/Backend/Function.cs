@@ -7,11 +7,18 @@ namespace Nicodem.Backend
     // This is convention is based on IA64 ABI
     public class Function
     {
+        private static readonly HardwareRegisterNode[] HardwareRegistersOrder =
+        {
+            Target.RDI,
+            Target.RSI,
+            Target.RDX,
+            Target.RCX,
+            Target.R8,
+            Target.R9
+        };
+
         private readonly SequenceNode _body;
         private readonly Function _nestedIn;
-        private readonly Location[] _parameters;
-        private readonly Temporary _result;
-        internal readonly Temporary FramePointer = new Temporary();
         private int _stackFrameSize;
 
         /// <summary>
@@ -20,22 +27,7 @@ namespace Nicodem.Backend
         public Function(SequenceNode body, IReadOnlyCollection<bool> parameterIsLocal, Function nestedInFunction = null)
         {
             _body = body;
-            _parameters = new Location[parameterIsLocal.Count];
-            var i = 0;
-            foreach (var isLocal in parameterIsLocal)
-            {
-                _parameters[i++] = isLocal ? (Location) AllocLocal() : new Temporary();
-            }
-            _result = new Temporary();
             _nestedIn = nestedInFunction;
-        }
-
-        /// <summary>
-        ///     Use to get result Temporary for use in function implementation
-        /// </summary>
-        public Temporary Result
-        {
-            get { return _result; }
         }
 
         public Local AllocLocal()
@@ -50,17 +42,31 @@ namespace Nicodem.Backend
             return local.AccessLocal(this);
         }
 
-        public SequenceNode FunctionCall(Temporary[] args, Temporary result, out Action<Node> nextNodeSetter)
+        public SequenceNode FunctionCall(Node[] args, out Action<Node> nextNodeSetter)
         {
-            var sequence = new Node[args.Length + 2];
+            var seq = new Node[args.Length + Math.Max(0, args.Length - HardwareRegistersOrder.Length) + 1];
+            // params in registers, params on stack, call
             var i = 0;
-            foreach (var arg in args)
+            for (; i < HardwareRegistersOrder.Length && i < args.Length; ++i)
             {
-                sequence[i++] = new AssignmentNode(_parameters[i].AccessLocal(this), arg.Node);
+                seq[i] = new AssignmentNode(HardwareRegistersOrder[i], args[i]);
             }
-            sequence[i++] = new FunctionCallNode(this,_body);
-            sequence[i++] = new AssignmentNode(result.Node, Result.Node);
-            return new SequenceNode(sequence, out nextNodeSetter);
+            var ptr = i;
+            for (; i < args.Length; ++i)
+            {
+                var v = Push(args[i]);
+                seq[ptr++] = v.Item1;
+                seq[ptr++] = v.Item2;
+            }
+            seq[ptr++] = new FunctionCallNode(_body);
+            return new SequenceNode(seq, out nextNodeSetter, Target.RAX);
+        }
+
+        private static Tuple<Node, Node> Push(Node value)
+        {
+            var push = new AssignmentNode(new MemoryNode(Target.RSP), value);
+            var move = new AssignmentNode(Target.RSP, new SubOperatorNode(Target.RSP, new ConstantNode<long>(8)));
+            return new Tuple<Node, Node>(push, move);
         }
     }
 }

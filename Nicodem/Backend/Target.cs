@@ -12,7 +12,8 @@ namespace Nicodem.Backend
 		public static readonly HardwareRegisterNode RSP = new HardwareRegisterNode ("rsp");
 		public static readonly HardwareRegisterNode RBP = new HardwareRegisterNode ("rbp");
 		public static readonly HardwareRegisterNode RSI = new HardwareRegisterNode ("rsi");
-		public static readonly HardwareRegisterNode RDI = new HardwareRegisterNode ("rdi");
+        public static readonly HardwareRegisterNode RDI = new HardwareRegisterNode("rdi");
+        public static readonly HardwareRegisterNode R8 = new HardwareRegisterNode("r8");
 		public static readonly HardwareRegisterNode R9  = new HardwareRegisterNode ("r9");
 		public static readonly HardwareRegisterNode R10 = new HardwareRegisterNode ("r10");
 		public static readonly HardwareRegisterNode R11 = new HardwareRegisterNode ("r11");
@@ -20,7 +21,6 @@ namespace Nicodem.Backend
 		public static readonly HardwareRegisterNode R13 = new HardwareRegisterNode ("r13");
 		public static readonly HardwareRegisterNode R14 = new HardwareRegisterNode ("r14");
 		public static readonly HardwareRegisterNode R15 = new HardwareRegisterNode ("r15");
-		public static readonly HardwareRegisterNode R16 = new HardwareRegisterNode ("r16");
 
 		public Target () {
 		}

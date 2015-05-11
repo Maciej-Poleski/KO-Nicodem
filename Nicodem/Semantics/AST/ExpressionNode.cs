@@ -83,7 +83,7 @@ namespace Nicodem.Semantics.AST
                             opExpr.MoveNext(); // move to next param with ','
                         }
                         var res = new FunctionCallNode();
-                        res.Arguments = args;
+                        res.Arguments = new List<ExpressionNode>(args);
                         // TODO: can something return a 'pointer' to function which we can call to execute?
                         res.Name = opExpr.Current.Fragment.GetOriginText();
                         return res;

@@ -96,7 +96,7 @@ namespace Nicodem.Semantics
 
 			public Brep.Node Build(FunctionCallNode funCallNode)
 			{
-				List<Brep.Node> procedure = new List<Brep.Node>();
+/*				List<Brep.Node> procedure = new List<Brep.Node>();
 				var args = new B.Temporary[funCallNode.Arguments.Count()];
 				for(int i = 0; i < args.Count(); i++) {
 					args[i] = new B.Temporary();
@@ -105,11 +105,19 @@ namespace Nicodem.Semantics
 
 				var result = new B.Temporary();
 				Action<Brep.Node> setter;
-				var call = funCallNode.Definition.BackendFunction.FunctionCall(args, result, out setter);
+				var call = funCallNode.Definition.BackendFunction.FunctionCall(args, out setter);
 				setter(null);
 				procedure.AddRange(call.Sequence);
 
-				return new Brep.SequenceNode(procedure, null, result.Node);
+				return new Brep.SequenceNode(procedure, null, result.Node);*/
+                // Hopefully equivalent in meaning (rewrite by @maciej-poleski)
+			    var args = new Brep.Node[funCallNode.Arguments.Count];
+			    for (var i = 0; i < args.Length; ++i)
+			    {
+			        args[i] = Build(funCallNode.Arguments[i] as dynamic);
+			    }
+                Action<Brep.Node> setter;
+			    return funCallNode.Definition.BackendFunction.FunctionCall(args, out setter);
 			}
 
 			public Brep.Node Build(OperatorNode opNode)

@@ -1,4 +1,5 @@
-﻿using Nicodem.Backend.Representation;
+﻿using System;
+using Nicodem.Backend.Representation;
 
 namespace Nicodem.Backend
 {
@@ -15,8 +16,9 @@ namespace Nicodem.Backend
 
         public override LocationNode AccessLocal(Function function)
         {
-            return new MemoryNode(new AddOperatorNode(_owningFunction.FramePointer.Node,
-                new ConstantNode<long>(_offsetFromStackFrame)));
+            if (function != _owningFunction)
+                throw new NotImplementedException();
+            return new MemoryNode(new SubOperatorNode(Target.RBP, new ConstantNode<long>(_offsetFromStackFrame)));
         }
     }
 }
