@@ -79,8 +79,8 @@
     <Compile Include="Trace\TraceBuilder.cs" />
     <Compile Include="Cover\TileFactory\InstructionFactory.cs" />
     <Compile Include="Cover\TileFactory\TileFactory_Jumps.cs" />
-    <Compile Include="Builder\InterferenceGraph.cs" />
     <Compile Include="Builder\RegisterAllocator.cs" />
+    <Compile Include="Builder\TemporariesGraph.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
