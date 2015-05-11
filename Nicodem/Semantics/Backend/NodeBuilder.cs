@@ -100,12 +100,23 @@ namespace Nicodem.Semantics
 
 			public Brep.Node Build(FunctionCallNode funCallNode)
 			{
-				List<Brep.Node> args = new List<Brep.Node>();
+				List<Brep.Node> procedure = new List<Brep.Node>();
 				foreach(var arg in funCallNode.Arguments) {
-					args.Add(Build(arg as dynamic));
+					procedure.Add(Build(arg as dynamic));
 				}
-                // FIXME This is not a place for argument passing !!! (argument passing is in Function)
-				return new Brep.FunctionCallNode(funCallNode.Definition.BackendFunction);
+				var args = new B.Temporary[procedure.Count];
+				for(int i = 0; i < procedure.Count; i++) {
+					// Ugly... TODO fix these types
+					args[i] = new B.Temporary(procedure.ElementAt(i).Value as Brep.TemporaryNode);
+				}
+
+				var result = new B.Temporary();
+				Action<Brep.Node> setter;
+				var call = funCallNode.Definition.BackendFunction.FunctionCall(args, result, out setter);
+				setter(null);
+				procedure.AddRange(call.Sequence);
+
+				return new Brep.SequenceNode(procedure, null, result.Node);
 			}
 
 			public Brep.Node Build(OperatorNode opNode)
