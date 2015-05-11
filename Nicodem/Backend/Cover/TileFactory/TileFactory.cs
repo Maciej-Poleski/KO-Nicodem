@@ -75,6 +75,7 @@ namespace Nicodem.Backend.Cover
 				Unop.Minus_Reg(),
 				Unop.Neg_Reg(),
 				Unop.BinNot_Reg(),
+				Unop.LogNot_Reg(),
 
 				Compare.RegReg_Eq(),
 				Compare.RegReg_Neq(),
