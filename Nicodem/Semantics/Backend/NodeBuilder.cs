@@ -74,7 +74,6 @@ namespace Nicodem.Semantics
 
 			public Brep.Node Build(VariableDefNode defNode)
 			{
-				// FIXME - should I care about variable allocation myself here?
 				if(defNode.NestedUse) {
 					defNode.VariableLocation = function.AllocLocal();
 				} else {
@@ -82,10 +81,7 @@ namespace Nicodem.Semantics
 				}
 
 				var expr = Build(defNode.Value as dynamic);
-				var assignment = new Brep.AssignmentNode(
-						function.AccessLocal(defNode.VariableLocation), expr.Value);
-
-				return new Brep.SequenceNode(new List<Brep.Node>{ expr, assignment }, null);
+				return new Brep.AssignmentNode(function.AccessLocal(defNode.VariableLocation), expr);
 			}
 
 			public Brep.Node Build(VariableUseNode useNode)
@@ -101,13 +97,10 @@ namespace Nicodem.Semantics
 			public Brep.Node Build(FunctionCallNode funCallNode)
 			{
 				List<Brep.Node> procedure = new List<Brep.Node>();
-				foreach(var arg in funCallNode.Arguments) {
-					procedure.Add(Build(arg as dynamic));
-				}
-				var args = new B.Temporary[procedure.Count];
-				for(int i = 0; i < procedure.Count; i++) {
-					// Ugly... TODO fix these types
-					args[i] = new B.Temporary(procedure.ElementAt(i).Value as Brep.TemporaryNode);
+				var args = new B.Temporary[funCallNode.Arguments.Count()];
+				for(int i = 0; i < args.Count(); i++) {
+					args[i] = new B.Temporary();
+					procedure.Add(new Brep.AssignmentNode(args[i].Node, Build(funCallNode.Arguments.ElementAt(i) as dynamic)));
 				}
 
 				var result = new B.Temporary();
