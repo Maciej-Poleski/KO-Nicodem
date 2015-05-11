@@ -84,11 +84,6 @@ namespace Nicodem.Semantics.Visitors
             base.Visit(node);
         }
 
-        public override void Visit(OperationNode node)
-        {
-            base.Visit(node);
-        }
-
         public override void Visit(SliceNode node)
         {
             base.Visit(node);
