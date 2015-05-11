@@ -6,7 +6,7 @@ namespace Nicodem.Backend.Representation
 {
     public abstract class Node
     {
-        protected TemporaryNode _temporaryRegister;
+        protected RegisterNode _register;
 
 		// optimumCovering consists of costs, tile covering the root and list of children under the tile.
 		Tuple<int, Tile, List<Node> > optimumCovering;
@@ -19,9 +19,9 @@ namespace Nicodem.Backend.Representation
         public Action<AbstractVisitor> Accept { get; private set; }
 
         // I can move it down inheritance hierarchy
-        public RegisterNode TemporaryRegister
+        public RegisterNode ResultRegister
         {
-            get { return _temporaryRegister ?? (_temporaryRegister = new TemporaryNode()); }
+            get { return _register ?? (_register = new TemporaryNode()); }
         }
 
 		public virtual Node[] GetChildren () {

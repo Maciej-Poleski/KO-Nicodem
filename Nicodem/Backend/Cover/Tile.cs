@@ -19,7 +19,7 @@ namespace Nicodem.Backend.Cover
 		}
 
 		public IEnumerable<Instruction> Cover(Node node) {
-			return instructionBuilder (node.TemporaryRegister, node);
+			return instructionBuilder (node.ResultRegister, node);
 		}
 	}
 }
