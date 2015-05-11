@@ -99,6 +99,26 @@ namespace Nicodem.Backend.Cover
 					}
 				);
 			}
+
+			public static Tile RegConst<T>() {
+				return makeBinopTile<MulOperatorNode, RegisterNode, ConstantNode<T>> (
+					(regNode, left, right) => new[] {
+						InstructionFactory.Move (Target.RAX, right),  // RAX = right
+						InstructionFactory.Mul (left),                // RDX:RAX = left * right
+						InstructionFactory.Move (regNode, Target.RAX) // result = RAX
+					}
+				);
+			}
+
+			public static Tile ConstReg<T>() {
+				return makeBinopTile<MulOperatorNode, ConstantNode<T>, RegisterNode> (
+					(regNode, left, right) => new[] {
+						InstructionFactory.Move (Target.RAX, left),   // RAX = left
+						InstructionFactory.Mul (right),               // RDX:RAX = left * right
+						InstructionFactory.Move (regNode, Target.RAX) // result = RAX
+					}
+				);
+			}
 		}
 
 		public static class Div
@@ -113,12 +133,58 @@ namespace Nicodem.Backend.Cover
 					}
 				);
 			}
+
+			public static Tile RegConst<T>() {
+				return makeBinopTile<DivOperatorNode, RegisterNode, ConstantNode<T>> (
+					(regNode, left, right) => new[] {
+						InstructionFactory.Xor (Target.RDX, Target.RDX), // RDX = 0
+						InstructionFactory.Move (Target.RAX, left),      // RDX:RAX = left
+						InstructionFactory.Move (regNode, right),        // reg = rigth
+						InstructionFactory.Div (regNode),                // RAX = left / reg = left / right
+						InstructionFactory.Move (regNode, Target.RAX)    // result = RAX
+					}
+				);
+			}
+
+			public static Tile ConstReg<T>() {
+				return makeBinopTile<DivOperatorNode, ConstantNode<T>, RegisterNode> (
+					(regNode, left, right) => new[] {
+						InstructionFactory.Xor (Target.RDX, Target.RDX), // RDX = 0
+						InstructionFactory.Move (Target.RAX, left),      // RDX:RAX = left
+						InstructionFactory.Div (right),                  // RAX = left / right
+						InstructionFactory.Move (regNode, Target.RAX)    // result = RAX
+					}
+				);
+			}
 		}
 
 		public static class Mod
 		{
 			public static Tile RegReg() {
 				return makeBinopTile<ModOperatorNode, RegisterNode, RegisterNode> (
+					(regNode, left, right) => new[] {
+						InstructionFactory.Xor (Target.RDX, Target.RDX), // RDX = 0
+						InstructionFactory.Move (Target.RAX, left),      // RDX:RAX = left
+						InstructionFactory.Div (right),                  // RDX = left % right
+						InstructionFactory.Move (regNode, Target.RDX)    // result = RDX
+					}
+				);
+			}
+
+			public static Tile RegConst<T>() {
+				return makeBinopTile<ModOperatorNode, RegisterNode, ConstantNode<T>> (
+					(regNode, left, right) => new[] {
+						InstructionFactory.Xor (Target.RDX, Target.RDX), // RDX = 0
+						InstructionFactory.Move (Target.RAX, left),      // RDX:RAX = left
+						InstructionFactory.Move (regNode, right),        // reg = rigth
+						InstructionFactory.Div (regNode),                // RDX = left % reg = left % right
+						InstructionFactory.Move (regNode, Target.RDX)    // result = RDX
+					}
+				);
+			}
+
+			public static Tile ConstReg<T>() {
+				return makeBinopTile<ModOperatorNode, ConstantNode<T>, RegisterNode> (
 					(regNode, left, right) => new[] {
 						InstructionFactory.Xor (Target.RDX, Target.RDX), // RDX = 0
 						InstructionFactory.Move (Target.RAX, left),      // RDX:RAX = left
