@@ -6,7 +6,7 @@ namespace Nicodem.Backend.Cover
 {
 	public static partial class TileFactory
 	{
-		static Tile makeBinopTile<T,L,R>( Func<RegisterNode, T, L, R, IEnumerable<Instruction> > tileMaker )
+		static Tile makeBinopTile<T,L,R>( Func<RegisterNode, L, R, IEnumerable<Instruction> > tileMaker )
 			where T : BinaryOperatorNode
 			where L : Node
 			where R : Node
@@ -20,7 +20,40 @@ namespace Nicodem.Backend.Cover
 					var root = node as T;
 					var left = root.LeftOperand as L;
 					var right = root.RightOperand as R;
-					return tileMaker(regNode, root, left, right);
+					return tileMaker(regNode, left, right);
+				}
+			);
+		}
+
+		static Tile makeBinopRegRegTile<T>( Func<RegisterNode,RegisterNode,Instruction> specificInsn )
+			where T : BinaryOperatorNode
+		{
+			return makeBinopTile<T, RegisterNode, RegisterNode> (
+				(regNode, left, right) => new[] {
+					InstructionFactory.Move (regNode, left),
+					specificInsn (regNode, right)
+				}
+			);
+		}
+
+		static Tile makeBinopRegConstTile<T,C>( Func<RegisterNode,ConstantNode<C>,Instruction> specificInsn )
+			where T : BinaryOperatorNode
+		{
+			return makeBinopTile<T, RegisterNode, ConstantNode<C>> (
+				(regNode, left, right) => new[] {
+					InstructionFactory.Move (regNode, left),
+					specificInsn (regNode, right)
+				}
+			);
+		}
+
+		static Tile makeBinopConstRegTile<T,C>( Func<RegisterNode,RegisterNode,Instruction> specificInsn )
+			where T : BinaryOperatorNode
+		{
+			return makeBinopTile<T, ConstantNode<C>, RegisterNode> (
+				(regNode, left, right) => new[] {
+					InstructionFactory.Move (regNode, left),
+					specificInsn (regNode, right)
 				}
 			);
 		}
@@ -28,60 +61,30 @@ namespace Nicodem.Backend.Cover
 		public static class Add 
 		{
 			public static Tile RegReg() {
-				return makeBinopTile<AddOperatorNode, RegisterNode, RegisterNode> (
-					(regNode, root, left, right) => new[] {
-						InstructionFactory.Move (regNode, left),  // res = left
-						InstructionFactory.Add (regNode, right)   // res = left + right
-					}
-				);
+				return makeBinopRegRegTile<AddOperatorNode> (InstructionFactory.Add);
 			}
 
 			public static Tile RegConst<T>() {
-				return makeBinopTile<AddOperatorNode, RegisterNode, ConstantNode<T>> (
-					(regNode, root, left, right) => new[] {
-						InstructionFactory.Move (regNode, left),  // res = left
-						InstructionFactory.Add (regNode, right)   // res = left + right
-					}
-				);
+				return makeBinopRegConstTile<AddOperatorNode,T> (InstructionFactory.Add);
 			}
 
 			public static Tile ConstReg<T>() {
-				return makeBinopTile<AddOperatorNode, ConstantNode<T>, RegisterNode> (
-					(regNode, root, left, right) => new[] {
-						InstructionFactory.Move (regNode, left),  // res = left
-						InstructionFactory.Add (regNode, right)   // res = left + right
-					}
-				);
+				return makeBinopConstRegTile<AddOperatorNode,T> (InstructionFactory.Add);
 			}
 		}
 
 		public static class Sub
 		{
 			public static Tile RegReg() {
-				return makeBinopTile<SubOperatorNode, RegisterNode, RegisterNode> (
-					(regNode, root, left, right) => new[] {
-						InstructionFactory.Move (regNode, left),  // res = left
-						InstructionFactory.Sub (regNode, right)   // res = left - right
-					}
-				);
+				return makeBinopRegRegTile<SubOperatorNode> (InstructionFactory.Sub);
 			}
 				
 			public static Tile RegConst<T>() {
-				return makeBinopTile<SubOperatorNode, RegisterNode, ConstantNode<T>> (
-					(regNode, root, left, right) => new[] {
-						InstructionFactory.Move (regNode, left),  // res = left
-						InstructionFactory.Sub (regNode, right)   // res = left - right
-					}
-				);
+				return makeBinopRegConstTile<SubOperatorNode,T> (InstructionFactory.Sub);
 			}
 
 			public static Tile ConstReg<T>() {
-				return makeBinopTile<SubOperatorNode, ConstantNode<T>, RegisterNode> (
-					(regNode, root, left, right) => new[] {
-						InstructionFactory.Move (regNode, left),  // res = left
-						InstructionFactory.Sub (regNode, right)   // res = left - right
-					}
-				);
+				return makeBinopConstRegTile<SubOperatorNode,T> (InstructionFactory.Sub);
 			}
 		}
 
@@ -89,7 +92,7 @@ namespace Nicodem.Backend.Cover
 		{
 			public static Tile RegReg() {
 				return makeBinopTile<MulOperatorNode, RegisterNode, RegisterNode> (
-					(regNode, root, left, right) => new[] {
+					(regNode, left, right) => new[] {
 						new Instruction ( //TODO define rax !!!
 							map => string.Format ("mov rax, {0}", map [left]),
 							use (left), define (), true),
@@ -118,24 +121,14 @@ namespace Nicodem.Backend.Cover
 		public static class Shl
 		{
 			public static Tile RegConst<T>() {
-				return makeBinopTile<ShlOperatorNode, RegisterNode, ConstantNode<T>> (
-					(regNode, root, left, right) => new[] {
-						InstructionFactory.Move (regNode, left),  // res = left
-						InstructionFactory.Shl (regNode, right)   // res = left << right
-					}
-				);
+				return makeBinopRegConstTile<ShlOperatorNode,T> (InstructionFactory.Shl);
 			}
 		}
 
 		public static class Shr
 		{
 			public static Tile RegConst<T>() {
-				return makeBinopTile<ShrOperatorNode, RegisterNode, ConstantNode<T>> (
-					(regNode, root, left, right) => new[] {
-						InstructionFactory.Move (regNode, left),  // res = left
-						InstructionFactory.Shr (regNode, right)   // res = left >> right
-					}
-				);
+				return makeBinopRegConstTile<ShrOperatorNode,T> (InstructionFactory.Shr);
 			}
 		}
 
@@ -150,90 +143,45 @@ namespace Nicodem.Backend.Cover
 		public static class BitXor
 		{
 			public static Tile RegReg() {
-				return makeBinopTile<BitXorOperatorNode, RegisterNode, RegisterNode> (
-					(regNode, root, left, right) => new[] {
-						InstructionFactory.Move (regNode, left),  // res = left
-						InstructionFactory.Xor (regNode, right)   // res = xor(left, right)
-					}
-				);
+				return makeBinopRegRegTile<BitXorOperatorNode> (InstructionFactory.Xor);
 			}
 
 			public static Tile RegConst<T>() {
-				return makeBinopTile<BitXorOperatorNode, RegisterNode, ConstantNode<T>> (
-					(regNode, root, left, right) => new[] {
-						InstructionFactory.Move (regNode, left),  // res = left
-						InstructionFactory.Xor (regNode, right)   // res = xor(left, right)
-					}
-				);
+				return makeBinopRegConstTile<BitXorOperatorNode,T> (InstructionFactory.Xor);
 			}
 
 			public static Tile ConstReg<T>() {
-				return makeBinopTile<BitXorOperatorNode, ConstantNode<T>, RegisterNode> (
-					(regNode, root, left, right) => new[] {
-						InstructionFactory.Move (regNode, left),  // res = left
-						InstructionFactory.Xor (regNode, right)   // res = xor(left, right)
-					}
-				);
+				return makeBinopConstRegTile<BitXorOperatorNode,T> (InstructionFactory.Xor);
 			}
 		}
 
 		public static class LogAnd
 		{
 			public static Tile RegReg() {
-				return makeBinopTile<LogAndOperatorNode, RegisterNode, RegisterNode> (
-					(regNode, root, left, right) => new[] {
-						InstructionFactory.Move (regNode, left),  // res = left
-						InstructionFactory.And (regNode, right)   // res = left && right
-					}
-				);
+				return makeBinopRegRegTile<LogAndOperatorNode> (InstructionFactory.And);
 			}
 
 			public static Tile RegConst<T>() {
-				return makeBinopTile<LogAndOperatorNode, RegisterNode, ConstantNode<T>> (
-					(regNode, root, left, right) => new[] {
-						InstructionFactory.Move (regNode, left),  // res = left
-						InstructionFactory.And (regNode, right)   // res = left && right
-					}
-				);
+				return makeBinopRegConstTile<LogAndOperatorNode,T> (InstructionFactory.And);
 			}
 
 			public static Tile ConstReg<T>() {
-				return makeBinopTile<LogAndOperatorNode, ConstantNode<T>, RegisterNode> (
-					(regNode, root, left, right) => new[] {
-						InstructionFactory.Move (regNode, left),  // res = left
-						InstructionFactory.And (regNode, right)   // res = left && right
-					}
-				);
+				return makeBinopConstRegTile<LogAndOperatorNode,T> (InstructionFactory.And);
 			}
 		}
 
 		public static class LogOr
 		{
 			public static Tile RegReg() {
-				return makeBinopTile<LogOrOperatorNode, RegisterNode, RegisterNode> (
-					(regNode, root, left, right) => new[] {
-						InstructionFactory.Move (regNode, left),  // res = left
-						InstructionFactory.Or (regNode, right)    // res = left || right
-					}
-				);
+				return makeBinopRegRegTile<LogOrOperatorNode> (InstructionFactory.Or);
 			}
 
 			public static Tile RegConst<T>() {
-				return makeBinopTile<LogOrOperatorNode, RegisterNode, ConstantNode<T>> (
-					(regNode, root, left, right) => new[] {
-						InstructionFactory.Move (regNode, left),  // res = left
-						InstructionFactory.Or (regNode, right)   // res = left || right
-					}
-				);
+				return makeBinopRegConstTile<LogOrOperatorNode,T> (InstructionFactory.Or);
 			}
 
 			public static Tile ConstReg<T>() {
-				return makeBinopTile<LogOrOperatorNode, ConstantNode<T>, RegisterNode> (
-					(regNode, root, left, right) => new[] {
-						InstructionFactory.Move (regNode, left),  // res = left
-						InstructionFactory.Or (regNode, right)   // res = left || right
-					}
-				);
+				return makeBinopConstRegTile<LogOrOperatorNode,T> (InstructionFactory.Or);
 			}
 		}
 	}
