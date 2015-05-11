@@ -32,26 +32,39 @@ namespace Nicodem.Backend.Cover
 				Add.RegReg(),
 				Add.RegConst<long>(),
 				Add.ConstReg<long>(),
+
 				Sub.RegReg(),
 				Sub.RegConst<long>(),
 				Sub.ConstReg<long>(),
+
 				Mul.RegReg(),
 				Mul.RegConst<long>(),
 				Mul.ConstReg<long>(),
+
 				Div.RegReg(),
 				Div.RegConst<long>(),
 				Div.ConstReg<long>(),
+
 				Mod.RegReg(),
 				Mod.RegConst<long>(),
 				Mod.ConstReg<long>(),
+
 				Shl.RegConst<long>(),
 				Shr.RegConst<long>(),
+
 				BitXor.RegReg(),
 				BitXor.RegConst<long>(),
 				BitXor.ConstReg<long>(),
+				BitAnd.RegReg(),
+				BitAnd.RegConst<long>(),
+				BitAnd.ConstReg<long>(),
+				BitOr.RegReg(),
+				BitOr.RegConst<long>(),
+				BitOr.ConstReg<long>(),
+
 				LogAnd.RegReg(),
-				LogAnd.RegConst<long>(),
-				LogAnd.ConstReg<long>(),
+				LogAnd.RegConst(),
+				LogAnd.ConstReg(),
 				LogOr.RegReg(),
 				LogOr.RegConst<long>(),
 				LogOr.ConstReg<long>(),

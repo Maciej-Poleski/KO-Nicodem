@@ -211,10 +211,32 @@ namespace Nicodem.Backend.Cover
 
 		public static class BitAnd
 		{
+			public static Tile RegReg() {
+				return makeBinopRegRegTile<BitAndOperatorNode> (InstructionFactory.And);
+			}
+
+			public static Tile RegConst<T>() {
+				return makeBinopRegConstTile<BitAndOperatorNode,T> (InstructionFactory.And);
+			}
+
+			public static Tile ConstReg<T>() {
+				return makeBinopConstRegTile<BitAndOperatorNode,T> (InstructionFactory.And);
+			}
 		}
 
 		public static class BitOr
 		{
+			public static Tile RegReg() {
+				return makeBinopRegRegTile<BitOrOperatorNode> (InstructionFactory.Or);
+			}
+
+			public static Tile RegConst<T>() {
+				return makeBinopRegConstTile<BitOrOperatorNode,T> (InstructionFactory.Or);
+			}
+
+			public static Tile ConstReg<T>() {
+				return makeBinopConstRegTile<BitOrOperatorNode,T> (InstructionFactory.Or);
+			}
 		}
 
 		public static class BitXor
@@ -232,21 +254,44 @@ namespace Nicodem.Backend.Cover
 			}
 		}
 
+		// x > 0 if l > 0 and r > 0
+		// 0 otherwise
 		public static class LogAnd
 		{
 			public static Tile RegReg() {
-				return makeBinopRegRegTile<LogAndOperatorNode> (InstructionFactory.And);
+				// l = 0            ->  first instruction sets reg to 0
+				// r = 0 but l > 0  ->  fourth instruction sets reg to 0
+				// l > 0 and r > 0  ->  first instruction sets reg = l > 0 and nothing changes
+				return makeBinopTile<LogAndOperatorNode, RegisterNode, RegisterNode> (
+					(regNode, left, right) => new[] {
+						InstructionFactory.Move (regNode, left),   // reg = left
+						InstructionFactory.Xor (left, left),       // left = 0
+						InstructionFactory.Cmp (right, left),      // if right == 0
+						InstructionFactory.Cmove (regNode, left)   // then reg = 0
+					}
+				);
 			}
 
-			public static Tile RegConst<T>() {
-				return makeBinopRegConstTile<LogAndOperatorNode,T> (InstructionFactory.And);
+			public static Tile RegConst() {
+				return makeBinopTile<LogAndOperatorNode, RegisterNode, ConstantNode<long>> (
+					(regNode, left, right) => right.Value == 0L
+					? new[] { InstructionFactory.Xor (regNode, regNode) } // r == 0 -> all = 0
+					: new[] { InstructionFactory.Move (regNode, left) }   // r != 0 -> all = l
+				);
 			}
 
-			public static Tile ConstReg<T>() {
-				return makeBinopConstRegTile<LogAndOperatorNode,T> (InstructionFactory.And);
+			public static Tile ConstReg() {
+				return makeBinopTile<LogAndOperatorNode, ConstantNode<long>, RegisterNode> (
+					(regNode, left, right) => left.Value == 0L
+					? new[] { InstructionFactory.Xor (regNode, regNode) }  // l == 0 -> all = 0
+					: new[] { InstructionFactory.Move (regNode, right) }   // l != 0 -> all = r
+				);
 			}
 		}
 
+		// x > 0 if l > 0 or r > 0
+		// 0 otherwise
+		// is equal to BitOr operator !!!
 		public static class LogOr
 		{
 			public static Tile RegReg() {
