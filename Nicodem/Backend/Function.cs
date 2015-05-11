@@ -4,8 +4,10 @@ using Nicodem.Backend.Representation;
 
 namespace Nicodem.Backend
 {
+    // This is convention is based on IA64 ABI
     public class Function
     {
+        private readonly SequenceNode _body;
         private readonly Function _nestedIn;
         private readonly Location[] _parameters;
         private readonly Temporary _result;
@@ -15,8 +17,9 @@ namespace Nicodem.Backend
         /// <summary>
         /// </summary>
         /// <param name="parameterIsLocal">Bitmap of parameters which need to be Local</param>
-        public Function(IReadOnlyCollection<bool> parameterIsLocal, Function nestedInFunction = null)
+        public Function(SequenceNode body, IReadOnlyCollection<bool> parameterIsLocal, Function nestedInFunction = null)
         {
+            _body = body;
             _parameters = new Location[parameterIsLocal.Count];
             var i = 0;
             foreach (var isLocal in parameterIsLocal)
@@ -55,7 +58,7 @@ namespace Nicodem.Backend
             {
                 sequence[i++] = new AssignmentNode(_parameters[i].AccessLocal(this), arg.Node);
             }
-            sequence[i++] = new FunctionCallNode(this);
+            sequence[i++] = new FunctionCallNode(this,_body);
             sequence[i++] = new AssignmentNode(result.Node, Result.Node);
             return new SequenceNode(sequence, out nextNodeSetter);
         }
