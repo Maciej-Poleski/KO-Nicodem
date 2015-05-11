@@ -145,7 +145,7 @@ namespace Nicodem.Semantics.Visitors
         }
 
         //every arguments has the same type and set type to the arguements type
-        public override void Visit(OperationNode node)
+        public override void Visit(OperatorNode node)
         {
             base.Visit(node);
             TypeNode argument_type = null;

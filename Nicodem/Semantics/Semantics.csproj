@@ -23,6 +23,8 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <ProductVersion>12.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -70,7 +72,6 @@
     <Compile Include="AST\ConstNode.cs" />
     <Compile Include="AST\ArrayNode.cs" />
     <Compile Include="AST\VariableUseNode.cs" />
-    <Compile Include="AST\OperationNode.cs" />
     <Compile Include="AST\FunctionCallNode.cs" />
     <Compile Include="AST\OperatorNode.cs" />
     <Compile Include="AST\OperatorType.cs" />

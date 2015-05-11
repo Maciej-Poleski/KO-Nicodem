@@ -17,8 +17,6 @@ namespace Nicodem.Semantics.Visitors
         // HasSideEffects must remain defined for all ExpressionNode types.
         private bool HasSideEffects(ConstNode node) { return false; }
         private bool HasSideEffects(IfNode node) { return false; }
-        // At the time of writing this code, nobody knew what OperationNode represents.
-        private bool HasSideEffects(OperationNode node) { throw new NotImplementedException(); }
         private bool HasSideEffects(OperatorNode node)
         {
             switch (node.Operator) {

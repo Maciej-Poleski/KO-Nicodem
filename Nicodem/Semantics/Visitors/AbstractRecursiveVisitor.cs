@@ -119,7 +119,7 @@ namespace Nicodem.Semantics.Visitors
 				node.Value.Accept (this);
 		}
 
-		public override void Visit(OperationNode node)
+		public override void Visit(OperatorNode node)
 		{
 			base.Visit (node);
 

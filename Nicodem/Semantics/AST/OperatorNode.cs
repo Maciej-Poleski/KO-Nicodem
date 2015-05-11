@@ -5,9 +5,10 @@ using Nicodem.Semantics.AST;
 
 namespace Nicodem.Semantics.AST
 {
-	class OperatorNode : OperationNode
+    class OperatorNode : ExpressionNode
 	{
 		public OperatorType Operator { get; set; }
+        public IEnumerable<ExpressionNode> Arguments { get; set; }
 
         #region implemented abstract members of Node
 
