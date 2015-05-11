@@ -100,7 +100,7 @@ namespace Nicodem.Semantics
 				var args = new B.Temporary[funCallNode.Arguments.Count()];
 				for(int i = 0; i < args.Count(); i++) {
 					args[i] = new B.Temporary();
-					procedure.Add(new Brep.AssignmentNode(args[i].Node, Build(funCallNode.Arguments.ElementAt(i))));
+					procedure.Add(new Brep.AssignmentNode(args[i].Node, Build(funCallNode.Arguments.ElementAt(i) as dynamic)));
 				}
 
 				var result = new B.Temporary();
