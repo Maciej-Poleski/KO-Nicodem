@@ -24,6 +24,7 @@ namespace Nicodem.Backend.Cover
 
 		public static IEnumerable<Tile> GetTiles() {
 			return new[] {
+				LabelTile(),
 				ConstTile<long>(),
 				MemAccessTile(),
 				MemAccessTile<long>(),
@@ -101,6 +102,15 @@ namespace Nicodem.Backend.Cover
 				Jump.Cond_ConstReg_Gt<long>(),
 				Jump.Cond_ConstReg_Ge<long>()
 			};
+		}
+
+		public static Tile LabelTile() {
+			return new Tile (typeof(LabelNode),
+				new Tile[] { },
+				(regNode, node) => new[] {
+					InstructionFactory.Label (node as LabelNode)
+				}
+			);
 		}
 
 		public static Tile ConstTile<T>() {

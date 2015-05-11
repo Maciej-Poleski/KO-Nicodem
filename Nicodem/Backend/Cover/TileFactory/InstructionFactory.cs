@@ -25,6 +25,12 @@ namespace Nicodem.Backend.Cover
 				use (dst), define (dst));
 		}
 
+		public static Instruction Label( LabelNode label ) {
+			return new Instruction (
+				map => string.Format ("{0}:", label.Label),
+				use (), define ());
+		}
+
 		#region mov
 
 		public static Instruction Move( RegisterNode dst, RegisterNode src ) {
