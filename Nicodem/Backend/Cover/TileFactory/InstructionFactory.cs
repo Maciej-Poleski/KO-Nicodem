@@ -91,7 +91,7 @@ namespace Nicodem.Backend.Cover
 
 		#endregion
 
-		#region add, sub, mul, xor, and, or
+		#region add, sub, xor, and, or
 
 		public static Instruction Add( RegisterNode dst, RegisterNode src ) {
 			return binopInstruction ("add", dst, src);
@@ -124,6 +124,27 @@ namespace Nicodem.Backend.Cover
 		public static Instruction Or<T>( RegisterNode dst, ConstantNode<T> c ) {
 			return binopInstruction ("or", dst, c);
 		}
+
+		#endregion
+
+		#region mul, div, mod
+
+		// lower part of the result in RAX, higher in RDX
+		public static Instruction Mul( RegisterNode reg ) {
+			return new Instruction (
+				map => string.Format ("mul {0}", map [reg]),
+				use (reg, Target.RAX, Target.RDX), define (Target.RAX, Target.RDX));
+		}
+
+		// divident = RDX:RAX
+		// divisor  = reg
+		// quotient = RAX
+		// reminder = RDX
+		public static Instruction Div( RegisterNode reg ) {
+			return new Instruction (
+				map => string.Format ("div {0}", map [reg]),
+				use (reg, Target.RAX, Target.RDX), define (Target.RAX, Target.RDX));
+		} 
 
 		#endregion
 

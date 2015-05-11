@@ -12,10 +12,14 @@ namespace Nicodem.Backend.Tests
 		static readonly HardwareRegisterNode rax = new HardwareRegisterNode("rax");
 		static readonly HardwareRegisterNode rbx = new HardwareRegisterNode("rbx");
 		static readonly HardwareRegisterNode rcx = new HardwareRegisterNode("rcx");
+		static readonly HardwareRegisterNode r9 = new HardwareRegisterNode("r9");
+		static readonly HardwareRegisterNode r10 = new HardwareRegisterNode("r10");
 
 		public static HardwareRegisterNode RAX { get { return rax; } }
 		public static HardwareRegisterNode RBX { get { return rbx; } }
 		public static HardwareRegisterNode RCX { get { return rcx; } }
+		public static HardwareRegisterNode R9  { get { return r9;  } }
+		public static HardwareRegisterNode R10 { get { return r10; } }
 		public static HardwareRegisterNode SPECIAL { get { return rspecial; } }
 
 		public static Dictionary<RegisterNode, HardwareRegisterNode> createMapping() {
@@ -27,8 +31,14 @@ namespace Nicodem.Backend.Tests
 		{
 			foreach (var ins in instructions)
 				foreach (var reg in ins.RegistersUsed) {
+					var target = rspecial;
+
+					var hardwareRegisterNode = reg as HardwareRegisterNode;
+					if (hardwareRegisterNode != null)
+						target = hardwareRegisterNode;
+
 					if (!mapping.Keys.Contains (reg))
-						mapping.Add (reg, rspecial);
+						mapping.Add (reg, target);
 				}
 		}
 

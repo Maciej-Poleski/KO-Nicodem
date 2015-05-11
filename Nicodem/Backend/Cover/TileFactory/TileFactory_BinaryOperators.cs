@@ -93,18 +93,9 @@ namespace Nicodem.Backend.Cover
 			public static Tile RegReg() {
 				return makeBinopTile<MulOperatorNode, RegisterNode, RegisterNode> (
 					(regNode, left, right) => new[] {
-						new Instruction ( //TODO define rax !!!
-							map => string.Format ("mov rax, {0}", map [left]),
-							use (left), define (), true),
-
-						// wynik rdx:rax
-						new Instruction ( //TODO define rax rdx
-							map => string.Format ("imul {0}", map [right]),
-							use (left, right), define (left)),
-
-						new Instruction ( //TODO use rax !!!
-							map => string.Format ("mov {0}, rax", map [regNode]),
-							use (left, regNode), define (regNode), true)
+						InstructionFactory.Move (Target.RAX, left),   // RAX = left
+						InstructionFactory.Mul (right),               // RDX:RAX = left * right
+						InstructionFactory.Move (regNode, Target.RAX) // result = RAX
 					}
 				);
 			}
@@ -112,10 +103,30 @@ namespace Nicodem.Backend.Cover
 
 		public static class Div
 		{
+			public static Tile RegReg() {
+				return makeBinopTile<DivOperatorNode, RegisterNode, RegisterNode> (
+					(regNode, left, right) => new[] {
+						InstructionFactory.Xor (Target.RDX, Target.RDX), // RDX = 0
+						InstructionFactory.Move (Target.RAX, left),      // RDX:RAX = left
+						InstructionFactory.Div (right),                  // RAX = left / right
+						InstructionFactory.Move (regNode, Target.RAX)    // result = RAX
+					}
+				);
+			}
 		}
 
 		public static class Mod
 		{
+			public static Tile RegReg() {
+				return makeBinopTile<ModOperatorNode, RegisterNode, RegisterNode> (
+					(regNode, left, right) => new[] {
+						InstructionFactory.Xor (Target.RDX, Target.RDX), // RDX = 0
+						InstructionFactory.Move (Target.RAX, left),      // RDX:RAX = left
+						InstructionFactory.Div (right),                  // RDX = left % right
+						InstructionFactory.Move (regNode, Target.RDX)    // result = RDX
+					}
+				);
+			}
 		}
 
 		public static class Shl

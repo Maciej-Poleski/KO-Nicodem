@@ -102,6 +102,74 @@ namespace Nicodem.Backend.Tests
 			testBinopConstReg ((l, r) => new LogAndOperatorNode (l, r), TileFactory.LogAnd.ConstReg<long> (), "and");
 			testBinopConstReg ((l, r) => new LogOrOperatorNode (l, r), TileFactory.LogOr.ConstReg<long> (), "or");
 		}
+
+		[Test]
+		public void Test_Mul_RegReg() {
+			var l = new TemporaryNode ();
+			var r = new TemporaryNode ();
+			var binop = new MulOperatorNode (l, r);
+
+			var map = TileFactoryTestUtils.createMapping ();
+			map.Add (l, TileFactoryTestUtils.R9);
+			map.Add (r, TileFactoryTestUtils.R10);
+
+			var instructions = TileFactory.Mul.RegReg().Cover (binop);
+			TileFactoryTestUtils.updateMapping (instructions, map);
+
+			var got = TileFactoryTestUtils.getASM (instructions, map);
+			var expected = 
+				"mov " + Target.RAX + ", " + TileFactoryTestUtils.R9 + "\n" +
+				"mul " + TileFactoryTestUtils.R10 + "\n" +
+				"mov " + TileFactoryTestUtils.SPECIAL + ", " + Target.RAX + "\n";
+
+			Assert.AreEqual (expected, got);
+		}
+
+		[Test]
+		public void Test_Div_RegReg() {
+			var l = new TemporaryNode ();
+			var r = new TemporaryNode ();
+			var binop = new DivOperatorNode (l, r);
+
+			var map = TileFactoryTestUtils.createMapping ();
+			map.Add (l, TileFactoryTestUtils.R9);
+			map.Add (r, TileFactoryTestUtils.R10);
+
+			var instructions = TileFactory.Div.RegReg().Cover (binop);
+			TileFactoryTestUtils.updateMapping (instructions, map);
+
+			var got = TileFactoryTestUtils.getASM (instructions, map);
+			var expected = 
+				"xor " + Target.RDX + ", " + Target.RDX + "\n" +
+				"mov " + Target.RAX + ", " + TileFactoryTestUtils.R9 + "\n" +
+				"div " + TileFactoryTestUtils.R10 + "\n" +
+				"mov " + TileFactoryTestUtils.SPECIAL + ", " + Target.RAX + "\n";
+
+			Assert.AreEqual (expected, got);
+		}
+
+		[Test]
+		public void Test_Mod_RegReg() {
+			var l = new TemporaryNode ();
+			var r = new TemporaryNode ();
+			var binop = new ModOperatorNode (l, r);
+
+			var map = TileFactoryTestUtils.createMapping ();
+			map.Add (l, TileFactoryTestUtils.R9);
+			map.Add (r, TileFactoryTestUtils.R10);
+
+			var instructions = TileFactory.Mod.RegReg().Cover (binop);
+			TileFactoryTestUtils.updateMapping (instructions, map);
+
+			var got = TileFactoryTestUtils.getASM (instructions, map);
+			var expected = 
+				"xor " + Target.RDX + ", " + Target.RDX + "\n" +
+				"mov " + Target.RAX + ", " + TileFactoryTestUtils.R9 + "\n" +
+				"div " + TileFactoryTestUtils.R10 + "\n" +
+				"mov " + TileFactoryTestUtils.SPECIAL + ", " + Target.RDX + "\n";
+
+			Assert.AreEqual (expected, got);
+		}
 	}
 }
 
