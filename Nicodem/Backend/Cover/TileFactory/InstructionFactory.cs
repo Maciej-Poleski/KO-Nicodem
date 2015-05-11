@@ -215,6 +215,12 @@ namespace Nicodem.Backend.Cover
 				use (left), define ());
 		}
 
+		public static Instruction Cmp<T>( ConstantNode<T> c, RegisterNode right ) {
+			return new Instruction (
+				map => string.Format ("cmp {0}, {1}", c.Value, map [right]),
+				use (right), define ());
+		}
+
 		#endregion
 
 		#region jump

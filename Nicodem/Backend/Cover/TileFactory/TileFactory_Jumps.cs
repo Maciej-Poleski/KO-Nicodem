@@ -131,6 +131,45 @@ namespace Nicodem.Backend.Cover
 
 			#endregion
 
+			#region const - reg
+
+			static Tile conditionalWithCmpConstReg<T,C>( string cond_type ) 
+				where T : BinaryOperatorNode
+			{
+				return conditionalWithCmp<T, ConstantNode<C>, RegisterNode> (
+					(root, reg1, con, lbl) => new[] {
+						InstructionFactory.Cmp (reg1, con),
+						InstructionFactory.Jump (cond_type, lbl)
+					}
+				);
+			}
+
+			public static Tile Cond_ConstReg_Lt<C>() {
+				return conditionalWithCmpConstReg<LtOperatorNode, C> ("l");
+			}
+
+			public static Tile Cond_ConstReg_Le<C>() {
+				return conditionalWithCmpConstReg<LteOperatorNode, C> ("le");
+			}
+
+			public static Tile Cond_ConstReg_Gt<C>() {
+				return conditionalWithCmpConstReg<GtOperatorNode, C> ("g");
+			}
+
+			public static Tile Cond_ConstReg_Ge<C>() {
+				return conditionalWithCmpConstReg<GteOperatorNode, C> ("ge");
+			}
+
+			public static Tile Cond_ConstReg_Eq<C>() {
+				return conditionalWithCmpConstReg<EqOperatorNode, C> ("e");
+			}
+
+			public static Tile Cond_ConstReg_Neq<C>() {
+				return conditionalWithCmpConstReg<NeqOperatorNode, C> ("ne");
+			}
+
+			#endregion
+
 			#endregion
 		}
 	}

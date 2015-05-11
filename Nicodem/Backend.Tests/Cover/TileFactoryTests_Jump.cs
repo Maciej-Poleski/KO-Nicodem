@@ -88,6 +88,38 @@ namespace Nicodem.Backend.Tests
 			testCondRegConstJump ((l, r) => new GtOperatorNode (l, r), TileFactory.Jump.Cond_RegConst_Gt<long> (), "g");
 			testCondRegConstJump ((l, r) => new GteOperatorNode (l, r), TileFactory.Jump.Cond_RegConst_Ge<long> (), "ge");
 		}
+
+		static void testCondConstRegJump( 
+			Func<ConstantNode<long>,RegisterNode,BinaryOperatorNode> condMaker, Tile tile, string cond_type )
+		{
+			var l = new ConstantNode<long> (15L);
+			var r = new TemporaryNode ();
+			var lbl = new LabelNode ("target");
+			var jmp = new ConditionalJumpToLabelNode (condMaker (l, r), lbl);
+
+			var map = TileFactoryTestUtils.createMapping ();
+			map.Add (r, TileFactoryTestUtils.RAX);
+
+			var instructions = tile.Cover (jmp);
+			TileFactoryTestUtils.updateMapping (instructions, map);
+
+			var got = TileFactoryTestUtils.getASM (instructions, map);
+			var expected = 
+				"cmp 10, " + TileFactoryTestUtils.RAX + "\n" +
+				"j" + cond_type + " " + lbl.Label;
+
+			Assert.AreEqual (expected, got);
+		}
+
+		[Test]
+		public void TestConditionalJump_ConstReg() {
+			testCondConstRegJump ((l, r) => new EqOperatorNode (l, r), TileFactory.Jump.Cond_ConstReg_Eq<long> (), "e");
+			testCondConstRegJump ((l, r) => new NeqOperatorNode (l, r), TileFactory.Jump.Cond_ConstReg_Neq<long> (), "ne");
+			testCondConstRegJump ((l, r) => new LtOperatorNode (l, r), TileFactory.Jump.Cond_ConstReg_Lt<long> (), "l");
+			testCondConstRegJump ((l, r) => new LteOperatorNode (l, r), TileFactory.Jump.Cond_ConstReg_Le<long> (), "le");
+			testCondConstRegJump ((l, r) => new GtOperatorNode (l, r), TileFactory.Jump.Cond_ConstReg_Gt<long> (), "g");
+			testCondConstRegJump ((l, r) => new GteOperatorNode (l, r), TileFactory.Jump.Cond_ConstReg_Ge<long> (), "ge");
+		}
 	}
 }
 

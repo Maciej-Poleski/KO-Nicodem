@@ -71,6 +71,37 @@ namespace Nicodem.Backend.Tests
 			testCompareRegConst ((l, r) => new GtOperatorNode (l, r), TileFactory.Compare.RegConst_Gt<long> (), "g");
 			testCompareRegConst ((l, r) => new GteOperatorNode (l, r), TileFactory.Compare.RegConst_Ge<long> (), "ge");
 		}
+
+		static void testCompareConstReg( 
+			Func<ConstantNode<long>,RegisterNode,BinaryOperatorNode> condMaker, Tile tile, string cond_type )
+		{
+			var l = new ConstantNode<long> (15L);
+			var r = new TemporaryNode ();
+			var jmp = condMaker (l, r);
+
+			var map = TileFactoryTestUtils.createMapping ();
+			map.Add (r, TileFactoryTestUtils.RAX);
+
+			var instructions = tile.Cover (jmp);
+			TileFactoryTestUtils.updateMapping (instructions, map);
+
+			var got = TileFactoryTestUtils.getASM (instructions, map);
+			var expected = 
+				"cmp 15, " + TileFactoryTestUtils.RAX + "\n" +
+				"set" + cond_type + " " + TileFactoryTestUtils.SPECIAL + "\n";
+
+			Assert.AreEqual (expected, got);
+		}
+
+		[Test]
+		public void TestComparison_ConstReg() {
+			testCompareConstReg ((l, r) => new EqOperatorNode (l, r), TileFactory.Compare.ConstReg_Eq<long> (), "e");
+			testCompareConstReg ((l, r) => new NeqOperatorNode (l, r), TileFactory.Compare.ConstReg_Neq<long> (), "ne");
+			testCompareConstReg ((l, r) => new LtOperatorNode (l, r), TileFactory.Compare.ConstReg_Lt<long> (), "l");
+			testCompareConstReg ((l, r) => new LteOperatorNode (l, r), TileFactory.Compare.ConstReg_Le<long> (), "le");
+			testCompareConstReg ((l, r) => new GtOperatorNode (l, r), TileFactory.Compare.ConstReg_Gt<long> (), "g");
+			testCompareConstReg ((l, r) => new GteOperatorNode (l, r), TileFactory.Compare.ConstReg_Ge<long> (), "ge");
+		}
 	}
 }
 

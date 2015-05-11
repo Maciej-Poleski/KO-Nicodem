@@ -44,6 +44,15 @@ namespace Nicodem.Backend.Cover
 					}
 				);
 			}
+
+			public static Tile ConstReg<T>() {
+				return makeBinopTile<AddOperatorNode, ConstantNode<T>, RegisterNode> (
+					(regNode, root, left, right) => new[] {
+						InstructionFactory.Move (regNode, left),  // res = left
+						InstructionFactory.Add (regNode, right)   // res = left + right
+					}
+				);
+			}
 		}
 
 		public static class Sub
@@ -59,6 +68,15 @@ namespace Nicodem.Backend.Cover
 				
 			public static Tile RegConst<T>() {
 				return makeBinopTile<SubOperatorNode, RegisterNode, ConstantNode<T>> (
+					(regNode, root, left, right) => new[] {
+						InstructionFactory.Move (regNode, left),  // res = left
+						InstructionFactory.Sub (regNode, right)   // res = left - right
+					}
+				);
+			}
+
+			public static Tile ConstReg<T>() {
+				return makeBinopTile<SubOperatorNode, ConstantNode<T>, RegisterNode> (
 					(regNode, root, left, right) => new[] {
 						InstructionFactory.Move (regNode, left),  // res = left
 						InstructionFactory.Sub (regNode, right)   // res = left - right
@@ -148,6 +166,15 @@ namespace Nicodem.Backend.Cover
 					}
 				);
 			}
+
+			public static Tile ConstReg<T>() {
+				return makeBinopTile<BitXorOperatorNode, ConstantNode<T>, RegisterNode> (
+					(regNode, root, left, right) => new[] {
+						InstructionFactory.Move (regNode, left),  // res = left
+						InstructionFactory.Xor (regNode, right)   // res = xor(left, right)
+					}
+				);
+			}
 		}
 
 		public static class LogAnd
@@ -169,6 +196,15 @@ namespace Nicodem.Backend.Cover
 					}
 				);
 			}
+
+			public static Tile ConstReg<T>() {
+				return makeBinopTile<LogAndOperatorNode, ConstantNode<T>, RegisterNode> (
+					(regNode, root, left, right) => new[] {
+						InstructionFactory.Move (regNode, left),  // res = left
+						InstructionFactory.And (regNode, right)   // res = left && right
+					}
+				);
+			}
 		}
 
 		public static class LogOr
@@ -184,6 +220,15 @@ namespace Nicodem.Backend.Cover
 
 			public static Tile RegConst<T>() {
 				return makeBinopTile<LogOrOperatorNode, RegisterNode, ConstantNode<T>> (
+					(regNode, root, left, right) => new[] {
+						InstructionFactory.Move (regNode, left),  // res = left
+						InstructionFactory.Or (regNode, right)   // res = left || right
+					}
+				);
+			}
+
+			public static Tile ConstReg<T>() {
+				return makeBinopTile<LogOrOperatorNode, ConstantNode<T>, RegisterNode> (
 					(regNode, root, left, right) => new[] {
 						InstructionFactory.Move (regNode, left),  // res = left
 						InstructionFactory.Or (regNode, right)   // res = left || right

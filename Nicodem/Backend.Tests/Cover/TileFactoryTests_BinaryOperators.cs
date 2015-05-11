@@ -70,6 +70,38 @@ namespace Nicodem.Backend.Tests
 			testBinopRegConst ((l, r) => new LogAndOperatorNode (l, r), TileFactory.LogAnd.RegConst<long> (), "and");
 			testBinopRegConst ((l, r) => new LogOrOperatorNode (l, r), TileFactory.LogOr.RegConst<long> (), "or");
 		}
+
+		static void testBinopConstReg( 
+			Func<ConstantNode<long>,RegisterNode,BinaryOperatorNode> condMaker, Tile tile, string mnemonik )
+		{
+			var l = new ConstantNode<long> (4L);
+			var r = new TemporaryNode ();
+			var binop = condMaker (l, r);
+
+			var map = TileFactoryTestUtils.createMapping ();
+			map.Add (r, TileFactoryTestUtils.RAX);
+
+			var instructions = tile.Cover (binop);
+			TileFactoryTestUtils.updateMapping (instructions, map);
+
+			var got = TileFactoryTestUtils.getASM (instructions, map);
+			var expected = 
+				"mov " + TileFactoryTestUtils.SPECIAL + ", 4\n" +
+				mnemonik + " " + TileFactoryTestUtils.SPECIAL + ", " + TileFactoryTestUtils.RAX + "\n";
+
+			Assert.AreEqual (expected, got);
+		}
+
+		[Test]
+		public void TestBinop_ConstReg() {
+			testBinopConstReg ((l, r) => new AddOperatorNode (l, r), TileFactory.Add.ConstReg<long> (), "add");
+			testBinopConstReg ((l, r) => new SubOperatorNode (l, r), TileFactory.Sub.ConstReg<long> (), "sub");
+			//testBinopConstReg ((l, r) => new ShlOperatorNode (l, r), TileFactory.Shl.ConstReg<long> (), "shl");
+			//testBinopConstReg ((l, r) => new ShrOperatorNode (l, r), TileFactory.Shr.ConstReg<long> (), "shr");
+			testBinopConstReg ((l, r) => new BitXorOperatorNode (l, r), TileFactory.BitXor.ConstReg<long> (), "xor");
+			testBinopConstReg ((l, r) => new LogAndOperatorNode (l, r), TileFactory.LogAnd.ConstReg<long> (), "and");
+			testBinopConstReg ((l, r) => new LogOrOperatorNode (l, r), TileFactory.LogOr.ConstReg<long> (), "or");
+		}
 	}
 }
 

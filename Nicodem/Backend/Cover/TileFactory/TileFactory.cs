@@ -30,16 +30,21 @@ namespace Nicodem.Backend.Cover
 
 				Add.RegReg(),
 				Add.RegConst<long>(),
+				Add.ConstReg<long>(),
 				Sub.RegReg(),
 				Sub.RegConst<long>(),
+				Sub.ConstReg<long>(),
 				Shl.RegConst<long>(),
 				Shr.RegConst<long>(),
 				BitXor.RegReg(),
 				BitXor.RegConst<long>(),
+				BitXor.ConstReg<long>(),
 				LogAnd.RegReg(),
 				LogAnd.RegConst<long>(),
+				LogAnd.ConstReg<long>(),
 				LogOr.RegReg(),
 				LogOr.RegConst<long>(),
+				LogOr.ConstReg<long>(),
 
 				Unop.Inc_Reg(),
 				Unop.Dec_Reg(),
@@ -60,6 +65,12 @@ namespace Nicodem.Backend.Cover
 				Compare.RegConst_Le<long>(),
 				Compare.RegConst_Gt<long>(),
 				Compare.RegConst_Ge<long>(),
+				Compare.ConstReg_Eq<long>(),
+				Compare.ConstReg_Neq<long>(),
+				Compare.ConstReg_Lt<long>(),
+				Compare.ConstReg_Le<long>(),
+				Compare.ConstReg_Gt<long>(),
+				Compare.ConstReg_Ge<long>(),
 
 				Assign.Reg_Reg(),
 				Assign.Reg_Const(),
@@ -82,7 +93,13 @@ namespace Nicodem.Backend.Cover
 				Jump.Cond_RegConst_Lt<long>(),
 				Jump.Cond_RegConst_Le<long>(),
 				Jump.Cond_RegConst_Gt<long>(),
-				Jump.Cond_RegConst_Ge<long>()
+				Jump.Cond_RegConst_Ge<long>(),
+				Jump.Cond_ConstReg_Eq<long>(),
+				Jump.Cond_ConstReg_Neq<long>(),
+				Jump.Cond_ConstReg_Lt<long>(),
+				Jump.Cond_ConstReg_Le<long>(),
+				Jump.Cond_ConstReg_Gt<long>(),
+				Jump.Cond_ConstReg_Ge<long>()
 			};
 		}
 

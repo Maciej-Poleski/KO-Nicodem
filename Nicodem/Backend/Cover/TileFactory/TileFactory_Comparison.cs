@@ -105,6 +105,45 @@ namespace Nicodem.Backend.Cover
 			}
 
 			#endregion
+
+			#region const - reg
+
+			static Tile compareConstReg<T, C>( string cond_type ) 
+				where T : BinaryOperatorNode
+			{
+				return compare<T,ConstantNode<C>,RegisterNode> (
+					(regNode, root, left, right) => new[] {
+						InstructionFactory.Cmp (left, right),
+						InstructionFactory.Set (cond_type, regNode)
+					}
+				);
+			}
+
+			public static Tile ConstReg_Lt<C>() {
+				return compareConstReg<LtOperatorNode, C> ("l");
+			}
+
+			public static Tile ConstReg_Le<C>() {
+				return compareConstReg<LteOperatorNode, C> ("le");
+			}
+
+			public static Tile ConstReg_Gt<C>() {
+				return compareConstReg<GtOperatorNode, C> ("g");
+			}
+
+			public static Tile ConstReg_Ge<C>() {
+				return compareConstReg<GteOperatorNode, C> ("ge");
+			}
+
+			public static Tile ConstReg_Eq<C>() {
+				return compareConstReg<EqOperatorNode, C> ("e");
+			}
+
+			public static Tile ConstReg_Neq<C>() {
+				return compareConstReg<NeqOperatorNode, C> ("ne");
+			}
+
+			#endregion
 		}
 	}
 }
