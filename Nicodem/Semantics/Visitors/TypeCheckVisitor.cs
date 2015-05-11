@@ -11,7 +11,6 @@ namespace Nicodem.Semantics.Visitors
     {
         List<WhileNode> _stack_of_while_node = new List<WhileNode>();
 
-
         //check if it is array type
         public override void Visit(ArrayNode node)
         {
@@ -144,20 +143,11 @@ namespace Nicodem.Semantics.Visitors
             node.ExpressionType = node.Value.ExpressionType;
         }
 
-        //every arguments has the same type and set type to the arguements type
-        public override void Visit(OperationNode node)
+        //rewrite Operator Type
+        public override void Visit(OperatorNode node)
         {
             base.Visit(node);
-            TypeNode argument_type = null;
-            foreach (var argument in node.Arguments)
-            {
-                if (argument_type != null && !TypeNode.Compare(argument_type, argument.ExpressionType))
-                    throw new TypeCheckException("Types are not the same.");
-                argument_type = argument.ExpressionType;
-            }
-            if (argument_type == null)
-                throw new TypeCheckException("Un recognized type of argument.");
-            node.ExpressionType = argument_type;
+            //node.ExpressionType = node.Operator;
         }
 
         //write type the same as in array node and check if Left and Right have int type
