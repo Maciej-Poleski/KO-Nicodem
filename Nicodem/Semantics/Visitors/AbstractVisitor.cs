@@ -67,10 +67,6 @@ namespace Nicodem.Semantics.Visitors
 			Visit (node as ExpressionNode);
 		}
 
-		public virtual void Visit(OperationNode node) {
-			Visit (node as ExpressionNode);
-		}
-
 		public virtual void Visit(SliceNode node) {
 			Visit (node as ExpressionNode);
 		}
@@ -99,7 +95,7 @@ namespace Nicodem.Semantics.Visitors
 		#endregion
 
 		public virtual void Visit(OperatorNode node) {
-			Visit (node as OperationNode);
+			Visit (node as ExpressionNode);
 		}
 	}
 }

@@ -143,11 +143,11 @@ namespace Nicodem.Semantics.Visitors
             node.ExpressionType = node.Value.ExpressionType;
         }
 
-        //rewrite Operator Type
+        //for every pair of arguments type should be proper types
         public override void Visit(OperatorNode node)
         {
             base.Visit(node);
-            //node.ExpressionType = node.Operator;
+            //TODO
         }
 
         //write type the same as in array node and check if Left and Right have int type
