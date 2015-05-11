@@ -12,6 +12,8 @@ namespace Nicodem.Semantics.ExpressionGraph
     {
         public ExpressionNode Expression { get; set; }
 
+        public Vertex() { }
+
         public Vertex(ExpressionNode expression)
         {
             Expression = expression;

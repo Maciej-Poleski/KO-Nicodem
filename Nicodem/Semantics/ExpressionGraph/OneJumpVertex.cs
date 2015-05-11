@@ -11,6 +11,8 @@ namespace Nicodem.Semantics.ExpressionGraph
     {
         public Vertex Jump { get; set; }
 
+        public OneJumpVertex() { }
+
         public OneJumpVertex(Vertex v_jump, ExpressionNode expression)
             : base(expression)
         {
