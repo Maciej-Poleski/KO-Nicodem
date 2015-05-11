@@ -4,9 +4,9 @@ using Nicodem.Backend.Cover;
 
 namespace Nicodem.Backend.Representation
 {
-    public abstract class Node : IValuable
+    public abstract class Node
     {
-        protected TemporaryNode _value;
+        protected TemporaryNode _temporaryRegister;
 
 		// optimumCovering consists of costs, tile covering the root and list of children under the tile.
 		Tuple<int, Tile, List<Node> > optimumCovering;
@@ -19,9 +19,9 @@ namespace Nicodem.Backend.Representation
         public Action<AbstractVisitor> Accept { get; private set; }
 
         // I can move it down inheritance hierarchy
-        public virtual RegisterNode Value
+        public RegisterNode TemporaryRegister
         {
-            get { return _value ?? (_value = new TemporaryNode()); }
+            get { return _temporaryRegister ?? (_temporaryRegister = new TemporaryNode()); }
         }
 
 		public virtual Node[] GetChildren () {

@@ -11,8 +11,6 @@
     <AssemblyName>Backend</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <ProductVersion>12.0.0</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -50,7 +48,6 @@
     <Compile Include="Representation\ConstantNode.cs" />
     <Compile Include="Representation\FunctionCallNode.cs" />
     <Compile Include="Representation\HardwareRegisterNode.cs" />
-    <Compile Include="Representation\IValuable.cs" />
     <Compile Include="Representation\LocationNode.cs" />
     <Compile Include="Representation\MemoryNode.cs" />
     <Compile Include="Representation\NodeMixin.cs" />

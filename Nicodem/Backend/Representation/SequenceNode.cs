@@ -11,9 +11,9 @@ namespace Nicodem.Backend.Representation
         {
             Sequence = sequence;
             NextNode = nextNode;
-			_value = value;
-			if(_value == null) {
-				_value = sequence.Last().Value as TemporaryNode;
+			_temporaryRegister = value;
+			if(_temporaryRegister == null) {
+				_temporaryRegister = sequence.Last().TemporaryRegister as TemporaryNode;
 			}
         }
 
@@ -35,9 +35,9 @@ namespace Nicodem.Backend.Representation
                     throw new InvalidOperationException("NextNode property is already initialized");
                 }
             };
-			_value = value;
+			_temporaryRegister = value;
 			if(value == null) {
-				_value = sequence.Last().Value as TemporaryNode;
+				_temporaryRegister = sequence.Last().TemporaryRegister as TemporaryNode;
 			}
         }
 

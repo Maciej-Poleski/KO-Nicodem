@@ -6,7 +6,6 @@ namespace Nicodem.Backend.Cover
 {
 	public class Tile
 	{
-		readonly RegisterNode temporaryRegister = new TemporaryNode ();
 		readonly Func<RegisterNode, Node, IEnumerable<Instruction>> instructionBuilder;
 
 		public int Cost { get; private set; }
@@ -20,7 +19,7 @@ namespace Nicodem.Backend.Cover
 		}
 
 		public IEnumerable<Instruction> Cover(Node node) {
-			return instructionBuilder (temporaryRegister, node);
+			return instructionBuilder (node.TemporaryRegister, node);
 		}
 	}
 }
