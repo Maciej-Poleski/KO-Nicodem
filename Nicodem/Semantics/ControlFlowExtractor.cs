@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nicodem.Semantics.Visitors
+namespace Nicodem.Semantics
 {
-    class ControlFlowVisititor
+    class ControlFlowExtractor
     {
     }
 }

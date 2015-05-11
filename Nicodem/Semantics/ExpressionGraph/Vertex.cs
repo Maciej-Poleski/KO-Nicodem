@@ -11,5 +11,10 @@ namespace Nicodem.Semantics.ExpressionGraph
     abstract class Vertex
     {
         public ExpressionNode Expression { get; set; }
+
+        public Vertex(ExpressionNode expression)
+        {
+            Expression = expression;
+        }
     }
 }

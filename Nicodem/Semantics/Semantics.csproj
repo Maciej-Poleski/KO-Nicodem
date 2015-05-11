@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AST\AtomNode.cs" />
+    <Compile Include="ControlFlowExtractor.cs" />
     <Compile Include="SideEffectExtractor.cs" />
     <Compile Include="ExpressionGraph\ReturnVertex.cs" />
     <Compile Include="ExpressionGraph\ConditionalJumpVertex.cs" />
@@ -81,7 +82,7 @@
     <Compile Include="AST\ElementNode.cs" />
     <Compile Include="Visitors\AbstractVisitor.cs" />
     <Compile Include="Visitors\AbstractRecursiveVisitor.cs" />
-    <Compile Include="Visitors\ControlFlowVisititor.cs" />
+    <Compile Include="Visitors\ControlFlowVisitor.cs" />
     <Compile Include="Visitors\SideEffectExtractorVisitor.cs" />
     <Compile Include="Visitors\FunctionSplitterVisitor.cs" />
     <Compile Include="Visitors\NestedUseVisitor.cs" />
