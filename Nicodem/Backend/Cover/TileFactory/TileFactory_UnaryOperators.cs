@@ -24,10 +24,14 @@ namespace Nicodem.Backend.Cover
 				);
 			}
 
-			/*
-			public static class LogNot
-			{
-			}*/
+			public static Tile LogNot_Reg() {
+				return makeUnopTile<LogNotOperatorNode, RegisterNode> (
+					(regNode, root, left) => new [] {
+						InstructionFactory.Cmp (left, new ConstantNode<long> (0L)),  // cmp(l, 0)
+						InstructionFactory.Sete (regNode)                            // if l = 0 then reg = 1 else reg = 0
+					}
+				);
+			}
 
 			public static Tile BinNot_Reg() {
 				return makeUnopTile<BinNotOperatorNode, RegisterNode> (

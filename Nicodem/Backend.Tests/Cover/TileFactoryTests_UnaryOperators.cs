@@ -120,6 +120,25 @@ namespace Nicodem.Backend.Tests
 
 			Assert.AreEqual (expected, got);
 		}
+
+		[Test]
+		public void Test_LogNot() {
+			var l = new TemporaryNode ();
+			var unary = new LogNotOperatorNode (l);
+
+			var map = TileFactoryTestUtils.createMapping ();
+			map.Add (l, TileFactoryTestUtils.RAX);
+
+			var instructions = TileFactory.Unop.LogNot_Reg().Cover (unary);
+			TileFactoryTestUtils.updateMapping (instructions, map);
+
+			var got = TileFactoryTestUtils.getASM (instructions, map);
+			var expected = 
+				"cmp " + TileFactoryTestUtils.RAX + ", 0\n" +
+				"sete " + TileFactoryTestUtils.SPECIAL + "\n";
+
+			Assert.AreEqual (expected, got);
+		}
 	}
 }
 
