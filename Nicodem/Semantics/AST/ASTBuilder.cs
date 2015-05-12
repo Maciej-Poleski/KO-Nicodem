@@ -119,7 +119,7 @@ namespace Nicodem.Semantics.AST
         /// <summary>
         /// Build AST tree from the given parse tree.
         /// </summary>
-        public Node BuildAST<TSymbol>(IParseTree<TSymbol> parseTree) where TSymbol:ISymbol<TSymbol>
+        public ProgramNode BuildAST<TSymbol>(IParseTree<TSymbol> parseTree) where TSymbol:ISymbol<TSymbol>
         {
             var programNode = new ProgramNode();
             programNode.BuildNode(parseTree);
