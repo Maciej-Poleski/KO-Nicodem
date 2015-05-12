@@ -68,7 +68,9 @@ namespace Nicodem.Parser
 				var trans = node.Transitions;
 				var ind = parseState.TransitionIndex;
 				for(; ind < trans.Count; ind++) {
-
+					if(GrammarUtils<TSymbol>.IsDead(trans[ind].Value)) {
+						continue;
+					}
                     if(_grammar.InFirstPlus(trans[ind].Key, currentSymbol)) {
 						if(trans[ind].Key.IsTerminal) {
 
