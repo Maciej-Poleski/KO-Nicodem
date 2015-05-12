@@ -18,7 +18,7 @@ namespace Nicodem.Semantics
             return visitor.Trees;
         }
 
-        IEnumerable<ExpressionGraph.Vertex> Extract(IEnumerable<Vertex> graph)
+        internal IEnumerable<Vertex> Extract(IEnumerable<Vertex> graph)
         {
             var vertexLists = new Dictionary<Vertex, List<Vertex>>();
             foreach (var vertex in graph) {
