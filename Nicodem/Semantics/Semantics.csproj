@@ -50,8 +50,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AST\AtomNode.cs" />
-    <Compile Include="ControlFlowExtractor.cs" />
-    <Compile Include="SideEffectExtractor.cs" />
     <Compile Include="ExpressionGraph\ReturnVertex.cs" />
     <Compile Include="ExpressionGraph\ConditionalJumpVertex.cs" />
     <Compile Include="ExpressionGraph\OneJumpVertex.cs" />
@@ -97,6 +95,9 @@
     <Compile Include="Visitors\FunctionLocalVisitor.cs" />
     <Compile Include="Backend\BackendBuilder.cs" />
     <Compile Include="Backend\NodeBuilder.cs" />
+    <Compile Include="Frontend.cs" />
+    <Compile Include="Extractors\ControlFlowExtractor.cs" />
+    <Compile Include="Extractors\SideEffectExtractor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -135,4 +136,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Extractors\" />
+  </ItemGroup>
 </Project>

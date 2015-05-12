@@ -11,6 +11,8 @@
     <AssemblyName>Backend</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <ProductVersion>12.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -57,11 +59,6 @@
     <Compile Include="Representation\SequenceNode.cs" />
     <Compile Include="Representation\TemporaryNode.cs" />
     <Compile Include="Representation\UnaryOperatorNode.cs" />
-    <Compile Include="Temporary.cs" />
-    <Compile Include="Location.cs" />
-    <Compile Include="Function.cs" />
-    <Compile Include="Local.cs" />
-    <Compile Include="Target.cs" />
     <Compile Include="Cover\Instruction.cs" />
     <Compile Include="Cover\Tile.cs" />
     <Compile Include="Cover\TileFactory\TileFactory.cs" />
@@ -78,6 +75,13 @@
     <Compile Include="Cover\TileFactory\TileFactory_Jumps.cs" />
     <Compile Include="Builder\RegisterAllocator.cs" />
     <Compile Include="Builder\TemporariesGraph.cs" />
+    <Compile Include="Builder\Builder.cs" />
+    <Compile Include="Backend.cs" />
+    <Compile Include="Data\Function.cs" />
+    <Compile Include="Data\Local.cs" />
+    <Compile Include="Data\Location.cs" />
+    <Compile Include="Data\Target.cs" />
+    <Compile Include="Data\Temporary.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -93,5 +97,6 @@
     <Folder Include="Cover\TileFactory\" />
     <Folder Include="Trace\" />
     <Folder Include="Builder\" />
+    <Folder Include="Data\" />
   </ItemGroup>
 </Project>
