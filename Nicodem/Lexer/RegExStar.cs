@@ -27,7 +27,9 @@ namespace Nicodem.Lexer
 
 		public override string ToString ()
 		{
-			return string.Format ("({0})*", Regex);
+			return isRegExComplex (Regex)
+				? string.Format ("({0})*", Regex)
+				: string.Format ("{0}*", Regex);
 		}
 
 		public override bool HasEpsilon()

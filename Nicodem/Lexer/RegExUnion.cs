@@ -37,12 +37,18 @@ namespace Nicodem.Lexer
 
             return 0;
         }
-
+			
 		public override string ToString ()
 		{
 			var builder = new StringBuilder ();
-			foreach (var r in Regexes)
-				builder.Append ("(").Append (r).Append (") | ");
+			for (var i = 0; i < Regexes.Length; ++i) {
+				if (isRegExComplex (Regexes [i]))
+					builder.Append ("(").Append (Regexes [i]).Append (")");
+				else
+					builder.Append (Regexes [i]);
+				if (i + 1 < Regexes.Length)
+					builder.Append (" | ");
+			}
 			return builder.ToString ();
 		}
 

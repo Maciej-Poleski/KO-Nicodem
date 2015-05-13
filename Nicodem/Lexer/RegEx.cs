@@ -62,6 +62,19 @@ namespace Nicodem.Lexer
 			return string.Format ("RegEx ");
 		}
 
+		protected bool isRegExComplex( RegEx<T> r ) {
+			var intersection = r as RegExIntersection<T>;
+			var union = r as RegExUnion<T>;
+
+			if (intersection != null)
+				return intersection.Regexes.Length > 1;
+
+			if (union != null)
+				return union.Regexes.Length > 1;
+
+			return false;
+		}
+
         #endregion
 
 		public static RegEx<N> Convert<N>(RegEx<T> regex, Func<T, N> converter)

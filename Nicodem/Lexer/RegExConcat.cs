@@ -38,7 +38,10 @@ namespace Nicodem.Lexer
 		{
 			var builder = new StringBuilder ();
 			foreach (var r in Regexes)
-				builder.Append ("(").Append (r).Append (")");
+				if (isRegExComplex (r))
+					builder.Append ("(").Append (r).Append (")");
+				else
+					builder.Append (r);
 			return builder.ToString ();
 		}
 
