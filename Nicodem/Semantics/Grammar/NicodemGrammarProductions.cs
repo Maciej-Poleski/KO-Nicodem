@@ -208,19 +208,19 @@ namespace Nicodem.Semantics.Grammar
         private static readonly string NameWithoutOperators = NameBase.RemoveInfixes(PreparedOperators);
 
         // Literal values (atomic expression)
-        private static readonly TokenCategory DecimalNumberLiteral = "[:digit:]+"; // Only decimal number literals for now
-        private static readonly TokenCategory CharacterLiteral = "'(\\\\[:print:])|[^']'";
-        private static readonly TokenCategory StringLiteral = "\"((\\\\.)|[^\"])*\"";
+        private static readonly TokenCategory DecimalNumberLiteralToken = "[:digit:]+"; // Only decimal number literals for now
+        private static readonly TokenCategory CharacterLiteralToken = "'(\\\\[:print:])|[^']'";
+        private static readonly TokenCategory StringLiteralToken = "\"((\\\\.)|[^\"])*\"";
         // String literal is delimited by not escaped " character
-        private static readonly TokenCategory BooleanLiteral = "true|false";
+        private static readonly TokenCategory BooleanLiteralToken = "true|false";
 
-        private static readonly TokenCategory[] Literals =
+        private static readonly TokenCategory[] LiteralTokens =
         {
-            DecimalNumberLiteral, CharacterLiteral, StringLiteral,
-            BooleanLiteral
+            DecimalNumberLiteralToken, CharacterLiteralToken, StringLiteralToken,
+            BooleanLiteralToken
         };
 
-        private static readonly string NameWithoutOperatorsAndValues = RemoveCases(NameWithoutOperators, Literals);
+        private static readonly string NameWithoutOperatorsAndValues = RemoveCases(NameWithoutOperators, LiteralTokens);
 
         private static readonly TokenCategory TypeName = NameWithoutOperatorsAndValues;
         private static readonly TokenCategory ObjectName = TypeName;    // Important - get the same symbol
@@ -639,6 +639,12 @@ namespace Nicodem.Semantics.Grammar
 
         #region Productions
 
+        private static readonly UniversalSymbol DecimalNumberLiteral = NewNonterminal();
+        private static readonly UniversalSymbol CharacterLiteral = NewNonterminal();
+        private static readonly UniversalSymbol StringLiteral = NewNonterminal();
+        private static readonly UniversalSymbol BooleanLiteral = NewNonterminal();
+        private static readonly UniversalSymbol Literals = NewNonterminal();
+
         private static UniversalSymbol TypeSpecifier = NewNonterminal();
         private static UniversalSymbol ObjectDeclaration = NewNonterminal();
         private static UniversalSymbol BlockExpression = NewNonterminal();
@@ -675,6 +681,12 @@ namespace Nicodem.Semantics.Grammar
 
         static NicodemGrammarProductions()
         {
+            DecimalNumberLiteral.SetProduction(DecimalNumberLiteralToken);
+            CharacterLiteral.SetProduction(CharacterLiteralToken);
+            StringLiteral.SetProduction(StringLiteralToken);
+            BooleanLiteral.SetProduction(BooleanLiteralToken);
+            Literals.SetProduction(DecimalNumberLiteral + CharacterLiteral + StringLiteral + BooleanLiteral);
+
             Program.SetProduction(Function.Star);
             Function.SetProduction(ObjectName * "("  * ParametersList * ")" * "->" * TypeSpecifier * Expression);
             ParametersList.SetProduction(((ObjectDeclaration * ",").Star * ObjectDeclaration).Optional);
@@ -712,7 +724,7 @@ namespace Nicodem.Semantics.Grammar
             BlockExpression.SetProduction("{" * Expression.Star * "}");   // No left-recursion thanks to '{'
             ObjectDefinitionExpression.SetProduction(TypeSpecifier * ObjectName * "=" * Expression);  // NOTE: "=" is _not_ an assignment operator here
             ArrayLiteralExpression.SetProduction("[" * (Expression * ",").Star * Expression.Optional * "]");
-            ObjectUseExpression.SetProduction(ObjectName + RegexSymbol.MakeUnion(Literals));
+            ObjectUseExpression.SetProduction(ObjectName + Literals);
             IfExpression.SetProduction("if" * Expression * Expression * ("else" * Expression).Optional);  // FIXME: if should be an operator
             WhileExpression.SetProduction("while" * Expression * Expression * ("else" * Expression).Optional);    // the same here?
             LoopControlExpression.SetProduction(("break".Token() + "continue") * (Expression * DecimalNumberLiteral.Optional).Optional);
