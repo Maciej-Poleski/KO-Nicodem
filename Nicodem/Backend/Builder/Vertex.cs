@@ -2,7 +2,7 @@
 using Nicodem.Backend.Representation;
 using System.Collections.Generic;
 
-namespace Nicodem.Backend
+namespace Nicodem.Backend.Builder
 {
 	public class Vertex
 	{

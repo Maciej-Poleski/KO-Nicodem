@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Nicodem.Backend.Builder
 {
-    public class TemporariesGraph
+	public class TemporariesGraph
     {
         public TemporariesGraph()
         {

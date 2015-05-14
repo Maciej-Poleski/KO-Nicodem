@@ -11,6 +11,7 @@ namespace Nicodem.Backend.Builder
 		}
 
 		public TemporariesGraph AnalyzeLiveness(List<Instruction> instructions) {
+			throw new NotImplementedException();
 		}
 	}
 }
