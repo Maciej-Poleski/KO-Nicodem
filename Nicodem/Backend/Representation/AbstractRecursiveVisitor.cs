@@ -97,6 +97,26 @@
 			Visit (node as UnaryOperatorNode);
 		}
 
+		public override void Visit (UnaryPlusOperatorNode node)
+		{
+			Visit (node as UnaryOperatorNode);
+		}
+
+		public override void Visit (UnaryMinusOperatorNode node)
+		{
+			Visit (node as UnaryOperatorNode);
+		}
+
+		public override void Visit (IncOperatorNode node)
+		{
+			Visit (node as UnaryOperatorNode);
+		}
+
+		public override void Visit (DecOperatorNode node)
+		{
+			Visit (node as UnaryOperatorNode);
+		}
+
 		#endregion
 
 		#region BinaryOperatorNode subclasses
