@@ -21,7 +21,7 @@ namespace Nicodem.Backend.Tests
 			TileFactoryTestUtils.updateMapping (instructions, map);
 
 			var got = TileFactoryTestUtils.getASM (instructions, map);
-			var expected = "jmp " + lbl.Label;
+			var expected = "jmp " + lbl.Label + "\n";
 
 			Assert.AreEqual (expected, got);
 		}
@@ -43,7 +43,7 @@ namespace Nicodem.Backend.Tests
 
 			var got = TileFactoryTestUtils.getASM (instructions, map);
 			var expected = "cmp " + TileFactoryTestUtils.RAX + ", " + TileFactoryTestUtils.RBX + "\n" +
-				"j" + cond_type + " " + lbl.Label;
+			               "j" + cond_type + " " + lbl.Label + "\n";
 
 			Assert.AreEqual (expected, got);
 		}
@@ -73,8 +73,8 @@ namespace Nicodem.Backend.Tests
 			TileFactoryTestUtils.updateMapping (instructions, map);
 
 			var got = TileFactoryTestUtils.getASM (instructions, map);
-			var expected = "cmp " + TileFactoryTestUtils.RAX + ", 10\n" +
-			               "j" + cond_type + " " + lbl.Label;
+			var expected = "cmp " + TileFactoryTestUtils.RAX + ", 15\n" +
+			               "j" + cond_type + " " + lbl.Label + "\n";
 
 			Assert.AreEqual (expected, got);
 		}
@@ -105,8 +105,8 @@ namespace Nicodem.Backend.Tests
 
 			var got = TileFactoryTestUtils.getASM (instructions, map);
 			var expected = 
-				"cmp 10, " + TileFactoryTestUtils.RAX + "\n" +
-				"j" + cond_type + " " + lbl.Label;
+				"cmp 15, " + TileFactoryTestUtils.RAX + "\n" +
+				"j" + cond_type + " " + lbl.Label + "\n";
 
 			Assert.AreEqual (expected, got);
 		}
