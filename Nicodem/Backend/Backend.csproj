@@ -11,8 +11,6 @@
     <AssemblyName>Backend</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <ProductVersion>12.0.0</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -82,6 +80,8 @@
     <Compile Include="Data\Location.cs" />
     <Compile Include="Data\Target.cs" />
     <Compile Include="Data\Temporary.cs" />
+    <Compile Include="Builder\Vertex.cs" />
+    <Compile Include="Builder\LivenessAnalysis.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
