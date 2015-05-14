@@ -27,5 +27,22 @@ namespace Nicodem.Source.Tests
             sd.PrintMessage("warning", fr, "found an error in your source");
             Assert.AreEqual(res, "warning at line 1:4 \"Error\" - found an error in your source");
         }
+
+        [Test]
+        public void PrintFragmentInLineTest()
+        {
+            string source = "OK. Error in line 1\nLine 2.";
+            IOriginReader reader = new StringOrigin(source).GetReader();
+            for (int i = 0; i < 4; i++)
+                reader.MoveNext(); // 'OK. '
+            ILocation locBeg = reader.CurrentLocation;
+            for (int i = 0; i < 5; i++)
+                reader.MoveNext(); // 'Error'
+            ILocation locEnd = reader.CurrentLocation;
+            IFragment fr = locBeg.Origin.MakeFragment(locBeg, locEnd);
+
+            SourceDiagnostic sd = new SourceDiagnostic();
+            sd.PrintFragmentInLine(fr);
+        }
     }
 }
