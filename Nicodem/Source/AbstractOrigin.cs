@@ -74,5 +74,10 @@ namespace Nicodem.Source
                 return sb.ToString();
             }
         }
+
+        public string GetLine(int lineNumber)
+        {
+            return sourceLines[lineNumber - 1];
+        }
     }
 }

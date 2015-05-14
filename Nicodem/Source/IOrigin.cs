@@ -15,5 +15,7 @@
         IFragment MakeFragment(ILocation from, ILocation to);
 
         string GetText(IFragment fragment);
+
+        string GetLine(int lineNumber);
     }
 }
