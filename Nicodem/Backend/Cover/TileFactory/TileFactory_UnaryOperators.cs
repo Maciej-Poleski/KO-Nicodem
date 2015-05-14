@@ -70,7 +70,7 @@ namespace Nicodem.Backend.Cover
 			}
 
 			public static Tile Inc_Reg() {
-				return makeUnopTile<NegOperatorNode, RegisterNode> (
+				return makeUnopTile<IncOperatorNode, RegisterNode> (
 					(regNode, root, left) => new [] {
 						InstructionFactory.Inc (left),
 						InstructionFactory.Move (regNode, left)
@@ -79,7 +79,7 @@ namespace Nicodem.Backend.Cover
 			}
 
 			public static Tile Dec_Reg() {
-				return makeUnopTile<NegOperatorNode, RegisterNode> (
+				return makeUnopTile<DecOperatorNode, RegisterNode> (
 					(regNode, root, left) => new [] {
 						InstructionFactory.Dec (left),
 						InstructionFactory.Move (regNode, left)
