@@ -11,11 +11,11 @@ namespace Nicodem.Semantics
 {
     class ControlFlowExtractor
     {
-        public Vertex Extract(ExpressionNode root)
+        public IEnumerable<Vertex> Extract(ExpressionNode root)
         {
             var visitor = new ControlFlowVisitor();
             visitor.Visit(root);
-            return visitor.Start;
+            return visitor.Graph;
         }
     }
 }

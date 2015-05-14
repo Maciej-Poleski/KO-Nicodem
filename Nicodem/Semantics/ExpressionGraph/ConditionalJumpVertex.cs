@@ -17,5 +17,7 @@ namespace Nicodem.Semantics.ExpressionGraph
             TrueJump = v_true;
             FalseJump = v_false;
         }
+
+        public ConditionalJumpVertex() { }
     }
 }
