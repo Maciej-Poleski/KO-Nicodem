@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using B = Nicodem.Backend;
 using Brep = Nicodem.Backend.Representation;
@@ -9,9 +10,9 @@ namespace Nicodem.Semantics
 	class BackendBuilder
 	{
 
-		public static Brep.Node BuildBackend(Vertex expVertex, B.Function function)
+		public static Brep.Node BuildBackend(IEnumerable<Vertex> expGraph, B.Function function)
 		{
-			return (new DFSBuilder(function)).Build(expVertex);
+			return (new DFSBuilder(function)).Build(expGraph.First());
 		}
 
 
