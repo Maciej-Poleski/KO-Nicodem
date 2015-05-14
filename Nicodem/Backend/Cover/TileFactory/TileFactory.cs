@@ -216,9 +216,9 @@ namespace Nicodem.Backend.Cover
 							};
 						case 1L:
 							return new [] {
-								new Instruction (
+								Instruction.CopyInstruction (
 									map => string.Format("mov {0}, {1}", map[dst], map[mul_reg]),
-									use(dst, mul_reg), define(dst), true),
+									use(dst, mul_reg), define(dst)),
 								InstructionFactory.Move( regNode, dst )
 							};
 						case 0L:

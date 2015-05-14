@@ -51,6 +51,7 @@
     <Compile Include="Cover\TileFactoryTests_BinaryOperators.cs" />
     <Compile Include="Cover\TileFactoryTests_Assignment.cs" />
     <Compile Include="Cover\TileFactoryTests.cs" />
+    <Compile Include="Cover\InstructionFactoryTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

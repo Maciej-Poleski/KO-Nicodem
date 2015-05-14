@@ -3,6 +3,7 @@ using Nicodem.Backend.Representation;
 using Nicodem.Backend.Cover;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 
 namespace Nicodem.Backend.Tests
 {

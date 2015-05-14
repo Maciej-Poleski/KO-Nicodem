@@ -1,6 +1,8 @@
 ﻿using NUnit.Framework;
 using Nicodem.Backend.Representation;
 using Nicodem.Backend.Cover;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Nicodem.Backend.Tests
 {
@@ -18,6 +20,26 @@ namespace Nicodem.Backend.Tests
 			var got = TileFactoryTestUtils.getASM (instructions, map);
 			var expected = 
 				"mov " + TileFactoryTestUtils.SPECIAL + ", 123\n";
+
+			Assert.AreEqual (expected, got);
+		}
+
+		[Test]
+		public void Test_Label() {
+			var node = new LabelNode ("myLabel");
+
+			var map = TileFactoryTestUtils.createMapping ();
+			var instructions = TileFactory.LabelTile ().Cover (node);
+			TileFactoryTestUtils.updateMapping (instructions, map);
+
+			var insn = instructions.ToArray () [0];
+			Assert.IsFalse (insn.IsCopyInstruction);
+			Assert.IsFalse (insn.IsJumpInstruction);
+			Assert.IsTrue (insn.IsLabel);
+			Assert.AreEqual (node.Label, insn.Label);
+
+			var got = TileFactoryTestUtils.getASM (instructions, map);
+			var expected = node.Label + ":\n";
 
 			Assert.AreEqual (expected, got);
 		}
