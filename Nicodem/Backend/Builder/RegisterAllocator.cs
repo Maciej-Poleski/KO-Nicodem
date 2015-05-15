@@ -10,7 +10,7 @@ namespace Nicodem.Backend.Builder
         {
         }
 
-        public bool AllocateRegisters(TemporariesGraph interferenceGraph, TemporariesGraph copiesGraph, int availableRegisters){
+        public bool AllocateRegisters(TemporariesGraph interferenceGraph, int availableRegisters){
             throw new NotImplementedException();
         }
 
