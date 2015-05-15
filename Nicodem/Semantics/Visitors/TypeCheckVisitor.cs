@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Nicodem.Semantics.AST;
-using Nicodem.Semantics.AST.OperatorType;
 
 namespace Nicodem.Semantics.Visitors
 {

@@ -13,7 +13,7 @@ namespace Nicodem.Semantics.Visitors
         List<Vertex> nodes_to_next_jmp = new List<Vertex>();
         Dictionary<ExpressionNode, ExpressionNode> changed_nodes = new Dictionary<ExpressionNode, ExpressionNode>();
         private int temporary_counter = 0;
-        public List<Vertex> Graph { public get; private set; }
+        public List<Vertex> Graph { get; private set; }
 
         private void AddNextJump(Vertex next_vertex)
         {

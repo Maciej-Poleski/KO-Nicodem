@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Nicodem.Semantics.AST;
+using Nicodem.Backend;
 
 namespace Nicodem.Semantics.Visitors
 {
@@ -27,6 +29,12 @@ namespace Nicodem.Semantics.Visitors
             var visitor = new FunctionSplitterVisitor();
             node.Accept(visitor);
             return visitor.Functions;
+        }
+
+        internal static IReadOnlyList<Tuple<Function,ExpressionNode>> SplitIntoFunctions(
+            this ProgramNode node)
+        {
+            throw new NotImplementedException("Please, implement me!");
         }
     }
 }
