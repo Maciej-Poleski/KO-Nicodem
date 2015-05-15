@@ -54,13 +54,16 @@ namespace Nicodem.Semantics.Visitors
         {
             base.Visit(node);
 
-            VariableDefNode t_then = new VariableDefNode();
-            t_then.Name = "T" + temporary_counter;
-            VariableUseNode t_then_use = new VariableUseNode();
-            t_then_use.Declaration = t_then;
-            t_then_use.Name = "T" + temporary_counter;
+            VariableDeclNode t = new VariableDeclNode();
+            t.Name = "T" + temporary_counter;
+            VariableUseNode t_use = new VariableUseNode();
+            t_use.Declaration = t;
+            t_use.Name = "T" + temporary_counter;
 
-            OneJumpVertex then_vertex = new OneJumpVertex(null, node.Then); //TODO T1 = then.Expression
+            OperatorNode assign_then = new OperatorNode();
+            assign_then.Operator = OperatorType.ASSIGN;
+            assign_then.Arguments = new List<ExpressionNode> { t_use, node.Then };
+            OneJumpVertex then_vertex = new OneJumpVertex(null, assign_then);
             graph_vertex.Add(then_vertex);
 
             ConditionalJumpVertex condition_vertex = new ConditionalJumpVertex(then_vertex, null, node.Condition);
@@ -71,7 +74,10 @@ namespace Nicodem.Semantics.Visitors
 
             if (node.HasElse)
             {
-                OneJumpVertex else_vertex = new OneJumpVertex(null, node.Else); //TODO T1 = else.Expression
+                OperatorNode assign_else = new OperatorNode();
+                assign_else.Operator = OperatorType.ASSIGN;
+                assign_else.Arguments = new List<ExpressionNode> { t_use, node.Else };
+                OneJumpVertex else_vertex = new OneJumpVertex(null, assign_else);
                 graph_vertex.Add(else_vertex);
                 nodes_to_next_jmp.Add(else_vertex);
                 condition_vertex.FalseJump = else_vertex;
@@ -80,8 +86,7 @@ namespace Nicodem.Semantics.Visitors
                 nodes_to_next_jmp.Add(condition_vertex);
             }
 
-            //vertex z T1
-            changed_nodes[node] = null; //TODO zmiana na T1
+            changed_nodes[node] = t_use;
             temporary_counter++;
         }
 
