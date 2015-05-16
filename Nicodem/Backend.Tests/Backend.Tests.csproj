@@ -52,6 +52,7 @@
     <Compile Include="Cover\TileFactoryTests_Assignment.cs" />
     <Compile Include="Cover\TileFactoryTests.cs" />
     <Compile Include="Cover\InstructionFactoryTests.cs" />
+    <Compile Include="InstructionSelection\CompareNodeWithTileTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -75,5 +76,6 @@
   -->
   <ItemGroup>
     <Folder Include="Cover\" />
+    <Folder Include="InstructionSelection\" />
   </ItemGroup>
 </Project>
