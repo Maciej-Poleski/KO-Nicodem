@@ -14,11 +14,16 @@ namespace Nicodem.Backend
             _offsetFromStackFrame = offset;
         }
 
-        public override LocationNode AccessLocal(Function function)
+        public override LocationNode AccessLocal(Function function, LocationNode stackFrame)
         {
-            if (function != _owningFunction)
-                throw new NotImplementedException();
-            return new MemoryNode(new SubOperatorNode(Target.RBP, new ConstantNode<long>(_offsetFromStackFrame)));
+            if (function == _owningFunction)
+            {
+                return new MemoryNode(new SubOperatorNode(stackFrame, new ConstantNode<long>(_offsetFromStackFrame)));
+            }
+            else
+            {
+                return AccessLocal(function.EnclosedIn,function.GetEnclosingFunctionStackFrame());
+            }
         }
     }
 }

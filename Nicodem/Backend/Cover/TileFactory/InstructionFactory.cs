@@ -26,17 +26,16 @@ namespace Nicodem.Backend.Cover
 		}
 
 		public static Instruction Label( LabelNode label ) {
-			return new Instruction (
-				map => string.Format ("{0}:", label.Label),
-				use (), define ());
+			return Instruction.LabelInstruction (
+				map => string.Format ("{0}:", label.Label), label.Label);
 		}
 
 		#region mov
 
 		public static Instruction Move( RegisterNode dst, RegisterNode src ) {
-			return new Instruction (
+			return Instruction.CopyInstruction (
 				map => string.Format ("mov {0}, {1}", map [dst], map [src]),
-				use (src, dst), define (dst), true);
+				use (src, dst), define (dst));
 		}
 
 		public static Instruction Move<T>( RegisterNode dst, ConstantNode<T> c ) {
@@ -253,9 +252,9 @@ namespace Nicodem.Backend.Cover
 		#region jump
 
 		public static Instruction Jump( string cond_type, LabelNode label ) {
-			return new Instruction (
+			return Instruction.JumpInstruction (
 				map => string.Format ("j{0} {1}", cond_type, label.Label),
-				use (), define ());
+				use (), define (), label.Label);
 		}
 
 		public static Instruction Jmp( LabelNode label ) {

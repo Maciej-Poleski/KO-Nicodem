@@ -147,7 +147,115 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(OperatorNode node)
         {
             base.Visit(node);
-            //TODO
+            List<ExpressionNode> arguments_list = new List<ExpressionNode>(node.Arguments);
+            switch (node.Operator)
+            {
+                // =
+                case OperatorType.ASSIGN:
+                    if (arguments_list.Count() != 2)
+                        throw new TypeCheckException("Inproper numbers of arguments.");
+                    if (!TypeNode.Compare(arguments_list[0].ExpressionType, arguments_list[1].ExpressionType))
+                        throw new TypeCheckException("Wrong argument type.");
+                    node.ExpressionType = arguments_list[0].ExpressionType;
+                    break;
+                // + - * / % += -= *= /= %= 
+                case OperatorType.PLUS:
+                case OperatorType.MINUS:
+                case OperatorType.MUL:
+                case OperatorType.DIV:
+                case OperatorType.MOD:
+                case OperatorType.PLUS_ASSIGN:
+                case OperatorType.MINUS_ASSIGN:
+                case OperatorType.MUL_ASSIGN:
+                case OperatorType.DIV_ASSIGN:
+                case OperatorType.MOD_ASSIGN:
+                    if (arguments_list.Count() != 2)
+                        throw new TypeCheckException("Inproper numbers of arguments.");
+                    if (!TypeNode.Compare(arguments_list[0].ExpressionType, NamedTypeNode.IntType()) || !TypeNode.Compare(arguments_list[1].ExpressionType, NamedTypeNode.IntType()))
+                        throw new TypeCheckException("Wrong argument type.");
+                    node.ExpressionType = NamedTypeNode.IntType();
+                    break;
+                // << >> <<= >>= 
+                case OperatorType.BIT_SHIFT_UP:
+                case OperatorType.BIT_SHIFT_DOWN:
+                case OperatorType.BIT_SHIFT_UP_ASSIGN:
+                case OperatorType.BIT_SHIFT_DOWN_ASSIGN:
+                    if (arguments_list.Count() != 2)
+                        throw new TypeCheckException("Inproper numbers of arguments.");
+                    if (!TypeNode.Compare(arguments_list[0].ExpressionType, NamedTypeNode.ByteType()) || !TypeNode.Compare(arguments_list[1].ExpressionType, NamedTypeNode.IntType()))
+                        throw new TypeCheckException("Wrong argument type.");
+                    node.ExpressionType = NamedTypeNode.ByteType();
+                    break;
+                //| ^ & 
+                case OperatorType.BIT_OR:
+                case OperatorType.BIT_XOR:
+                case OperatorType.BIT_AND:
+                    foreach (var argument in node.Arguments)
+                        if (!TypeNode.Compare(argument.ExpressionType, NamedTypeNode.ByteType()))
+                            throw new TypeCheckException("Wrong argument type.");
+                    node.ExpressionType = NamedTypeNode.ByteType();
+                    break;
+                //&= ^= |=
+                case OperatorType.BIT_AND_ASSIGN:
+                case OperatorType.BIT_XOR_ASSIGN:
+                case OperatorType.BIT_OR_ASSIGN:
+                    if (arguments_list.Count() != 2)
+                        throw new TypeCheckException("Inproper numbers of arguments.");
+                    if (!TypeNode.Compare(arguments_list[0].ExpressionType, NamedTypeNode.ByteType()) || !TypeNode.Compare(arguments_list[1].ExpressionType, NamedTypeNode.ByteType()))
+                        throw new TypeCheckException("Wrong argument type.");
+                    node.ExpressionType = NamedTypeNode.ByteType();
+                    break;
+                // || && 
+                case OperatorType.OR:
+                case OperatorType.AND:
+                    foreach (var argument in node.Arguments)
+                        if (!TypeNode.Compare(argument.ExpressionType, NamedTypeNode.BoolType()))
+                            throw new TypeCheckException("Wrong argument type.");
+                    node.ExpressionType = NamedTypeNode.BoolType();
+                    break;
+                // ==!= < <= > >=
+                case OperatorType.EQUAL:
+                case OperatorType.NOT_EQUAL:
+                case OperatorType.LESS:
+                case OperatorType.LESS_EQUAL:
+                case OperatorType.GREATER:
+                case OperatorType.GREATER_EQUAL:
+                    if (arguments_list.Count() != 2)
+                        throw new TypeCheckException("Inproper numbers of arguments.");
+                    if (!TypeNode.Compare(arguments_list[0].ExpressionType, NamedTypeNode.IntType()) || !TypeNode.Compare(arguments_list[1].ExpressionType, NamedTypeNode.IntType()))
+                        throw new TypeCheckException("Wrong argument type.");
+                    node.ExpressionType = NamedTypeNode.BoolType();
+                    break;
+                // PRE ++ -- + -
+                case OperatorType.PRE_INCREMENT:
+                case OperatorType.PRE_DECREMENT:
+                case OperatorType.UNARY_PLUS:
+                case OperatorType.UNARY_MINUS:
+                    if (arguments_list.Count() != 1)
+                        throw new TypeCheckException("Inproper numbers of arguments.");
+                    if (!TypeNode.Compare(arguments_list[0].ExpressionType, NamedTypeNode.IntType()))
+                        throw new TypeCheckException("Wrong argument type.");
+                    node.ExpressionType = NamedTypeNode.IntType();
+                    break;
+                // PRE ! ~
+                case OperatorType.NOT:
+                case OperatorType.BIT_NOT:
+                    if (arguments_list.Count() != 1)
+                        throw new TypeCheckException("Inproper numbers of arguments.");
+                    if (!TypeNode.Compare(arguments_list[0].ExpressionType, NamedTypeNode.ByteType()))
+                        throw new TypeCheckException("Wrong argument type.");
+                    node.ExpressionType = NamedTypeNode.ByteType();
+                    break;
+                // POST ++ --
+                case OperatorType.POST_INCREMENT:
+                case OperatorType.POST_DECREMENT:
+                    if (arguments_list.Count() != 1)
+                        throw new TypeCheckException("Inproper numbers of arguments.");
+                    if (!TypeNode.Compare(arguments_list[0].ExpressionType, NamedTypeNode.IntType()))
+                        throw new TypeCheckException("Wrong argument type.");
+                    node.ExpressionType = NamedTypeNode.IntType();
+                    break;
+            }
         }
 
         //write type the same as in array node and check if Left and Right have int type
@@ -159,6 +267,7 @@ namespace Nicodem.Semantics.Visitors
             if (!TypeNode.Compare(NamedTypeNode.IntType(), node.Right.ExpressionType))
                 throw new TypeCheckException("Right is not int value.");
             node.ExpressionType = node.Array.ExpressionType;
+            ((ArrayTypeNode)node.ExpressionType).IsFixedSize = false;
         }
 
         public override void Visit(VariableDeclNode node)

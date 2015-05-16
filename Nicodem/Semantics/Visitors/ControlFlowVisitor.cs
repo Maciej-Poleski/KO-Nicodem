@@ -10,10 +10,20 @@ namespace Nicodem.Semantics.Visitors
 {
     class ControlFlowVisitor : AbstractRecursiveVisitor
     {
-        List<Vertex> nodes_to_next_jmp = new List<Vertex>();
-        Dictionary<ExpressionNode, ExpressionNode> changed_nodes = new Dictionary<ExpressionNode, ExpressionNode>();
+        private List<Vertex> nodes_to_next_jmp = new List<Vertex>();
+        private Dictionary<ExpressionNode, ExpressionNode> changed_nodes = new Dictionary<ExpressionNode, ExpressionNode>();
         private int temporary_counter = 0;
-        public List<Vertex> Graph { public get; private set; }
+        private List<Vertex> graph_vertex = new List<Vertex>();
+        private List<WhileNode> while_stack = new List<WhileNode>();
+        private Dictionary<WhileNode, List<Vertex>> while_for_loop_control = new Dictionary<WhileNode, List<Vertex>>();
+
+        public List<Vertex> Graph
+        {
+            get
+            {
+                return graph_vertex;
+            }
+        }
 
         private void AddNextJump(Vertex next_vertex)
         {
@@ -33,7 +43,8 @@ namespace Nicodem.Semantics.Visitors
             base.Visit(node);
             foreach (var expression in node.Elements)
             {
-                var next_vertex = new OneJumpVertex(null, expression);
+                OneJumpVertex next_vertex = new OneJumpVertex(null, expression);
+                graph_vertex.Add(next_vertex);
                 AddNextJump(next_vertex);
                 nodes_to_next_jmp.Add(next_vertex);
             }
@@ -42,36 +53,56 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(IfNode node)
         {
             base.Visit(node);
-            //vertex then
-            VariableDefNode t_then = new VariableDefNode();
-            t_then.Name = "T" + temporary_counter;
-            VariableUseNode t_then_use = new VariableUseNode();
-            t_then_use.Declaration = t_then;
-            t_then_use.Name = "T" + temporary_counter;
-            var then_vertex = new OneJumpVertex(null, node.Then); //TODO T1 = then.Expression
+
+            VariableDeclNode t = new VariableDeclNode();
+            t.Name = "T" + temporary_counter;
+            VariableUseNode t_use = new VariableUseNode();
+            t_use.Declaration = t;
+            t_use.Name = "T" + temporary_counter;
+
+            OperatorNode assign_then = new OperatorNode();
+            assign_then.Operator = OperatorType.ASSIGN;
+            assign_then.Arguments = new List<ExpressionNode> { t_use, node.Then };
+            OneJumpVertex then_vertex = new OneJumpVertex(null, assign_then);
+            graph_vertex.Add(then_vertex);
+
             ConditionalJumpVertex condition_vertex = new ConditionalJumpVertex(then_vertex, null, node.Condition);
-            //jump to condtion
+            graph_vertex.Add(condition_vertex);
             AddNextJump(condition_vertex);
-            //queue true path
+
             nodes_to_next_jmp.Add(then_vertex);
-            //vertex else
+
             if (node.HasElse)
             {
-                var else_vertex = new OneJumpVertex(null, node.Else); //TODO T1 = else.Expression
+                OperatorNode assign_else = new OperatorNode();
+                assign_else.Operator = OperatorType.ASSIGN;
+                assign_else.Arguments = new List<ExpressionNode> { t_use, node.Else };
+                OneJumpVertex else_vertex = new OneJumpVertex(null, assign_else);
+                graph_vertex.Add(else_vertex);
                 nodes_to_next_jmp.Add(else_vertex);
                 condition_vertex.FalseJump = else_vertex;
             }
             else{
                 nodes_to_next_jmp.Add(condition_vertex);
             }
-            //vertex z T1
-            changed_nodes[node] = null; //TODO zmiana na T1
+
+            changed_nodes[node] = t_use;
             temporary_counter++;
         }
 
         public override void Visit(LoopControlNode node)
         {
             base.Visit(node);
+
+            if (node.Depth > while_stack.Count) throw new Exception("Not enough whiles on stack.");
+            WhileNode loop_control_while = while_stack[while_stack.Count - node.Depth - 1];
+
+            OneJumpVertex loop_control_vertex = new OneJumpVertex(null, node.Value);
+
+            if (while_for_loop_control.ContainsKey(loop_control_while))
+                while_for_loop_control[loop_control_while].Add(loop_control_vertex);
+            else
+                while_for_loop_control[loop_control_while] = new List<Vertex>{loop_control_vertex};
         }
 
         public override void Visit(OperatorNode node)
@@ -90,12 +121,23 @@ namespace Nicodem.Semantics.Visitors
 
         public override void Visit(WhileNode node)
         {
+            while_stack.Add(node);
             base.Visit(node);
-            var condition_vertex = new ConditionalJumpVertex(null, null, node.Condition);
+
+            ConditionalJumpVertex condition_vertex = new ConditionalJumpVertex(null, null, node.Condition);
+            graph_vertex.Add(condition_vertex);
             AddNextJump(condition_vertex);
-            var body_vertex = new OneJumpVertex(condition_vertex, node.Body);
+
+            OneJumpVertex body_vertex = new OneJumpVertex(condition_vertex, node.Body);
+            graph_vertex.Add(body_vertex);
+
             condition_vertex.TrueJump = body_vertex;
             nodes_to_next_jmp.Add(condition_vertex);
+
+            if (while_for_loop_control.ContainsKey(node))
+                foreach (var loop_control_vetex in while_for_loop_control[node])
+                    nodes_to_next_jmp.Add(loop_control_vetex);
+            while_stack.Remove(node);
         }
 
     }

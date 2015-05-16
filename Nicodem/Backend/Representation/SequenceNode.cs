@@ -44,7 +44,11 @@ namespace Nicodem.Backend.Representation
         public Node NextNode { get; private set; }
 
 		public override Node[] GetChildren() {
-			return new Node[]{ NextNode };
+			var nodes = new Node[Sequence.Count];
+			int i = 0;
+			foreach (var node in Sequence)
+				nodes [i++] = node;
+			return nodes
 		}
     }
 }

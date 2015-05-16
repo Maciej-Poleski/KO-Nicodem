@@ -30,7 +30,7 @@ namespace Nicodem.Backend.Representation
 
 		// Compare checks whether the tile given as an argument can cover this Node. If yes, it returns tuple
 		// of the form (true, list of children under the tile). If not, it returns instead (false, null).
-		Tuple<bool, List<Node>> Compare(Tile tile) {
+		public Tuple<bool, List<Node>> Compare(Tile tile) {
 			// exceptional case for assign { mem {reg}, reg }
 			if (this.GetType () == typeof(AssignmentNode) && (this.GetChildren () [0]).GetType () == typeof(MemoryNode)) {
 				if(tile.Type == typeof(AssignmentNode) && (tile.Children[0].Type) != typeof(MemoryNode)) {

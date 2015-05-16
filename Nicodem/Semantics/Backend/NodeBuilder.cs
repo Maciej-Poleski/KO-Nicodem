@@ -117,7 +117,8 @@ namespace Nicodem.Semantics
 			        args[i] = Build(funCallNode.Arguments[i] as dynamic);
 			    }
                 Action<Brep.Node> setter;
-			    return funCallNode.Definition.BackendFunction.FunctionCall(args, out setter);
+			    return funCallNode.Definition.BackendFunction.FunctionCall(null,args, out setter);
+                // FIXME: Provide calling function instead of null
 			}
 
 			public Brep.Node Build(OperatorNode opNode)
