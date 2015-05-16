@@ -50,12 +50,26 @@ namespace Nicodem.Semantics.CST
             // TODO improve error handling
             if (tokenizerResult.LastParsedLocation != tokenizerResult.FailedAtLocation)
             {
-                Console.WriteLine("Syntax error:");
-                Console.WriteLine(tokenizerResult.FailedAtLocation.ToString());
+                throw new LexerFailure(origin.MakeFragment(tokenizerResult.LastParsedLocation,tokenizerResult.FailedAtLocation));
             }
             var tokens = tokenizerResult.Tokens.ToArray();
             var sanitizedTokens = tokens.Where(a => a.Item2.All(c => !forbidden.Contains(c)));
             return sanitizedTokens;
+        }
+
+        public class LexerFailure : Exception
+        {
+            private readonly IFragment _fragment;
+
+            public IFragment Fragment
+            {
+                get { return _fragment; }
+            }
+
+            public LexerFailure(IFragment fragment)
+            {
+                this._fragment = fragment;
+            }
         }
     }
 }
