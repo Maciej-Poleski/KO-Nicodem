@@ -4,27 +4,28 @@ using Nicodem.Backend.Representation;
 
 namespace Nicodem.Backend.Builder
 {
-    public class RegisterAllocator
-    {
-        public RegisterAllocator()
-        {
-        }
+	public class RegisterAllocator
+	{
+		private IReadOnlyList<HardwareRegisterNode> registers;
 
-        public bool AllocateRegisters(TemporariesGraph interferenceGraph, TemporariesGraph copiesGraph, int availableRegisters){
-            throw new NotImplementedException();
-        }
+		public RegisterAllocator(IReadOnlyList<HardwareRegisterNode> registers)
+		{
+			this.registers = registers;
+		}
 
-        public IReadOnlyDictionary<Temporary, int> TempsMapping { 
-            get {
-                throw new NotImplementedException();
-            }
-        }
+		public bool AllocateRegisters (InterferenceGraph graph, IReadOnlyDictionary<RegisterNode, HardwareRegisterNode> initial)
+		{		
+			throw new NotImplementedException ();
+		}
 
-        public IReadOnlyList<Temporary> TempsToMemory { 
-            get {
-                throw new NotImplementedException();
-            }
-        }
-    }
+		public IReadOnlyDictionary<RegisterNode, HardwareRegisterNode> RegistersColoring { 
+			get;
+			private set;
+		}
+
+		public IReadOnlyList<RegisterNode> SpilledRegisters { 
+			get;
+			private set;
+		}
+	}
 }
-

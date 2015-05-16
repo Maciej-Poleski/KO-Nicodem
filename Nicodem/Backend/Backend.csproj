@@ -72,7 +72,6 @@
     <Compile Include="Cover\TileFactory\InstructionFactory.cs" />
     <Compile Include="Cover\TileFactory\TileFactory_Jumps.cs" />
     <Compile Include="Builder\RegisterAllocator.cs" />
-    <Compile Include="Builder\TemporariesGraph.cs" />
     <Compile Include="Builder\Builder.cs" />
     <Compile Include="Backend.cs" />
     <Compile Include="Data\Function.cs" />
@@ -82,6 +81,7 @@
     <Compile Include="Data\Temporary.cs" />
     <Compile Include="Builder\Vertex.cs" />
     <Compile Include="Builder\LivenessAnalysis.cs" />
+    <Compile Include="Builder\InterferenceGraph.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
