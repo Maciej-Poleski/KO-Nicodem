@@ -7,7 +7,7 @@ namespace Nicodem.Backend
     [Obsolete]
 	public abstract class Location
 	{
-	    public abstract LocationNode AccessLocal(Function function);
+	    public abstract LocationNode AccessLocal(Function function, LocationNode stackFrame);
 	}
 }
 

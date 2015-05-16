@@ -28,7 +28,7 @@ namespace Nicodem.Backend
             get { return _node; }
         }
 
-        public override LocationNode AccessLocal(Function function)
+        public override LocationNode AccessLocal(Function function, LocationNode stackFrame)
         {
             return Node;
         }

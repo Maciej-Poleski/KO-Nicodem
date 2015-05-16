@@ -4,11 +4,12 @@ namespace Nicodem.Backend.Representation
 {
     public class FunctionCallNode : Node
     {
-        public FunctionCallNode(SequenceNode body)
+        public FunctionCallNode(Function function)
         {
-            Body = body;
+            Function = function;
         }
 
-        public SequenceNode Body { get; private set; }
+        // Function type depends on architecture. Adjust when Target will be in shape.
+        public Function Function { get; private set; }
     }
 }

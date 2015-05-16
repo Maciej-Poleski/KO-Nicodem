@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using Nicodem.Semantics.CST;
 using Nicodem.Source;
 
@@ -22,7 +24,8 @@ namespace Nicodem.Compiler
             var tokenized = CSTBuilder.SanitizedTokens(inputFile);
             foreach (var tuple in tokenized)
             {
-                Console.Write("\""+tuple.Item1.GetOriginText()+"\" ");
+                Debug.Assert(tuple.Item2.Count() == 1);
+                Console.Write("\"" + tuple.Item1.GetOriginText() + "\"(" + tuple.Item2.First() + ") ");
             }
         }
     }
