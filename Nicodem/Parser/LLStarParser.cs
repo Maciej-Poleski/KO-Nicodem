@@ -19,19 +19,18 @@ namespace Nicodem.Parser
             _grammar = grammar;
 		}
 
-        public IParseTree<TSymbol> Parse(IEnumerable<ParseLeaf<TSymbol>> word)
+        public ParseResult<TSymbol> Parse(IEnumerable<ParseLeaf<TSymbol>> word)
 		{
             var memoizedWord = new MemoizedInput<ParseLeaf<TSymbol>>(word);
             var result = ParseTerm(_grammar.Start, memoizedWord, memoizedWord.Begin);
             // whole input has to be eaten
-			if(result && result.Iterator == memoizedWord.End) {
-				return result.Tree;
-			} else {
-            	return null;
-			}
+			if(result && (result as ItOK<TSymbol>).Iterator != memoizedWord.End) {
+				result = new ItError<TSymbol>((result as ItOK<TSymbol>).Iterator, _grammar.Start);
+            } 
+			return ParserUtils<TSymbol>.Convert(result);
 		}
 
-		private ParseResult<TSymbol> ParseTerm(TSymbol term, MemoizedInput<ParseLeaf<TSymbol>> word, MemoizedInput<ParseLeaf<TSymbol>>.Iterator input)
+		private ItParseResult<TSymbol> ParseTerm(TSymbol term, MemoizedInput<ParseLeaf<TSymbol>> word, MemoizedInput<ParseLeaf<TSymbol>>.Iterator input)
 		{
 			var dfa = _grammar.Automatons[term];
 			var children = new List<IParseTree<TSymbol>>(); 
@@ -54,7 +53,7 @@ namespace Nicodem.Parser
 						_grammar.WhichProduction[state.Accepting], 
 						children);
 
-					return new ParseResult<TSymbol>(parsedTree, it);
+					return new ItOK<TSymbol>(parsedTree, it);
 				}
 
 				var lookIt = it;
@@ -84,23 +83,19 @@ namespace Nicodem.Parser
 					if(!result) {
 						return ReturnError(term, children, input, it);
 					}
-					children.Add(result.Tree);
-					it = result.Iterator;
+					var okRes = result as ItOK<TSymbol>;
+					children.Add(okRes.Tree);
+					it = okRes.Iterator;
 				}
 				
 				state = FindTransition(state.Transitions, transSymbol);
 			}
 		}
 
-		private ParseResult<TSymbol> ReturnError(TSymbol term, IList<IParseTree<TSymbol>> children, 
+		private ItParseResult<TSymbol> ReturnError(TSymbol term, IList<IParseTree<TSymbol>> children, 
 				MemoizedInput<ParseLeaf<TSymbol>>.Iterator input, MemoizedInput<ParseLeaf<TSymbol>>.Iterator currentIt)
 		{
-			var branch = new ParseBranch<TSymbol>(
-				GetFragmentRange(input.Current.Fragment, children.Last().Fragment), 
-					term, 
-					_grammar.Productions[term][0],  // TODO could not parse any productions
-					children);
-			return new ParseResult<TSymbol>(branch, currentIt, false);
+			return new ItError<TSymbol>(currentIt, term);
 		}
 
 		private static IFragment GetFragmentRange(IFragment begin, IFragment end) {

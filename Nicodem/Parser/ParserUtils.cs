@@ -20,26 +20,49 @@ namespace Nicodem.Parser
             	throw new ArgumentException(String.Format("There is no implemented static field EOF in {0}", typeof(TSymbol)));
 			}
 		}
+
+		public static ParseResult<TSymbol> Convert(ItParseResult<TSymbol> result) 
+		{
+			var okRes = result as ItOK<TSymbol>;
+			if(okRes != null) {
+				return new OK<TSymbol>(okRes.Tree);
+			} else {
+				var err = result as ItError<TSymbol>;
+				var fragment = err.Iterator.Pos >= 0 ? err.Iterator.Current.Fragment : null;
+				return new Error<TSymbol>(fragment, err.Symbol);
+			}
+		}
 	}
 
-	internal struct ParseResult<TSymbol> where TSymbol : ISymbol<TSymbol>
-    {
+	internal abstract class ItParseResult<TSymbol> where TSymbol : ISymbol<TSymbol>
+	{
+		public static implicit operator bool(ItParseResult<TSymbol> result)
+        {
+			return result is ItOK<TSymbol>;
+        }
+	}
 
+	internal class ItOK<TSymbol> : ItParseResult<TSymbol> where TSymbol : ISymbol<TSymbol>
+    {
         public MemoizedInput<ParseLeaf<TSymbol>>.Iterator Iterator { get; private set; }
         public IParseTree<TSymbol> Tree { get; private set; } 
-        private bool _ok;
 
-		public ParseResult(IParseTree<TSymbol> tree, MemoizedInput<ParseLeaf<TSymbol>>.Iterator iterator, bool ok = true)
-            : this()
+		public ItOK(IParseTree<TSymbol> tree, MemoizedInput<ParseLeaf<TSymbol>>.Iterator iterator)
         {
             Tree = tree;
             Iterator = iterator;
-            _ok = ok;
         }
+    }
 
-		public static implicit operator bool(ParseResult<TSymbol> result)
+	internal class ItError<TSymbol> : ItParseResult<TSymbol> where TSymbol : ISymbol<TSymbol>
+    {
+        public MemoizedInput<ParseLeaf<TSymbol>>.Iterator Iterator { get; private set; }
+		public TSymbol Symbol { get; private set; }
+
+		public ItError(MemoizedInput<ParseLeaf<TSymbol>>.Iterator iterator, TSymbol symbol)
         {
-            return result._ok;
+            Iterator = iterator;
+			Symbol = symbol;
         }
     }
 }

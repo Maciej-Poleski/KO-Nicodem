@@ -36,9 +36,9 @@ namespace Nicodem.Parser.Tests
 			var emptyInput = new List<ParseLeaf<CharSymbol>>();
 
 			var res = parser.Parse(emptyInput);
-			Assert.IsNotNull(res);
+			Assert.IsTrue(res);
 
-			var resAsBranch = res as ParseBranch<CharSymbol>;
+			var resAsBranch = ((OK<CharSymbol>) res).Tree as ParseBranch<CharSymbol>;
 			Assert.IsNotNull(resAsBranch);
 			Assert.AreEqual(resAsBranch.Children.Count(), 1);
 			Assert.AreEqual(resAsBranch.Symbol, start);
@@ -59,7 +59,7 @@ namespace Nicodem.Parser.Tests
 				var parser = new LlParser<CharSymbol>(ge.Grammar);
 
 				foreach(var prog in ge.ValidPrograms) {
-					Assert.NotNull(parser.Parse(prog.Item2), ge.Name + ": " + prog.Item1);
+					Assert.IsTrue(parser.Parse(prog.Item2), ge.Name + ": " + prog.Item1);
 				}
 			}
 		}
@@ -80,7 +80,7 @@ namespace Nicodem.Parser.Tests
 				var parser = new LlParser<CharSymbol>(ge.Grammar);
 
 				foreach(var prog in ge.InvalidPrograms) {
-					Assert.IsNull(parser.Parse(prog.Item2), ge.Name + ": " + prog.Item1);
+					Assert.IsFalse(parser.Parse(prog.Item2), ge.Name + ": " + prog.Item1);
 				}
 			}
 		}
@@ -95,7 +95,7 @@ namespace Nicodem.Parser.Tests
 				var parser = new LlParser<CharSymbol>(ge.Grammar);
 
 				foreach(var prog in ge.ValidPrograms) {
-					Assert.NotNull(parser.Parse(prog.Item2), ge.Name + ": " + prog.Item1);
+					Assert.IsTrue(parser.Parse(prog.Item2), ge.Name + ": " + prog.Item1);
 				}
 			}
 		}
@@ -110,7 +110,7 @@ namespace Nicodem.Parser.Tests
 				var parser = new LlParser<CharSymbol>(ge.Grammar);
 
 				foreach(var prog in ge.InvalidPrograms) {
-					Assert.IsNull(parser.Parse(prog.Item2), ge.Name + ": " + prog.Item1);
+					Assert.IsFalse(parser.Parse(prog.Item2), ge.Name + ": " + prog.Item1);
 				}
 			}
 		}
@@ -125,7 +125,7 @@ namespace Nicodem.Parser.Tests
 				var parser = new LlParser<CharSymbol>(ge.Grammar);
 
 				foreach(var prog in ge.ValidPrograms) {
-					Assert.NotNull(parser.Parse(prog.Item2), ge.Name + ": " + prog.Item1);
+					Assert.IsTrue(parser.Parse(prog.Item2), ge.Name + ": " + prog.Item1);
 				}
 			}
 		}
@@ -140,7 +140,7 @@ namespace Nicodem.Parser.Tests
 				var parser = new LlParser<CharSymbol>(ge.Grammar);
 
 				foreach(var prog in ge.InvalidPrograms) {
-					Assert.IsNull(parser.Parse(prog.Item2), ge.Name + ": " + prog.Item1);
+					Assert.IsFalse(parser.Parse(prog.Item2), ge.Name + ": " + prog.Item1);
 				}
 			}
 		}

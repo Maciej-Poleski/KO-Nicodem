@@ -5,7 +5,7 @@ namespace Nicodem.Parser
 {
 	public interface IParser<TSymbol> where TSymbol : ISymbol<TSymbol>
 	{
-		IParseTree<TSymbol> Parse(IEnumerable<ParseLeaf<TSymbol>> word);
+		ParseResult<TSymbol> Parse(IEnumerable<ParseLeaf<TSymbol>> word);
 	}
 }
 

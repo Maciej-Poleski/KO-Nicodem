@@ -21,21 +21,20 @@ namespace Nicodem.Parser
 		}
 
         // At this moment return null when parsing fails
-        public IParseTree<TSymbol> Parse(IEnumerable<ParseLeaf<TSymbol>> word)
+		public ParseResult<TSymbol> Parse(IEnumerable<ParseLeaf<TSymbol>> word)
 		{
             var memoizedWord = new MemoizedInput<ParseLeaf<TSymbol>>(word);
             var result = ParseTerm(_grammar.Start, memoizedWord, memoizedWord.Begin).First();
 
             // whole input has to be eaten
-            if(result && result.Iterator == memoizedWord.End) {
-                return result.Tree;
-            } else {
-                return null;
-            }
+			if(result && (result as ItOK<TSymbol>).Iterator != memoizedWord.End) {
+				result = new ItError<TSymbol>((result as ItOK<TSymbol>).Iterator, _grammar.Start);
+            } 
+			return ParserUtils<TSymbol>.Convert(result);
 		}
 
         // returns either a list of successfull parsed results or a singleton list with failure 
-		private IEnumerable<ParseResult<TSymbol>> ParseTerm(TSymbol term, MemoizedInput<ParseLeaf<TSymbol>> word, MemoizedInput<ParseLeaf<TSymbol>>.Iterator iterator)
+		private IEnumerable<ItParseResult<TSymbol>> ParseTerm(TSymbol term, MemoizedInput<ParseLeaf<TSymbol>> word, MemoizedInput<ParseLeaf<TSymbol>>.Iterator iterator)
 		{
 			var dfa = _grammar.Automatons[term];
 			// stack for backtracking - <position in word, current state of appropriate DFA>
@@ -43,6 +42,7 @@ namespace Nicodem.Parser
 			var children = new Stack<IParseTree<TSymbol>>(); 
             bool accepted = false;
 			var eof = ParserUtils<TSymbol>.GetEOF();
+			ItError<TSymbol> furthest = null;
 
             st.Push(new ParseState(dfa.Start, 0, iterator));
 
@@ -62,7 +62,7 @@ namespace Nicodem.Parser
 						_grammar.WhichProduction[node.Accepting], 
 						parsedChildren);
 
-					yield return new ParseResult<TSymbol>(parsedTree, it);
+					yield return new ItOK<TSymbol>(parsedTree, it);
 				}
 
 				var trans = node.Transitions;
@@ -78,13 +78,19 @@ namespace Nicodem.Parser
 							st.Push(new ParseState(trans[ind].Value, 0, it != word.End ? it.Next() : word.End));
 							break;
 						} else {
-							IEnumerator<ParseResult<TSymbol>> resultIt = ParseTerm(trans[ind].Key, word, it).GetEnumerator();
+							IEnumerator<ItParseResult<TSymbol>> resultIt = ParseTerm(trans[ind].Key, word, it).GetEnumerator();
                             resultIt.MoveNext();
-                            if(resultIt.Current) {
-                                children.Push(resultIt.Current.Tree);
-								st.Push(new ParseState(trans[ind].Value, 0, resultIt.Current.Iterator, resultIt));
-                                break;
-                            }
+							if(resultIt.Current) {
+								var res = resultIt.Current as ItOK<TSymbol>;
+								children.Push(res.Tree);
+								st.Push(new ParseState(trans[ind].Value, 0, res.Iterator, resultIt));
+								break;
+							} else {
+								var res = resultIt.Current as ItError<TSymbol>;
+								if(furthest == null || res.Iterator > furthest.Iterator) {
+									furthest = res;
+								} 
+							}
 						}
 					}
 				}
@@ -92,6 +98,9 @@ namespace Nicodem.Parser
 
 				// could not find next parsing transition
 				if(ind >= trans.Count) { 
+					if(furthest == null || it > furthest.Iterator) {
+						furthest = new ItError<TSymbol>(it, term);
+					}
 					Backtrack(st, children);
 				}
 			}
@@ -99,7 +108,7 @@ namespace Nicodem.Parser
 			if(accepted) {
                 yield break;
 			} else {
-				yield return new ParseResult<TSymbol>(null, iterator, false);
+				yield return furthest ?? new ItError<TSymbol>(iterator, term);
 			}
 		}
 
@@ -112,7 +121,7 @@ namespace Nicodem.Parser
 				if(state.NextPossibleResult != null && state.NextPossibleResult.MoveNext()) {
 
 					children.Pop();
-					var nextRes = state.NextPossibleResult.Current;
+					var nextRes = state.NextPossibleResult.Current as ItOK<TSymbol>;
 					children.Push(nextRes.Tree);
 					stack.Push(
 						new ParseState(state.State, 
@@ -144,12 +153,12 @@ namespace Nicodem.Parser
 			public int TransitionIndex { get; set; }
             public MemoizedInput<ParseLeaf<TSymbol>>.Iterator Iterator { get; private set; }
             // used when function may return multiple ok results during one call
-			public IEnumerator<ParseResult<TSymbol>> NextPossibleResult { get; private set; } 
+			public IEnumerator<ItParseResult<TSymbol>> NextPossibleResult { get; private set; } 
 
             public ParseState(DfaState<TSymbol> state, 
                 int transitionIndex, 
 				MemoizedInput<ParseLeaf<TSymbol>>.Iterator iterator,
-				IEnumerator<ParseResult<TSymbol>> nextPossibleResult = null)
+				IEnumerator<ItParseResult<TSymbol>> nextPossibleResult = null)
 			{
 				State = state;
 				TransitionIndex = transitionIndex;
