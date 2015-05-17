@@ -48,7 +48,7 @@ namespace Nicodem.Backend.Representation
 			int i = 0;
 			foreach (var node in Sequence)
 				nodes [i++] = node;
-			return nodes
+			return nodes;
 		}
     }
 }
