@@ -53,6 +53,7 @@
     <Compile Include="Cover\TileFactoryTests.cs" />
     <Compile Include="Cover\InstructionFactoryTests.cs" />
     <Compile Include="InstructionSelection\CompareNodeWithTileTests.cs" />
+    <Compile Include="Builder\RegisterAllocatorTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -77,5 +78,6 @@
   <ItemGroup>
     <Folder Include="Cover\" />
     <Folder Include="InstructionSelection\" />
+    <Folder Include="Builder\" />
   </ItemGroup>
 </Project>

@@ -82,6 +82,7 @@
     <Compile Include="Builder\Vertex.cs" />
     <Compile Include="Builder\LivenessAnalysis.cs" />
     <Compile Include="Builder\InterferenceGraph.cs" />
+    <Compile Include="Builder\FindUnion.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
