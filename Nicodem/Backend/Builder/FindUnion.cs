@@ -15,6 +15,7 @@ namespace Nicodem.Backend
 		}
 
 		public T Find(T obj){
+			if(!rep.ContainsKey(obj)) throw new ArgumentException("The object is not belonging to the given universum.");
 			if(rep[obj].Equals(obj)) return obj;
 			var _rep = Find(rep[obj]);
 			rep[obj] = _rep;
