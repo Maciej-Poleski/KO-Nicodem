@@ -7,13 +7,13 @@ namespace Nicodem.Backend.Builder
 {
 	public class RegisterAllocator
 	{
-		private readonly IList<HardwareRegisterNode> registers;
+		private readonly IEnumerable<HardwareRegisterNode> registers;
 		private Dictionary<Vertex,int> degree = new Dictionary<Vertex,int> ();
 		private HashSet<Vertex> toSpill = new HashSet<Vertex> ();
 		private HashSet<Vertex> toSimplify = new HashSet<Vertex> ();
 		private Stack<Vertex> stack = new Stack<Vertex> ();
 
-		public RegisterAllocator (IList<HardwareRegisterNode> registers)
+		public RegisterAllocator (IEnumerable<HardwareRegisterNode> registers)
 		{
 			this.registers = registers;
 		}
