@@ -15,7 +15,7 @@ namespace Nicodem.Semantics.Visitors
         private int temporary_counter = 0;
         private List<Vertex> graph_vertex = new List<Vertex>();
         private List<WhileNode> while_stack = new List<WhileNode>();
-        private Dictionary<WhileNode, List<Vertex>> while_for_loop_control = new Dictionary<WhileNode, List<Vertex>>();
+        private Dictionary<LoopControlMode, Dictionary<WhileNode, List<Vertex>>> while_for_loop_control = new Dictionary<LoopControlMode, Dictionary<WhileNode, List<Vertex>>>();
 
         public List<Vertex> Graph
         {
@@ -99,10 +99,10 @@ namespace Nicodem.Semantics.Visitors
 
             OneJumpVertex loop_control_vertex = new OneJumpVertex(null, node.Value);
 
-            if (while_for_loop_control.ContainsKey(loop_control_while))
-                while_for_loop_control[loop_control_while].Add(loop_control_vertex);
+            if (while_for_loop_control.ContainsKey(node.Mode) && while_for_loop_control[node.Mode].ContainsKey(loop_control_while))
+                while_for_loop_control[node.Mode][loop_control_while].Add(loop_control_vertex);
             else
-                while_for_loop_control[loop_control_while] = new List<Vertex>{loop_control_vertex};
+                while_for_loop_control[node.Mode][loop_control_while] = new List<Vertex>{loop_control_vertex};
         }
 
         public override void Visit(OperatorNode node)
@@ -134,9 +134,12 @@ namespace Nicodem.Semantics.Visitors
             condition_vertex.TrueJump = body_vertex;
             nodes_to_next_jmp.Add(condition_vertex);
 
-            if (while_for_loop_control.ContainsKey(node))
-                foreach (var loop_control_vetex in while_for_loop_control[node])
+            if (while_for_loop_control.ContainsKey(LoopControlMode.LCM_BREAK) && while_for_loop_control[LoopControlMode.LCM_BREAK].ContainsKey(node))
+                foreach (var loop_control_vetex in while_for_loop_control[LoopControlMode.LCM_BREAK][node])
                     nodes_to_next_jmp.Add(loop_control_vetex);
+            if (while_for_loop_control.ContainsKey(LoopControlMode.LCM_CONTINUE) && while_for_loop_control[LoopControlMode.LCM_CONTINUE].ContainsKey(node))
+                foreach (var loop_control_vetex in while_for_loop_control[LoopControlMode.LCM_CONTINUE][node])
+                    ((OneJumpVertex)loop_control_vetex).Jump = body_vertex;
             while_stack.Remove(node);
         }
 
