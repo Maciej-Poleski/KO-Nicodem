@@ -68,5 +68,30 @@ namespace Nicodem.Lexer
         {
             return state.Accepting != 0;
         }
+
+        static bool FindAcceptingState(IDfaState<char> state, Dictionary<IDfaState<char>, int> color)
+        {
+            if (state.Accepting != 0)
+                return true;
+            color[state] = 1;
+
+            foreach (var transition in state.Transitions)
+            {
+                if (!color.ContainsKey(transition.Value))
+                    if (FindAcceptingState(transition.Value, color))
+                        return true;
+            }
+
+            color[state] = 2;
+            return false;
+        }
+
+        internal static bool IsPseudoDead(this IDfaState<char> state)
+        {
+            Dictionary<IDfaState<char>, int> color = new Dictionary<IDfaState<char>, int>();
+            if (!FindAcceptingState(state, color))
+                return true;
+            return false;
+        }
     }
 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Brep = Nicodem.Backend.Representation;
 
 namespace Nicodem.Semantics.Visitors
 {
@@ -56,7 +57,7 @@ namespace Nicodem.Semantics.Visitors
                             tempDef.Type = arg.ExpressionType;
                             tempDef.NestedUse = false;
                             tempDef.Value = arg;
-                            tempDef.VariableLocation = new Temporary();
+                            tempDef.VariableLocation = new Brep.TemporaryNode();
                             trees.Add(tempDef);
                             var tempUse = new VariableUseNode();
                             tempUse.Name = "temp";

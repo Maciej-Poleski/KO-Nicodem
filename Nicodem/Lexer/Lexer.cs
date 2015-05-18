@@ -128,8 +128,10 @@ namespace Nicodem.Lexer
                 {
                     lastAcceptingReaderState = default(TMemento);
                 }
-                while (!dfaState.IsDead() && sourceReader.MoveNext())
+                //FIXME: use isDead() when DFA minimization will be fixed
+                while (!dfaState.IsPseudoDead() && sourceReader.MoveNext())
                 {
+                    Debug.Assert(dfaState.IsDead() == dfaState.IsPseudoDead()); 
                     var c = sourceReader.CurrentCharacter;
                     dfaState = FindTransition(dfaState.Transitions, c);
                     if (dfaState.IsAccepting<DfaUtils.MinimizedDfaState<char>, char>())
@@ -139,6 +141,7 @@ namespace Nicodem.Lexer
                         succeed = true;
                     }
                 }
+                Debug.Assert(dfaState.IsDead() == dfaState.IsPseudoDead()); // DFA _is_ minimized
                 if (succeed)
                 {
                     sourceReader.Rollback(lastAcceptingReaderState);
@@ -182,9 +185,13 @@ namespace Nicodem.Lexer
             return new CategoryEnumerable(this, dfaState.Accepting);
         }
 
-        private static T FindTransition<T>(KeyValuePair<char, T>[] transitions, char c) where T : AbstractDfaState<T, char>
+        private static T FindTransition<T>(KeyValuePair<char, T>[] transitions, char c)
+            where T : AbstractDfaState<T, char>
         {
-            return Array.FindLast(transitions, pair => pair.Key <= c).Value;
+            var i = Array.FindLastIndex(transitions, pair => pair.Key <= c);
+            Debug.Assert(transitions[i].Key <= c);
+            Debug.Assert(i + 1 == transitions.Length || transitions[i + 1].Key > c);
+            return transitions[i].Value;
         }
 
         private class CategoryEnumerable : IEnumerable<int>

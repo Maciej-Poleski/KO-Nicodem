@@ -26,9 +26,13 @@ namespace Nicodem.Semantics.CST
                               NicodemGrammarProductions.MakeProductionsDictionaryForGrammarConstructor());
 
             var parser = new LLStarParser<Symbol>(grammar);
-            var cst = parser.Parse(leafs);
-
-            return cst;
+            var parseRes = parser.Parse(leafs);
+			if(parseRes is OK<Symbol>) {
+				return (parseRes as OK<Symbol>).Tree;
+			} else {
+				// TODO - show an Error<Symbol> properly to the user
+				return null;
+			}
         }
 
         public static IEnumerable<Tuple<IFragment, IEnumerable<int>>> SanitizedTokens(IOrigin origin)

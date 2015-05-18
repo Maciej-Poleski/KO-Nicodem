@@ -1,6 +1,7 @@
 ﻿using System;
 using Nicodem.Semantics.AST;
 using Nicodem.Backend;
+using Brep = Nicodem.Backend.Representation;
 using System.Collections.Generic;
 
 namespace Nicodem.Semantics.Visitors
@@ -29,7 +30,7 @@ namespace Nicodem.Semantics.Visitors
 			if (node.NestedUse) {
 				functions.Peek().AllocLocal ();
 			} else {
-				node.VariableLocation = new Temporary ();
+				node.VariableLocation = new Brep.TemporaryNode();
 			}
 
 			base.Visit(node);

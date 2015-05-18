@@ -64,6 +64,7 @@
     <Compile Include="ParserUtils.cs" />
     <Compile Include="IProduction.cs" />
     <Compile Include="FirstSet.cs" />
+    <Compile Include="ParseResult.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
