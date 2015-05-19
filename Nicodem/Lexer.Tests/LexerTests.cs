@@ -122,9 +122,22 @@ namespace Lexer.Tests
             Assert.IsEmpty(lexer.Process("a "));
             Assert.IsEmpty(lexer.Process("a"));
             Assert.IsTrue(lexer.Process(" a").Tokens().SequenceEqual(new[] { " " }));
-            Assert.IsTrue(lexer.Process(" ").Tokens().SequenceEqual(new[] { " " }));
+            Assert.IsTrue(lexer.Process("\n\t").Tokens().SequenceEqual(new[] { "\n\t" }));
+            Assert.IsTrue(lexer.Process("\n").Tokens().SequenceEqual(new[] { "\n" }));
+            Assert.IsTrue(lexer.Process("\t").Tokens().SequenceEqual(new[] { "\t" }));
             Assert.IsTrue(lexer.Process("\n   ").Tokens().SequenceEqual(new[] { "\n   " }));
             Assert.IsTrue(lexer.Process("\t\r\n a b c").Tokens().SequenceEqual(new[] { "\t\r\n " }));
+        }
+
+        [Test]
+        public void LexerMainTest()
+        {
+            var lexer = new Nicodem.Lexer.Lexer(RegExParser.Parse("[:space:]*main[:space:]*\\(\\)[:space:]*"));
+            Assert.IsEmpty(lexer.Process("a"));
+            Assert.IsEmpty(lexer.Process("\tain()"));
+            Assert.IsTrue(lexer.Process("\tmain()\n\n\n\n\n").Tokens().SequenceEqual(new[] { "\tmain()\n\n\n\n\n" }));
+            Assert.IsTrue(lexer.Process(" main \n \r \t   ()tttt").Tokens().SequenceEqual(new[] { " main \n \r \t   ()" }));
+            Assert.IsTrue(lexer.Process("main()").Tokens().SequenceEqual(new[] { "main()" }));
         }
     }
 
