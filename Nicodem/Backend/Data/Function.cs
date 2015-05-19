@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using Nicodem.Backend.Representation;
 
@@ -33,14 +34,20 @@ namespace Nicodem.Backend
             get { return _enclosedIn; }
         }
 
+        /// <value>Label of this function.</value>
+        internal string Label { get; private set; } // TODO: set it during object construction
+
         /// <value>Body of this function.</value>
         public IEnumerable<Node> Body { get; set; }
 
-        /// <value>Temporaries representing arguments inside Body.</value>
-        public TemporaryNode[] ArgTemporary { get; private set; } // TODO: set it inside constructor
+        /// <value>Locations representing arguments inside Body.</value>
+        public LocationNode[] ArgsLocations { get; private set; } // TODO: set it inside constructor
 
         /// <value>Number of arguments of this function.</value>
-        public int ArgsCount { get { return ArgTemporary.Length; } }
+        public int ArgsCount { get { return ArgsLocations.Length; } }
+
+        /// <value>Node which value will be returned as this function result.</value>
+        public Node Result { get; set; }
 
         // ------------------- constructor -------------------
 
@@ -104,6 +111,14 @@ namespace Nicodem.Backend
             return new SequenceNode(seq, out nextNodeSetter, Target.RAX);
         }
 
+        /// <summary>
+        /// Generates the whole body of this function: prologue, body, epilogue.
+        /// </summary>
+        public IEnumerable<Node> GenerateTheWholeBody()
+        {
+            return GeneratePrologue().Concat(Body.Concat(GenerateEpilogue()));
+        }
+
         // ------------------- private methods -------------------
 
         private LocationNode GetEnclosingFunctionStackFrame(Node stackFrame)
@@ -141,6 +156,22 @@ namespace Nicodem.Backend
             var push = new AssignmentNode(new MemoryNode(Target.RSP), value);
             var move = new AssignmentNode(Target.RSP, new SubOperatorNode(Target.RSP, new ConstantNode<long>(8)));
             return new Tuple<Node, Node>(push, move);
+        }
+
+        // ------ prologue, epilogue ------
+
+        private IEnumerable<Node> GeneratePrologue()
+        {
+            // TODO: implement this
+            // arguments locations in ArgsLocations -> rewrite them from registers
+            throw new NotImplementedException();
+        }
+
+        private IEnumerable<Node> GenerateEpilogue()
+        {
+            // TODO: implement this
+            // function result in Result -> mov it to RAX
+            throw new NotImplementedException();
         }
     }
 }

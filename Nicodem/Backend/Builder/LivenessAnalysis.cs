@@ -10,7 +10,7 @@ namespace Nicodem.Backend.Builder
 		{
 		}
 
-		public InterferenceGraph AnalyzeLiveness(List<Instruction> instructions) {
+		public InterferenceGraph AnalyzeLiveness(IEnumerable<Instruction> instructions) {
 			throw new NotImplementedException();
 		}
 	}

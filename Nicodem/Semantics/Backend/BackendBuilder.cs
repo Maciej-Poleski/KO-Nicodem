@@ -24,13 +24,14 @@ namespace Nicodem.Semantics
         {
             // TODO: implement this!
 
-            // example: values to fill
+            // example: values to fill!
             B.Function f = funDef.BackendFunction; // get previously created backend function object
             f.Body = null; // set body (backend tree)
             for (int i=0; i<f.ArgsCount; i++) {
                 // for each argument set temporary node used for this argument inside created backend tree
-                f.ArgTemporary[i] = new Brep.TemporaryNode(); 
+                f.ArgsLocations[i] = new Brep.TemporaryNode(); 
             }
+            f.Result = null; // set Node which value will be function result
 
             throw new NotImplementedException();
         }
