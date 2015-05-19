@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Nicodem.Backend.Representation;
 
@@ -23,6 +23,27 @@ namespace Nicodem.Backend
         // RBP - this stack frame
         // (optional) RBP-8 - address of stack frame of nearest enclosing Function (NOTE: space will be alocated in preamble)
 
+        // Can be public if somebody wants (but this structure will change soon)
+        private IReadOnlyList<bool> Parameters { get; set; }
+
+        // ------------------- properties -------------------
+
+        internal Function EnclosedIn
+        {
+            get { return _enclosedIn; }
+        }
+
+        /// <value>Body of this function.</value>
+        public IEnumerable<Node> Body { get; set; }
+
+        /// <value>Temporaries representing arguments inside Body.</value>
+        public TemporaryNode[] ArgTemporary { get; private set; } // TODO: set it inside constructor
+
+        /// <value>Number of arguments of this function.</value>
+        public int ArgsCount { get { return ArgTemporary.Length; } }
+
+        // ------------------- constructor -------------------
+
         /// <summary>
         /// </summary>
         /// <param name="parameterIsLocal">Bitmap of parameters which need to be Local</param>
@@ -32,33 +53,19 @@ namespace Nicodem.Backend
             _enclosedIn = enclosedInFunction;
         }
 
-        // Can be public if somebody wants (but this structure will change soon)
-        private IReadOnlyList<bool> Parameters { get; set; }
-
-        internal Function EnclosedIn
-        {
-            get { return _enclosedIn; }
-        }
+        // ------------------- internal methods -------------------
 
         internal LocationNode GetCurrentStackFrame()
         {
             return Target.RBP;
         }
 
-        private LocationNode GetEnclosingFunctionStackFrame(Node stackFrame)
-        {
-            if (_enclosedIn == null)
-            {
-                throw new InvalidOperationException("There is no enclosing function");
-            }
-            return new MemoryNode(new SubOperatorNode(stackFrame, new ConstantNode<long>(8)));
-            // Address of enclosing function stack frame is just below old RBP (current RBP-8)
-        }
-
         internal LocationNode GetEnclosingFunctionStackFrame()
         {
             return GetEnclosingFunctionStackFrame(GetCurrentStackFrame());
         }
+
+        // ------------------- public methods -------------------
 
         public Local AllocLocal()
         {
@@ -96,6 +103,20 @@ namespace Nicodem.Backend
             seq[ptr++] = new FunctionCallNode(this);
             return new SequenceNode(seq, out nextNodeSetter, Target.RAX);
         }
+
+        // ------------------- private methods -------------------
+
+        private LocationNode GetEnclosingFunctionStackFrame(Node stackFrame)
+        {
+            if (_enclosedIn == null)
+            {
+                throw new InvalidOperationException("There is no enclosing function");
+            }
+            return new MemoryNode(new SubOperatorNode(stackFrame, new ConstantNode<long>(8)));
+            // Address of enclosing function stack frame is just below old RBP (current RBP-8)
+        }
+
+        // ------ computation of stack ------
 
         private Node ComputationOfStackFrameAddress(Function target)
         {
