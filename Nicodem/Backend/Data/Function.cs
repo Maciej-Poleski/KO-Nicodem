@@ -18,6 +18,17 @@ namespace Nicodem.Backend
             Target.R9
         };
 
+		public static readonly HardwareRegisterNode[] CallerSavedRegisters = 
+		{
+			Target.RAX,
+			Target.RCX,
+			Target.RDX,
+			Target.R8,
+			Target.R9,
+			Target.R10,
+			Target.R11
+		};
+
         private readonly Function _enclosedIn;
         // Function with not null _enclosedIn have additional variable on stack just below old RBP - pointer to nearest enclosing Function stack frame
         private int _stackFrameSize;
@@ -35,7 +46,7 @@ namespace Nicodem.Backend
         }
 
         /// <value>Label of this function.</value>
-        internal string Label { get; private set; } // TODO: set it during object construction
+        public string Label { get; private set; } // TODO: set it during object construction
 
         /// <value>Body of this function.</value>
         public IEnumerable<Node> Body { get; set; }

@@ -11,6 +11,7 @@ namespace Nicodem.Backend.Tests
 		static readonly RegisterNode reg2 = new TemporaryNode ();
 		static readonly ConstantNode<long> constant = new ConstantNode<long> (10L);
 		static readonly LabelNode label = new LabelNode ("myLabel");
+		static readonly FunctionCallNode fun = new FunctionCallNode (new Function (new[]{ false }));
 
 		[Test]
 		public void Test_LabelInstructions () {
@@ -108,7 +109,9 @@ namespace Nicodem.Backend.Tests
 				InstructionFactory.Setge (reg1),
 				InstructionFactory.Setl (reg1),
 				InstructionFactory.Setle (reg1),
-				InstructionFactory.Setne (reg1)
+				InstructionFactory.Setne (reg1),
+
+				InstructionFactory.Call (fun)
 			};
 
 			foreach (var insn in lst) {
