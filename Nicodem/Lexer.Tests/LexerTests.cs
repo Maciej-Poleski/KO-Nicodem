@@ -113,6 +113,19 @@ namespace Lexer.Tests
             Assert.IsTrue(lexer.Process("db").Tokens().SequenceEqual(new[] {"d", "b"}));
             Assert.IsEmpty(lexer.Process("eb"));
         }
+
+        [Test]
+        public void LexerWhiteSpaceTest()
+        {
+            //var lexer = new Nicodem.Lexer.Lexer(RegExFactory.Concat(MakeCharRegex(' '), RegExFactory.Star(MakeCharRegex(' '))));
+            var lexer = new Nicodem.Lexer.Lexer(RegExParser.Parse("[:space:]+"));
+            Assert.IsEmpty(lexer.Process("a "));
+            Assert.IsEmpty(lexer.Process("a"));
+            Assert.IsTrue(lexer.Process(" a").Tokens().SequenceEqual(new[] { " " }));
+            Assert.IsTrue(lexer.Process(" ").Tokens().SequenceEqual(new[] { " " }));
+            Assert.IsTrue(lexer.Process("\n   ").Tokens().SequenceEqual(new[] { "\n   " }));
+            Assert.IsTrue(lexer.Process("\t\r\n a b c").Tokens().SequenceEqual(new[] { "\t\r\n " }));
+        }
     }
 
     internal static class Extensions
