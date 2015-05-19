@@ -135,6 +135,7 @@ namespace Lexer.Tests
             var lexer = new Nicodem.Lexer.Lexer(RegExParser.Parse("[:space:]*main[:space:]*\\(\\)[:space:]*"));
             Assert.IsEmpty(lexer.Process("a"));
             Assert.IsEmpty(lexer.Process("\tain()"));
+            Assert.IsTrue(lexer.Process("\rmain()").Tokens().SequenceEqual(new[] { "\rmain()" }));
             Assert.IsTrue(lexer.Process("\tmain()\n\n\n\n\n").Tokens().SequenceEqual(new[] { "\tmain()\n\n\n\n\n" }));
             Assert.IsTrue(lexer.Process(" main \n \r \t   ()tttt").Tokens().SequenceEqual(new[] { " main \n \r \t   ()" }));
             Assert.IsTrue(lexer.Process("main()").Tokens().SequenceEqual(new[] { "main()" }));
