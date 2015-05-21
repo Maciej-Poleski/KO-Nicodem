@@ -3,6 +3,9 @@ using Nicodem.Backend.Representation;
 
 namespace Nicodem.Backend
 {
+    /// <summary>
+    /// This is class with target architecture. It contains all physical registers.
+    /// </summary>
 	public class Target
 	{
 		public static readonly HardwareRegisterNode RAX = new HardwareRegisterNode ("rax");
@@ -14,7 +17,7 @@ namespace Nicodem.Backend
 		public static readonly HardwareRegisterNode RSI = new HardwareRegisterNode ("rsi");
         public static readonly HardwareRegisterNode RDI = new HardwareRegisterNode("rdi");
         public static readonly HardwareRegisterNode R8 = new HardwareRegisterNode("r8");
-		public static readonly HardwareRegisterNode R9  = new HardwareRegisterNode ("r9");
+		public static readonly HardwareRegisterNode R9 = new HardwareRegisterNode ("r9");
 		public static readonly HardwareRegisterNode R10 = new HardwareRegisterNode ("r10");
 		public static readonly HardwareRegisterNode R11 = new HardwareRegisterNode ("r11");
 		public static readonly HardwareRegisterNode R12 = new HardwareRegisterNode ("r12");
@@ -30,6 +33,25 @@ namespace Nicodem.Backend
 			// return new Function();
             // FIXME You must provide local/temporary variables bitmap
 		}
+
+        public static readonly HardwareRegisterNode[] AllHardwareRegisters = new HardwareRegisterNode[] {
+            RAX,
+            RBX,
+            RCX,
+            RDX,
+            RSP,
+            RBP,
+            RSI,
+            RDI,
+            R8 ,
+            R9 ,
+            R10,
+            R11,
+            R12,
+            R13,
+            R14,
+            R15,
+        };
 	}
 }
 

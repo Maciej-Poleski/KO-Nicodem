@@ -31,9 +31,12 @@ namespace Nicodem.Semantics.Visitors
             return visitor.Functions;
         }
 
-        internal static IReadOnlyList<Tuple<Function,ExpressionNode>> SplitIntoFunctions(
-            this ProgramNode node)
+        /// <summary>
+        /// Split program AST into functions. Each function cannot contain nested function code.
+        /// </summary>
+       internal static IReadOnlyCollection<FunctionDefinitionNode>  SplitIntoFunctions(this ProgramNode node)
         {
+            // TODO: implement!
             throw new NotImplementedException("Please, implement me!");
         }
     }

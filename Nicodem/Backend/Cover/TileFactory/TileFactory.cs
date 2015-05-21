@@ -28,6 +28,7 @@ namespace Nicodem.Backend.Cover
 				ConstTile<long>(),
 				MemAccessTile(),
 				MemAccessTile<long>(),
+				CallTile(),
 
 				Add.RegReg(),
 				Add.RegConst<long>(),
@@ -171,6 +172,15 @@ namespace Nicodem.Backend.Cover
 					return new[] {
 						InstructionFactory.MoveFromMemory (regNode, add)
 					};
+				}
+			);
+		}
+
+		public static Tile CallTile() {
+			return new Tile (typeof(FunctionCallNode),
+				new Tile[] { },
+				(regNode, node) => new[] {
+					InstructionFactory.Call (node as FunctionCallNode)
 				}
 			);
 		}

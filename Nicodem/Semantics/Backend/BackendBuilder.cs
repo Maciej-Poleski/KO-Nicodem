@@ -15,6 +15,26 @@ namespace Nicodem.Semantics
 			return (new DFSBuilder(function)).Build(expGraph.First());
 		}
 
+        /// <summary>
+        /// Returns fully prepared backend Function object for the given program function.
+        /// </summary>
+        /// <param name="funDef">Function definition.</param>
+        /// <param name="expGraph">ControlFlowGraph of this function body.</param>
+        public static B.Function BuildBackendFunction(AST.FunctionDefinitionNode funDef, IEnumerable<Vertex> expGraph)
+        {
+            // TODO: implement this!
+
+            // example: values to fill!
+            B.Function f = funDef.BackendFunction; // get previously created backend function object
+            f.Body = null; // set body (backend tree)
+            for (int i=0; i<f.ArgsCount; i++) {
+                // for each argument set temporary node used for this argument inside created backend tree
+                f.ArgsLocations[i] = new Brep.TemporaryNode(); 
+            }
+            f.Result = null; // set Node which value will be function result
+
+            throw new NotImplementedException();
+        }
 
 		// --- private classes --------------------------------------
 

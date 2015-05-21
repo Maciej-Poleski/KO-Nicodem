@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Linq;
 using System.Collections.Generic;
 using Nicodem.Backend.Representation;
 
@@ -17,11 +18,49 @@ namespace Nicodem.Backend
             Target.R9
         };
 
+		public static readonly HardwareRegisterNode[] CallerSavedRegisters = 
+		{
+			Target.RAX,
+			Target.RCX,
+			Target.RDX,
+			Target.R8,
+			Target.R9,
+			Target.R10,
+			Target.R11
+		};
+
         private readonly Function _enclosedIn;
         // Function with not null _enclosedIn have additional variable on stack just below old RBP - pointer to nearest enclosing Function stack frame
         private int _stackFrameSize;
         // RBP - this stack frame
         // (optional) RBP-8 - address of stack frame of nearest enclosing Function (NOTE: space will be alocated in preamble)
+
+        // Can be public if somebody wants (but this structure will change soon)
+        private IReadOnlyList<bool> Parameters { get; set; }
+
+        // ------------------- properties -------------------
+
+        internal Function EnclosedIn
+        {
+            get { return _enclosedIn; }
+        }
+
+        /// <value>Label of this function.</value>
+        public string Label { get; private set; } // TODO: set it during object construction
+
+        /// <value>Body of this function.</value>
+        public IEnumerable<Node> Body { get; set; }
+
+        /// <value>Locations representing arguments inside Body.</value>
+        public LocationNode[] ArgsLocations { get; private set; } // TODO: set it inside constructor
+
+        /// <value>Number of arguments of this function.</value>
+        public int ArgsCount { get { return ArgsLocations.Length; } }
+
+        /// <value>Node which value will be returned as this function result.</value>
+        public Node Result { get; set; }
+
+        // ------------------- constructor -------------------
 
         /// <summary>
         /// </summary>
@@ -32,33 +71,19 @@ namespace Nicodem.Backend
             _enclosedIn = enclosedInFunction;
         }
 
-        // Can be public if somebody wants (but this structure will change soon)
-        private IReadOnlyList<bool> Parameters { get; set; }
-
-        internal Function EnclosedIn
-        {
-            get { return _enclosedIn; }
-        }
+        // ------------------- internal methods -------------------
 
         internal LocationNode GetCurrentStackFrame()
         {
             return Target.RBP;
         }
 
-        private LocationNode GetEnclosingFunctionStackFrame(Node stackFrame)
-        {
-            if (_enclosedIn == null)
-            {
-                throw new InvalidOperationException("There is no enclosing function");
-            }
-            return new MemoryNode(new SubOperatorNode(stackFrame, new ConstantNode<long>(8)));
-            // Address of enclosing function stack frame is just below old RBP (current RBP-8)
-        }
-
         internal LocationNode GetEnclosingFunctionStackFrame()
         {
             return GetEnclosingFunctionStackFrame(GetCurrentStackFrame());
         }
+
+        // ------------------- public methods -------------------
 
         public Local AllocLocal()
         {
@@ -97,6 +122,28 @@ namespace Nicodem.Backend
             return new SequenceNode(seq, out nextNodeSetter, Target.RAX);
         }
 
+        /// <summary>
+        /// Generates the whole body of this function: prologue, body, epilogue.
+        /// </summary>
+        public IEnumerable<Node> GenerateTheWholeBody()
+        {
+            return GeneratePrologue().Concat(Body.Concat(GenerateEpilogue()));
+        }
+
+        // ------------------- private methods -------------------
+
+        private LocationNode GetEnclosingFunctionStackFrame(Node stackFrame)
+        {
+            if (_enclosedIn == null)
+            {
+                throw new InvalidOperationException("There is no enclosing function");
+            }
+            return new MemoryNode(new SubOperatorNode(stackFrame, new ConstantNode<long>(8)));
+            // Address of enclosing function stack frame is just below old RBP (current RBP-8)
+        }
+
+        // ------ computation of stack ------
+
         private Node ComputationOfStackFrameAddress(Function target)
         {
             if (target.EnclosedIn == this)
@@ -120,6 +167,22 @@ namespace Nicodem.Backend
             var push = new AssignmentNode(new MemoryNode(Target.RSP), value);
             var move = new AssignmentNode(Target.RSP, new SubOperatorNode(Target.RSP, new ConstantNode<long>(8)));
             return new Tuple<Node, Node>(push, move);
+        }
+
+        // ------ prologue, epilogue ------
+
+        private IEnumerable<Node> GeneratePrologue()
+        {
+            // TODO: implement this
+            // arguments locations in ArgsLocations -> rewrite them from registers
+            throw new NotImplementedException();
+        }
+
+        private IEnumerable<Node> GenerateEpilogue()
+        {
+            // TODO: implement this
+            // function result in Result -> mov it to RAX
+            throw new NotImplementedException();
         }
     }
 }
