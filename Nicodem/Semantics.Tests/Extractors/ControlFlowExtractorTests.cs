@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Nicodem.Semantics.AST;
+using Nicodem.Semantics.Extractors;
 
 namespace Semantics.Tests.Extractors
 {
@@ -37,14 +38,21 @@ namespace Semantics.Tests.Extractors
             OperatorNode first_statement = MakeOperator(OperatorType.PLUS, _a, _2); 
             OperatorNode _a_gret_3 = MakeOperator(OperatorType.GREATER, _a, _3);
             OperatorNode _a_plus_2 = MakeOperator(OperatorType.PLUS, _a, _2);
+            OperatorNode _a_plus_5 = MakeOperator(OperatorType.PLUS, _a, _5);
             IfNode _if = new IfNode();
+            _if.Condition = _a_gret_3;
+            _if.Then = _a_plus_2;
+            _if.Else = _a_plus_5;
+            OperatorNode second_statement = MakeOperator(OperatorType.PLUS, _a, MakeOperator(OperatorType.PLUS, _if, _5));
+            BlockExpressionNode _if_block = new BlockExpressionNode();
+            _if_block.Elements = new List<ExpressionNode> { first_statement, second_statement };
+            block_expression_operator_and_if = _if_block;
         }
 
         [Test]
         public void BasicIfTest()
         {
-            
-            //check number of nodes in graph
+            var cf_graph = new ControlFlowExtractor().Extract(block_expression_operator_and_if);
         }
         
     }
