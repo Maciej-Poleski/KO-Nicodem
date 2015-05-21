@@ -55,6 +55,7 @@
     <Compile Include="InstructionSelection\CompareNodeWithTileTests.cs" />
     <Compile Include="Builder\RegisterAllocatorTest.cs" />
     <Compile Include="Builder\FindUnionTest.cs" />
+    <Compile Include="Trace\TraceBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -80,5 +81,6 @@
     <Folder Include="Cover\" />
     <Folder Include="InstructionSelection\" />
     <Folder Include="Builder\" />
+    <Folder Include="Trace\" />
   </ItemGroup>
 </Project>

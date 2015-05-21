@@ -20,4 +20,3 @@ namespace Nicodem.Backend.Builder
 		public HashSet<Vertex> CopyNeighbors { get; set; }
 	}
 }
-

@@ -50,7 +50,7 @@ namespace Nicodem.Backend.Builder
 				UpdateVertexPartition (graph);
 
 			} while(toSimplify.Count > 0 || toSpill.Count > 0 || toFreeze.Count > 0);
-			Console.WriteLine (stack.Count);
+
 			AssignColors ();
 		}
 
@@ -171,7 +171,6 @@ namespace Nicodem.Backend.Builder
 
 				foreach (Vertex neigh in vertex.NonCopyNeighbors)
 					if (RegistersColoring.ContainsKey (neigh.Register)) {
-						Console.WriteLine (RegistersColoring [neigh.Register]);
 						forbidden.Add (RegistersColoring [neigh.Register]);
 					}
 				if (forbidden.Count >= registers.Count)
@@ -180,7 +179,6 @@ namespace Nicodem.Backend.Builder
 					foreach (HardwareRegisterNode reg in registers)
 						if (!forbidden.Contains (reg)) {
 							RegistersColoring [vertex.Register] = reg;
-							Console.WriteLine (reg.Name);
 							break;
 						}
 				}
