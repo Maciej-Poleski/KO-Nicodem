@@ -91,7 +91,7 @@ namespace Nicodem.Backend.Tests
 				InstructionFactory.Neg (reg1),
 				InstructionFactory.Not (reg1),
 
-				InstructionFactory.Call (label.Label),
+				InstructionFactory.Call (fun),
 				InstructionFactory.Ret (),
 
 				InstructionFactory.Pop (reg1),

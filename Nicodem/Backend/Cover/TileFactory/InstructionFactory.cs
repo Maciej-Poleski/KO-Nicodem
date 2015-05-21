@@ -30,16 +30,6 @@ namespace Nicodem.Backend.Cover
 				map => string.Format ("{0}:", label.Label), label.Label);
 		}
 
-		#region call
-
-		public static Instruction Call( FunctionCallNode function ) {
-			return new Instruction (
-				map => string.Format ("call {0}", function.Function.Label),
-				Function.CallerSavedRegisters, Function.CallerSavedRegisters);
-		}
-
-		#endregion
-
 		#region mov
 
 		public static Instruction Move( RegisterNode dst, RegisterNode src ) {
@@ -209,14 +199,14 @@ namespace Nicodem.Backend.Cover
 
 		#region call, ret
 
-		public static Instruction Call( string fname ) {
+		public static Instruction Call( FunctionCallNode function ) {
 			return new Instruction (
-				map => string.Format ("call {0}", fname),
-				use (), define ());
+				map => string.Format ("call {0}", function.Function.Label),
+				Function.CallerSavedRegisters, Function.CallerSavedRegisters);
 		}
 
 		public static Instruction Ret() {
-			return new Instruction (map => "ret", use (), define ());
+			return new Instruction (map => "ret", use (Target.RSP), define (Target.RSP));
 		}
 
 		#endregion
@@ -226,13 +216,13 @@ namespace Nicodem.Backend.Cover
 		public static Instruction Pop( RegisterNode reg ) {
 			return new Instruction (
 				map => string.Format ("pop {0}", map [reg]),
-				use (reg), define (reg));
+				use (reg, Target.RSP), define (reg, Target.RSP));
 		}
 
 		public static Instruction Push( RegisterNode reg ) {
 			return new Instruction (
 				map => string.Format ("push {0}", map [reg]),
-				use (reg), define ());
+				use (reg, Target.RSP), define (Target.RSP));
 		}
 
 		#endregion
