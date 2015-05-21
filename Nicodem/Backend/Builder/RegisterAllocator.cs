@@ -8,30 +8,75 @@ namespace Nicodem.Backend.Builder
 	public class RegisterAllocator
 	{
 		private readonly IList<HardwareRegisterNode> registers;
-		private Dictionary<Vertex,int> degree = new Dictionary<Vertex,int> ();
 		private HashSet<Vertex> toSpill = new HashSet<Vertex> ();
 		private HashSet<Vertex> toSimplify = new HashSet<Vertex> ();
+		private HashSet<Vertex> toFreeze = new HashSet<Vertex> ();
+		private HashSet<Move> toCoalesce = new HashSet<Move> ();
+		private HashSet<Vertex> frozen = new HashSet<Vertex> ();
+		private HashSet<Vertex> removed = new HashSet<Vertex> ();
+		private HashSet<Vertex> significantHeighbors = new HashSet<Vertex> ();
+		private InterferenceGraph interferenceGraph;
+		private FindUnion<Vertex> fu;
+
 		private Stack<Vertex> stack = new Stack<Vertex> ();
+		private Dictionary<Vertex, Vertex> mapping;
+
 
 		public RegisterAllocator (IList<HardwareRegisterNode> registers)
 		{
 			this.registers = registers;
+			SpilledRegisters = new List<RegisterNode> ();
+			RegistersColoring = new Dictionary<RegisterNode, HardwareRegisterNode> ();
 		}
 
 		public void AllocateRegisters (InterferenceGraph graph)
 		{		
 			SpilledRegisters.Clear ();
-			RegistersColoring.Clear();
+			RegistersColoring.Clear ();
+			mapping = InterferenceGraph.copyGraph (graph);
 
-			Initialize(graph);
+			Initialize (graph);
 
 			do {
 				if (toSimplify.Count > 0)
 					Simplify ();
-				else if (toSpill.Count > 0) Spill ();
-			} while(toSimplify.Count > 0 || toSpill.Count > 0);
+			//	else if (FindToCoalesce ())
+			//		Coalesce ();
+				else if (toFreeze.Count > 0)
+					Freeze ();
+				else if (toSpill.Count > 0)
+					Spill ();
 
+				UpdateVertexPartition (graph);
+
+			} while(toSimplify.Count > 0 || toSpill.Count > 0 || toFreeze.Count > 0);
+			Console.WriteLine (stack.Count);
 			AssignColors ();
+		}
+
+		private void UpdateVertexPartition (InterferenceGraph graph)
+		{
+			foreach (Vertex vertex in graph.Vertices)
+				if (removed.Contains (vertex))
+					continue;
+				else if (mapping [vertex].NonCopyNeighbors.Count < registers.Count) {
+					if (toSpill.Contains (vertex)) {
+						toSpill.Remove (vertex);
+						if (mapping [vertex].CopyNeighbors.Count > 0)
+							toFreeze.Add (vertex);
+						else
+							toSimplify.Add (vertex);
+					}
+				}
+
+			foreach (Vertex vertex in graph.Vertices)
+				if (removed.Contains (vertex))
+					continue;
+				else if (mapping [vertex].CopyNeighbors.Count == 0)
+				if (toFreeze.Contains (vertex)) {
+					toFreeze.Remove (vertex);
+					toSimplify.Add (vertex);
+				}
 		}
 
 		private void Simplify ()
@@ -39,10 +84,18 @@ namespace Nicodem.Backend.Builder
 			var v = toSimplify.First ();
 			stack.Push (v);
 			toSimplify.Remove (v);
-
-			foreach (Vertex vertex in v.NonCopyNeighbors)
-				DecrementDegree (vertex);
+			RemoveVertex (v);
 		}
+
+		private void RemoveVertex (Vertex v)
+		{
+			removed.Add (v);
+			foreach (Vertex neigh in mapping[v].NonCopyNeighbors)
+				neigh.NonCopyNeighbors.Remove (mapping [v]);
+			foreach (Vertex neigh in mapping[v].CopyNeighbors)
+				neigh.CopyNeighbors.Remove (mapping [v]);	
+		}
+
 
 		private void Spill ()
 		{
@@ -51,52 +104,143 @@ namespace Nicodem.Backend.Builder
 			toSimplify.Add (v);
 		}
 
+		private void Freeze ()
+		{
+			var v = toFreeze.First ();
+			toFreeze.Remove (v);
+			toSimplify.Add (v);
+			frozen.Add (v);
+		}
+
+		private void Coalesce ()
+		{
+			var move = toCoalesce.First ();
+			toCoalesce.Remove (move);
+
+			var a = fu.Find (move.en1);
+			var b = fu.Find (move.en2);
+
+			toSpill.Remove (b);
+			toFreeze.Remove (b);
+			toSimplify.Remove (b);
+			
+			a.CopyNeighbors.Union (b.CopyNeighbors);
+			a.NonCopyNeighbors.Union (b.NonCopyNeighbors);
+
+			foreach (Vertex vertex in a.CopyNeighbors) {
+				vertex.CopyNeighbors.Remove (b);
+				vertex.CopyNeighbors.Add (a);
+			}
+
+			foreach (Vertex vertex in a.NonCopyNeighbors) {
+				vertex.NonCopyNeighbors.Remove (b);
+				vertex.NonCopyNeighbors.Add (a);
+			}
+
+			fu.Union (a, b);
+		}
+
+		private bool FindToCoalesce ()
+		{
+			while (toCoalesce.Count > 0 && !ValidateMove (toCoalesce.First ()))
+				toCoalesce.Remove (toCoalesce.First ());
+			return (toCoalesce.Count > 0);
+		}
+
+		private bool ValidateMove (Move move)
+		{
+			if (frozen.Contains (move.en1) || frozen.Contains (move.en2))
+				return false;
+			if (fu.Find (move.en1) == fu.Find (move.en2))
+				return false;
+			return true;
+		}
+
+		private void RemoveCopy (Vertex a, Vertex b)
+		{
+			a.CopyNeighbors.Remove (fu.Find (b));
+			b.CopyNeighbors.Remove (fu.Find (a));
+			
+		}
+
 		private void AssignColors ()
 		{
-			while(stack.Count > 0) {
-				var vertex = stack.Pop();
-				var  forbidden = new HashSet<HardwareRegisterNode> ();
+			while (stack.Count > 0) {
+				var vertex = stack.Pop ();
+				var forbidden = new HashSet<HardwareRegisterNode> ();
 
 				foreach (Vertex neigh in vertex.NonCopyNeighbors)
-					if (RegistersColoring.ContainsKey (neigh.Register))
+					if (RegistersColoring.ContainsKey (neigh.Register)) {
+						Console.WriteLine (RegistersColoring [neigh.Register]);
 						forbidden.Add (RegistersColoring [neigh.Register]);
-
+					}
 				if (forbidden.Count >= registers.Count)
 					SpilledRegisters.Add (vertex.Register);
 				else {
 					foreach (HardwareRegisterNode reg in registers)
-						if (!forbidden.Contains (reg)){
+						if (!forbidden.Contains (reg)) {
 							RegistersColoring [vertex.Register] = reg;
+							Console.WriteLine (reg.Name);
 							break;
 						}
 				}
 			}
 		}
 
-		private void Initialize(InterferenceGraph graph){
-			toSpill.Clear();
-			toSimplify.Clear();
-			stack.Clear();
-
-			foreach(Vertex vertex in graph.Vertices){
-				degree[vertex] = vertex.NonCopyNeighbors.Count;
-				if(vertex.Register is HardwareRegisterNode) continue;
-				if(degree[vertex] < registers.Count) toSimplify.Add(vertex);
-				else
-					toSpill.Add(vertex);
-			}
-		}
-
-		private void DecrementDegree (Vertex vertex)
+		private void Initialize (InterferenceGraph graph)
 		{
-			--degree [vertex];
+			toSpill.Clear ();
+			toSimplify.Clear ();
+			toFreeze.Clear ();
+			toCoalesce.Clear ();
+			removed.Clear ();
+			frozen.Clear ();
+			stack.Clear ();
+			fu = new FindUnion<Vertex> (graph.Vertices);
 
-			if (degree [vertex] == registers.Count - 1) {
-				toSpill.Remove (vertex);
-				toSimplify.Add(vertex);
+			foreach (Vertex vertex in graph.Vertices) {
+				if (vertex.Register is HardwareRegisterNode) {
+					RegistersColoring [vertex.Register] = vertex.Register as HardwareRegisterNode;
+					continue;
+				}
+				if (vertex.NonCopyNeighbors.Count < registers.Count) {
+					if (vertex.CopyNeighbors.Count > 0)
+						toFreeze.Add (vertex);
+					else
+						toSimplify.Add (vertex);
+				} else
+					toSpill.Add (vertex);
+
+				/*	foreach (Vertex neigh in vertex.NonCopyNeighbors)
+					if (neigh.NonCopyNeighbors.Count >= registers.Count)
+						++significantHeighbors [vertex]++;
+			*/
 			}
 		}
 
+		private bool BriggsTest (Vertex a, Vertex b)
+		{
+			int counter = 0;
+
+			foreach (Vertex neigh in a.NonCopyNeighbors.Intersect(b.NonCopyNeighbors))
+				if (neigh.CopyNeighbors.Count >= registers.Count)
+					++counter;
+
+			return (counter < registers.Count);
+		}
+
+
+		private struct Move
+		{
+			public Vertex en1;
+			public Vertex en2;
+
+			public Move (Vertex en1, Vertex en2)
+			{
+				this.en1 = en1;
+				this.en2 = en2;
+			}
+		}
 
 		public Dictionary<RegisterNode, HardwareRegisterNode> RegistersColoring { 
 			get;
