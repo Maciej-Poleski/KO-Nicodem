@@ -28,7 +28,7 @@ namespace Nicodem.Lexer
             while (Q.Count > 0)
             {
                 IDfaState<char> current_state = Q.Dequeue();
-                if (color.ContainsKey(current_state))
+                if (!color.ContainsKey(current_state))
                 {
                     color[current_state] = 1;
                     if (current_state.IsPseudoDead())
