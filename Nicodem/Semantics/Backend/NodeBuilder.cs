@@ -4,25 +4,26 @@ using System.Linq;
 using Nicodem.Semantics.AST;
 using B = Nicodem.Backend;
 using Brep = Nicodem.Backend.Representation;
+using AST = Nicodem.Semantics.AST;
 
 namespace Nicodem.Semantics
 {
 	class NodeBuilder
 	{
 
-		public static Brep.Node BuildNode(ExpressionNode expNode, B.Function function)
+		public static Brep.Node BuildNode(ExpressionNode expNode, AST.FunctionDefinitionNode funDef)
 		{
-			return (new RecursiveBuilder(function)).Build(expNode as dynamic);
+			return (new RecursiveBuilder(funDef)).Build(expNode as dynamic);
 		}
 
 		// --- private classes -----------
 		private class RecursiveBuilder
 		{
-			private readonly B.Function function;
+			private readonly AST.FunctionDefinitionNode funDef;
 
-			public RecursiveBuilder(B.Function function)
+			public RecursiveBuilder(AST.FunctionDefinitionNode funDef)
 			{
-				this.function = function;
+				this.funDef = funDef;
 			}
 
 			public Brep.Node Build(Node node) {
@@ -72,11 +73,22 @@ namespace Nicodem.Semantics
 
 			}
 
+			// the only situation to call method is when we want a value of some function argument
+			// all args in B.Function are assumed to be already set
+			public Brep.Node Build(VariableDeclNode argNode)
+			{
+				int argNum = GetArgNumber(argNode, funDef.BackendFunction);
+				if(argNum < 0) {
+					throw new InvalidOperationException("Trying to use undeclared function argument");
+				}
+				return funDef.BackendFunction.ArgsLocations[argNum];
+			}
+
 			public Brep.Node Build(VariableDefNode defNode)
 			{
 				if(defNode.NestedUse) {
-					var loc = function.AllocLocal();
-					defNode.VariableLocation = function.AccessLocal(loc);
+					var loc = funDef.BackendFunction.AllocLocal();
+					defNode.VariableLocation = funDef.BackendFunction.AccessLocal(loc);
 				} else {
 					defNode.VariableLocation = new Brep.TemporaryNode();
 				}
@@ -103,7 +115,7 @@ namespace Nicodem.Semantics
 			        args[i] = Build(funCallNode.Arguments[i] as dynamic);
 			    }
                 Action<Brep.Node> setter;
-			    return funCallNode.Definition.BackendFunction.FunctionCall(function, args, out setter);
+				return funCallNode.Definition.BackendFunction.FunctionCall(funDef.BackendFunction, args, out setter);
 			}
 
 			public Brep.Node Build(OperatorNode opNode)
@@ -256,6 +268,17 @@ namespace Nicodem.Semantics
 					throw new InvalidOperationException("Cannot assign something to a null location");
 				}
 				return new Brep.AssignmentNode(location, expr);
+			}
+
+			private static int GetArgNumber(AST.VariableDeclNode arg, B.Function function)
+			{
+				for(int i = 0; i < function.ArgsLocations.Count(); i++) {
+					if(Object.ReferenceEquals(arg, function.ArgsLocations[i])) {
+						return i;
+					}
+				}
+
+				return -1;
 			}
 		}
 	}

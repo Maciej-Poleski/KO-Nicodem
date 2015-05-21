@@ -9,12 +9,6 @@ namespace Nicodem.Semantics
 {
 	class BackendBuilder
 	{
-
-		public static Brep.Node BuildBackend(IEnumerable<Vertex> expGraph, B.Function function)
-		{
-			return (new DFSBuilder(function)).Build(expGraph.First());
-		}
-
         /// <summary>
         /// Returns fully prepared backend Function object for the given program function.
         /// </summary>
@@ -22,32 +16,30 @@ namespace Nicodem.Semantics
         /// <param name="expGraph">ControlFlowGraph of this function body.</param>
         public static B.Function BuildBackendFunction(AST.FunctionDefinitionNode funDef, IEnumerable<Vertex> expGraph)
         {
-            // TODO: implement this!
-
-            // example: values to fill!
             B.Function f = funDef.BackendFunction; // get previously created backend function object
-            f.Body = null; // set body (backend tree)
-            for (int i=0; i<f.ArgsCount; i++) {
+            for (int i = 0; i < f.ArgsCount; i++) {
                 // for each argument set temporary node used for this argument inside created backend tree
                 f.ArgsLocations[i] = new Brep.TemporaryNode(); 
             }
-            f.Result = null; // set Node which value will be function result
 
-            throw new NotImplementedException();
+			f.Body = new List<Brep.Node>{ (new DFSBuilder(funDef)).Build(expGraph.First()) };
+            f.Result = null; // TODO set Node which value will be function result
+
+			return f;
         }
 
 		// --- private classes --------------------------------------
 
 		private class DFSBuilder
 		{
-			private B.Function function;
+			private AST.FunctionDefinitionNode funDef;
 			private Dictionary<Vertex, bool> visitted = new Dictionary<Vertex, bool>();
 			private Dictionary<Vertex, Brep.Node> built = new Dictionary<Vertex, Brep.Node>();
 			private Dictionary<Vertex, List<Action<Brep.Node>>> awaiting = new Dictionary<Vertex, List<Action<Brep.Node>>>();
 
-			public DFSBuilder(B.Function function)
+			public DFSBuilder(AST.FunctionDefinitionNode funDef)
 			{
-				this.function = function;
+				this.funDef = funDef;
 			}
 
 			public Brep.Node Build(Vertex expVertex)
@@ -59,7 +51,7 @@ namespace Nicodem.Semantics
 
 					var condVertex = expVertex as ConditionalJumpVertex;
 
-					var condNode = NodeBuilder.BuildNode(condVertex.Expression, function);
+					var condNode = NodeBuilder.BuildNode(condVertex.Expression, funDef);
 
 					Action<Brep.Node> trueAct = null;
 					Action<Brep.Node> falseAct = null;
@@ -72,7 +64,7 @@ namespace Nicodem.Semantics
 					// I interpret it as a sequence of two actions, therefore:
 					var jumpVertex = expVertex as OneJumpVertex;
 
-					var first = NodeBuilder.BuildNode(jumpVertex.Expression, function);
+					var first = NodeBuilder.BuildNode(jumpVertex.Expression, funDef);
 
 					Action<Brep.Node> secondAct = null;
 					newNode = new Brep.SequenceNode(new List<Brep.Node>{first}, out secondAct);
@@ -80,7 +72,7 @@ namespace Nicodem.Semantics
 				} else {
 
 					var retVertex = expVertex as ReturnVertex;
-					newNode = NodeBuilder.BuildNode(retVertex.Expression, function);
+					newNode = NodeBuilder.BuildNode(retVertex.Expression, funDef);
 				}
 
 				// finish build of dependent nodes
