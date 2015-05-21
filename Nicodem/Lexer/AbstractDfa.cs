@@ -22,6 +22,9 @@ namespace Nicodem.Lexer
             int number = 0;
             Queue<IDfaState<char>> Q = new Queue<IDfaState<char>>();
             Dictionary<IDfaState<char>, int> color = new Dictionary<IDfaState<char>, int>();
+
+            Q.Enqueue(dfa.Start);
+
             while (Q.Count > 0)
             {
                 IDfaState<char> current_state = Q.Dequeue();
