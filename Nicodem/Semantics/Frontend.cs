@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Nicodem.Parser;
 using Nicodem.Semantics.AST;
 using Nicodem.Semantics.Visitors;
+using Nicodem.Semantics.Extractors;
 
 namespace Nicodem.Semantics
 {

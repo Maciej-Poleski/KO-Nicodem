@@ -10,6 +10,22 @@ namespace Nicodem.Backend.Tests
 	public class TileFactoryTests
 	{
 		[Test]
+		public void Test_Call() {
+			var fun = new Function (new[]{ false }); //TODO { Label = "myFun" };
+			var node = new FunctionCallNode (fun);
+
+			var map = TileFactoryTestUtils.createMapping ();
+			var instructions = TileFactory.CallTile ().Cover (node);
+			TileFactoryTestUtils.updateMapping (instructions, map);
+
+			var got = TileFactoryTestUtils.getASM (instructions, map);
+			var expected = 
+				"call " + node.Function.Label + "\n";
+
+			Assert.AreEqual (expected, got);
+		}
+
+		[Test]
 		public void Test_Const() {
 			var node = new ConstantNode<long> (123L);
 

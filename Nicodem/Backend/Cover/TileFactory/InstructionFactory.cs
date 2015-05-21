@@ -30,6 +30,16 @@ namespace Nicodem.Backend.Cover
 				map => string.Format ("{0}:", label.Label), label.Label);
 		}
 
+		#region call
+
+		public static Instruction Call( FunctionCallNode function ) {
+			return new Instruction (
+				map => string.Format ("call {0}", function.Function.Label),
+				Function.CallerSavedRegisters, Function.CallerSavedRegisters);
+		}
+
+		#endregion
+
 		#region mov
 
 		public static Instruction Move( RegisterNode dst, RegisterNode src ) {

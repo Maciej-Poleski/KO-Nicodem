@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nicodem.Semantics
+namespace Nicodem.Semantics.Extractors
 {
-    class SideEffectExtractor
+    public class SideEffectExtractor
     {
         IEnumerable<ExpressionNode> Extract(ExpressionNode root)
         {

@@ -38,6 +38,20 @@ namespace Nicodem.Semantics.Visitors
             nodes_to_next_jmp = new List<Vertex>();
         }
 
+        public override void Visit(ArrayNode node)
+        {
+            base.Visit(node);
+            var new_elements = new List<ExpressionNode>();
+            foreach (var element in node.Elements)
+            {
+                if (changed_nodes.ContainsKey(element))
+                    new_elements.Add(changed_nodes[element]);
+                else
+                    new_elements.Add(element);
+            }
+            node.Elements = new_elements;
+        }
+
         public override void Visit(BlockExpressionNode node)
         {
             base.Visit(node);
