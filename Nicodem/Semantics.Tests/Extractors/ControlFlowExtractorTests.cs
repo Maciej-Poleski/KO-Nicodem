@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using Nicodem.Semantics.AST;
 using Nicodem.Semantics.Extractors;
+using Nicodem.Semantics.ExpressionGraph;
 
 namespace Semantics.Tests.Extractors
 {
@@ -13,7 +14,7 @@ namespace Semantics.Tests.Extractors
     class ControlFlowExtractorTests
     {
 
-        ExpressionNode block_expression_operator_and_if;
+        BlockExpressionNode block_expression_operator_and_if;
 
         private OperatorNode MakeOperator(OperatorType _operator, params ExpressionNode[] _arguments){
             OperatorNode made_one = new OperatorNode();
@@ -52,7 +53,8 @@ namespace Semantics.Tests.Extractors
         [Test]
         public void BasicIfTest()
         {
-            var cf_graph = new ControlFlowExtractor().Extract(block_expression_operator_and_if);
+            IEnumerable<Vertex> cf_graph = new ControlFlowExtractor().Extract(block_expression_operator_and_if);
+            Assert.AreEqual(5, cf_graph.Count());
         }
         
     }

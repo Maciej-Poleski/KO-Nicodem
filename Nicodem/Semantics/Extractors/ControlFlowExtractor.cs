@@ -7,7 +7,7 @@ using Nicodem.Semantics.ExpressionGraph;
 using Nicodem.Semantics.AST;
 using Nicodem.Semantics.Visitors;
 
-namespace Nicodem.Semantics
+namespace Nicodem.Semantics.Extractors
 {
     class ControlFlowExtractor
     {

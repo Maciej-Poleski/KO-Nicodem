@@ -54,6 +54,12 @@
     <Compile Include="ExpressionGraph\ConditionalJumpVertex.cs" />
     <Compile Include="ExpressionGraph\OneJumpVertex.cs" />
     <Compile Include="ExpressionGraph\Vertex.cs" />
+    <Compile Include="Extractors\ControlFlowExtractor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Extractors\SideEffectExtractor.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Grammar\NicodemGrammarProductions.cs" />
     <Compile Include="Grammar\Production.cs" />
     <Compile Include="Grammar\Symbol.cs" />
@@ -96,8 +102,6 @@
     <Compile Include="Backend\BackendBuilder.cs" />
     <Compile Include="Backend\NodeBuilder.cs" />
     <Compile Include="Frontend.cs" />
-    <Compile Include="Extractors\ControlFlowExtractor.cs" />
-    <Compile Include="Extractors\SideEffectExtractor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -134,9 +138,5 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup />
-  <ItemGroup>
-    <Folder Include="Extractors\" />
   </ItemGroup>
 </Project>
