@@ -11,7 +11,7 @@ namespace Nicodem.Backend
 		private static LabelNode epilog;
 		private static List<Node> trace;
 		private static Dictionary<Node, LabelNode> labels;
-		private static Dictionary<Node, bool> assigned;
+		private static HashSet<Node> assigned;
 
 
 		public static IEnumerable<Node> BuildTrace (Node node)
@@ -19,7 +19,7 @@ namespace Nicodem.Backend
 			trace = new List<Node> ();
 			epilog = LabelFactory.NextLabel ();
 			labels = new Dictionary<Node, LabelNode> ();
-			assigned = new Dictionary<Node, bool> ();
+			assigned = new HashSet<Node> ();
 
 			DfsVisit (node);
 			trace.Add (epilog);
@@ -39,7 +39,7 @@ namespace Nicodem.Backend
 
 		private static void DfsVisit (Node node)
 		{
-			assigned [node] = true;
+			assigned.Add(node);
 			trace.Add (GetLabel (node));
 			
 			if (node is ConditionalJumpNode) {
@@ -49,7 +49,7 @@ namespace Nicodem.Backend
 				var otherNode = conditionalJump.NextNodeIfFalse;
 				var condition = conditionalJump.Condition;
 
-				if (conditionalJump.NextNodeIfTrue == null || assigned [conditionalJump.NextNodeIfTrue]) {
+				if (conditionalJump.NextNodeIfTrue == null || assigned.Contains(conditionalJump.NextNodeIfTrue)) {
 					condition = new NegOperatorNode (condition);
 					otherNode = conditionalJump.NextNodeIfTrue;
 					nextNode = conditionalJump.NextNodeIfFalse;
@@ -57,14 +57,14 @@ namespace Nicodem.Backend
 
 				trace.Add (new ConditionalJumpToLabelNode (condition, GetLabel (otherNode)));
 
-				if (!assigned [nextNode])
+				if (!assigned.Contains(nextNode))
 					DfsVisit (nextNode);
 				else
 					trace.Add (new UnconditionalJumpToLabelNode (GetLabel (nextNode)));
 
-				if (!assigned [otherNode])
+				if (!assigned.Contains(otherNode))
 					DfsVisit (otherNode);
-		
+
 			} else if (node is SequenceNode) {
 				var sequenceNode = node as SequenceNode;
 
@@ -72,7 +72,7 @@ namespace Nicodem.Backend
 					trace.Add (expr);
 
 				trace.Add (new UnconditionalJumpToLabelNode (GetLabel (sequenceNode.NextNode)));
-				if (!assigned [sequenceNode.NextNode])
+				if (!assigned.Contains(sequenceNode.NextNode))
 					DfsVisit (sequenceNode.NextNode);
 			}
 		}
