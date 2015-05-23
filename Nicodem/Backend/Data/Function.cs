@@ -178,6 +178,8 @@ namespace Nicodem.Backend
         private IEnumerable<Node> GeneratePrologue()
         {
 			var prologue = new List<Node> ();
+			// add label
+			prologue.Add(new LabelNode(Label));
 			// push rbp
 			var pushRbp = Push (Target.RBP);
 			prologue.Add (pushRbp.Item1);
@@ -185,10 +187,10 @@ namespace Nicodem.Backend
 			// mov rbp, rsp
 			prologue.Add (new AssignmentNode(Target.RBP, Target.RSP));
 			// sub rsp, _stackFrameSize
-			prologue.Add (new AssignmentNode(Target.RSP, new SubOperatorNode(Target.RSP, new ConstantNode<long>(_stackFrameSize))));
+			prologue.Add (new SubOperatorNode(Target.RSP, new ConstantNode<long>(_stackFrameSize)));
 
             // move arguments from hardware registers to LocationNodes in ArgsLocations
-			for (int i = 0; i < HardwareRegistersOrder.Length; i++) {
+			for (int i = 0; i < ArgsCount; i++) {
 				prologue.Add (new AssignmentNode (ArgsLocations [i], HardwareRegistersOrder [i]));
 			}
 
