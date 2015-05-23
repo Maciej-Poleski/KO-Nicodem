@@ -99,13 +99,5 @@ namespace Nicodem.Backend.Representation
 			instructions.AddRange (coveringTile.Cover (this));
 			return instructions;
 		}
-
-		// Returns a list of instructions covering the trees given as arguments.
-		public static IEnumerable<Instruction> CoverNodesWithInstructions(IEnumerable<Node> nodesToCover) {
-			var instructions = new List<Instruction> ();
-			foreach (var node in nodesToCover)
-				instructions.AddRange (node.CoverWithInstructions ());
-			return instructions;
-		}
     }
 }

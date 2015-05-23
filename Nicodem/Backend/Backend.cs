@@ -17,7 +17,6 @@ namespace Nicodem.Backend
                 f.Body = TraceBuilder.BuildTrace(f.Body.First());
             }
 
-            var instrSelector = new InstructionSelection();
             var livenessAnalyzer = new LivenessAnalysis();
             var regAllocator = new RegisterAllocator(Target.AllHardwareRegisters);
 
@@ -28,7 +27,7 @@ namespace Nicodem.Backend
                         throw new ArgumentException("Your input is stupid... (or our compiler).");
                     }
                     var fBody = f.GenerateTheWholeBody();
-                    var fInstr = instrSelector.SelectInstructions(fBody);
+					var fInstr = InstructionSelection.SelectInstructions(fBody);
                     var inGraph = livenessAnalyzer.AnalyzeLiveness(fInstr);
                     regAllocator.AllocateRegisters(inGraph);
                     var toCorrect = regAllocator.SpilledRegisters;

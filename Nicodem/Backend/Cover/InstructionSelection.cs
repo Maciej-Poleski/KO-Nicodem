@@ -9,10 +9,12 @@ namespace Nicodem.Backend.Cover
         /// <summary>
         /// Selects instructions covering given backend trees in the given order.
         /// </summary>
-        public IEnumerable<Instruction> SelectInstructions(IEnumerable<Node> backendTrees)
+        public static IEnumerable<Instruction> SelectInstructions(IEnumerable<Node> backendTrees)
         {
-            // TODO: implement this!
-            throw new NotImplementedException();
+			var instructions = new List<Instruction> ();
+			foreach (var tree in backendTrees)
+				instructions.AddRange (tree.CoverWithInstructions ());
+			return instructions;
         }
     }
 }
