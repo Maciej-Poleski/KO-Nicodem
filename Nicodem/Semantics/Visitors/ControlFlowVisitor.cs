@@ -38,23 +38,29 @@ namespace Nicodem.Semantics.Visitors
             nodes_to_next_jmp = new List<Vertex>();
         }
 
+        private IEnumerable<ExpressionNode> ReplaceChangedNodes(IEnumerable<ExpressionNode> nodes)
+        {
+            var new_nodes = new List<ExpressionNode>();
+            foreach (var node in nodes)
+            {
+                if (changed_nodes.ContainsKey(node))
+                    new_nodes.Add(changed_nodes[node]);
+                else
+                    new_nodes.Add(node);
+            }
+            return new_nodes;
+        }
+
         public override void Visit(ArrayNode node)
         {
             base.Visit(node);
-            var new_elements = new List<ExpressionNode>();
-            foreach (var element in node.Elements)
-            {
-                if (changed_nodes.ContainsKey(element))
-                    new_elements.Add(changed_nodes[element]);
-                else
-                    new_elements.Add(element);
-            }
-            node.Elements = new_elements;
+            node.Elements = ReplaceChangedNodes(node.Elements);
         }
 
         public override void Visit(BlockExpressionNode node)
         {
             base.Visit(node);
+            node.Elements = ReplaceChangedNodes(node.Elements);
             foreach (var expression in node.Elements)
             {
                 OneJumpVertex next_vertex = new OneJumpVertex(null, expression);
@@ -64,12 +70,28 @@ namespace Nicodem.Semantics.Visitors
             }
         }
 
+        public override void Visit(FunctionCallNode node)
+        {
+            base.Visit(node);
+            node.Arguments = new List<ExpressionNode> (ReplaceChangedNodes(node.Arguments));
+        }
+
         public override void Visit(IfNode node)
         {
             base.Visit(node);
 
-            VariableDeclNode t = new VariableDeclNode();
+            if (changed_nodes.ContainsKey(node.Condition))
+                node.Condition = changed_nodes[node.Condition];
+            if (changed_nodes.ContainsKey(node.Then))
+                node.Then = changed_nodes[node.Then];
+            if (changed_nodes.ContainsKey(node.Else))
+                node.Else = changed_nodes[node.Else];
+
+            VariableDefNode t = new VariableDefNode();
             t.Name = "T" + temporary_counter;
+            AtomNode _0 = new AtomNode(NamedTypeNode.IntType());
+            _0.Value = "0";
+            t.Value = _0;
             VariableUseNode t_use = new VariableUseNode();
             t_use.Declaration = t;
             t_use.Name = "T" + temporary_counter;
@@ -122,21 +144,20 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(OperatorNode node)
         {
             base.Visit(node);
-            var new_arguments = new List<ExpressionNode>();
-            foreach(var argument in node.Arguments)
-            {
-                if (changed_nodes.ContainsKey(argument))
-                    new_arguments.Add(changed_nodes[argument]);
-                else
-                    new_arguments.Add(argument);
-            }
-            node.Arguments = new_arguments;
+            node.Arguments = ReplaceChangedNodes(node.Arguments);
         }
 
         public override void Visit(WhileNode node)
         {
             while_stack.Add(node);
             base.Visit(node);
+
+            if (changed_nodes.ContainsKey(node.Condition))
+                node.Condition = changed_nodes[node.Condition];
+            if (changed_nodes.ContainsKey(node.Body))
+                node.Body = changed_nodes[node.Body];
+            if (changed_nodes.ContainsKey(node.Else))
+                node.Else = changed_nodes[node.Else];
 
             ConditionalJumpVertex condition_vertex = new ConditionalJumpVertex(null, null, node.Condition);
             graph_vertex.Add(condition_vertex);
