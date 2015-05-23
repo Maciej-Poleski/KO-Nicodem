@@ -29,6 +29,8 @@ namespace Nicodem.Backend
 			Target.R11
 		};
 
+		public static readonly HardwareRegisterNode[] CalleeSavedRegisters = { };
+
         private readonly Function _enclosedIn;
         // Function with not null _enclosedIn have additional variable on stack just below old RBP - pointer to nearest enclosing Function stack frame
         private int _stackFrameSize;
@@ -53,6 +55,8 @@ namespace Nicodem.Backend
 
         /// <value>Locations representing arguments inside Body.</value>
         public LocationNode[] ArgsLocations { get; private set; } // TODO: set it inside constructor
+
+		public LocationNode[] CalleeSavedRegLocations { get; private set; } // TODO: create inside constructor (count = count of CalleeSavedRegisters)
 
         /// <value>Number of arguments of this function.</value>
         public int ArgsCount { get { return ArgsLocations.Length; } }
@@ -173,16 +177,46 @@ namespace Nicodem.Backend
 
         private IEnumerable<Node> GeneratePrologue()
         {
-            // TODO: implement this
-            // arguments locations in ArgsLocations -> rewrite them from registers
-            throw new NotImplementedException();
+			var prologue = new List<Node> ();
+			// push rbp
+			var pushRbp = Push (Target.RBP);
+			prologue.Add (pushRbp.Item1);
+			prologue.Add (pushRbp.Item2);
+			// mov rbp, rsp
+			prologue.Add (new AssignmentNode(Target.RBP, Target.RSP));
+			// sub rsp, _stackFrameSize
+			prologue.Add (new AssignmentNode(Target.RSP, new SubOperatorNode(Target.RSP, new ConstantNode<long>(_stackFrameSize))));
+
+            // move arguments from hardware registers to LocationNodes in ArgsLocations
+			for (int i = 0; i < HardwareRegistersOrder.Length; i++) {
+				prologue.Add (new AssignmentNode (ArgsLocations [i], HardwareRegistersOrder [i]));
+			}
+
+			// save callee-saved registers
+			for (int i = 0; i < CalleeSavedRegisters.Length; i++) {
+				prologue.Add (new AssignmentNode (CalleeSavedRegLocations [i], CalleeSavedRegisters [i]));
+			}
+
+			return prologue;
         }
 
         private IEnumerable<Node> GenerateEpilogue()
         {
-            // TODO: implement this
+			var epilogue = new List<Node> ();
             // function result in Result -> mov it to RAX
-            throw new NotImplementedException();
+			epilogue.Add (new AssignmentNode (Target.RAX, Result));
+			// restore callee-saved registers
+			for (int i = 0; i < CalleeSavedRegisters.Length; i++) {
+				epilogue.Add (new AssignmentNode (CalleeSavedRegisters [i], CalleeSavedRegLocations [i]));
+			}
+			// mov rsp, rbp
+			epilogue.Add(new AssignmentNode (Target.RSP, Target.RBP));
+			// pop rbp
+			epilogue.Add(new AssignmentNode (Target.RBP, new MemoryNode(Target.RSP)));
+			epilogue.Add (new AssignmentNode (Target.RSP, new AddOperatorNode (Target.RSP, new ConstantNode<long> (8))));
+			// ret
+			epilogue.Add(new RetNode());
+			return epilogue;
         }
     }
 }
