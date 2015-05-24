@@ -104,10 +104,10 @@ namespace Nicodem.Backend
 
         public SequenceNode FunctionCall(Function from, Node[] args, out Action<Node> nextNodeSetter)
         {
-            return FunctionCall(from, args, new TemporaryNode(), nextNodeSetter);
+            return FunctionCall(from, args, new TemporaryNode(), out nextNodeSetter);
         }
 
-        public SequenceNode FunctionCall(Function from, Node[] args, LocationNode result, out Action<Node> nextNodeSetter)
+        public SequenceNode FunctionCall(Function from, Node[] args, RegisterNode result, out Action<Node> nextNodeSetter)
         {
             var pl = _enclosedIn == null ? 0 : 1; // space for enclosing function stack frame address
             var seq = new Node[args.Length + Math.Max(0, args.Length - HardwareRegistersOrder.Length) + 3 + pl];
@@ -129,8 +129,8 @@ namespace Nicodem.Backend
                 seq[ptr++] = v.Item2;
             }
             seq[ptr++] = new FunctionCallNode(this);
-            seq[ptr++] = new AssignmentNode(result, Body);  // Assume value of function body is return value
-            seq[ptr++] = new AssignmentNode(Target.RSP, new AddOperatorNode(Target.RSP, _stackFrameSize));
+            seq[ptr++] = new AssignmentNode(result, Body.Last().ResultRegister);  // Assume value of function body is return value
+            seq[ptr++] = new AssignmentNode(Target.RSP, new AddOperatorNode(Target.RSP, new ConstantNode<long>(_stackFrameSize)));
             return new SequenceNode(seq, out nextNodeSetter, result);
         }
 

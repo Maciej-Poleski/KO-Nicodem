@@ -11,7 +11,7 @@ namespace Nicodem.Backend.Tests
 	{
 		[Test]
 		public void Test_Call() {
-			var fun = new Function (new[]{ false }); //TODO { Label = "myFun" };
+			var fun = new Function ("myFun", new[]{ false });
 			var node = new FunctionCallNode (fun);
 
 			var map = TileFactoryTestUtils.createMapping ();
