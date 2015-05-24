@@ -37,6 +37,7 @@ namespace Nicodem.Semantics.Visitors
             var oldFunction = _currentFunction;
             var parametersBitmap = node.Parameters.Select(p => p.NestedUse).ToArray();
             _currentFunction = new Function(node.Name, parametersBitmap, oldFunction);  // no name mangling for now - no function name overloading
+            node.BackendFunction = _currentFunction;
             _functions.Add(_currentFunction);
             base.Visit(node);
             _currentFunction = oldFunction;
@@ -64,16 +65,11 @@ namespace Nicodem.Semantics.Visitors
                 Name = f.Name, 
                 Parameters = f.Parameters, 
                 BackendFunction = f.BackendFunction, 
-                Body = filterBody(f.Body), 
+                Body = FunctionDefFilterVisitor.FilterBody(f.Body), 
                 ExpressionType = f.ExpressionType, 
                 Fragment = f.Fragment,
                 ResultType = f.ResultType
             }).ToArray();
-        }
-
-        private static ExpressionNode filterBody(ExpressionNode expressionNode)
-        {
-            return expressionNode;  // TODO filter out nested functions
         }
 
         internal static IReadOnlyCollection<Function> SplitIntoBackendFunctions(this ProgramNode node)
@@ -81,6 +77,22 @@ namespace Nicodem.Semantics.Visitors
             var visitor = new FunctionSplitter2Visitor();
             node.Accept(visitor);
             return visitor.Functions;
+        }
+
+        private class FunctionDefFilterVisitor : AbstractRecursiveVisitor
+        {
+            public override void Visit(BlockExpressionNode node)
+            {
+                base.Visit(node);
+                node.Elements = node.Elements.Where(e => !(e is FunctionDefinitionNode));   // it sucks, i know that
+            }
+
+            internal static ExpressionNode FilterBody(ExpressionNode node)
+            {
+                var visitor = new FunctionDefFilterVisitor();
+                node.Accept(visitor);
+                return node;
+            }
         }
     }
 }
