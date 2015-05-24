@@ -131,7 +131,7 @@ namespace Nicodem.Lexer
                 //FIXME: use isDead() when DFA minimization will be fixed
                 while (!dfaState.IsPseudoDead() && sourceReader.MoveNext())
                 {
-                    Debug.Assert(dfaState.IsDead() == dfaState.IsPseudoDead()); 
+                    //Debug.Assert(dfaState.IsDead() == dfaState.IsPseudoDead()); 
                     var c = sourceReader.CurrentCharacter;
                     dfaState = FindTransition(dfaState.Transitions, c);
                     if (dfaState.IsAccepting<DfaUtils.MinimizedDfaState<char>, char>())
@@ -141,7 +141,7 @@ namespace Nicodem.Lexer
                         succeed = true;
                     }
                 }
-                Debug.Assert(dfaState.IsDead() == dfaState.IsPseudoDead()); // DFA _is_ minimized
+                //Debug.Assert(dfaState.IsDead() == dfaState.IsPseudoDead()); // DFA _is_ minimized
                 if (succeed)
                 {
                     sourceReader.Rollback(lastAcceptingReaderState);

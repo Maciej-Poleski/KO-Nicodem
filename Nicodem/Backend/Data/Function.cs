@@ -48,10 +48,10 @@ namespace Nicodem.Backend
         }
 
         /// <value>Label of this function.</value>
-        public string Label { get; private set; } // TODO: set it during object construction
+        public string Label { get; private set; }
 
         /// <value>Body of this function.</value>
-        public IEnumerable<Node> Body { get; set; }
+        public IEnumerable<Node> Body { get; set; } // Currently implementation requires return value to be stored in Body.ResultRegister
 
         /// <value>Locations representing arguments inside Body.</value>
         public LocationNode[] ArgsLocations { get; private set; } // TODO: set it inside constructor
@@ -62,15 +62,16 @@ namespace Nicodem.Backend
         public int ArgsCount { get { return ArgsLocations.Length; } }
 
         /// <value>Node which value will be returned as this function result.</value>
-        public Node Result { get; set; }
+        public Node Result { get; set; }    // very very bad idea - one temporary for all function calls?
 
         // ------------------- constructor -------------------
 
         /// <summary>
         /// </summary>
         /// <param name="parameterIsLocal">Bitmap of parameters which need to be Local</param>
-        public Function(IReadOnlyList<bool> parameters, Function enclosedInFunction = null)
+        public Function(string label, IReadOnlyList<bool> parameters, Function enclosedInFunction = null)
         {
+            Label = label;
             Parameters = parameters;
             _enclosedIn = enclosedInFunction;
         }
@@ -91,7 +92,7 @@ namespace Nicodem.Backend
 
         public Local AllocLocal()
         {
-            // Assume all local are 8-byte wide
+            // Assume all locals are 8-byte wide
             // isn't true that variables on stack on AMD64 are 8-byte aligned?
             return new Local(this, _stackFrameSize += 8);
         }
@@ -103,9 +104,14 @@ namespace Nicodem.Backend
 
         public SequenceNode FunctionCall(Function from, Node[] args, out Action<Node> nextNodeSetter)
         {
+            return FunctionCall(from, args, new TemporaryNode(), nextNodeSetter);
+        }
+
+        public SequenceNode FunctionCall(Function from, Node[] args, LocationNode result, out Action<Node> nextNodeSetter)
+        {
             var pl = _enclosedIn == null ? 0 : 1; // space for enclosing function stack frame address
-            var seq = new Node[args.Length + Math.Max(0, args.Length - HardwareRegistersOrder.Length) + 1 + pl];
-            // params in registers, params on stack, call
+            var seq = new Node[args.Length + Math.Max(0, args.Length - HardwareRegistersOrder.Length) + 3 + pl];
+            // params in registers, params on stack, call, result, cleanup stack
             if (pl == 1)
             {
                 seq[0] = new AssignmentNode(HardwareRegistersOrder[0], from.ComputationOfStackFrameAddress(this));
@@ -123,7 +129,9 @@ namespace Nicodem.Backend
                 seq[ptr++] = v.Item2;
             }
             seq[ptr++] = new FunctionCallNode(this);
-            return new SequenceNode(seq, out nextNodeSetter, Target.RAX);
+            seq[ptr++] = new AssignmentNode(result, Body);  // Assume value of function body is return value
+            seq[ptr++] = new AssignmentNode(Target.RSP, new AddOperatorNode(Target.RSP, _stackFrameSize));
+            return new SequenceNode(seq, out nextNodeSetter, result);
         }
 
         /// <summary>

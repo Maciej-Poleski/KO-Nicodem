@@ -52,7 +52,7 @@ namespace Nicodem.Semantics.CST
 
             var tokenizerResult = lexer.Process(origin);
             // TODO improve error handling
-            if (tokenizerResult.LastParsedLocation != tokenizerResult.FailedAtLocation)
+            if (!tokenizerResult.LastParsedLocation.EqualsLocation(tokenizerResult.FailedAtLocation))
             {
                 throw new LexerFailure(origin.MakeFragment(tokenizerResult.LastParsedLocation,tokenizerResult.FailedAtLocation));
             }
@@ -74,6 +74,11 @@ namespace Nicodem.Semantics.CST
             {
                 this._fragment = fragment;
             }
+        }
+
+        private static bool EqualsLocation(this ILocation loc1, ILocation loc2)
+        {
+            return loc1.GetOriginPosition().Equals(loc2.GetOriginPosition());
         }
     }
 }
