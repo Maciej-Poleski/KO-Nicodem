@@ -14,7 +14,7 @@ namespace Nicodem.Semantics.Extractors
         IEnumerable<ExpressionNode> Extract(ExpressionNode root)
         {
             var visitor = new SideEffectExtractorVisitor();
-            visitor.Visit(root);
+            root.Accept(visitor);
             return visitor.Trees;
         }
 
