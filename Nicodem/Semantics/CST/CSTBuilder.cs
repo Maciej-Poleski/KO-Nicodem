@@ -25,7 +25,7 @@ namespace Nicodem.Semantics.CST
                               NicodemGrammarProductions.StartSymbol(),
                               NicodemGrammarProductions.MakeProductionsDictionaryForGrammarConstructor());
 
-            var parser = new LLStarParser<Symbol>(grammar);
+            var parser = new LlParser<Symbol>(grammar);
             var parseRes = parser.Parse(leafs);
 			if(parseRes is OK<Symbol>) {
 				return (parseRes as OK<Symbol>).Tree;

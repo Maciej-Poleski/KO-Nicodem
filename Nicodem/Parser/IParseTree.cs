@@ -8,5 +8,6 @@ namespace Nicodem.Parser
 	{
 		TSymbol Symbol { get; }
 		IFragment Fragment { get; }
+        string ToStringIndented(string indent);
 	}
 }

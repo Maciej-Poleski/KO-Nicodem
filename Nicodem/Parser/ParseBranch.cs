@@ -42,6 +42,14 @@ namespace Nicodem.Parser
 			return !(childs1.MoveNext () || childs2.MoveNext ());
 		}
 
+        public string ToStringIndented(string indent)
+        {
+            string r = indent + Symbol.ToString() + " : " + Production.ToString();
+            foreach (var child in Children) r = "\n" + child.ToStringIndented(indent + "| ");
+            return r;
+        }
+
+        public override string ToString() { return ToStringIndented("");  }
 	}
 }
 
