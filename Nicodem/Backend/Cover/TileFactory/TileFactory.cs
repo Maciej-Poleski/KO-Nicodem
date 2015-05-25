@@ -129,7 +129,19 @@ namespace Nicodem.Backend.Cover
 				Jump.Cond_ConstReg_Lt<long>(),
 				Jump.Cond_ConstReg_Le<long>(),
 				Jump.Cond_ConstReg_Gt<long>(),
-				Jump.Cond_ConstReg_Ge<long>()
+				Jump.Cond_ConstReg_Ge<long>(),
+
+				Advanced.EffectiveMultiplication_RegConst(),
+				Advanced.EffectiveMultiplication_ConstReg(),
+				Advanced.EffectiveAddition_RegReg(),
+				Advanced.EffectiveAddition_RegConst<long>(),
+				Advanced.EffectiveAddition_ConstReg<long>(),
+				Advanced.EffectiveAddition_ConstRegReg1<long>(),
+				Advanced.EffectiveAddition_ConstRegReg2<long>(),
+				Advanced.EffectiveAddition_RegConstReg1<long>(),
+				Advanced.EffectiveAddition_RegConstReg2<long>(),
+				Advanced.EffectiveAddition_RegRegConst1<long>(),
+				Advanced.EffectiveAddition_RegRegConst2<long>()
 			};
 		}
 
