@@ -17,9 +17,11 @@ namespace Nicodem.Semantics
         public static B.Function BuildBackendFunction(AST.FunctionDefinitionNode funDef, IEnumerable<Vertex> expGraph)
         {
             B.Function f = funDef.BackendFunction; // get previously created backend function object
+            // FIXME: this code is no longer needed -> args will be constructed inside function object
             for (int i = 0; i < f.ArgsCount; i++) {
                 // for each argument set temporary node used for this argument inside created backend tree
-                f.ArgsLocations[i] = new Brep.TemporaryNode(); 
+
+                //f.ArgsLocations[i] = new Brep.TemporaryNode(); 
             }
 
 			f.Body = new List<Brep.Node>{ (new DFSBuilder(funDef, expGraph.Last())).Build(expGraph.First()) };

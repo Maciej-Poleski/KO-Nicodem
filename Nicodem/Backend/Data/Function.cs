@@ -53,7 +53,14 @@ namespace Nicodem.Backend
         /// <value>Body of this function.</value>
         public IEnumerable<Node> Body { get; set; } // Currently implementation requires return value to be stored in Body.ResultRegister
 
+        //private Location[] ArgsLocations; // TODO: use this!
+
+        public LocationNode GetArgLocationNode(int i){
+            throw new NotImplementedException();
+        }
+
         /// <value>Locations representing arguments inside Body.</value>
+        [Obsolete]
         public LocationNode[] ArgsLocations { get; private set; } // TODO: set it inside constructor
 
 		public LocationNode[] CalleeSavedRegLocations { get; private set; } // TODO: create inside constructor (count = count of CalleeSavedRegisters)
@@ -199,7 +206,7 @@ namespace Nicodem.Backend
 
             // move arguments from hardware registers to LocationNodes in ArgsLocations
 			for (int i = 0; i < ArgsCount; i++) {
-				prologue.Add (new AssignmentNode (ArgsLocations [i], HardwareRegistersOrder [i]));
+                prologue.Add (new AssignmentNode (GetArgLocationNode(i), HardwareRegistersOrder [i]));
 			}
 
 			// save callee-saved registers

@@ -81,7 +81,7 @@ namespace Nicodem.Semantics
 				if(argNum < 0) {
 					throw new InvalidOperationException("Trying to use undeclared function argument");
 				}
-				return funDef.BackendFunction.ArgsLocations[argNum];
+                return funDef.BackendFunction.GetArgLocationNode(argNum);
 			}
 
 			public Brep.Node Build(VariableDefNode defNode)
@@ -272,6 +272,7 @@ namespace Nicodem.Semantics
 
 			private static int GetArgNumber(AST.VariableDeclNode arg, B.Function function)
 			{
+                // TODO: need to change this
 				for(int i = 0; i < function.ArgsLocations.Count(); i++) {
 					if(Object.ReferenceEquals(arg, function.ArgsLocations[i])) {
 						return i;
