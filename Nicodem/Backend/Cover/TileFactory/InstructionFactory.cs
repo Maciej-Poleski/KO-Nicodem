@@ -5,6 +5,12 @@ namespace Nicodem.Backend.Cover
 {
 	public static class InstructionFactory
 	{
+		static IEnumerable<T> join<T>( IEnumerable<T> enumerable, T elem) {
+			var S = new LinkedList<T> (enumerable);
+			S.AddLast (elem);
+			return S;
+		}
+
 		static IEnumerable<RegisterNode> use(params RegisterNode[] nodes ){
 			return nodes;
 		}
@@ -34,7 +40,10 @@ namespace Nicodem.Backend.Cover
 
 		public static Instruction Move( RegisterNode dst, RegisterNode src ) {
 			return Instruction.CopyInstruction (
-				map => string.Format ("mov {0}, {1}", map [dst], map [src]),
+				map => 
+					(map [dst].ToString () == map [src].ToString ()) 
+					? ""
+					: string.Format ("mov {0}, {1}", map [dst], map [src]),
 				use (src, dst), define (dst));
 		}
 
@@ -205,6 +214,13 @@ namespace Nicodem.Backend.Cover
 				Function.CallerSavedRegisters, Function.CallerSavedRegisters);
 		}
 
+		public static Instruction Call( RegisterNode reg ) {
+			return new Instruction (
+				map => string.Format ("call {0}", map [reg]),
+				join (Function.CallerSavedRegisters, reg),
+				Function.CallerSavedRegisters);
+		}
+
 		public static Instruction Ret() {
 			return new Instruction (map => "ret", use (Target.RSP), define (Target.RSP));
 		}
@@ -259,6 +275,12 @@ namespace Nicodem.Backend.Cover
 
 		public static Instruction Jmp( LabelNode label ) {
 			return Jump ("mp", label);
+		}
+
+		public static Instruction Jmp( RegisterNode reg ) {
+			return new Instruction (
+				map => string.Format ("jmp {0}", map [reg]),
+				use (reg), define ());
 		}
 
 		public static Instruction Jle( LabelNode label ) {

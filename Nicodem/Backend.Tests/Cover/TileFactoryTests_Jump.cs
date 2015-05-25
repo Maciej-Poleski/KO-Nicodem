@@ -15,7 +15,7 @@ namespace Nicodem.Backend.Tests
 			var lbl = new LabelNode ("target");
 			var jmp = new UnconditionalJumpToLabelNode (lbl);
 
-			var tile = TileFactory.Jump.Unconditional ();
+			var tile = TileFactory.Jump.Unconditional_Label ();
 			var map = TileFactoryTestUtils.createMapping ();
 
 			var instructions = tile.Cover (jmp);
