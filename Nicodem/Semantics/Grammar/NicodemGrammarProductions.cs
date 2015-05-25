@@ -501,6 +501,11 @@ namespace Nicodem.Semantics.Grammar
 
             private class EofTerminalSymbol: ISymbol
             {
+                static EofTerminalSymbol()
+                {
+                    SymbolToName[Symbol.EOF] = "EOF";
+                }
+
                 public Symbol ToSymbol()
                 {
                     return Symbol.EOF;
