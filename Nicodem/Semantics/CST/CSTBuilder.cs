@@ -30,7 +30,15 @@ namespace Nicodem.Semantics.CST
 			if(parseRes is OK<Symbol>) {
 				return (parseRes as OK<Symbol>).Tree;
 			} else {
-				// TODO - show an Error<Symbol> properly to the user
+				var err = parseRes as Error<Symbol>;
+				Console.WriteLine(String.Format("Cannot parse symbol {0} at:", err.Symbol));
+				Console.WriteLine(String.Format("Begin line - {0}, char - {1}, end line - {2}, char - {3}", 
+					err.Fragment.GetBeginOriginPosition().LineNumber,
+					err.Fragment.GetBeginOriginPosition().CharNumber,
+					err.Fragment.GetEndOriginPosition().LineNumber,
+					err.Fragment.GetEndOriginPosition().CharNumber
+				));
+				Console.WriteLine(err.Fragment.GetOriginText());
 				return null;
 			}
         }

@@ -632,7 +632,11 @@ namespace Nicodem.Semantics.Grammar
 
         internal static string GetSymbolName(Symbol symbol)
         {
-            return SymbolToName[symbol];
+			if(SymbolToName.ContainsKey(symbol)) {
+				return SymbolToName[symbol];
+			} else {
+				return "Anonymous";
+			}
         }
 
         #region ProductionStuff

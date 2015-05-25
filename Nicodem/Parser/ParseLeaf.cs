@@ -21,7 +21,7 @@ namespace Nicodem.Parser
 
         public string ToStringIndented(string indent)
         {
-            return indent + Symbol.ToString();
+			return indent + "Leaf " + Symbol.ToString() + " end leaf";
         }
 
         public override string ToString() { return ToStringIndented(""); }

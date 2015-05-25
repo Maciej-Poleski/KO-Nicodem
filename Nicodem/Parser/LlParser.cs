@@ -114,7 +114,6 @@ namespace Nicodem.Parser
 
         private static void Backtrack(Stack<ParseState> stack, Stack<IParseTree<TSymbol>> children)
 		{
-			Console.WriteLine("Backtrack");
             while(stack.Any()) {
                 var state = stack.Pop();
 

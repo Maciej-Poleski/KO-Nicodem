@@ -44,8 +44,8 @@ namespace Nicodem.Parser
 
         public string ToStringIndented(string indent)
         {
-            string r = indent + Symbol.ToString() + " : " + Production.ToString();
-            foreach (var child in Children) r = "\n" + child.ToStringIndented(indent + "| ");
+            string r = indent + "Branch " + Symbol.ToString() + " : " + Production.ToString();
+            foreach (var child in Children) r += "\n" + child.ToStringIndented(indent + "| ");
             return r;
         }
 
