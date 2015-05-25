@@ -23,12 +23,8 @@ namespace Nicodem.Compiler
             var inputFile = new FileOrigin(args[1]);
             try
             {
-                var tokenized = CSTBuilder.SanitizedTokens(inputFile);
-                foreach (var tuple in tokenized)
-                {
-                    Debug.Assert(tuple.Item2.Count() == 1);
-                    Console.Write("\"" + tuple.Item1.GetOriginText() + "\"(" + tuple.Item2.First() + ") ");
-                }
+                var parseTree = CSTBuilder.Build(inputFile);
+                Console.WriteLine(parseTree);
             }
             catch (CSTBuilder.LexerFailure ex)
             {

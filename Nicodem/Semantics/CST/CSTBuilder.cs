@@ -11,7 +11,7 @@ namespace Nicodem.Semantics.CST
 {
     public static class CSTBuilder
     {
-        internal static IParseTree<Symbol> Build(Source.IOrigin origin)
+        public static IParseTree<Symbol> Build(Source.IOrigin origin)
         {
             var sanitizedTokens = SanitizedTokens(origin);
 
