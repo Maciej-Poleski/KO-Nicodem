@@ -601,7 +601,7 @@ namespace Nicodem.Semantics.Grammar
             {
                 get
                 {
-                    return new RegexSymbol(() => RegExFactory.Union(_regexSymbol(), RegExFactory.Empty<Symbol>()));
+                    return new RegexSymbol(() => RegExFactory.Union(_regexSymbol(), RegExFactory.Epsilon<Symbol>()));
                 }
             }
         }
