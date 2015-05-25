@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Nicodem.Parser;
 using Nicodem.Semantics.Visitors;
+using Nicodem.Semantics.ExpressionGraph;
 
 namespace Nicodem.Semantics.AST
 {
@@ -26,6 +27,11 @@ namespace Nicodem.Semantics.AST
         public override void Accept(AbstractVisitor visitor)
         {
             visitor.Visit(this);
+        }
+
+        public override SubExpressionGraph Accept(ReturnedAbstractVisitor<SubExpressionGraph> visitor)
+        {
+            return visitor.Visit(this);
         }
     }
 }

@@ -11,6 +11,7 @@ namespace Nicodem.Semantics.Visitors
     class ControlFlowVisitor : AbstractRecursiveVisitor
     {
         private List<Vertex> nodes_to_next_jmp = new List<Vertex>();
+        private Dictionary<List<Vertex>, Vertex> next_jumps = new Dictionary<List<Vertex>, Vertex>();
         private Dictionary<ExpressionNode, ExpressionNode> changed_nodes = new Dictionary<ExpressionNode, ExpressionNode>();
         private int temporary_counter = 0;
         private List<Vertex> graph_vertex = new List<Vertex>();
@@ -36,6 +37,11 @@ namespace Nicodem.Semantics.Visitors
             }
 
             nodes_to_next_jmp = new List<Vertex>();
+        }
+
+        private Vertex FindNextJump(List<Vertex> vertex)
+        {
+            return null;
         }
 
         private IEnumerable<ExpressionNode> ReplaceChangedNodes(IEnumerable<ExpressionNode> nodes)
@@ -150,6 +156,9 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(WhileNode node)
         {
             while_stack.Add(node);
+
+            List<Vertex> state_before = nodes_to_next_jmp;
+
             base.Visit(node);
 
             if (changed_nodes.ContainsKey(node.Condition))
@@ -162,6 +171,8 @@ namespace Nicodem.Semantics.Visitors
             ConditionalJumpVertex condition_vertex = new ConditionalJumpVertex(null, null, node.Condition);
             graph_vertex.Add(condition_vertex);
             AddNextJump(condition_vertex);
+
+            //TODO try to find begin before while
 
             OneJumpVertex body_vertex = new OneJumpVertex(condition_vertex, node.Body);
             graph_vertex.Add(body_vertex);

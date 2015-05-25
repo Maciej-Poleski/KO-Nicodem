@@ -24,7 +24,7 @@ namespace Nicodem.Compiler
             try
             {
                 var parseTree = CSTBuilder.Build(inputFile);
-                Console.WriteLine(parseTree);
+                Console.WriteLine(parseTree.ToString());
             }
             catch (CSTBuilder.LexerFailure ex)
             {

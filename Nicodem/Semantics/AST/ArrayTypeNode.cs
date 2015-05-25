@@ -1,5 +1,6 @@
 using Nicodem.Semantics.Visitors;
 using Nicodem.Parser;
+using Nicodem.Semantics.ExpressionGraph;
 
 namespace Nicodem.Semantics.AST
 {
@@ -28,6 +29,11 @@ namespace Nicodem.Semantics.AST
 		{
 			visitor.Visit (this);
 		}
+
+        public override SubExpressionGraph Accept(ReturnedAbstractVisitor<SubExpressionGraph> visitor)
+        {
+            return visitor.Visit(this);
+        }
 	}
 }
 
