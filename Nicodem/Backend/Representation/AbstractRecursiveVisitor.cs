@@ -8,6 +8,23 @@
 
 		#region Node subclasses
 
+		public override void Visit (PushNode node)
+		{
+			Visit (node as Node);
+			node.Register.Accept (this);
+		}
+
+		public override void Visit (PopNode node)
+		{
+			Visit (node as Node);
+			node.Register.Accept (this);
+		}
+
+		public override void Visit (RetNode node)
+		{
+			Visit (node as Node);
+		}
+
 		public override void Visit (LabelNode node)
 		{
 			Visit (node as Node);

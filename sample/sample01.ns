@@ -1,4 +1,4 @@
-main() -> void
+main(int mutable x) -> void mutable
 {
   print("Hello, World!\n")
 }

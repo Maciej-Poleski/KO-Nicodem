@@ -18,6 +18,13 @@ namespace Nicodem.Parser
 		public bool Equals(IParseTree<TSymbol> other){
 			return (other is ParseLeaf<TSymbol> && Symbol.Equals(other.Symbol));
 		}
+
+        public string ToStringIndented(string indent)
+        {
+			return indent + "Leaf " + Symbol.ToString() + " end leaf";
+        }
+
+        public override string ToString() { return ToStringIndented(""); }
 	}
 }
 

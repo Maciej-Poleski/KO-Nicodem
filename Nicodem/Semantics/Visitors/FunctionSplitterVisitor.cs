@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Nicodem.Semantics.AST;
 using Nicodem.Backend;
@@ -21,23 +22,39 @@ namespace Nicodem.Semantics.Visitors
         }
     }
 
+    internal class FunctionSplitter2Visitor : AbstractRecursiveVisitor
+    {
+        private readonly List<Function> _functions = new List<Function>();
+        private Function _currentFunction;
+
+        internal IReadOnlyList<Function> Functions
+        {
+            get { return _functions; }
+        }
+
+        public override void Visit(FunctionDefinitionNode node)
+        {
+            var oldFunction = _currentFunction;
+            var parametersBitmap = node.Parameters.Select(p => p.NestedUse).ToArray();
+            _currentFunction = new Function(node.Name, parametersBitmap, oldFunction);  // no name mangling for now - no function name overloading
+            node.BackendFunction = _currentFunction;
+            _functions.Add(_currentFunction);
+            base.Visit(node);
+            _currentFunction = oldFunction;
+        }
+    }
+
     public static partial class Extensions
     {
+        /// <summary>
+        /// Return all function definitions contained in this program AST.
+        /// </summary>
         internal static IReadOnlyCollection<FunctionDefinitionNode> GetAllFunctionDefinitions(
             this ProgramNode node)
         {
             var visitor = new FunctionSplitterVisitor();
             node.Accept(visitor);
             return visitor.Functions;
-        }
-
-        /// <summary>
-        /// Split program AST into functions. Each function cannot contain nested function code.
-        /// </summary>
-       internal static IReadOnlyCollection<FunctionDefinitionNode>  SplitIntoFunctions(this ProgramNode node)
-        {
-            // TODO: implement!
-            throw new NotImplementedException("Please, implement me!");
         }
     }
 }

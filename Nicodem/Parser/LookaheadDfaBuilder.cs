@@ -38,7 +38,7 @@ namespace Nicodem.Parser
 
         private void AddEpsiEdges(State s)
         {
-            Console.WriteLine("AddEpsi for " + s); // DEBUG
+            //Console.WriteLine("AddEpsi for " + s); // DEBUG
             var queue = new Queue<LlConfiguration<TSymbol>>();
             foreach (var conf in s) queue.Enqueue(conf);
             s.Clear();
@@ -157,7 +157,7 @@ namespace Nicodem.Parser
                     startingSet.Add(new LlConfiguration<TSymbol>(decision, stack));
                 }
             }
-            Console.WriteLine("STARTING STATE -> " + startingSet); // DEBUG
+            //Console.WriteLine("STARTING STATE -> " + startingSet); // DEBUG
             // complement starting state by epsi edges
             AddEpsiEdges(startingSet);
             // expand starting state to the whole LookaheadDFA

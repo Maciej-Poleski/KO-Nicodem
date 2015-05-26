@@ -50,6 +50,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Parser\Parser.csproj">
+      <Project>{dc9385d6-c37e-441f-8baa-3b7eaec2da39}</Project>
+      <Name>Parser %28Parser\Parser%29</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Semantics\Semantics.csproj">
       <Project>{B0BC59FC-D28F-42B9-A4CC-5470287924B2}</Project>
       <Name>Semantics</Name>

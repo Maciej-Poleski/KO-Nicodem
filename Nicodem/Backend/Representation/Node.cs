@@ -8,9 +8,6 @@ namespace Nicodem.Backend.Representation
     {
         protected RegisterNode _register;
 
-		// optimumCovering consists of costs, tile covering the root and list of children under the tile.
-		Tuple<int, Tile, List<Node> > optimumCovering;
-
         protected Node()
         {
             Accept = NodeMixin.MakeAcceptThunk(this);
@@ -60,12 +57,16 @@ namespace Nicodem.Backend.Representation
 		}
 
 		// Computes optimum covering of this node with tiles given as an argument.
-		void ComputeOptimumCovering(IEnumerable<Tile> tiles) {
+		// ptimumCovering consists of cost, a tile covering the root and a list of children under the tile.
+		Tuple<int, Tile, List<Node>> ComputeOptimumCovering(IEnumerable<Tile> tiles) {
 			// recursively compute optimum covering for children
-			foreach (var child in this.GetChildren()) {
-				child.ComputeOptimumCovering (tiles);
+			var children = this.GetChildren();
+			var childrenOptCovering = new Tuple<int, Tile, List<Node>>[children.Length];
+
+			for(int i=0; i<children.Length; i++) {
+				childrenOptCovering[i] = children[i].ComputeOptimumCovering (tiles);
 			}
-			this.optimumCovering = new Tuple<int, Tile, List<Node>> (int.MaxValue, null, null);
+			var optCovering = new Tuple<int, Tile, List<Node>> (int.MaxValue, null, null);
 			// check each tile and choose the one that minimizes the cost.
 			foreach (var tile in tiles) {
 				var compareResult = this.Compare (tile); // returns Tuple{true/false, list of children}
@@ -73,13 +74,30 @@ namespace Nicodem.Backend.Representation
 				if (compareResult.Item1 == true) {
 					int coveringCost = tile.Cost;
 					// for each child under the tile add its optimum covering cost to the currently computed coveringCost
-					foreach (var child in compareResult.Item2)
-						coveringCost += child.optimumCovering.Item1;
+					for (int i = 0; i < childrenOptCovering.Length; i++) {
+						coveringCost += childrenOptCovering [i].Item1;
+					}
 
-					if (coveringCost < this.optimumCovering.Item1)
-						this.optimumCovering = new Tuple<int, Tile, List<Node>> (coveringCost, tile, compareResult.Item2);
+					if (coveringCost < optCovering.Item1)
+						optCovering = new Tuple<int, Tile, List<Node>> (coveringCost, tile, compareResult.Item2);
 				}
 			}
+			return optCovering;
+		}
+
+		// Returns a list of instructions covering the tree rooted in this node.
+		public IEnumerable<Instruction> CoverWithInstructions() {
+			var tiles = TileFactory.GetTiles ();
+			var optCovering = ComputeOptimumCovering (tiles);
+			var coveringTile = optCovering.Item2;
+			var childrenToCover = optCovering.Item3;
+			var instructions = new List<Instruction> ();
+			// get instructions covering the children at first
+			foreach (var child in childrenToCover)
+				instructions.AddRange (child.CoverWithInstructions ());
+			// and instructions covering the root at the end
+			instructions.AddRange (coveringTile.Cover (this));
+			return instructions;
 		}
     }
 }

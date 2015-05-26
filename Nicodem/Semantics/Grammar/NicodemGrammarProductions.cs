@@ -278,6 +278,11 @@ namespace Nicodem.Semantics.Grammar
             RightToLeft,
         }
 
+        private struct EofSymbol
+        { }
+
+        private static readonly EofSymbol Eof = new EofSymbol();
+
         private static string DescribeSymbolInfo(SymbolInfo info)
         {
             switch (info)
@@ -348,6 +353,11 @@ namespace Nicodem.Semantics.Grammar
             public static implicit operator UniversalSymbol(string implicitToken)
             {
                 return implicitToken.Token();
+            }
+
+            public static implicit operator UniversalSymbol(EofSymbol ignored)
+            {
+                return new UniversalSymbol(new EofTerminalSymbol());
             }
 
             #region +
@@ -488,6 +498,19 @@ namespace Nicodem.Semantics.Grammar
                     return _attributedSymbol.GetValueOrDefault();
                 }
             }
+
+            private class EofTerminalSymbol: ISymbol
+            {
+                static EofTerminalSymbol()
+                {
+                    SymbolToName[Symbol.EOF] = "EOF";
+                }
+
+                public Symbol ToSymbol()
+                {
+                    return Symbol.EOF;
+                }
+            }
         }
 
         private class RegexSymbol
@@ -525,6 +548,11 @@ namespace Nicodem.Semantics.Grammar
             public static implicit operator RegexSymbol(string implicitToken)
             {
                 return (UniversalSymbol) implicitToken;
+            }
+
+            public static implicit operator RegexSymbol(EofSymbol eof)
+            {
+                return (UniversalSymbol) eof;
             }
 
             public static RegexSymbol operator+(RegexSymbol left, RegexSymbol right)
@@ -573,7 +601,7 @@ namespace Nicodem.Semantics.Grammar
             {
                 get
                 {
-                    return new RegexSymbol(() => RegExFactory.Union(_regexSymbol(), RegExFactory.Empty<Symbol>()));
+                    return new RegexSymbol(() => RegExFactory.Union(_regexSymbol(), RegExFactory.Epsilon<Symbol>()));
                 }
             }
         }
@@ -609,7 +637,11 @@ namespace Nicodem.Semantics.Grammar
 
         internal static string GetSymbolName(Symbol symbol)
         {
-            return SymbolToName[symbol];
+			if(SymbolToName.ContainsKey(symbol)) {
+				return SymbolToName[symbol];
+			} else {
+				return "Anonymous";
+			}
         }
 
         #region ProductionStuff
@@ -687,7 +719,7 @@ namespace Nicodem.Semantics.Grammar
             BooleanLiteral.SetProduction(BooleanLiteralToken);
             Literals.SetProduction(DecimalNumberLiteral + CharacterLiteral + StringLiteral + BooleanLiteral);
 
-            Program.SetProduction(Function.Star);
+            Program.SetProduction(Function.Star * Eof);
             Function.SetProduction(ObjectName * "("  * ParametersList * ")" * "->" * TypeSpecifier * Expression);
             ParametersList.SetProduction(((ObjectDeclaration * ",").Star * ObjectDeclaration).Optional);
             ObjectDeclaration.SetProduction(TypeSpecifier * ObjectName);

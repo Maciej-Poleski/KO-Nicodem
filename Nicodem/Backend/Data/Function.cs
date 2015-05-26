@@ -29,33 +29,33 @@ namespace Nicodem.Backend
 			Target.R11
 		};
 
+		public static readonly HardwareRegisterNode[] CalleeSavedRegisters = { };
+
         private readonly Function _enclosedIn;
         // Function with not null _enclosedIn have additional variable on stack just below old RBP - pointer to nearest enclosing Function stack frame
         private int _stackFrameSize;
         // RBP - this stack frame
         // (optional) RBP-8 - address of stack frame of nearest enclosing Function (NOTE: space will be alocated in preamble)
 
-        // Can be public if somebody wants (but this structure will change soon)
-        private IReadOnlyList<bool> Parameters { get; set; }
+        /// <value>Locations of function arguments.</value>
+        private Location[] ArgsLocations; // used inside constructor
+
+        /// <value>Place for storing callee saved registers. Used in prologue.</value>
+        private LocationNode[] CalleeSavedRegLocations { get; set; } // created inside constructor
 
         // ------------------- properties -------------------
 
-        internal Function EnclosedIn
-        {
-            get { return _enclosedIn; }
-        }
+        /// <value>Enclosing function.</value>
+        internal Function EnclosedIn { get { return _enclosedIn; } }
 
         /// <value>Label of this function.</value>
-        public string Label { get; private set; } // TODO: set it during object construction
-
-        /// <value>Body of this function.</value>
-        public IEnumerable<Node> Body { get; set; }
-
-        /// <value>Locations representing arguments inside Body.</value>
-        public LocationNode[] ArgsLocations { get; private set; } // TODO: set it inside constructor
+        public string Label { get; private set; }
 
         /// <value>Number of arguments of this function.</value>
         public int ArgsCount { get { return ArgsLocations.Length; } }
+
+        /// <value>Body of this function.</value>
+        public IEnumerable<Node> Body { get; set; } // Currently implementation requires return value to be stored in Body.ResultRegister
 
         /// <value>Node which value will be returned as this function result.</value>
         public Node Result { get; set; }
@@ -65,10 +65,20 @@ namespace Nicodem.Backend
         /// <summary>
         /// </summary>
         /// <param name="parameterIsLocal">Bitmap of parameters which need to be Local</param>
-        public Function(IReadOnlyList<bool> parameters, Function enclosedInFunction = null)
+        public Function(string label, IReadOnlyList<bool> parameters, Function enclosedInFunction = null)
         {
-            Parameters = parameters;
+            Label = label;
+            ArgsLocations = new Location[parameters.Count];
+            int ind = 0;
+            foreach (bool isArgLocal in parameters) {
+                if (isArgLocal)
+                    ArgsLocations[ind] = AllocLocal();
+                else 
+                    ArgsLocations[ind] = new Temporary();
+                ind++;
+            }
             _enclosedIn = enclosedInFunction;
+            CalleeSavedRegLocations = new LocationNode[CalleeSavedRegisters.Length];
         }
 
         // ------------------- internal methods -------------------
@@ -83,11 +93,16 @@ namespace Nicodem.Backend
             return GetEnclosingFunctionStackFrame(GetCurrentStackFrame());
         }
 
+        internal void MoveTemporaryToMemory(RegisterNode temp)
+        {
+            throw new NotImplementedException();
+        }
+
         // ------------------- public methods -------------------
 
         public Local AllocLocal()
         {
-            // Assume all local are 8-byte wide
+            // Assume all locals are 8-byte wide
             // isn't true that variables on stack on AMD64 are 8-byte aligned?
             return new Local(this, _stackFrameSize += 8);
         }
@@ -99,9 +114,14 @@ namespace Nicodem.Backend
 
         public SequenceNode FunctionCall(Function from, Node[] args, out Action<Node> nextNodeSetter)
         {
+            return FunctionCall(from, args, new TemporaryNode(), out nextNodeSetter);
+        }
+
+        public SequenceNode FunctionCall(Function from, Node[] args, RegisterNode result, out Action<Node> nextNodeSetter)
+        {
             var pl = _enclosedIn == null ? 0 : 1; // space for enclosing function stack frame address
-            var seq = new Node[args.Length + Math.Max(0, args.Length - HardwareRegistersOrder.Length) + 1 + pl];
-            // params in registers, params on stack, call
+            var seq = new Node[args.Length + Math.Max(0, args.Length - HardwareRegistersOrder.Length) + 3 + pl];
+            // params in registers, params on stack, call, result, cleanup stack
             if (pl == 1)
             {
                 seq[0] = new AssignmentNode(HardwareRegistersOrder[0], from.ComputationOfStackFrameAddress(this));
@@ -119,7 +139,16 @@ namespace Nicodem.Backend
                 seq[ptr++] = v.Item2;
             }
             seq[ptr++] = new FunctionCallNode(this);
-            return new SequenceNode(seq, out nextNodeSetter, Target.RAX);
+            seq[ptr++] = new AssignmentNode(result, Body.Last().ResultRegister);  // Assume value of function body is return value
+            seq[ptr++] = new AssignmentNode(Target.RSP, new AddOperatorNode(Target.RSP, new ConstantNode<long>(_stackFrameSize)));
+            return new SequenceNode(seq, out nextNodeSetter, result);
+        }
+
+        /// <summary>
+        /// Returns LocationNode for accesing i-th argument.
+        /// </summary>
+        public LocationNode GetArgLocationNode(int i){
+            return AccessLocal(ArgsLocations[i]);
         }
 
         /// <summary>
@@ -173,16 +202,48 @@ namespace Nicodem.Backend
 
         private IEnumerable<Node> GeneratePrologue()
         {
-            // TODO: implement this
-            // arguments locations in ArgsLocations -> rewrite them from registers
-            throw new NotImplementedException();
+			var prologue = new List<Node> ();
+			// add label
+			prologue.Add(new LabelNode(Label));
+			// push rbp
+			var pushRbp = Push (Target.RBP);
+			prologue.Add (pushRbp.Item1);
+			prologue.Add (pushRbp.Item2);
+			// mov rbp, rsp
+			prologue.Add (new AssignmentNode(Target.RBP, Target.RSP));
+			// sub rsp, _stackFrameSize
+			prologue.Add (new SubOperatorNode(Target.RSP, new ConstantNode<long>(_stackFrameSize)));
+
+            // move arguments from hardware registers to LocationNodes in ArgsLocations
+			for (int i = 0; i < ArgsCount; i++) {
+                prologue.Add (new AssignmentNode (GetArgLocationNode(i), HardwareRegistersOrder [i]));
+			}
+
+			// save callee-saved registers
+			for (int i = 0; i < CalleeSavedRegisters.Length; i++) {
+				prologue.Add (new AssignmentNode (CalleeSavedRegLocations [i], CalleeSavedRegisters [i]));
+			}
+
+			return prologue;
         }
 
         private IEnumerable<Node> GenerateEpilogue()
         {
-            // TODO: implement this
+			var epilogue = new List<Node> ();
             // function result in Result -> mov it to RAX
-            throw new NotImplementedException();
+			epilogue.Add (new AssignmentNode (Target.RAX, Result));
+			// restore callee-saved registers
+			for (int i = 0; i < CalleeSavedRegisters.Length; i++) {
+				epilogue.Add (new AssignmentNode (CalleeSavedRegisters [i], CalleeSavedRegLocations [i]));
+			}
+			// mov rsp, rbp
+			epilogue.Add(new AssignmentNode (Target.RSP, Target.RBP));
+			// pop rbp
+			epilogue.Add(new AssignmentNode (Target.RBP, new MemoryNode(Target.RSP)));
+			epilogue.Add (new AssignmentNode (Target.RSP, new AddOperatorNode (Target.RSP, new ConstantNode<long> (8))));
+			// ret
+			epilogue.Add(new RetNode());
+			return epilogue;
         }
     }
 }

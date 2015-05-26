@@ -8,6 +8,21 @@
 
 		#region Node subclasses
 
+		public virtual void Visit (PushNode node)
+		{
+			Visit (node as Node);
+		}
+
+		public virtual void Visit (PopNode node)
+		{
+			Visit (node as Node);
+		}
+
+		public virtual void Visit (RetNode node)
+		{
+			Visit (node as Node);
+		}
+
 		public virtual void Visit (LabelNode node)
 		{
 			Visit (node as Node);

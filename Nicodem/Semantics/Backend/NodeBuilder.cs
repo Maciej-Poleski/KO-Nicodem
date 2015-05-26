@@ -77,34 +77,29 @@ namespace Nicodem.Semantics
 			// all args in B.Function are assumed to be already set
 			public Brep.Node Build(VariableDeclNode argNode)
 			{
-				int argNum = GetArgNumber(argNode, funDef.BackendFunction);
+				int argNum = GetArgNumber(argNode, funDef);
 				if(argNum < 0) {
 					throw new InvalidOperationException("Trying to use undeclared function argument");
 				}
-				return funDef.BackendFunction.ArgsLocations[argNum];
+				return funDef.BackendFunction.GetArgLocationNode(argNum);
 			}
 
 			public Brep.Node Build(VariableDefNode defNode)
 			{
-				if(defNode.NestedUse) {
-					var loc = funDef.BackendFunction.AllocLocal();
-					defNode.VariableLocation = funDef.BackendFunction.AccessLocal(loc);
-				} else {
-					defNode.VariableLocation = new Brep.TemporaryNode();
-				}
-
 				var expr = Build(defNode.Value as dynamic);
-				return new Brep.AssignmentNode(defNode.VariableLocation, expr);
+				var locNode = funDef.BackendFunction.AccessLocal(defNode.VariableLocation);
+				return new Brep.AssignmentNode(locNode, expr);
 			}
 
 			public Brep.Node Build(VariableUseNode useNode)
 			{
 				var definition = useNode.Declaration as VariableDefNode;
-				if(definition == null) {
-					throw new InvalidOperationException("Cannot use undefined value");
+				if(definition != null) {
+					return funDef.BackendFunction.AccessLocal(definition.VariableLocation);
+				} else {
+					// must be a function argument
+					return Build(useNode.Declaration);
 				}
-
-				return definition.VariableLocation;
 			}
 
 			public Brep.Node Build(FunctionCallNode funCallNode)
@@ -270,10 +265,10 @@ namespace Nicodem.Semantics
 				return new Brep.AssignmentNode(location, expr);
 			}
 
-			private static int GetArgNumber(AST.VariableDeclNode arg, B.Function function)
+			private static int GetArgNumber(AST.VariableDeclNode arg, AST.FunctionDefinitionNode funDef)
 			{
-				for(int i = 0; i < function.ArgsLocations.Count(); i++) {
-					if(Object.ReferenceEquals(arg, function.ArgsLocations[i])) {
+				for(int i = 0; i < funDef.Parameters.Count(); i++) {
+					if(Object.ReferenceEquals(arg, funDef.Parameters.ElementAt(i))) {
 						return i;
 					}
 				}

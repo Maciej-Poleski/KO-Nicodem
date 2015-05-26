@@ -4,7 +4,7 @@ using Nicodem.Parser;
 
 namespace Nicodem.Semantics.Grammar
 {
-    internal struct Symbol : ISymbol<Symbol>, IEquatable<Symbol>, IComparable<Symbol>
+    public struct Symbol : ISymbol<Symbol>, IEquatable<Symbol>, IComparable<Symbol>
     {
         public static readonly Symbol MinValue = new Symbol(int.MinValue);
         public static readonly Symbol EOF = new Symbol(-1);

@@ -11,7 +11,37 @@ namespace Nicodem.Backend.Tests
 		static readonly RegisterNode reg2 = new TemporaryNode ();
 		static readonly ConstantNode<long> constant = new ConstantNode<long> (10L);
 		static readonly LabelNode label = new LabelNode ("myLabel");
-		static readonly FunctionCallNode fun = new FunctionCallNode (new Function (new[]{ false }));
+		static readonly FunctionCallNode fun = new FunctionCallNode (new Function ("foo", new[]{ false }));
+
+		[Test]
+		public void Test_Mov_Diff() {
+			var instructions = new[] { InstructionFactory.Move (reg1, reg2) };
+
+			var map = TileFactoryTestUtils.createMapping ();
+			map.Add (reg1, TileFactoryTestUtils.RAX);
+			map.Add (reg2, TileFactoryTestUtils.RCX);
+			TileFactoryTestUtils.updateMapping (instructions, map);
+
+			var got = TileFactoryTestUtils.getASM (instructions, map);
+			var expected = "mov " + TileFactoryTestUtils.RAX + ", " + TileFactoryTestUtils.RCX + "\n";
+
+			Assert.AreEqual (expected, got);
+		}
+
+		[Test]
+		public void Test_Mov_Same() {
+			var instructions = new[] { InstructionFactory.Move (reg1, reg2) };
+
+			var map = TileFactoryTestUtils.createMapping ();
+			map.Add (reg1, TileFactoryTestUtils.RAX);
+			map.Add (reg2, TileFactoryTestUtils.RAX);
+			TileFactoryTestUtils.updateMapping (instructions, map);
+
+			var got = TileFactoryTestUtils.getASM (instructions, map);
+			const string expected = "";
+
+			Assert.AreEqual (expected, got);
+		}
 
 		[Test]
 		public void Test_LabelInstructions () {
@@ -92,10 +122,13 @@ namespace Nicodem.Backend.Tests
 				InstructionFactory.Not (reg1),
 
 				InstructionFactory.Call (fun),
+				InstructionFactory.Call (reg1),
 				InstructionFactory.Ret (),
 
 				InstructionFactory.Pop (reg1),
 				InstructionFactory.Push (reg1),
+
+				InstructionFactory.Jmp (reg1),
 
 				InstructionFactory.Cmove (reg1, reg2),
 				InstructionFactory.Cmovg (reg1, reg2),
@@ -109,9 +142,7 @@ namespace Nicodem.Backend.Tests
 				InstructionFactory.Setge (reg1),
 				InstructionFactory.Setl (reg1),
 				InstructionFactory.Setle (reg1),
-				InstructionFactory.Setne (reg1),
-
-				InstructionFactory.Call (fun)
+				InstructionFactory.Setne (reg1)
 			};
 
 			foreach (var insn in lst) {

@@ -17,13 +17,15 @@ namespace Nicodem.Semantics
         public static B.Function BuildBackendFunction(AST.FunctionDefinitionNode funDef, IEnumerable<Vertex> expGraph)
         {
             B.Function f = funDef.BackendFunction; // get previously created backend function object
+            // FIXME: this code is no longer needed -> args will be constructed inside function object
             for (int i = 0; i < f.ArgsCount; i++) {
                 // for each argument set temporary node used for this argument inside created backend tree
-                f.ArgsLocations[i] = new Brep.TemporaryNode(); 
+
+                //f.ArgsLocations[i] = new Brep.TemporaryNode(); 
             }
 
-			f.Body = new List<Brep.Node>{ (new DFSBuilder(funDef)).Build(expGraph.First()) };
-            f.Result = null; // TODO set Node which value will be function result
+			f.Body = new List<Brep.Node>{ (new DFSBuilder(funDef, expGraph.Last())).Build(expGraph.First()) };
+			f.Result = null; // this is set by DFSBuilder
 
 			return f;
         }
@@ -33,13 +35,15 @@ namespace Nicodem.Semantics
 		private class DFSBuilder
 		{
 			private AST.FunctionDefinitionNode funDef;
+			private Vertex resNode;
 			private Dictionary<Vertex, bool> visitted = new Dictionary<Vertex, bool>();
 			private Dictionary<Vertex, Brep.Node> built = new Dictionary<Vertex, Brep.Node>();
 			private Dictionary<Vertex, List<Action<Brep.Node>>> awaiting = new Dictionary<Vertex, List<Action<Brep.Node>>>();
 
-			public DFSBuilder(AST.FunctionDefinitionNode funDef)
+			public DFSBuilder(AST.FunctionDefinitionNode funDef, Vertex resNode)
 			{
 				this.funDef = funDef;
+				this.resNode = resNode;
 			}
 
 			public Brep.Node Build(Vertex expVertex)
@@ -73,6 +77,11 @@ namespace Nicodem.Semantics
 
 					var retVertex = expVertex as ReturnVertex;
 					newNode = NodeBuilder.BuildNode(retVertex.Expression, funDef);
+
+				}
+
+				if(expVertex == resNode) {
+					funDef.BackendFunction.Result = newNode;
 				}
 
 				// finish build of dependent nodes

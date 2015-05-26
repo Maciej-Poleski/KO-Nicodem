@@ -11,7 +11,7 @@ namespace Nicodem.Semantics.CST
 {
     public static class CSTBuilder
     {
-        internal static IParseTree<Symbol> Build(Source.IOrigin origin)
+        public static IParseTree<Symbol> Build(Source.IOrigin origin)
         {
             var sanitizedTokens = SanitizedTokens(origin);
 
@@ -25,12 +25,20 @@ namespace Nicodem.Semantics.CST
                               NicodemGrammarProductions.StartSymbol(),
                               NicodemGrammarProductions.MakeProductionsDictionaryForGrammarConstructor());
 
-            var parser = new LLStarParser<Symbol>(grammar);
+            var parser = new LlParser<Symbol>(grammar);
             var parseRes = parser.Parse(leafs);
 			if(parseRes is OK<Symbol>) {
 				return (parseRes as OK<Symbol>).Tree;
 			} else {
-				// TODO - show an Error<Symbol> properly to the user
+				var err = parseRes as Error<Symbol>;
+				Console.WriteLine(String.Format("Cannot parse symbol {0} at:", err.Symbol));
+				Console.WriteLine(String.Format("Begin line - {0}, char - {1}, end line - {2}, char - {3}", 
+					err.Fragment.GetBeginOriginPosition().LineNumber,
+					err.Fragment.GetBeginOriginPosition().CharNumber,
+					err.Fragment.GetEndOriginPosition().LineNumber,
+					err.Fragment.GetEndOriginPosition().CharNumber
+				));
+				Console.WriteLine(err.Fragment.GetOriginText());
 				return null;
 			}
         }
@@ -52,7 +60,7 @@ namespace Nicodem.Semantics.CST
 
             var tokenizerResult = lexer.Process(origin);
             // TODO improve error handling
-            if (tokenizerResult.LastParsedLocation != tokenizerResult.FailedAtLocation)
+            if (!tokenizerResult.LastParsedLocation.EqualsLocation(tokenizerResult.FailedAtLocation))
             {
                 throw new LexerFailure(origin.MakeFragment(tokenizerResult.LastParsedLocation,tokenizerResult.FailedAtLocation));
             }
@@ -74,6 +82,11 @@ namespace Nicodem.Semantics.CST
             {
                 this._fragment = fragment;
             }
+        }
+
+        private static bool EqualsLocation(this ILocation loc1, ILocation loc2)
+        {
+            return loc1.GetOriginPosition().Equals(loc2.GetOriginPosition());
         }
     }
 }

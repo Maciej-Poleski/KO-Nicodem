@@ -57,7 +57,8 @@ namespace Nicodem.Backend.Cover
 		public string Label { get; private set; }
 
 		public string ToString(IReadOnlyDictionary<RegisterNode, HardwareRegisterNode> registerMapping) {
-			return instructionBuilder (registerMapping) + "\n";
+			var str = instructionBuilder (registerMapping);
+			return str != "" ? (str + "\n") : str; 
 		}
 	}
 }

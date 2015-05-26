@@ -11,16 +11,65 @@ namespace Nicodem.Backend.Tests
 	{
 		[Test]
 		public void Test_Call() {
-			var fun = new Function (new[]{ false }); //TODO { Label = "myFun" };
+			var fun = new Function ("myFun", new[]{ false });
 			var node = new FunctionCallNode (fun);
 
 			var map = TileFactoryTestUtils.createMapping ();
-			var instructions = TileFactory.CallTile ().Cover (node);
+			var instructions = TileFactory.Stack.Call ().Cover (node);
 			TileFactoryTestUtils.updateMapping (instructions, map);
 
 			var got = TileFactoryTestUtils.getASM (instructions, map);
 			var expected = 
 				"call " + node.Function.Label + "\n";
+
+			Assert.AreEqual (expected, got);
+		}
+
+		[Test]
+		public void Test_Push() {
+			var reg = new TemporaryNode ();
+			var node = new PushNode (reg);
+
+			var map = TileFactoryTestUtils.createMapping ();
+			var instructions = TileFactory.Stack.Push ().Cover (node);
+			map.Add (reg, TileFactoryTestUtils.RAX);
+			TileFactoryTestUtils.updateMapping (instructions, map);
+
+			var got = TileFactoryTestUtils.getASM (instructions, map);
+			var expected = 
+				"push " + TileFactoryTestUtils.RAX + "\n";
+
+			Assert.AreEqual (expected, got);
+		}
+
+		[Test]
+		public void Test_Pop() {
+			var reg = new TemporaryNode ();
+			var node = new PopNode (reg);
+
+			var map = TileFactoryTestUtils.createMapping ();
+			var instructions = TileFactory.Stack.Pop ().Cover (node);
+			map.Add (reg, TileFactoryTestUtils.RAX);
+			TileFactoryTestUtils.updateMapping (instructions, map);
+
+			var got = TileFactoryTestUtils.getASM (instructions, map);
+			var expected = 
+				"pop " + TileFactoryTestUtils.RAX + "\n";
+
+			Assert.AreEqual (expected, got);
+		}
+
+
+		[Test]
+		public void Test_Ret() {
+			var node = new RetNode ();
+
+			var map = TileFactoryTestUtils.createMapping ();
+			var instructions = TileFactory.Stack.Ret ().Cover (node);
+			TileFactoryTestUtils.updateMapping (instructions, map);
+
+			var got = TileFactoryTestUtils.getASM (instructions, map);
+			const string expected = "ret\n";
 
 			Assert.AreEqual (expected, got);
 		}
