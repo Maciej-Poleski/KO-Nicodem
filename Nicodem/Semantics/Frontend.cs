@@ -40,10 +40,11 @@ namespace Nicodem.Semantics
             ast.FillInNestedUseFlag();
             ast.Accept(new FunctionLocalVisitor(new Backend.Target())); // create backend function objects
             // split into functions
-            IEnumerable<FunctionDefinitionNode> funcList = ast.SplitIntoFunctions();
+            IEnumerable<FunctionDefinitionNode> funcList = ast.GetAllFunctionDefinitions();
 
             // for each function -> extract controlflow (controlflow graph = expression graph)
             // each vertex of this graph holds (AST) ExpressionNode
+            // during this phase - substitute nested function definition with empty BlockExpression
             IEnumerable<Tuple<FunctionDefinitionNode,ControlFlowGraph>> funcCFGs = funcList.Select(
                 t => Tuple.Create(t, new ControlFlowExtractor().Extract(t.Body))
             );
