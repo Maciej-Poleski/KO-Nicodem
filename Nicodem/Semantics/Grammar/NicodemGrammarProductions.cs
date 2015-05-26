@@ -501,6 +501,11 @@ namespace Nicodem.Semantics.Grammar
 
             private class EofTerminalSymbol: ISymbol
             {
+                static EofTerminalSymbol()
+                {
+                    SymbolToName[Symbol.EOF] = "EOF";
+                }
+
                 public Symbol ToSymbol()
                 {
                     return Symbol.EOF;
@@ -596,7 +601,7 @@ namespace Nicodem.Semantics.Grammar
             {
                 get
                 {
-                    return new RegexSymbol(() => RegExFactory.Union(_regexSymbol(), RegExFactory.Empty<Symbol>()));
+                    return new RegexSymbol(() => RegExFactory.Union(_regexSymbol(), RegExFactory.Epsilon<Symbol>()));
                 }
             }
         }

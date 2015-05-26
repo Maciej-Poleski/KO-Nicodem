@@ -84,6 +84,9 @@
     <Compile Include="Builder\FindUnion.cs" />
     <Compile Include="Cover\InstructionSelection.cs" />
     <Compile Include="Representation\RetNode.cs" />
+    <Compile Include="Cover\TileFactory\TileFactory_Advanced.cs" />
+    <Compile Include="Representation\PopNode.cs" />
+    <Compile Include="Representation\PushNode.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

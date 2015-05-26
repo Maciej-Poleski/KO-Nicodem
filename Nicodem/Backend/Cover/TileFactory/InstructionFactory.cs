@@ -1,10 +1,17 @@
 ﻿using Nicodem.Backend.Representation;
 using System.Collections.Generic;
+using System;
 
 namespace Nicodem.Backend.Cover
 {
 	public static class InstructionFactory
 	{
+		static IEnumerable<T> join<T>( IEnumerable<T> enumerable, T elem) {
+			var S = new LinkedList<T> (enumerable);
+			S.AddLast (elem);
+			return S;
+		}
+
 		static IEnumerable<RegisterNode> use(params RegisterNode[] nodes ){
 			return nodes;
 		}
@@ -34,7 +41,10 @@ namespace Nicodem.Backend.Cover
 
 		public static Instruction Move( RegisterNode dst, RegisterNode src ) {
 			return Instruction.CopyInstruction (
-				map => string.Format ("mov {0}, {1}", map [dst], map [src]),
+				map => 
+					(map [dst].ToString () == map [src].ToString ()) 
+					? ""
+					: string.Format ("mov {0}, {1}", map [dst], map [src]),
 				use (src, dst), define (dst));
 		}
 
@@ -205,6 +215,13 @@ namespace Nicodem.Backend.Cover
 				Function.CallerSavedRegisters, Function.CallerSavedRegisters);
 		}
 
+		public static Instruction Call( RegisterNode reg ) {
+			return new Instruction (
+				map => string.Format ("call {0}", map [reg]),
+				join (Function.CallerSavedRegisters, reg),
+				Function.CallerSavedRegisters);
+		}
+
 		public static Instruction Ret() {
 			return new Instruction (map => "ret", use (Target.RSP), define (Target.RSP));
 		}
@@ -259,6 +276,12 @@ namespace Nicodem.Backend.Cover
 
 		public static Instruction Jmp( LabelNode label ) {
 			return Jump ("mp", label);
+		}
+
+		public static Instruction Jmp( RegisterNode reg ) {
+			return new Instruction (
+				map => string.Format ("jmp {0}", map [reg]),
+				use (reg), define ());
 		}
 
 		public static Instruction Jle( LabelNode label ) {
@@ -356,6 +379,61 @@ namespace Nicodem.Backend.Cover
 		#endregion
 
 		#region lea
+
+		// dst = src1 + src2
+		public static Instruction Lea_Add( RegisterNode dst, RegisterNode src1, RegisterNode src2 ) {
+			return new Instruction (
+				map => string.Format ("lea {0}, [{1}+{2}]", map [dst], map [src1], map [src2]),
+				use (dst, src1, src2), define (dst));
+		}
+
+		// dst = src + const
+		public static Instruction Lea_Add<T>( RegisterNode dst, RegisterNode src, ConstantNode<T> c ) {
+			return new Instruction (
+				map => string.Format ("lea {0}, [{1}+{2}]", map [dst], map [src], c.Value),
+				use (dst, src), define (dst));
+		}
+
+		// dst = src1 + src2 + const
+		public static Instruction Lea_Add<T>( RegisterNode dst, RegisterNode src1, RegisterNode src2, ConstantNode<T> c ) {
+			return new Instruction (
+				map => string.Format ("lea {0}, [{1}+{2}+{3}]", map [dst], map [src1], map[src2], c.Value),
+				use (dst, src1, src2), define (dst));
+		}
+
+		// dst = src * const
+		public static Instruction Lea_Mul( RegisterNode dst, RegisterNode src, ConstantNode<long> c ) {
+			if (c.Value != 2L && c.Value != 4L && c.Value != 8L)
+				throw new ArgumentException ("LEA instruction accepts only 2 4 8 as constant!");
+			return new Instruction (
+				map => string.Format ("lea {0}, [{1}*{2}]", map [dst], map [src], c.Value),
+				use (dst, src), define (dst));
+		}
+
+		// dst = src1 * const + src2
+		public static Instruction Lea_MulAdd( RegisterNode dst, RegisterNode src1, ConstantNode<long> c, RegisterNode src2 ) {
+			if (c.Value != 2L && c.Value != 4L && c.Value != 8L)
+				throw new ArgumentException ("LEA instruction accepts only 2 4 8 as constant!");
+
+			return new Instruction (
+				map => string.Format ("lea {0}, [{1}*{2}+{3}]", map [dst], map [src1], c.Value, map[src2]),
+				use (dst, src1, src2), define (dst));
+		}
+
+		// dst = src1 * const1 + const2
+		public static Instruction Lea_MulAdd<T>( RegisterNode dst, RegisterNode src, ConstantNode<long> c, ConstantNode<T> c2 ) {
+			return new Instruction (
+				map => string.Format ("lea {0}, [{1}*{2}+{3}]", map [dst], map [src], c.Value, c2.Value),
+				use (dst, src), define (dst));
+		}
+
+		// dst = src1 * const1 + src2 + const2
+		public static Instruction Lea_MulAdd<T>( RegisterNode dst, RegisterNode src1, ConstantNode<long> c1, RegisterNode src2, ConstantNode<T> c2 ) {
+			return new Instruction (
+				map => string.Format ("lea {0}, [{1}*{2}+{3}+{4}]", map [dst], map [src1], c1.Value, map [src2], c2.Value),
+				use (dst, src1, src2), define (dst));
+		}
+
 		#endregion
 
 		#region shl shr

@@ -72,7 +72,6 @@ namespace Nicodem.Backend.Tests
 		[Test]
 		public void Test_AddSameReg() {
 			var expected = 
-				"mov " + TileFactoryTestUtils.RBX + ", " + TileFactoryTestUtils.RBX + "\n" +
 				"add " + TileFactoryTestUtils.RBX + ", 2\n" +
 				"mov " + TileFactoryTestUtils.SPECIAL + ", " + TileFactoryTestUtils.RBX + "\n";
 			sameTest ((reg, con) => new AddOperatorNode (reg, con), TileFactory.Assign.Reg_AddConst (), 2L, expected);
@@ -81,7 +80,6 @@ namespace Nicodem.Backend.Tests
 		[Test]
 		public void Test_SubSameReg() {
 			var expected = 
-				"mov " + TileFactoryTestUtils.RBX + ", " + TileFactoryTestUtils.RBX + "\n" +
 				"sub " + TileFactoryTestUtils.RBX + ", 2\n" +
 				"mov " + TileFactoryTestUtils.SPECIAL + ", " + TileFactoryTestUtils.RBX + "\n";
 			sameTest ((reg, con) => new SubOperatorNode (reg, con), TileFactory.Assign.Reg_SubConst (), 2L, expected);

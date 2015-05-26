@@ -28,7 +28,11 @@ namespace Nicodem.Backend.Cover
 				ConstTile<long>(),
 				MemAccessTile(),
 				MemAccessTile<long>(),
-				CallTile(),
+
+				Stack.Call(),
+				Stack.Ret(),
+				Stack.Push(),
+				Stack.Pop(),
 
 				Add.RegReg(),
 				Add.RegConst<long>(),
@@ -106,7 +110,8 @@ namespace Nicodem.Backend.Cover
 				Assign.MemConst_Reg(),
 				Assign.MemConst_Const(),
 
-				Jump.Unconditional(),
+				Jump.Unconditional_Label(),
+				Jump.Unconditional_Reg(),
 				Jump.Cond_RegReg_Eq(),
 				Jump.Cond_RegReg_Neq(),
 				Jump.Cond_RegReg_Lt(),
@@ -124,7 +129,19 @@ namespace Nicodem.Backend.Cover
 				Jump.Cond_ConstReg_Lt<long>(),
 				Jump.Cond_ConstReg_Le<long>(),
 				Jump.Cond_ConstReg_Gt<long>(),
-				Jump.Cond_ConstReg_Ge<long>()
+				Jump.Cond_ConstReg_Ge<long>(),
+
+				Advanced.EffectiveMultiplication_RegConst(),
+				Advanced.EffectiveMultiplication_ConstReg(),
+				Advanced.EffectiveAddition_RegReg(),
+				Advanced.EffectiveAddition_RegConst<long>(),
+				Advanced.EffectiveAddition_ConstReg<long>(),
+				Advanced.EffectiveAddition_ConstRegReg1<long>(),
+				Advanced.EffectiveAddition_ConstRegReg2<long>(),
+				Advanced.EffectiveAddition_RegConstReg1<long>(),
+				Advanced.EffectiveAddition_RegConstReg2<long>(),
+				Advanced.EffectiveAddition_RegRegConst1<long>(),
+				Advanced.EffectiveAddition_RegRegConst2<long>()
 			};
 		}
 
@@ -176,138 +193,49 @@ namespace Nicodem.Backend.Cover
 			);
 		}
 
-		public static Tile CallTile() {
-			return new Tile (typeof(FunctionCallNode),
-				new Tile[] { },
-				(regNode, node) => new[] {
-					InstructionFactory.Call (node as FunctionCallNode)
-				}
-			);
-		}
-
-		public static class Lea
+		public static class Stack
 		{
-			// lea dst, [reg1 + val1 * reg2 + val2]
-			// x = y * c,  better for c = 0,1,2,3,4,5,8,9
-			public static Tile EffectiveMultiplication() {
-				return new Tile (typeof(AssignmentNode),
-					new[] {
-						makeTile<RegisterNode>(),
-						makeTile<MulOperatorNode>(
-							makeTile<RegisterNode>(),
-							makeTile<ConstantNode<long>>()
-						)
-					},
-					(regNode, node) => {
-						var assignment = node as AssignmentNode;
-						var dst = assignment.Target as RegisterNode;
-						var mul = assignment.Source as MulOperatorNode;
-						var mul_reg = mul.LeftOperand as RegisterNode;
-						var mul_val = mul.RightOperand as ConstantNode<long>;
-
-						switch (mul_val.Value) {
-						case 2L:
-						case 4L:
-						case 8L:
-							return new [] {
-								new Instruction (
-									map => string.Format("lea {0}, [{1}*{2}]", map[dst], map[mul_reg], mul_val.Value),
-									use(dst, mul_reg), define(dst)),
-								InstructionFactory.Move( regNode, dst )
-							};
-						case 3L:
-						case 5L:
-						case 9L:
-							return new [] {
-								new Instruction (
-									map => string.Format("lea {0}, [{1}+{1}*{2}]", map[dst], map[mul_reg], mul_val.Value - 1L),
-									use(dst, mul_reg), define(dst)),
-								InstructionFactory.Move( regNode, dst )
-							};
-						case 1L:
-							return new [] {
-								Instruction.CopyInstruction (
-									map => string.Format("mov {0}, {1}", map[dst], map[mul_reg]),
-									use(dst, mul_reg), define(dst)),
-								InstructionFactory.Move( regNode, dst )
-							};
-						case 0L:
-							return new [] {
-								new Instruction (
-									map => string.Format("xor {0}, {0}", map[dst]),
-									use(dst), define(dst)),
-								InstructionFactory.Move( regNode, dst )
-							};
-						default:
-							return null; // TODO copy from multiply
-						}
+			public static Tile Call() {
+				return new Tile (typeof(FunctionCallNode),
+					new Tile[] { },
+					(regNode, node) => new[] {
+						InstructionFactory.Call (node as FunctionCallNode)
 					}
 				);
 			}
 
-			public static Tile Reg_RegRegConstConst() {
-				return new Tile (typeof(AssignmentNode),
-					new[] {
-						makeTile<RegisterNode> (),
-						makeTile<AddOperatorNode>(
-							makeTile<AddOperatorNode>(
-								makeTile<RegisterNode>(),
-								makeTile<MulOperatorNode> (
-									makeTile<RegisterNode> (),
-									makeTile<ConstantNode<long>> ()
-								)
-							),
-							makeTile<ConstantNode<long>>()
-						)
+			public static Tile Ret() {
+				return new Tile (typeof(RetNode),
+					new Tile[] { },
+					(regNode, node) => new[] {
+						InstructionFactory.Ret ()
+					}
+				);
+			}
+
+			public static Tile Push() {
+				return new Tile (typeof(PushNode),
+					new [] {
+						makeTile<RegisterNode> ()
 					},
 					(regNode, node) => {
-						var assignment = node as AssignmentNode;
-						var dst = assignment.Target as RegisterNode;
-						var add1 = assignment.Source as AddOperatorNode;
-						var add2 = add1.LeftOperand as AddOperatorNode;
-
-						var reg1 = add2.LeftOperand as RegisterNode;
-						var mul = add2.RightOperand as MulOperatorNode;
-						var mul_reg = mul.LeftOperand as RegisterNode;
-						var mul_val = mul.RightOperand as ConstantNode<long>;
-						var val2 = add1.RightOperand as ConstantNode<long>;
-
-						return new [] {
-							new Instruction (
-								map => string.Format ("lea {0}, [{1}+{2}*{3}+{4}]", map [dst], map [reg1], map[mul_reg], mul_val.Value, val2.Value),
-								use (dst, mul_reg), define (dst)),
-							InstructionFactory.Move (regNode, dst)
+						var root = node as PushNode;
+						return new[] {
+							InstructionFactory.Push (root.Register)
 						};
 					}
 				);
 			}
 
-			public static Tile Reg_RegReg() {
-				return new Tile (typeof(AssignmentNode),
-					new[] {
-						makeTile<RegisterNode>(),
-						makeTile<MemoryNode>(
-							makeTile<AddOperatorNode>(
-								makeTile<RegisterNode>(),
-								makeTile<RegisterNode>()
-							)
-						)
+			public static Tile Pop() {
+				return new Tile (typeof(PopNode),
+					new [] {
+						makeTile<RegisterNode> ()
 					},
 					(regNode, node) => {
-						var assignment = node as AssignmentNode;
-						var dst = assignment.Target as RegisterNode;
-						var mem = assignment.Source as MemoryNode;
-						var mem_add = mem.Address as AddOperatorNode;
-						var mem_add_1 = mem_add.LeftOperand as RegisterNode;
-						var mem_add_2 = mem_add.RightOperand as RegisterNode;
-
-						return new [] {
-							// lea dst, [reg1 + reg2]
-							new Instruction (
-								map => string.Format("lea {0}, [{1} + {2}]", map[dst], map[mem_add_1], map[mem_add_2]),
-								use(dst, mem_add_1, mem_add_2), define(dst)),
-
-							InstructionFactory.Move( regNode, dst )
+						var root = node as PopNode;
+						return new[] {
+							InstructionFactory.Pop (root.Register)
 						};
 					}
 				);

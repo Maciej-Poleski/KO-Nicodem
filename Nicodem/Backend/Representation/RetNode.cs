@@ -2,9 +2,6 @@
 {
 	public class RetNode : Node
 	{
-		public RetNode ()
-		{
-		}
 	}
 }
 

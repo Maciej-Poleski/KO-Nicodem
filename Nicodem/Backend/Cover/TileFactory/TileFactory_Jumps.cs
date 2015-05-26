@@ -10,10 +10,24 @@ namespace Nicodem.Backend.Cover
 		{
 			#region unconditional
 
-			public static Tile Unconditional() {
+			public static Tile Unconditional_Label() {
 				return new Tile (typeof(UnconditionalJumpToLabelNode),
 					new [] {
 						makeTile<LabelNode> ()
+					},
+					(regNode, node) => {
+						var root = node as UnconditionalJumpToLabelNode;
+						return new[] {
+							InstructionFactory.Jmp (root.NextNode)
+						};
+					}
+				);
+			}
+
+			public static Tile Unconditional_Reg() {
+				return new Tile (typeof(UnconditionalJumpToLabelNode),
+					new [] {
+						makeTile<RegisterNode> ()
 					},
 					(regNode, node) => {
 						var root = node as UnconditionalJumpToLabelNode;
