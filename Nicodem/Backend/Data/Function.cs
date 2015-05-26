@@ -91,6 +91,11 @@ namespace Nicodem.Backend
             return GetEnclosingFunctionStackFrame(GetCurrentStackFrame());
         }
 
+        internal void MoveTemporaryToMemory(RegisterNode temp)
+        {
+            throw new NotImplementedException();
+        }
+
         // ------------------- public methods -------------------
 
         public Local AllocLocal()
