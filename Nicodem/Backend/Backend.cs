@@ -11,7 +11,7 @@ namespace Nicodem.Backend
     {
         private static int MAX_ALLOC_TRY = 3;
 
-        void FromFunctionsToNasm(IEnumerable<Function> funcList)
+        IEnumerable<string> FromFunctionsToNasm(IEnumerable<Function> funcList)
         {
             foreach (var f in funcList) {
                 f.Body = TraceBuilder.BuildTrace(f.Body.First());
@@ -20,27 +20,40 @@ namespace Nicodem.Backend
             var livenessAnalyzer = new LivenessAnalysis();
             var regAllocator = new RegisterAllocator(Target.AllHardwareRegisters);
 
+            var output = new List<string>();
+
             foreach (var f in funcList) {
                 int tryCount = 0;
+                IEnumerable<Instruction> fInstr;
                 while(true){
                     if (tryCount == MAX_ALLOC_TRY) {
                         throw new ArgumentException("Your input is stupid... (or our compiler).");
                     }
                     var fBody = f.GenerateTheWholeBody();
-					var fInstr = InstructionSelection.SelectInstructions(fBody);
+					fInstr = InstructionSelection.SelectInstructions(fBody);
                     var inGraph = livenessAnalyzer.AnalyzeLiveness(fInstr);
                     regAllocator.AllocateRegisters(inGraph);
                     var toCorrect = regAllocator.SpilledRegisters;
                     if (toCorrect.Any()) {
-                        // apply changes toCorrect
+                        // apply changes
+                        foreach(var reg in toCorrect){
+                            f.MoveTemporaryToMemory(reg);
+                        }
                     } else {
+                        // success
                         break;
                     }
                     tryCount++;
                 }
-                // use regAllocator.RegistersColoring
-                // produce nasm
+
+                // use regAllocator.RegistersColoring to produce nasm
+                var regMapping = regAllocator.RegistersColoring;
+                foreach (var instr in fInstr) {
+                    output.Add(instr.ToString(regMapping));
+                }
+                output.Add("\n");
             }
+            return output;
         }
     }
 }

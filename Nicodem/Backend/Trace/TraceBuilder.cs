@@ -71,6 +71,8 @@ namespace Nicodem.Backend
 				foreach (Node expr in sequenceNode.Sequence)
 					trace.Add (expr);
 
+				trace.Add(sequenceNode.ResultRegister);
+
 				trace.Add (new UnconditionalJumpToLabelNode (GetLabel (sequenceNode.NextNode)));
 				if (!assigned.Contains (sequenceNode.NextNode))
 					DfsVisit (sequenceNode.NextNode);

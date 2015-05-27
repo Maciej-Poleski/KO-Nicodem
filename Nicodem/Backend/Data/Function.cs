@@ -37,39 +37,28 @@ namespace Nicodem.Backend
         // RBP - this stack frame
         // (optional) RBP-8 - address of stack frame of nearest enclosing Function (NOTE: space will be alocated in preamble)
 
-        // Can be public if somebody wants (but this structure will change soon)
-        private IReadOnlyList<bool> Parameters { get; set; }
+        /// <value>Locations of function arguments.</value>
+        private Location[] ArgsLocations; // used inside constructor
+
+        /// <value>Place for storing callee saved registers. Used in prologue.</value>
+        private LocationNode[] CalleeSavedRegLocations { get; set; } // created inside constructor
 
         // ------------------- properties -------------------
 
-        internal Function EnclosedIn
-        {
-            get { return _enclosedIn; }
-        }
+        /// <value>Enclosing function.</value>
+        internal Function EnclosedIn { get { return _enclosedIn; } }
 
         /// <value>Label of this function.</value>
         public string Label { get; private set; }
 
-        /// <value>Body of this function.</value>
-        public IEnumerable<Node> Body { get; set; } // Currently implementation requires return value to be stored in Body.ResultRegister
-
-        //private Location[] ArgsLocations; // TODO: use this!
-
-        public LocationNode GetArgLocationNode(int i){
-            throw new NotImplementedException();
-        }
-
-        /// <value>Locations representing arguments inside Body.</value>
-        [Obsolete]
-        public LocationNode[] ArgsLocations { get; private set; } // TODO: set it inside constructor
-
-		public LocationNode[] CalleeSavedRegLocations { get; private set; } // TODO: create inside constructor (count = count of CalleeSavedRegisters)
-
         /// <value>Number of arguments of this function.</value>
         public int ArgsCount { get { return ArgsLocations.Length; } }
 
+        /// <value>Body of this function.</value>
+        public IEnumerable<Node> Body { get; set; } // Currently implementation requires return value to be stored in Body.ResultRegister
+
         /// <value>Node which value will be returned as this function result.</value>
-        public Node Result { get; set; }    // very very bad idea - one temporary for all function calls?
+        public Node Result { get; set; }
 
         // ------------------- constructor -------------------
 
@@ -79,8 +68,17 @@ namespace Nicodem.Backend
         public Function(string label, IReadOnlyList<bool> parameters, Function enclosedInFunction = null)
         {
             Label = label;
-            Parameters = parameters;
+            ArgsLocations = new Location[parameters.Count];
+            int ind = 0;
+            foreach (bool isArgLocal in parameters) {
+                if (isArgLocal)
+                    ArgsLocations[ind] = AllocLocal();
+                else 
+                    ArgsLocations[ind] = new Temporary();
+                ind++;
+            }
             _enclosedIn = enclosedInFunction;
+            CalleeSavedRegLocations = new LocationNode[CalleeSavedRegisters.Length];
         }
 
         // ------------------- internal methods -------------------
@@ -93,6 +91,11 @@ namespace Nicodem.Backend
         internal LocationNode GetEnclosingFunctionStackFrame()
         {
             return GetEnclosingFunctionStackFrame(GetCurrentStackFrame());
+        }
+
+        internal void MoveTemporaryToMemory(RegisterNode temp)
+        {
+            throw new NotImplementedException();
         }
 
         // ------------------- public methods -------------------
@@ -139,6 +142,13 @@ namespace Nicodem.Backend
             seq[ptr++] = new AssignmentNode(result, Body.Last().ResultRegister);  // Assume value of function body is return value
             seq[ptr++] = new AssignmentNode(Target.RSP, new AddOperatorNode(Target.RSP, new ConstantNode<long>(_stackFrameSize)));
             return new SequenceNode(seq, out nextNodeSetter, result);
+        }
+
+        /// <summary>
+        /// Returns LocationNode for accesing i-th argument.
+        /// </summary>
+        public LocationNode GetArgLocationNode(int i){
+            return AccessLocal(ArgsLocations[i]);
         }
 
         /// <summary>

@@ -57,7 +57,7 @@ namespace Nicodem.Semantics.Visitors
                             tempDef.Type = arg.ExpressionType;
                             tempDef.NestedUse = false;
                             tempDef.Value = arg;
-                            tempDef.VariableLocation = new Brep.TemporaryNode();
+							tempDef.VariableLocation = new Temporary();
                             trees.Add(tempDef);
                             var tempUse = new VariableUseNode();
                             tempUse.Name = "temp";

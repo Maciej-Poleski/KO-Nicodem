@@ -2,14 +2,14 @@
 {
 	public class PopNode : Node
 	{
-		public RegisterNode Register { get; private set; }
+		public Node Value { get; private set; }
 
-		public PopNode( RegisterNode reg ) {
-			Register = reg;
+		public PopNode( Node val ) {
+			Value = val;
 		}
 
 		public override Node[] GetChildren() {
-			return new[]{ Register };
+			return new[]{ Value };
 		}
 	}
 }

@@ -11,13 +11,13 @@
 		public override void Visit (PushNode node)
 		{
 			Visit (node as Node);
-			node.Register.Accept (this);
+			node.Value.Accept (this);
 		}
 
 		public override void Visit (PopNode node)
 		{
 			Visit (node as Node);
-			node.Register.Accept (this);
+			node.Value.Accept (this);
 		}
 
 		public override void Visit (RetNode node)

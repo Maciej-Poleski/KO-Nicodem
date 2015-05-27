@@ -10,7 +10,7 @@ namespace Nicodem.Semantics.AST
 	class VariableDefNode : VariableDeclNode
 	{
 		public ExpressionNode Value { get; set; } // set during AST construction
-		public Brep.LocationNode VariableLocation { get; set; }
+		public Location VariableLocation { get; set; }
         
         #region implemented abstract members of Node
 

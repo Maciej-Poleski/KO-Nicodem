@@ -30,7 +30,7 @@ namespace Nicodem.Semantics.Visitors
 			if (node.NestedUse) {
 				functions.Peek().AllocLocal ();
 			} else {
-				node.VariableLocation = new Brep.TemporaryNode();
+				node.VariableLocation = new Temporary();
 			}
 
 			base.Visit(node);

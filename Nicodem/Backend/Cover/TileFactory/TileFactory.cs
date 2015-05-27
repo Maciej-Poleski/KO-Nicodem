@@ -220,8 +220,9 @@ namespace Nicodem.Backend.Cover
 					},
 					(regNode, node) => {
 						var root = node as PushNode;
+						var reg = root.Value as RegisterNode;
 						return new[] {
-							InstructionFactory.Push (root.Register)
+							InstructionFactory.Push (reg)
 						};
 					}
 				);
@@ -234,8 +235,9 @@ namespace Nicodem.Backend.Cover
 					},
 					(regNode, node) => {
 						var root = node as PopNode;
+						var reg = root.Value as RegisterNode;
 						return new[] {
-							InstructionFactory.Pop (root.Register)
+							InstructionFactory.Pop (reg)
 						};
 					}
 				);

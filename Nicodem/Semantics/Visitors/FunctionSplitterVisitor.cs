@@ -46,53 +46,15 @@ namespace Nicodem.Semantics.Visitors
 
     public static partial class Extensions
     {
+        /// <summary>
+        /// Return all function definitions contained in this program AST.
+        /// </summary>
         internal static IReadOnlyCollection<FunctionDefinitionNode> GetAllFunctionDefinitions(
             this ProgramNode node)
         {
             var visitor = new FunctionSplitterVisitor();
             node.Accept(visitor);
             return visitor.Functions;
-        }
-
-        /// <summary>
-        /// Split program AST into functions. Each function cannot contain nested function code.
-        /// </summary>
-        internal static IReadOnlyCollection<FunctionDefinitionNode> SplitIntoFunctions(this ProgramNode node)
-        {
-            var visitor = new FunctionSplitterVisitor();
-            node.Accept(visitor);
-            return visitor.Functions.Select(f => new FunctionDefinitionNode() { 
-                Name = f.Name, 
-                Parameters = f.Parameters, 
-                BackendFunction = f.BackendFunction, 
-                Body = FunctionDefFilterVisitor.FilterBody(f.Body), 
-                ExpressionType = f.ExpressionType, 
-                Fragment = f.Fragment,
-                ResultType = f.ResultType
-            }).ToArray();
-        }
-
-        internal static IReadOnlyCollection<Function> SplitIntoBackendFunctions(this ProgramNode node)
-        {
-            var visitor = new FunctionSplitter2Visitor();
-            node.Accept(visitor);
-            return visitor.Functions;
-        }
-
-        private class FunctionDefFilterVisitor : AbstractRecursiveVisitor
-        {
-            public override void Visit(BlockExpressionNode node)
-            {
-                base.Visit(node);
-                node.Elements = node.Elements.Where(e => !(e is FunctionDefinitionNode));   // it sucks, i know that
-            }
-
-            internal static ExpressionNode FilterBody(ExpressionNode node)
-            {
-                var visitor = new FunctionDefFilterVisitor();
-                node.Accept(visitor);
-                return node;
-            }
         }
     }
 }
