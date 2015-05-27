@@ -22,9 +22,9 @@ namespace Nicodem.Semantics.Extractors
         /// <returns>Vertex in transformed expression graph.</returns>
         public IEnumerable<Vertex> Extract<T>(T root) where T : ExpressionNode
         {
-            var visitor = new ControlFlowVisitor();
-            root.Accept(visitor);
-            return visitor.Graph;
+            var visitor = new ReturnedControlFlowVisitor();
+            var graph = root.Accept(visitor);
+            return graph.Graph;
         }
     }
 }

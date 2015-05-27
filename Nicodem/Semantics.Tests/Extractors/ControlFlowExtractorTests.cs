@@ -53,8 +53,31 @@ namespace Semantics.Tests.Extractors
         [Test]
         public void BasicIfTest()
         {
-            IEnumerable<Vertex> cf_graph = new ControlFlowExtractor().Extract(block_expression_operator_and_if);
-            Assert.AreEqual(5, cf_graph.Count());
+            List<Vertex> cf_graph = new List<Vertex>(new ControlFlowExtractor().Extract(block_expression_operator_and_if));
+
+            Assert.IsTrue(cf_graph[0].Expression is VariableUseNode);
+            Assert.IsTrue(cf_graph[1].Expression is VariableUseNode);
+            Assert.IsTrue(cf_graph[2].Expression is OperatorNode);
+            Assert.IsTrue(cf_graph[3].Expression is VariableUseNode);
+            Assert.IsTrue(cf_graph[4].Expression is VariableUseNode);
+            Assert.IsTrue(cf_graph[5].Expression is VariableUseNode);
+            Assert.IsTrue(cf_graph[6].Expression is OperatorNode);
+            Assert.IsTrue(cf_graph[7].Expression is VariableUseNode);
+            Assert.IsTrue(cf_graph[8].Expression is VariableUseNode);
+            Assert.IsTrue(cf_graph[9].Expression is OperatorNode);
+            Assert.IsTrue(cf_graph[10].Expression is VariableUseNode);
+            Assert.IsTrue(cf_graph[11].Expression is VariableUseNode);
+            Assert.IsTrue(cf_graph[12].Expression is OperatorNode);
+            Assert.IsTrue(cf_graph[13].Expression is OperatorNode);
+            Assert.IsTrue(cf_graph[14].Expression is OperatorNode);
+            Assert.IsTrue(cf_graph[15].Expression is OperatorNode);
+            Assert.IsTrue(cf_graph[16].Expression is VariableUseNode);
+            Assert.IsTrue(cf_graph[17].Expression is VariableUseNode);
+            Assert.IsTrue(cf_graph[18].Expression is OperatorNode);
+            Assert.IsTrue(cf_graph[19].Expression is OperatorNode);
+
+            Assert.IsTrue(cf_graph[13] is ConditionalJumpVertex);
+            Assert.AreEqual(20, cf_graph.Count);
         }
         
     }
