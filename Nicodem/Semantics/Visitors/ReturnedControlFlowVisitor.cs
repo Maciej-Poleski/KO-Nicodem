@@ -14,6 +14,7 @@ namespace Nicodem.Semantics.Visitors
         private int temporary_counter = 0;
         private List<WhileNode> while_stack = new List<WhileNode>();
         private Dictionary<LoopControlMode, Dictionary<WhileNode, List<Vertex>>> while_for_loop_control = new Dictionary<LoopControlMode, Dictionary<WhileNode, List<Vertex>>>();
+        
         /// <summary>
         /// Create concatiantion of thwo SubExpressionGraphs
         /// </summary>
@@ -25,7 +26,7 @@ namespace Nicodem.Semantics.Visitors
             if (current == null || next == null)
                 throw new Exception("One Of Subgraph is null");
 
-            Debug.Assert(current.Graph.Count == 0 && next.Graph.Count == 0);
+            Debug.Assert(current.Graph.Count != 0 || next.Graph.Count != 0);
 
             if (current.Start == null || current.End == null)
             {
@@ -41,6 +42,7 @@ namespace Nicodem.Semantics.Visitors
             
             return new SubExpressionGraph(current.Start, new List<Vertex>(current.Graph.Concat(next.Graph)), next.End);
         }
+        
         /// <summary>
         /// Create simply SubExpressionGraph with one Vertex.
         /// </summary>
@@ -51,6 +53,7 @@ namespace Nicodem.Semantics.Visitors
             var vertex = new OneJumpVertex(null, node);
             return new SubExpressionGraph(vertex, new List<Vertex>{vertex}, vertex);
         }
+        
         /// <summary>
         /// Check if there is If node, and we should update Value of node by temporary variable
         /// </summary>
@@ -101,10 +104,10 @@ namespace Nicodem.Semantics.Visitors
             return sub_graph;
         }
 
-        //??
+        //Just create one Vertex SubExpressionGraph with this node
         public override SubExpressionGraph Visit(AtomNode node)
         {
-            return base.Visit(node);
+            return CreateOneVertexSubGraph(node);
         }
 
         //Replace IfNodes and link sub_graph of childs
@@ -341,7 +344,13 @@ namespace Nicodem.Semantics.Visitors
             return sub_graph;
         }
 
+        //Just create one Vertex SubExpressionGraph
+        public override SubExpressionGraph Visit(VariableUseNode node)
+        {
+            return CreateOneVertexSubGraph(node);
+        }
 
+        //create cycle for while
         public override SubExpressionGraph Visit(WhileNode node)
         {
             while_stack.Add(node);
