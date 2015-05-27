@@ -2,14 +2,14 @@
 {
 	public class PushNode : Node
 	{
-		public RegisterNode Register { get; private set; }
+		public Node Value { get; private set; }
 
-		public PushNode( RegisterNode reg ) {
-			Register = reg;
+		public PushNode( Node val ) {
+			Value = val;
 		}
 
 		public override Node[] GetChildren() {
-			return new[]{ Register };
+			return new[]{ Value };
 		}
 	}
 }
