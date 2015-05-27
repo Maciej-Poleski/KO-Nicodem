@@ -3,27 +3,36 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Nicodem.Semantics.AST;
 
 namespace Nicodem.Semantics.ExpressionGraph
 {
     class SubExpressionGraph
     {
+        /// <summary>
+        /// Start of Graph
+        /// </summary>
         public Vertex Start;
-        public Vertex End{
-            get{
-                if(currentEnd.Count == 0)
-                    return null;
-                return currentEnd[0];
-            }
-        }
+        /// <summary>
+        /// End of Graph
+        /// </summary>
+        public Vertex End;
+        /// <summary>
+        /// List of Vertex in Graph
+        /// </summary>
         public List<Vertex> Graph = new List<Vertex>();
-        public List<Vertex> currentEnd = new List<Vertex>();
+        /// <summary>
+        /// Flag which means if there is "fresh" if in this graph.
+        /// null - means that there isn't
+        /// not null - temporary use in if
+        /// </summary>
+        public ExpressionNode If = null;
 
-        public SubExpressionGraph(Vertex _start, List<Vertex> _graph, List<Vertex> _currentEnd)
+        public SubExpressionGraph(Vertex _start, List<Vertex> _graph, Vertex _end)
         {
             Start = _start;
             Graph = _graph;
-            currentEnd = _currentEnd;
+            End = _end;
         }
 
         public SubExpressionGraph(){ }
