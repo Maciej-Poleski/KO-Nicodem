@@ -33,7 +33,7 @@ namespace Nicodem.Semantics.AST
 			visitor.Visit (this);
 		}
 
-        public override SubExpressionGraph Accept(ReturnedAbstractVisitor<SubExpressionGraph> visitor)
+        public override T Accept<T>(ReturnedAbstractVisitor<T> visitor)
         {
             return visitor.Visit(this);
         }
