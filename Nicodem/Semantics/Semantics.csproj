@@ -53,6 +53,7 @@
     <Compile Include="ExpressionGraph\ReturnVertex.cs" />
     <Compile Include="ExpressionGraph\ConditionalJumpVertex.cs" />
     <Compile Include="ExpressionGraph\OneJumpVertex.cs" />
+    <Compile Include="ExpressionGraph\SubExpressionGraph.cs" />
     <Compile Include="ExpressionGraph\Vertex.cs" />
     <Compile Include="Extractors\ControlFlowExtractor.cs">
       <SubType>Code</SubType>
@@ -88,6 +89,8 @@
     <Compile Include="Visitors\AbstractVisitor.cs" />
     <Compile Include="Visitors\AbstractRecursiveVisitor.cs" />
     <Compile Include="Visitors\ControlFlowVisitor.cs" />
+    <Compile Include="Visitors\ReturnedAbstractVisitor.cs" />
+    <Compile Include="Visitors\ReturnedControlFlowVisitor.cs" />
     <Compile Include="Visitors\SideEffectExtractorVisitor.cs" />
     <Compile Include="Visitors\FunctionSplitterVisitor.cs" />
     <Compile Include="Visitors\NestedUseVisitor.cs" />
