@@ -33,7 +33,7 @@ namespace Nicodem.Semantics.Grammar
 
         private static bool _tokenCategoryAttributionLock = false;
 
-        private struct TokenCategory : IEquatable<TokenCategory>
+        internal struct TokenCategory : IEquatable<TokenCategory>
         {
             public override string ToString()
             {
@@ -271,17 +271,17 @@ namespace Nicodem.Semantics.Grammar
 
         #region ProductionImplementation
 
-        private enum SymbolInfo
+        internal enum SymbolInfo
         {
             None,
             LeftToRight,
             RightToLeft,
         }
 
-        private struct EofSymbol
+        internal struct EofSymbol
         { }
 
-        private static readonly EofSymbol Eof = new EofSymbol();
+        internal static readonly EofSymbol Eof = new EofSymbol();
 
         private static string DescribeSymbolInfo(SymbolInfo info)
         {
@@ -298,7 +298,7 @@ namespace Nicodem.Semantics.Grammar
             return null;
         }
 
-        private class UniversalSymbol : IEquatable<UniversalSymbol>
+        internal class UniversalSymbol : IEquatable<UniversalSymbol>
         {
             public bool Equals(UniversalSymbol other)
             {
@@ -513,7 +513,7 @@ namespace Nicodem.Semantics.Grammar
             }
         }
 
-        private class RegexSymbol
+        internal class RegexSymbol
         {
             private delegate RegEx<Symbol> SuspendedRegexSymbol();
 
@@ -671,45 +671,45 @@ namespace Nicodem.Semantics.Grammar
 
         #region Productions
 
-        private static readonly UniversalSymbol DecimalNumberLiteral = NewNonterminal();
-        private static readonly UniversalSymbol CharacterLiteral = NewNonterminal();
-        private static readonly UniversalSymbol StringLiteral = NewNonterminal();
-        private static readonly UniversalSymbol BooleanLiteral = NewNonterminal();
-        private static readonly UniversalSymbol Literals = NewNonterminal();
+        internal static readonly UniversalSymbol DecimalNumberLiteral = NewNonterminal();
+        internal static readonly UniversalSymbol CharacterLiteral = NewNonterminal();
+        internal static readonly UniversalSymbol StringLiteral = NewNonterminal();
+        internal static readonly UniversalSymbol BooleanLiteral = NewNonterminal();
+        internal static readonly UniversalSymbol Literals = NewNonterminal();
 
-        private static UniversalSymbol TypeSpecifier = NewNonterminal();
-        private static UniversalSymbol ObjectDeclaration = NewNonterminal();
-        private static UniversalSymbol BlockExpression = NewNonterminal();
-        private static UniversalSymbol ObjectDefinitionExpression = NewNonterminal();   // VariableDefNode
-        private static UniversalSymbol ArrayLiteralExpression = NewNonterminal();       // ArrayNode
-        private static UniversalSymbol ObjectUseExpression = NewNonterminal();          // VariableUseNode __and__ ConstNode
-        private static UniversalSymbol IfExpression = NewNonterminal();                 // IfNode
-        private static UniversalSymbol WhileExpression = NewNonterminal();              // WhileNode
-        private static UniversalSymbol LoopControlExpression = NewNonterminal();        // LoopControlNode
-        private static UniversalSymbol AtomicExpression = NewNonterminal();             // above expressions
-        private static UniversalSymbol Operator0Expression = NewNonterminal();          // atomic expression or parenthesized general expression
-        private static UniversalSymbol Operator1Expression = NewNonterminal(LeftToRight);          // scope resolution (unimplemented)
-        private static UniversalSymbol Operator2Expression = NewNonterminal(LeftToRight);          // ++ -- (postfix) function call, array subscript, slice subscript
-        private static UniversalSymbol Operator3Expression = NewNonterminal(RightToLeft);          // ++ -- + - ! ~ ((de)reference, new not implemented) prefix
-        private static UniversalSymbol Operator4Expression = NewNonterminal(LeftToRight);          // pointer to member, not implemented
-        private static UniversalSymbol Operator5Expression = NewNonterminal(LeftToRight);          // * / %
-        private static UniversalSymbol Operator6Expression = NewNonterminal(LeftToRight);          // + -
-        private static UniversalSymbol Operator7Expression = NewNonterminal(LeftToRight);          // << >>
-        private static UniversalSymbol Operator8Expression = NewNonterminal(LeftToRight);          // < <= > >=
-        private static UniversalSymbol Operator9Expression = NewNonterminal(LeftToRight);          // == !=
-        private static UniversalSymbol Operator10Expression = NewNonterminal(LeftToRight);         // &
-        private static UniversalSymbol Operator11Expression = NewNonterminal(LeftToRight);         // ^
-        private static UniversalSymbol Operator12Expression = NewNonterminal(LeftToRight);         // |
-        private static UniversalSymbol Operator13Expression = NewNonterminal(LeftToRight);         // &&
-        private static UniversalSymbol Operator14Expression = NewNonterminal(LeftToRight);         // ||
-        private static UniversalSymbol Operator15Expression = NewNonterminal(RightToLeft);         // = += -= *= /= %= <<= >>= &= ^= |=
-        private static UniversalSymbol Operator16Expression = NewNonterminal(RightToLeft);         // throw (unimplemented)
-        private static UniversalSymbol Operator17Expression = NewNonterminal(LeftToRight);         // , (N/A)
-        private static UniversalSymbol OperatorExpression = NewNonterminal();           // OperationNode
-        private static UniversalSymbol Expression = NewNonterminal();
-        private static UniversalSymbol ParametersList = NewNonterminal();               // NOTE: There is no such node in AST, flatten this
-        private static UniversalSymbol Function = NewNonterminal();
-        private static UniversalSymbol Program = NewNonterminal();
+        internal static UniversalSymbol TypeSpecifier = NewNonterminal();
+        internal static UniversalSymbol ObjectDeclaration = NewNonterminal();
+        internal static UniversalSymbol BlockExpression = NewNonterminal();
+        internal static UniversalSymbol ObjectDefinitionExpression = NewNonterminal();   // VariableDefNode
+        internal static UniversalSymbol ArrayLiteralExpression = NewNonterminal();       // ArrayNode
+        internal static UniversalSymbol ObjectUseExpression = NewNonterminal();          // VariableUseNode __and__ ConstNode
+        internal static UniversalSymbol IfExpression = NewNonterminal();                 // IfNode
+        internal static UniversalSymbol WhileExpression = NewNonterminal();              // WhileNode
+        internal static UniversalSymbol LoopControlExpression = NewNonterminal();        // LoopControlNode
+        internal static UniversalSymbol AtomicExpression = NewNonterminal();             // above expressions
+        internal static UniversalSymbol Operator0Expression = NewNonterminal();          // atomic expression or parenthesized general expression
+        internal static UniversalSymbol Operator1Expression = NewNonterminal(LeftToRight);          // scope resolution (unimplemented)
+        internal static UniversalSymbol Operator2Expression = NewNonterminal(LeftToRight);          // ++ -- (postfix) function call, array subscript, slice subscript
+        internal static UniversalSymbol Operator3Expression = NewNonterminal(RightToLeft);          // ++ -- + - ! ~ ((de)reference, new not implemented) prefix
+        internal static UniversalSymbol Operator4Expression = NewNonterminal(LeftToRight);          // pointer to member, not implemented
+        internal static UniversalSymbol Operator5Expression = NewNonterminal(LeftToRight);          // * / %
+        internal static UniversalSymbol Operator6Expression = NewNonterminal(LeftToRight);          // + -
+        internal static UniversalSymbol Operator7Expression = NewNonterminal(LeftToRight);          // << >>
+        internal static UniversalSymbol Operator8Expression = NewNonterminal(LeftToRight);          // < <= > >=
+        internal static UniversalSymbol Operator9Expression = NewNonterminal(LeftToRight);          // == !=
+        internal static UniversalSymbol Operator10Expression = NewNonterminal(LeftToRight);         // &
+        internal static UniversalSymbol Operator11Expression = NewNonterminal(LeftToRight);         // ^
+        internal static UniversalSymbol Operator12Expression = NewNonterminal(LeftToRight);         // |
+        internal static UniversalSymbol Operator13Expression = NewNonterminal(LeftToRight);         // &&
+        internal static UniversalSymbol Operator14Expression = NewNonterminal(LeftToRight);         // ||
+        internal static UniversalSymbol Operator15Expression = NewNonterminal(RightToLeft);         // = += -= *= /= %= <<= >>= &= ^= |=
+        internal static UniversalSymbol Operator16Expression = NewNonterminal(RightToLeft);         // throw (unimplemented)
+        internal static UniversalSymbol Operator17Expression = NewNonterminal(LeftToRight);         // , (N/A)
+        internal static UniversalSymbol OperatorExpression = NewNonterminal();           // OperationNode
+        internal static UniversalSymbol Expression = NewNonterminal();
+        internal static UniversalSymbol ParametersList = NewNonterminal();               // NOTE: There is no such node in AST, flatten this
+        internal static UniversalSymbol Function = NewNonterminal();
+        internal static UniversalSymbol Program = NewNonterminal();
 
         static NicodemGrammarProductions()
         {

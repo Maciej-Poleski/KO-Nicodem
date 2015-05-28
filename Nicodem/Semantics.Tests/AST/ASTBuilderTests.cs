@@ -2,9 +2,13 @@ using NUnit.Framework;
 using System;
 using Nicodem.Parser;
 using Nicodem.Semantics.AST;
+using Nicodem.Semantics.Grammar;
+using Nicodem.Source;
 
 namespace Semantics.Tests
 {
+    using ParseTree = IParseTree<Symbol>;
+
     [TestFixture()]
     public class ASTBuilderTests
     {
@@ -33,6 +37,47 @@ namespace Semantics.Tests
             #endregion
         }
 
+        private class DummyFragment : IFragment
+        {
+            private string text;
+
+            public DummyFragment(string text)
+            {
+                this.text = text;
+            }
+
+            public IOrigin Origin
+            {
+                get { throw new NotImplementedException(); }
+            }
+            public OriginPosition GetBeginOriginPosition() { throw new NotImplementedException(); }
+            public OriginPosition GetEndOriginPosition() { throw new NotImplementedException(); }
+
+            public string GetOriginText() { return text; }
+        }
+
+        private ASTBuilder builder;
+        private Grammar<Symbol> grammar;
+        private DummyFragment dummyFrag;
+        private Production dummyProd;
+        private Symbol eofSymbol;
+        private Symbol programSymbol;
+        private Symbol functionSymbol;
+
+        [TestFixtureSetUp]
+        public void Init()
+        {
+            builder = new ASTBuilder();
+            grammar = new Grammar<Symbol>(
+                           NicodemGrammarProductions.StartSymbol(),
+                           NicodemGrammarProductions.MakeProductionsDictionaryForGrammarConstructor());
+            dummyFrag = new DummyFragment("dummy");
+            dummyProd = null;
+            eofSymbol = (Symbol)(NicodemGrammarProductions.UniversalSymbol)NicodemGrammarProductions.Eof;
+            programSymbol = (Symbol)(NicodemGrammarProductions.UniversalSymbol)NicodemGrammarProductions.Program;
+            functionSymbol = (Symbol)(NicodemGrammarProductions.UniversalSymbol)NicodemGrammarProductions.Function;
+        }
+
         [Test()]
         public void GetNameTest()
         {
@@ -53,6 +98,31 @@ namespace Semantics.Tests
             Assert.IsTrue(ASTBuilder.IsLeftOperator(new TestSymbol(false, "Name-Operator-left")));
             Assert.IsFalse(ASTBuilder.IsLeftOperator(new TestSymbol(false, "Name-Desc")));
             Assert.IsFalse(ASTBuilder.IsLeftOperator(new TestSymbol(false, "Name-Operator-right")));
+        }
+
+        [Test()]
+        public void EmptyProgramTest()
+        {
+            var tree = new ParseBranch<Symbol>(dummyFrag, programSymbol, dummyProd, new ParseTree[] {
+                new ParseLeaf<Symbol>(new DummyFragment(""), eofSymbol)
+            });
+            ProgramNode result = builder.BuildAST<Symbol>(tree);
+            // TODO(guspiel): When it becomes clear what AST to expect, write an AssertEquals here.
+        }
+
+        [Test()]
+        public void ProgramWithTwoEmptyFunctionsTest()
+        {
+            var tree = new ParseBranch<Symbol>(dummyFrag, programSymbol, dummyProd, new ParseTree[] {
+                new ParseBranch<Symbol>(dummyFrag, functionSymbol, dummyProd, new ParseTree[] {
+                    // TODO(guspiel): invalid without a body?
+                }),
+                new ParseBranch<Symbol>(dummyFrag, functionSymbol, dummyProd, new ParseTree[] {
+                    // TODO(guspiel): invalid without a body?
+                })
+            });
+            ProgramNode result = builder.BuildAST<Symbol>(tree);
+            // TODO(guspiel): When it becomes clear what AST to expect, write an AssertEquals here.
         }
     }
 }
