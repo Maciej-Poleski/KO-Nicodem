@@ -175,7 +175,7 @@ namespace Nicodem.Semantics.Grammar
 
         private static string RemoveCases(this string token, params string[] cases)
         {
-            return "((" + token + ")" + "&(^(" + string.Join("|", cases) + ")))";
+            return "((" + token + ")" + "&(^(" + string.Join("|", cases.Select(c => "(" + c + ")")) + ")))";
         }
 
         private static string RemoveCases(this string token, params TokenCategory[] cases)
