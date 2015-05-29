@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Semantics.Tests
 {
-	internal static class SemanticsTestUtils
+	internal static class Utils
 	{
 		#region types
 
@@ -195,17 +195,24 @@ namespace Semantics.Tests
 			};
 		}
 
-		internal static OperatorNode Assignment(VariableDeclNode variable, AtomNode literal) {
+		internal static OperatorNode Assignment(VariableDeclNode variable, ExpressionNode node) {
 			return new OperatorNode {
 				Operator = OperatorType.ASSIGN,
-				Arguments = new ExpressionNode[] { Usage (variable), literal }
+				Arguments = new ExpressionNode[] { Usage (variable), node }
 			};
 		}
 
-		internal static OperatorNode Assignment(VariableDeclNode variable, VariableDeclNode var2) {
+		internal static OperatorNode Add(ExpressionNode node1, ExpressionNode node2) {
 			return new OperatorNode {
-				Operator = OperatorType.ASSIGN,
-				Arguments = new ExpressionNode[] { Usage (variable), Usage (var2) }
+				Operator = OperatorType.PLUS,
+				Arguments = new [] { node1, node2 }
+			};
+		}
+
+		internal static OperatorNode Sub(ExpressionNode node1, ExpressionNode node2) {
+			return new OperatorNode {
+				Operator = OperatorType.MINUS,
+				Arguments = new [] { node1, node2 }
 			};
 		}
 
@@ -223,6 +230,13 @@ namespace Semantics.Tests
 				Parameters = parameters,
 				ResultType = type,
 				Body = body
+			};
+		}
+
+		internal static FunctionCallNode FunctionCall(string name, params ExpressionNode[] args) {
+			return new FunctionCallNode {
+				Name = name,
+				Arguments = args
 			};
 		}
 

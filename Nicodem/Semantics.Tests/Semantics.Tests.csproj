@@ -40,7 +40,8 @@
     <Compile Include="Visitors\NestedUseVisitorTests.cs" />
     <Compile Include="AST\ASTBuilderTests.cs" />
     <Compile Include="Extractors\ControlFlowExtractorTests.cs" />
-    <Compile Include="SemanticsTestUtils.cs" />
+    <Compile Include="Visitors\NameResolutionVisitorTests.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
