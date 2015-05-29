@@ -114,6 +114,7 @@ namespace Nicodem.Semantics.AST
                 var node = ASTBuilder.FirstChild(op1); // Operator1Expression -> Operator0Expression
                 // Operator0Expression -> AtomicExpression | "(" Expression ")";
                 var childs = ASTBuilder.ChildrenEnumerator(node);
+                Debug.Assert(!childs.MoveNext()); // assert or not?
                 if (ASTBuilder.EatSymbol("(", childs))
                 {
                     return GetExpressionNode(childs.Current); // Expression
