@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Nicodem.Backend.Cover;
 
@@ -13,8 +13,6 @@ namespace Nicodem.Backend.Representation
             Accept = NodeMixin.MakeAcceptThunk(this);
         }
 
-        public Action<AbstractVisitor> Accept { get; private set; }
-
         // I can move it down inheritance hierarchy
         public RegisterNode ResultRegister
         {
@@ -24,6 +22,31 @@ namespace Nicodem.Backend.Representation
 		public virtual Node[] GetChildren () {
 			return new Node[]{};
 		}
+
+        public Action<AbstractVisitor> Accept { get; private set; }
+
+        #region implemented ReplaceRegisterWithLocal
+        /// <summary>
+        /// Called during moving some reister to memory. Update childs and then check if this node contains
+        /// register to replace. If so return access local instead of this node nad when this node contains 
+        /// register (but is not this register) - move this subtree to the output list (newTrees).
+        /// </summary>
+        /// <returns>This node updated or generated access to local variable.</returns>
+        /// <param name="map">Map from registers (to replace) to function locals.</param>
+        /// <param name="newNodes">List for inserting new trees.</param>
+        /// <param name="f">Function owning new locals.</param>
+        internal virtual Node ReplaceRegisterWithLocal(IReadOnlyDictionary<RegisterNode, Local> map, 
+                                                       List<Node> newTrees, Function f)
+        {
+            if(map.ContainsKey(_register)){
+                Local l = map[_register];
+                if(this is TemporaryNode) newTrees.Add(new AssignmentNode(f.AccessLocal(l), this));
+                return f.AccessLocal(l);
+            }
+            return this;
+        }
+        #endregion
+
 
 		// Compare checks whether the tile given as an argument can cover this Node. If yes, it returns tuple
 		// of the form (true, list of children under the tile). If not, it returns instead (false, null).

@@ -12,6 +12,18 @@
 		public override Node[] GetChildren() {
 			return new Node[]{ Operand };
 		}
+
+        #region implemented ReplaceRegisterWithLocal
+        internal override Node ReplaceRegisterWithLocal(
+            System.Collections.Generic.IReadOnlyDictionary<RegisterNode, Local> map, 
+            System.Collections.Generic.List<Node> newTrees, 
+            Function f)
+        {
+            Operand = Operand.ReplaceRegisterWithLocal(map, newTrees, f);
+            return base.ReplaceRegisterWithLocal(map, newTrees, f);
+        }
+        #endregion
+
     }
 
     public class LogNotOperatorNode : UnaryOperatorNode

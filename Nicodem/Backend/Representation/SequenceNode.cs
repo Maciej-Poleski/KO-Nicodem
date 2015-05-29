@@ -50,5 +50,21 @@ namespace Nicodem.Backend.Representation
 				nodes [i++] = node;
 			return nodes;
 		}
+
+        #region implemented ReplaceRegisterWithLocal
+        internal override Node ReplaceRegisterWithLocal(
+            System.Collections.Generic.IReadOnlyDictionary<RegisterNode, Local> map, 
+            System.Collections.Generic.List<Node> newTrees, 
+            Function f)
+        {
+            List<Node> l = new List<Node>();
+            foreach (var ch in Sequence) {
+                l.Add(ch.ReplaceRegisterWithLocal(map, newTrees, f));
+            }
+            Sequence = l;
+            //TODO: what to do with NextNode?
+            return base.ReplaceRegisterWithLocal(map, newTrees, f);
+        }
+        #endregion
     }
 }
