@@ -36,9 +36,7 @@ namespace Nicodem.Backend
                     var toCorrect = regAllocator.SpilledRegisters;
                     if (toCorrect.Any()) {
                         // apply changes
-                        foreach(var reg in toCorrect){
-                            f.MoveTemporaryToMemory(reg);
-                        }
+                        f.MoveRegistersToMemory(toCorrect);
                     } else {
                         // success
                         break;
