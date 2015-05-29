@@ -222,8 +222,8 @@ namespace Nicodem.Semantics.Grammar
 
         private static readonly string NameWithoutOperatorsAndValues = RemoveCases(NameWithoutOperators, LiteralTokens);
 
-        private static readonly TokenCategory TypeName = NameWithoutOperatorsAndValues;
-        private static readonly TokenCategory ObjectName = TypeName;    // Important - get the same symbol
+        internal static readonly TokenCategory TypeName = NameWithoutOperatorsAndValues;
+        internal static readonly TokenCategory ObjectName = TypeName;    // Important - get the same symbol
         
 
         /// <summary>

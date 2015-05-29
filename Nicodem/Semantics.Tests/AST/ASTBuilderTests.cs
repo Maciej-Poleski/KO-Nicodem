@@ -8,6 +8,8 @@ using Nicodem.Source;
 namespace Semantics.Tests
 {
     using ParseTree = IParseTree<Symbol>;
+    using P = NicodemGrammarProductions;
+    using UniversalSymbol = NicodemGrammarProductions.UniversalSymbol;
 
     [TestFixture()]
     public class ASTBuilderTests
@@ -59,10 +61,8 @@ namespace Semantics.Tests
         private ASTBuilder builder;
         private Grammar<Symbol> grammar;
         private DummyFragment dummyFrag;
-        private Production dummyProd;
-        private Symbol eofSymbol;
-        private Symbol programSymbol;
-        private Symbol functionSymbol;
+        private IProduction<Symbol> dummyProd;
+        private UniversalSymbol[] operatorSymbol;
 
         [TestFixtureSetUp]
         public void Init()
@@ -73,9 +73,26 @@ namespace Semantics.Tests
                            NicodemGrammarProductions.MakeProductionsDictionaryForGrammarConstructor());
             dummyFrag = new DummyFragment("dummy");
             dummyProd = null;
-            eofSymbol = (Symbol)(NicodemGrammarProductions.UniversalSymbol)NicodemGrammarProductions.Eof;
-            programSymbol = (Symbol)(NicodemGrammarProductions.UniversalSymbol)NicodemGrammarProductions.Program;
-            functionSymbol = (Symbol)(NicodemGrammarProductions.UniversalSymbol)NicodemGrammarProductions.Function;
+            operatorSymbol = new UniversalSymbol[] {
+                P.Operator0Expression,
+                P.Operator1Expression,
+                P.Operator2Expression,
+                P.Operator3Expression,
+                P.Operator4Expression,
+                P.Operator5Expression,
+                P.Operator6Expression,
+                P.Operator7Expression,
+                P.Operator8Expression,
+                P.Operator9Expression,
+                P.Operator10Expression,
+                P.Operator11Expression,
+                P.Operator12Expression,
+                P.Operator13Expression,
+                P.Operator14Expression,
+                P.Operator15Expression,
+                P.Operator16Expression,
+                P.Operator17Expression
+            };
         }
 
         [Test()]
@@ -100,27 +117,156 @@ namespace Semantics.Tests
             Assert.IsFalse(ASTBuilder.IsLeftOperator(new TestSymbol(false, "Name-Operator-right")));
         }
 
+        private Symbol Cast(object symbol)
+        {
+            return (Symbol)(NicodemGrammarProductions.UniversalSymbol)symbol;
+        }
+
+        private ParseTree Wrap(UniversalSymbol symbol, ParseTree wrapped)
+        {
+            return new ParseBranch<Symbol>(dummyFrag, Cast(symbol), dummyProd, new ParseTree[] { wrapped });
+        }
+
+        private ParseTree Wrap(UniversalSymbol symbol, ParseTree[] wrapped)
+        {
+            return new ParseBranch<Symbol>(dummyFrag, Cast(symbol), dummyProd, wrapped);
+        }
+
+        private ParseTree Leaf(UniversalSymbol symbol, string code)
+        {
+            return new ParseLeaf<Symbol>(new DummyFragment(code), Cast(symbol));
+        }
+
+        private ParseTree Str(string code)
+        {
+            return Leaf((UniversalSymbol)code, code);
+        }
+
+        private ParseTree Operators(int last, int first, ParseTree wrapped)
+        {
+            ParseTree result = wrapped;
+            for (int i = first; i <= last; i++) result = Wrap(operatorSymbol[i], result);
+            return result;
+        }
+
+        private ParseTree Operators(int last, int first, ParseTree[] wrapped)
+        {
+            ParseTree result = Wrap(operatorSymbol[first++], wrapped);
+            for (int i = first; i <= last; i++) result = Wrap(operatorSymbol[i], result);
+            return result;
+        }
+
+        private ParseTree NumberAtomicExpression()
+        {
+            return
+                Wrap(P.AtomicExpression,
+                Wrap(P.ObjectUseExpression,
+                Leaf(P.Literals, "42")));
+        }
+
+        private ParseTree NumberExpression()
+        {
+            return Wrap(P.Expression, 
+                Wrap(P.OperatorExpression, 
+                Operators(17, 0, 
+                NumberAtomicExpression())));
+        }
+
+        private ParseTree MulExpression()
+        {
+            return
+                Wrap(P.Expression,
+                Wrap(P.OperatorExpression,
+                Operators(17, 5, new ParseTree[] { 
+                    Operators(4, 0, NumberAtomicExpression()),
+                    Str("*"),
+                    Operators(4, 0, NumberAtomicExpression())
+                })));
+        }
+
+        private ParseTree AddMulExpression()
+        {
+            return 
+                Wrap(P.Expression,
+                Wrap(P.OperatorExpression,
+                Operators(17, 6, new ParseTree[] {  
+                    NumberAtomicExpression(),
+                    Str("+"),
+                    Wrap(P.Operator5Expression, new ParseTree[] {
+                        Operators(4, 0, NumberAtomicExpression()),
+                        Str("*"),
+                        Operators(4, 0, NumberAtomicExpression())
+                    })
+                })));
+        }
+
+        private ParseTree ExpressionFunction(ParseTree expressionTree)
+        {
+            return Wrap(P.Function, new ParseTree[] {
+                Leaf(P.ObjectName, "MyFunc"),
+                Str("("),
+                Wrap(P.ParametersList, new ParseTree[] {}),
+                Str(")"),
+                Str("->"),
+                Wrap(P.TypeSpecifier, Leaf(P.TypeName, "int")),
+                expressionTree
+            });
+        }
+
+        private ParseTree FunctionProgram(ParseTree functionTree)
+        {
+            return Wrap(P.Program, new ParseTree[] { functionTree });
+        }
+
+        private ParseTree NumberFunction()
+        {
+            return ExpressionFunction(NumberExpression());
+        }
+
+        private ParseTree ExpressionProgram(ParseTree expressionTree)
+        {
+            return FunctionProgram(ExpressionFunction(expressionTree));
+        }
+
         [Test()]
         public void EmptyProgramTest()
         {
-            var tree = new ParseBranch<Symbol>(dummyFrag, programSymbol, dummyProd, new ParseTree[] {
-                new ParseLeaf<Symbol>(new DummyFragment(""), eofSymbol)
+            var tree = Wrap(P.Program, Leaf(P.Eof, ""));
+            ProgramNode result = builder.BuildAST<Symbol>(tree);
+            // TODO(guspiel): When it becomes clear what AST to expect, write an AssertEquals here.
+        }
+
+        [Test()]
+        public void ProgramWithTheSimplestFunction()
+        { 
+            var tree = ExpressionProgram(NumberExpression());
+            ProgramNode result = builder.BuildAST<Symbol>(tree);
+            // TODO(guspiel): When it becomes clear what AST to expect, write an AssertEquals here.
+        }
+
+        [Test()]
+        public void ProgramWithTwoFunctions()
+        { 
+            var tree = Wrap(P.Program, new ParseTree[] { 
+                NumberFunction(),
+                NumberFunction()
             });
             ProgramNode result = builder.BuildAST<Symbol>(tree);
             // TODO(guspiel): When it becomes clear what AST to expect, write an AssertEquals here.
         }
 
         [Test()]
-        public void ProgramWithTwoEmptyFunctionsTest()
+        public void ProgramWithMultiplication()
         {
-            var tree = new ParseBranch<Symbol>(dummyFrag, programSymbol, dummyProd, new ParseTree[] {
-                new ParseBranch<Symbol>(dummyFrag, functionSymbol, dummyProd, new ParseTree[] {
-                    // TODO(guspiel): invalid without a body?
-                }),
-                new ParseBranch<Symbol>(dummyFrag, functionSymbol, dummyProd, new ParseTree[] {
-                    // TODO(guspiel): invalid without a body?
-                })
-            });
+            var tree = ExpressionProgram(MulExpression());
+            ProgramNode result = builder.BuildAST<Symbol>(tree);
+            // TODO(guspiel): When it becomes clear what AST to expect, write an AssertEquals here.
+        }
+
+        [Test()]
+        public void ProgramWithAdditionAndMultiplication()
+        {
+            var tree = ExpressionProgram(AddMulExpression());
             ProgramNode result = builder.BuildAST<Symbol>(tree);
             // TODO(guspiel): When it becomes clear what AST to expect, write an AssertEquals here.
         }
