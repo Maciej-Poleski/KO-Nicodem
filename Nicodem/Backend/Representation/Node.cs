@@ -40,7 +40,7 @@ namespace Nicodem.Backend.Representation
         {
             if(map.ContainsKey(_register)){
                 Local l = map[_register];
-                if(this is TemporaryNode) newTrees.Add(new AssignmentNode(f.AccessLocal(l), this));
+                if(!(this is TemporaryNode)) newTrees.Add(new AssignmentNode(f.AccessLocal(l), this));
                 return f.AccessLocal(l);
             }
             return this;
