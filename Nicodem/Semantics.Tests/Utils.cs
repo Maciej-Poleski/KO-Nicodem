@@ -188,17 +188,17 @@ namespace Semantics.Tests
 
 		#endregion
 
-		internal static VariableUseNode Usage(VariableDeclNode def) {
+		internal static VariableUseNode Usage(VariableDeclNode def, bool inherit_decl = true) {
 			return new VariableUseNode {
 				Name = def.Name,
-				Declaration = def
+				Declaration = inherit_decl ? def : null
 			};
 		}
 
-		internal static OperatorNode Assignment(VariableDeclNode variable, ExpressionNode node) {
+		internal static OperatorNode Assignment(ExpressionNode node1, ExpressionNode node2) {
 			return new OperatorNode {
 				Operator = OperatorType.ASSIGN,
-				Arguments = new ExpressionNode[] { Usage (variable), node }
+				Arguments = new [] { node1, node2 }
 			};
 		}
 

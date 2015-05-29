@@ -93,13 +93,14 @@ namespace Semantics.Tests
 		 */
 		[Test]
 		public void Complex() {
-			var fExprC = Utils.DeclareInt ("c");
-			var fExprA = Utils.DeclareInt ("a");
-			var fExprB = Utils.DeclareInt ("b");
+			var fVarC = Utils.DeclareInt ("c");
+			var fVarA = Utils.DeclareInt ("a");
+			var fVarB = Utils.DeclareInt ("b");
 
 			// function g
 			var gArg = Utils.DeclareByte ("b");
-			var gExpr1 = Utils.Assignment (fExprC, Utils.IntLiteral (12));
+			var gUseC = Utils.Usage (fVarC, false);
+			var gExpr1 = Utils.Assignment (gUseC, Utils.IntLiteral (12));
 			var gExpr2 = Utils.ByteLiteral (4);
 			var gFunction = Utils.FunctionDef ("g",
 				Utils.parameters (gArg),
@@ -110,8 +111,11 @@ namespace Semantics.Tests
 			// function h
 			var hArg = Utils.DeclareInt ("b");
 			var hExpr1 = Utils.IntLiteral (44);
-			var hExpr2 = Utils.Assignment (fExprC, Utils.Sub (fExprA, fExprB));
-			var hExpr3 = Utils.Assignment (fExprA, fExprB);
+			var hUseC = Utils.Usage (fVarC, false);
+			var hUseA = Utils.Usage (fVarA, false);
+			var hUseB = Utils.Usage (hArg, false);
+			var hExpr2 = Utils.Assignment (hUseC, Utils.Sub (hUseA, hUseB));
+			var hExpr3 = Utils.Assignment (hUseA, hUseB);
 			var hFunction = Utils.FunctionDef ("h",
 				Utils.parameters (hArg),
 				Utils.MakeConstantInt (),
@@ -120,17 +124,25 @@ namespace Semantics.Tests
 
 			//function f
 			var fParam = Utils.DeclareInt ("a");
-			var fExpr0 = Utils.Assignment (fExprB, Utils.IntLiteral (12));
+			var useB = Utils.Usage (fVarB, false);
+			var useA = Utils.Usage (fVarA, false);
+			var fExpr0 = Utils.Assignment (useB, Utils.IntLiteral (12));
 			var fExprCallg12 = Utils.FunctionCall ("g", Utils.ByteLiteral (12));
 			var fExprCallh3 = Utils.FunctionCall ("h", Utils.ByteLiteral (3));
-			var fExprCallgh0Inner = Utils.FunctionCall ("h", Utils.ByteLiteral (0));
+			var fExprCallgh0Inner = Utils.FunctionCall ("h", Utils.Add (useA, useB));
 			var fExprCallgh0 = Utils.FunctionCall ("g", fExprCallgh0Inner);
 			var fFunction = Utils.FunctionDef ("f",
 				Utils.parameters (fParam),
 				Utils.MakeConstantInt (),
-				Utils.body (fExprC, gFunction, fExprA, fExprB, fExprCallg12, hFunction, fExpr0, fExprCallh3, fExprCallgh0)
+				Utils.body (fVarC, gFunction, fVarA, fVarB, fExprCallg12, hFunction, fExpr0, fExprCallh3, fExprCallgh0)
 			);
 
+			Assert.IsNull (gUseC.Declaration);
+			Assert.IsNull (hUseA.Declaration);
+			Assert.IsNull (hUseB.Declaration);
+			Assert.IsNull (hUseC.Declaration);
+			Assert.IsNull (useA.Declaration);
+			Assert.IsNull (useB.Declaration);
 			Assert.IsNull (fExprCallg12.Definition);
 			Assert.IsNull (fExprCallgh0.Definition);
 			Assert.IsNull (fExprCallgh0Inner.Definition);
@@ -139,6 +151,12 @@ namespace Semantics.Tests
 			var program = Utils.Program (fFunction);
 			program.Accept (new NameResolutionVisitor ());
 
+			Assert.AreEqual (fVarC, gUseC.Declaration);
+			Assert.AreEqual (fVarC, hUseC.Declaration);
+			Assert.AreEqual (fVarA, hUseA.Declaration);
+			Assert.AreEqual (hArg, hUseB.Declaration);
+			Assert.AreEqual (fVarA, useA.Declaration);
+			Assert.AreEqual (fVarB, useB.Declaration);
 			Assert.AreEqual (gFunction, fExprCallg12.Definition);
 			Assert.AreEqual (gFunction, fExprCallgh0.Definition);
 			Assert.AreEqual (hFunction, fExprCallgh0Inner.Definition);
