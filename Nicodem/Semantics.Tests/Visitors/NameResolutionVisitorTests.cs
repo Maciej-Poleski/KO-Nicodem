@@ -71,6 +71,110 @@ namespace Semantics.Tests
 		/*
 		 * f(int mutable a) -> int
 		 * {
+		 *   int mutable b
+		 *   b = a + a
+		 *   int mutable c
+		 *   int mutable d
+		 *   d = a + b
+		 *   a = 1
+		 *   c = c
+		 * }
+		 */
+		[Test]
+		public void VariableUse() {
+			var fParam = Utils.DeclareInt ("a");
+			var fVarB = Utils.DeclareInt ("b");
+			var fVarC = Utils.DeclareInt ("c");
+			var fVarD = Utils.DeclareInt ("d");
+			var useA = Utils.Usage (fParam, false);
+			var useB = Utils.Usage (fVarB, false);
+			var useC = Utils.Usage (fVarC, false);
+			var useD = Utils.Usage (fVarD, false);
+			var fAssignB = Utils.Assignment (useB, Utils.Add (useA, useA));
+			var fAssignD = Utils.Assignment (useD, Utils.Add (useA, useB));
+			var fAssignA = Utils.Assignment (useA, Utils.IntLiteral (1));
+			var fAssignC = Utils.Assignment (useC, useC);
+
+			var fFunction = Utils.FunctionDef ("f",
+				Utils.parameters (fParam),
+				Utils.MakeConstantInt (),
+				Utils.body (fVarB, fAssignB, fVarC, fVarD, fAssignD, fAssignC, fAssignA)
+			);
+
+			Assert.IsNull (useA.Declaration);
+			Assert.IsNull (useB.Declaration);
+			Assert.IsNull (useC.Declaration);
+			Assert.IsNull (useD.Declaration);
+
+			var program = Utils.Program (fFunction);
+			program.Accept (new NameResolutionVisitor ());
+
+			Assert.AreEqual (fParam, useA.Declaration);
+			Assert.AreEqual (fVarB, useB.Declaration);
+			Assert.AreEqual (fVarC, useC.Declaration);
+			Assert.AreEqual (fVarD, useD.Declaration);
+		}
+
+		/*
+		 * f(int mutable a) -> int
+		 * {
+		 *   int mutable b
+		 *   b = a + a
+		 *   g(int mutable x) -> int
+		 *   {
+		 *     int mutable c
+		 *     int mutable d
+		 *     d = a + b
+		 *   }
+		 *   a = 1
+		 *   c = c
+		 * }
+		 */
+		[Test]
+		public void VariableUseInNestedFunction() {
+			var fParam = Utils.DeclareInt ("a");
+			var fVarB = Utils.DeclareInt ("b");
+			var fVarC = Utils.DeclareInt ("c");
+			var fVarD = Utils.DeclareInt ("d");
+			var useA = Utils.Usage (fParam, false);
+			var useB = Utils.Usage (fVarB, false);
+			var useC = Utils.Usage (fVarC, false);
+			var useD = Utils.Usage (fVarD, false);
+			var fAssignB = Utils.Assignment (useB, Utils.Add (useA, useA));
+			var fAssignD = Utils.Assignment (useD, Utils.Add (useA, useB));
+			var fAssignA = Utils.Assignment (useA, Utils.IntLiteral (1));
+			var fAssignC = Utils.Assignment (useC, useC);
+
+			var gParam = Utils.DeclareInt ("x");
+			var gFunction = Utils.FunctionDef("g",
+				Utils.parameters (gParam),
+				Utils.MakeConstantInt (),
+				Utils.body (fVarC, fVarD, fAssignD)
+			);
+
+			var fFunction = Utils.FunctionDef ("f",
+				Utils.parameters (fParam),
+				Utils.MakeConstantInt (),
+				Utils.body (fVarB, fAssignB, gFunction, fAssignC, fAssignA)
+			);
+
+			Assert.IsNull (useA.Declaration);
+			Assert.IsNull (useB.Declaration);
+			Assert.IsNull (useC.Declaration);
+			Assert.IsNull (useD.Declaration);
+
+			var program = Utils.Program (fFunction);
+			program.Accept (new NameResolutionVisitor ());
+
+			Assert.AreEqual (fParam, useA.Declaration);
+			Assert.AreEqual (fVarB, useB.Declaration);
+			Assert.AreEqual (fVarC, useC.Declaration);
+			Assert.AreEqual (fVarD, useD.Declaration);
+		}
+
+		/*
+		 * f(int mutable a) -> int
+		 * {
 		 *   int mutable c
 		 *   g(byte mutable b) -> byte
 		 *   {
