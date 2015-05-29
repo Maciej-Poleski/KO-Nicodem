@@ -40,6 +40,7 @@
     <Compile Include="Visitors\NestedUseVisitorTests.cs" />
     <Compile Include="AST\ASTBuilderTests.cs" />
     <Compile Include="Extractors\ControlFlowExtractorTests.cs" />
+    <Compile Include="SemanticsTestUtils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -56,7 +57,7 @@
       <Name>Semantics</Name>
     </ProjectReference>
     <ProjectReference Include="..\Source\Source.csproj">
-      <Project>{6078ffe3-28c8-4169-831d-e1d1aafdd72f}</Project>
+      <Project>{6078FFE3-28C8-4169-831D-E1D1AAFDD72F}</Project>
       <Name>Source</Name>
     </ProjectReference>
   </ItemGroup>
