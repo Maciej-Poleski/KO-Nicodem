@@ -43,6 +43,10 @@ namespace Core.Tests
 			var divided_3 = pr.Refine (new List<int> { 1, 6 });
 			Assert.AreEqual (2, divided_3.Count);
 			Assert.AreEqual (6, pr.Partition.Count);
+
+			var divided_4 = pr.Refine (new List<int> { 1, 2, 3, 4, 5, 6 });
+			Assert.AreEqual (0, divided_4.Count);
+			Assert.AreEqual (6, pr.Partition.Count);
 		}
 
 		[Test]
@@ -57,6 +61,10 @@ namespace Core.Tests
 
 			var divided_2 = pr.Refine (new List<int> { 2, 3, 4, 5, 6 });
 			Assert.IsTrue (divided_2.Any ());
+
+			var divided_3 = pr.Refine (new List<int> { 1 });
+			Assert.AreEqual (0, divided_3.Count);
+			Assert.AreEqual (2, pr.Partition.Count);
 		}
 
 		[Test]
