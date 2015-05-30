@@ -216,6 +216,14 @@ namespace Semantics.Tests
 			};
 		}
 
+		internal static IfNode If(ExpressionNode cond, ExpressionNode then, ExpressionNode _else) {
+			return new IfNode {
+				Condition = cond,
+				Then = then,
+				Else = _else
+			};
+		}
+
 		internal static IEnumerable<VariableDeclNode> parameters(params VariableDeclNode[] p) {
 			return p;
 		}
