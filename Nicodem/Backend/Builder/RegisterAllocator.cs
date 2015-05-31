@@ -11,12 +11,9 @@ namespace Nicodem.Backend.Builder
 		private HashSet<Vertex> toSpill = new HashSet<Vertex> ();
 		private HashSet<Vertex> toSimplify = new HashSet<Vertex> ();
 		private HashSet<Vertex> toFreeze = new HashSet<Vertex> ();
-		private HashSet<Move> toCoalesce = new HashSet<Move> ();
 		private HashSet<Vertex> frozen = new HashSet<Vertex> ();
 		private HashSet<Vertex> removed = new HashSet<Vertex> ();
 		private HashSet<Vertex> significantHeighbors = new HashSet<Vertex> ();
-		private InterferenceGraph interferenceGraph;
-		private FindUnion<Vertex> fu;
 
 		private Stack<Vertex> stack = new Stack<Vertex> ();
 		private Dictionary<Vertex, Vertex> mapping;
@@ -40,8 +37,6 @@ namespace Nicodem.Backend.Builder
 			do {
 				if (toSimplify.Count > 0)
 					Simplify ();
-			//	else if (FindToCoalesce ())
-			//		Coalesce ();
 				else if (toFreeze.Count > 0)
 					Freeze ();
 				else if (toSpill.Count > 0)
@@ -112,57 +107,6 @@ namespace Nicodem.Backend.Builder
 			frozen.Add (v);
 		}
 
-		private void Coalesce ()
-		{
-			var move = toCoalesce.First ();
-			toCoalesce.Remove (move);
-
-			var a = fu.Find (move.en1);
-			var b = fu.Find (move.en2);
-
-			toSpill.Remove (b);
-			toFreeze.Remove (b);
-			toSimplify.Remove (b);
-			
-			a.CopyNeighbors.Union (b.CopyNeighbors);
-			a.NonCopyNeighbors.Union (b.NonCopyNeighbors);
-
-			foreach (Vertex vertex in a.CopyNeighbors) {
-				vertex.CopyNeighbors.Remove (b);
-				vertex.CopyNeighbors.Add (a);
-			}
-
-			foreach (Vertex vertex in a.NonCopyNeighbors) {
-				vertex.NonCopyNeighbors.Remove (b);
-				vertex.NonCopyNeighbors.Add (a);
-			}
-
-			fu.Union (a, b);
-		}
-
-		private bool FindToCoalesce ()
-		{
-			while (toCoalesce.Count > 0 && !ValidateMove (toCoalesce.First ()))
-				toCoalesce.Remove (toCoalesce.First ());
-			return (toCoalesce.Count > 0);
-		}
-
-		private bool ValidateMove (Move move)
-		{
-			if (frozen.Contains (move.en1) || frozen.Contains (move.en2))
-				return false;
-			if (fu.Find (move.en1) == fu.Find (move.en2))
-				return false;
-			return true;
-		}
-
-		private void RemoveCopy (Vertex a, Vertex b)
-		{
-			a.CopyNeighbors.Remove (fu.Find (b));
-			b.CopyNeighbors.Remove (fu.Find (a));
-			
-		}
-
 		private void AssignColors ()
 		{
 			while (stack.Count > 0) {
@@ -190,11 +134,9 @@ namespace Nicodem.Backend.Builder
 			toSpill.Clear ();
 			toSimplify.Clear ();
 			toFreeze.Clear ();
-			toCoalesce.Clear ();
 			removed.Clear ();
 			frozen.Clear ();
 			stack.Clear ();
-			fu = new FindUnion<Vertex> (graph.Vertices);
 
 			foreach (Vertex vertex in graph.Vertices) {
 				if (vertex.Register is HardwareRegisterNode) {
@@ -208,35 +150,6 @@ namespace Nicodem.Backend.Builder
 						toSimplify.Add (vertex);
 				} else
 					toSpill.Add (vertex);
-
-				/*	foreach (Vertex neigh in vertex.NonCopyNeighbors)
-					if (neigh.NonCopyNeighbors.Count >= registers.Count)
-						++significantHeighbors [vertex]++;
-			*/
-			}
-		}
-
-		private bool BriggsTest (Vertex a, Vertex b)
-		{
-			int counter = 0;
-
-			foreach (Vertex neigh in a.NonCopyNeighbors.Intersect(b.NonCopyNeighbors))
-				if (neigh.CopyNeighbors.Count >= registers.Count)
-					++counter;
-
-			return (counter < registers.Count);
-		}
-
-
-		private struct Move
-		{
-			public Vertex en1;
-			public Vertex en2;
-
-			public Move (Vertex en1, Vertex en2)
-			{
-				this.en1 = en1;
-				this.en2 = en2;
 			}
 		}
 
