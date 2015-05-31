@@ -21,7 +21,7 @@ namespace Nicodem.Parser
 
         public string ToStringIndented(string indent)
         {
-			return indent + "Leaf " + Symbol.ToString() + " end leaf";
+            return indent + Symbol.ToString() + ": " + (Fragment != null ? Fragment.GetOriginText() : "__no_fragment__");
         }
 
         public override string ToString() { return ToStringIndented(""); }

@@ -6,8 +6,8 @@ namespace Nicodem.Semantics.Grammar
 {
     public struct Symbol : ISymbol<Symbol>, IEquatable<Symbol>, IComparable<Symbol>
     {
-        public static readonly Symbol MinValue = new Symbol(int.MinValue);
-        public static readonly Symbol EOF = new Symbol(-1);
+        public static readonly Symbol MinValue = MakeNamedSymbol(int.MinValue, "MinValue");
+        public static readonly Symbol EOF = MakeNamedSymbol(-1, "EOF");
 
         #region ISymbol implementation
 
@@ -30,6 +30,13 @@ namespace Nicodem.Semantics.Grammar
             _category = category;
         }
 
+        private static Symbol MakeNamedSymbol(int category, string name)
+        {
+            var symbol = new Symbol(category);
+            NicodemGrammarProductions.RegisterSymbolName(symbol, name);
+            return symbol;
+        }
+
         public int CompareTo(Symbol other)
         {
             return _category.CompareTo(other._category);
@@ -42,7 +49,7 @@ namespace Nicodem.Semantics.Grammar
 
         public override string ToString()
         {
-            return string.Format("{0}{1} ({2})", IsTerminal ? "T" : "N", _category, Description);
+            return string.Format("{0}{1}{2}", IsTerminal ? "T" : "N", _category, Description == "" ? "" : " (" + Description + ")");
         }
 
         public override bool Equals(object obj)
