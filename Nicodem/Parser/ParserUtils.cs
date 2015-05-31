@@ -1,14 +1,16 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Nicodem.Core;
+using Nicodem.Source;
 
 namespace Nicodem.Parser
 {
-	internal static class ParserUtils<TSymbol>
+	public static class ParserUtils<TSymbol>
 		where TSymbol : ISymbol<TSymbol>
 	{
-		public static TSymbol GetEOF()
+		internal static TSymbol GetEOF()
 		{
 			if(typeof(TSymbol).GetField("EOF") != null) {
 
@@ -21,7 +23,7 @@ namespace Nicodem.Parser
 			}
 		}
 
-		public static ParseResult<TSymbol> Convert(ItParseResult<TSymbol> result) 
+		internal static ParseResult<TSymbol> Convert(ItParseResult<TSymbol> result) 
 		{
 			var okRes = result as ItOK<TSymbol>;
 			if(okRes != null) {
@@ -31,6 +33,41 @@ namespace Nicodem.Parser
 				var fragment = err.Iterator.Pos >= 0 ? err.Iterator.Current.Fragment : null;
 				return new Error<TSymbol>(fragment, err.Symbol);
 			}
+		}
+
+		public static string PrepareErrorMessage(Error<TSymbol> err)
+		{
+			var sb = new StringBuilder();
+			sb.Append(String.Format("Could not parse symbol: {0} in {1}\n", err.Symbol, err.Fragment.Origin));
+			var orig = err.Fragment.Origin;
+
+			var begLine = err.Fragment.GetBeginOriginPosition().LineNumber;
+			var endLine = err.Fragment.GetBeginOriginPosition().LineNumber;
+
+			int oneBefore = begLine - 1;
+			int oneAfter = endLine + 1;
+
+			if(oneBefore >= 1) {
+
+				sb.Append("\t..........\n");
+				var before = orig.GetLine(oneBefore);
+				sb.Append(String.Format("{0}\t{1}\n", oneBefore, before));
+			}
+
+			sb.Append(String.Format("{0}\t{1}\n", begLine, orig.GetLine(begLine)));
+			sb.Append('\t');
+			sb.Append((new SourceDiagnostic()).GetFragmentInLine(err.Fragment));
+			sb.Append('\n');
+
+			try {
+				var next = orig.GetLine(oneAfter);
+				sb.Append(String.Format("{0}\t{1}\n", oneAfter, next));
+				sb.Append("\t..........\n");
+			} catch {
+				// ...
+			}
+
+			return sb.ToString();
 		}
 	}
 
