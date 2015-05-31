@@ -18,8 +18,8 @@ namespace Nicodem.Semantics.Visitors
             var typeOfArray = node.VariableType;
             if(typeOfArray == null)
                 throw new TypeCheckException("No set Type for Array.");
-            if (typeOfArray is ArrayTypeNode)
-                throw new TypeCheckException("Array don't have array type");
+			if (!(typeOfArray is ArrayTypeNode))
+                throw new TypeCheckException("Array doesn't have array type"); 
             var typeOfElementInArray = ((ArrayTypeNode)typeOfArray).ElementType;
             if (typeOfElementInArray == null)
                 throw new TypeCheckException("Type of element in array is not set.");
@@ -28,7 +28,7 @@ namespace Nicodem.Semantics.Visitors
                 if (expression.ExpressionType == null)
                     throw new TypeCheckException("Array contains value with not specified type.");
                 if (!TypeNode.Compare(typeOfElementInArray,expression.ExpressionType))
-                    throw new TypeCheckException("Inpropper Type of element in array.");
+                    throw new TypeCheckException("Improper Type of element in array.");
             }
             node.ExpressionType = node.VariableType;
         }
@@ -43,8 +43,9 @@ namespace Nicodem.Semantics.Visitors
             if (Byte.TryParse(value, out out_byte))
                 _set_of_types.Add(NamedTypeNode.ByteType());
             int out_int;
-            if (Int32.TryParse(value, out out_int))
-                _set_of_types.Add(NamedTypeNode.IntType());
+			if (Int32.TryParse (value, out out_int)) {
+				_set_of_types.Add (NamedTypeNode.IntType ());
+			}
             char out_char;
             if (Char.TryParse(value, out out_char))
                 _set_of_types.Add(NamedTypeNode.CharType());
@@ -53,14 +54,23 @@ namespace Nicodem.Semantics.Visitors
 
         //try to find definition type on base of Value
         public override void Visit(AtomNode node)
-        {
-            base.Visit(node);
-            if (node.Value == null)
-                throw new TypeCheckException("Value is not set.");
+		{
+			base.Visit (node);
+			if (node.Value == null)
+				throw new TypeCheckException ("Value is not set.");
+
             HashSet<TypeNode> deducedType = deduceType(node.Value);
-            if (!deducedType.Contains(node.VariableType))
-                throw new TypeCheckException("Type of Const is not consistent with deducated Type.");
-            node.ExpressionType = node.VariableType;
+			bool contains = false;
+			foreach (var v in deducedType) {
+				if (TypeNode.Compare (v, node.VariableType)) {
+					contains = true;
+					break;
+				}
+			}
+			if (!contains)
+				throw new TypeCheckException ("Type of Const is not consistent with deduced Type.");
+
+			node.ExpressionType = node.VariableType;
         }
 
         //type is the last one element, if don't have set void
@@ -94,12 +104,12 @@ namespace Nicodem.Semantics.Visitors
             var listOfFunctionArguments = node.Definition.Parameters.ToList();
             
             if(listOfFunctionArguments.Count != listOfFunctionCallArguments.Count)
-                throw new TypeCheckException("Inproper number of arguments.");
+                throw new TypeCheckException("Improper number of arguments.");
             
             for (int i = 0; i < listOfFunctionArguments.Count; i++)
             {
                 if (!TypeNode.Compare(listOfFunctionArguments[i].Type,listOfFunctionCallArguments[i].ExpressionType))
-                    throw new Exception(String.Format("Argument {0} has inproper type.", i));
+                    throw new Exception(String.Format("Argument {0} has improper type.", i));
             }
 
             node.ExpressionType = node.Definition.ResultType;
@@ -109,8 +119,8 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(FunctionDefinitionNode node)
         {
             base.Visit(node);
-            if (TypeNode.Compare(node.ResultType, node.Body.ExpressionType))
-                throw new TypeCheckException("Body don't return the same type as set type.");
+			if (!TypeNode.Compare (node.ResultType, node.Body.ExpressionType))
+				throw new TypeCheckException ("Body doesn't return the same type as set type.");
             node.ExpressionType = NamedTypeNode.VoidType();
         }
 
@@ -119,7 +129,7 @@ namespace Nicodem.Semantics.Visitors
         {
             base.Visit(node);
             if(!TypeNode.Compare(NamedTypeNode.BoolType(), node.Condition.ExpressionType))
-                throw new Exception("Inpropper type in if condition");
+                throw new Exception("Improper type in if condition");
             if(!node.HasElse || !TypeNode.Compare(node.Then.ExpressionType, node.Else.ExpressionType))
                 node.ExpressionType = NamedTypeNode.VoidType();
             else

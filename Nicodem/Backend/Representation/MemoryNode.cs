@@ -13,5 +13,16 @@
 		public override Node[] GetChildren() {
 			return new Node[]{ Address };
 		}
+
+        #region implemented ReplaceRegisterWithLocal
+        internal override Node ReplaceRegisterWithLocal(
+            System.Collections.Generic.IReadOnlyDictionary<RegisterNode, Local> map, 
+            System.Collections.Generic.List<Node> newTrees, 
+            Function f)
+        {
+            Address = Address.ReplaceRegisterWithLocal(map, newTrees, f);
+            return base.ReplaceRegisterWithLocal(map, newTrees, f);
+        }
+        #endregion
     }
 }

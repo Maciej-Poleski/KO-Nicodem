@@ -54,7 +54,7 @@ namespace Nicodem.Lexer
         }
     }
 
-    internal static partial class Extensions
+    internal static class Extensions
     {
         internal static bool IsDead<T>(this T state) where T : AbstractDfaState<T, char>
         {

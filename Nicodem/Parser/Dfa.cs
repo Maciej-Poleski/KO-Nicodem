@@ -56,12 +56,12 @@ namespace Nicodem.Parser
             ListReachableStatesAndEnsureInitialized(start);
 		}
 			
-		public Dfa(IDfa<TSymbol> lexerDfa)
+		public Dfa(DfaUtils.MinimizedDfa<TSymbol> lexerDfa)
 		{
-			var states = new Dictionary<IDfaState<TSymbol>, DfaState<TSymbol>>();
+			var states = new Dictionary<DfaUtils.MinimizedDfaState<TSymbol>, DfaState<TSymbol>>();
 			var accepting = new Dictionary<DfaState<TSymbol>, uint>();
 			var transitions = new Dictionary<DfaState<TSymbol>, List<KeyValuePair<TSymbol, DfaState<TSymbol>>>>();
-			var queue = new Queue<IDfaState<TSymbol>>();
+			var queue = new Queue<DfaUtils.MinimizedDfaState<TSymbol>>();
 
 			states[lexerDfa.Start] = new DfaState<TSymbol>();
 			accepting[states[lexerDfa.Start]] = lexerDfa.Start.Accepting;
@@ -69,7 +69,7 @@ namespace Nicodem.Parser
 			queue.Enqueue(lexerDfa.Start);
 
 			while (queue.Count > 0) {
-				IDfaState<TSymbol> s1 = queue.Dequeue();
+				DfaUtils.MinimizedDfaState<TSymbol> s1 = queue.Dequeue();
 				DfaState<TSymbol> s2 = states[s1];
 				foreach (var i in s1.Transitions) {
 					if (!states.ContainsKey(i.Value)) {
@@ -88,7 +88,7 @@ namespace Nicodem.Parser
 			Start = states[lexerDfa.Start];
 		}
 
-		public static IDfa<TSymbol> RegexDfa(RegEx<TSymbol> RegEx, uint acceptingStateMarker)
+		public static DfaUtils.MinimizedDfa<TSymbol> RegexDfa(RegEx<TSymbol> RegEx, uint acceptingStateMarker)
 		{
 			if (acceptingStateMarker == 0) {
 				throw new ArgumentOutOfRangeException();
@@ -104,16 +104,20 @@ namespace Nicodem.Parser
 				>(factorDfa, factorDfa, new DfaUtils.AmbiguityHandler(MaxAmbiguityHandler));
 		}
 
-		public static Dfa<TSymbol> ProductDfa(IDfa<TSymbol>[] dfas)
+		public static Dfa<TSymbol> ProductDfa(DfaUtils.MinimizedDfa<TSymbol>[] dfas)
 		{
 			if (dfas.Length == 0) {
 				throw new ArgumentException();
 			} else if (dfas.Length == 1) {
 				return new Dfa<TSymbol>(dfas[0]);
 			} else {
-				IDfa<TSymbol> cur = dfas[0];
+				DfaUtils.MinimizedDfa<TSymbol> cur = dfas[0];
 				for (int i = 1; i < dfas.Length; i++) {
 					cur = DfaUtils.MakeMinimizedProductDfa<
+						DfaUtils.MinimizedDfa<TSymbol>,
+					DfaUtils.MinimizedDfaState<TSymbol>,	
+					DfaUtils.MinimizedDfa<TSymbol>,
+					DfaUtils.MinimizedDfaState<TSymbol>,
 					TSymbol
 					>(cur, dfas[i], new DfaUtils.AmbiguityHandler(MaxAmbiguityHandler));
 				}

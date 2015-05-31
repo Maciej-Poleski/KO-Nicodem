@@ -93,16 +93,17 @@ namespace Nicodem.Core
 			}
 
 			foreach (var partNode in changedNodes) {
-				var intersectionPart = new SetPartition<T> (partNode.Value.Intersection);
-				var node = partition.AddLast (intersectionPart);
-
 				if (!partNode.Value.Difference.Any ()) {
                     foreach(T el in partNode.Value.Intersection) {
                         var backIt = partNode.Value.Difference.AddLast(el);
                         pointers[el].ToIterator = backIt;
                     }
                     partNode.Value.Intersection.Clear();
+					continue;
 				}
+
+				var intersectionPart = new SetPartition<T> (partNode.Value.Intersection);
+				var node = partition.AddLast (intersectionPart);
 
 				foreach (T el in partNode.Value.Intersection)
 					pointers [el].ToSet = node;
@@ -122,8 +123,12 @@ namespace Nicodem.Core
 			get {
 				var results = new List<LinkedList<T>> ();
 
-				foreach (SetPartition<T> part in partition)
+				foreach(SetPartition<T> part in partition) {
 					results.Add (part.Difference);
+					if(!part.Difference.Any()) {
+						throw new InvalidOperationException("Should not happen!");
+					}	
+				}
 
 				return results;
 			}

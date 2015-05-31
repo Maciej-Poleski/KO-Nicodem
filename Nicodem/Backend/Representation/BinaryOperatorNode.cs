@@ -14,6 +14,18 @@
 		public override Node[] GetChildren() {
 			return new Node[]{ LeftOperand, RightOperand };
 		}
+
+        #region implemented ReplaceRegisterWithLocal
+        internal override Node ReplaceRegisterWithLocal(
+            System.Collections.Generic.IReadOnlyDictionary<RegisterNode, Local> map, 
+            System.Collections.Generic.List<Node> newTrees, 
+            Function f)
+        {
+            LeftOperand = LeftOperand.ReplaceRegisterWithLocal(map, newTrees, f);
+            RightOperand = RightOperand.ReplaceRegisterWithLocal(map, newTrees, f);
+            return base.ReplaceRegisterWithLocal(map, newTrees, f);
+        }
+        #endregion
     }
 
     public class AddOperatorNode : BinaryOperatorNode

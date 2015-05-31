@@ -635,12 +635,17 @@ namespace Nicodem.Semantics.Grammar
 
         private static readonly Dictionary<Symbol, string> SymbolToName=new Dictionary<Symbol, string>();
 
+        internal static void RegisterSymbolName(Symbol symbol, string name)
+        {
+            SymbolToName[symbol] = name;
+        }
+
         internal static string GetSymbolName(Symbol symbol)
         {
 			if(SymbolToName.ContainsKey(symbol)) {
 				return SymbolToName[symbol];
 			} else {
-				return "Anonymous";
+				return "__no_symbol_name__";
 			}
         }
 

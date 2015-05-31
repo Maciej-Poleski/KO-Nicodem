@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Diagnostics;
 using System.Collections.Generic;
 using Nicodem.Backend.Representation;
 
@@ -93,9 +94,32 @@ namespace Nicodem.Backend
             return GetEnclosingFunctionStackFrame(GetCurrentStackFrame());
         }
 
-        internal void MoveTemporaryToMemory(RegisterNode temp)
+        internal void MoveRegistersToMemory(IReadOnlyList<RegisterNode> temps)
         {
-            throw new NotImplementedException();
+            // create mapping
+            var mapping = new Dictionary<RegisterNode, Local>();
+            foreach (var reg in temps) {
+                Debug.Assert(!(reg is HardwareRegisterNode)); // cannot move HardwareRegister to memory
+                // create new local - in memory variable
+                Local l = AllocLocal();
+                mapping[reg] = l;
+            }
+
+            // test whether some temp was holding this function argument
+            for (int i=0; i<ArgsCount; i++) {
+                if (ArgsLocations[i] is Temporary) {
+                    var argTemp = ArgsLocations[i] as Temporary;
+                    if (mapping.ContainsKey(argTemp.Node)) {
+                        ArgsLocations[i] = mapping[argTemp.Node]; // if yes, store this location
+                    }
+                }
+            }
+            // go through body and substitute each occurence of temp with AccessLocal(l);
+            List<Node> newBody = new List<Node>();
+            foreach (var tree in Body) {
+                var res = tree.ReplaceRegisterWithLocal(mapping, newBody, this);
+                newBody.Add(res);
+            }
         }
 
         // ------------------- public methods -------------------

@@ -25,8 +25,7 @@ namespace Nicodem.Lexer
         private readonly Dictionary<uint, Tuple<uint, uint>> _decompressionMapping =
             new Dictionary<uint, Tuple<uint, uint>>();
 
-        //private readonly DfaUtils.MinimizedDfa<char> _dfa;
-        private readonly IDfa<char> _dfa;
+        private readonly DfaUtils.MinimizedDfa<char> _dfa;
         private uint _nextCategory;
 
         /// <summary>
@@ -47,14 +46,14 @@ namespace Nicodem.Lexer
                 _dfa = DfaUtils.MakeEmptyLanguageDfa<char>();
                 return;
             }
-            IDfa<char> lastDfa = MakeRegexDfa(regexCategories[0], 1); //.Minimized<RegExDfa<char>, DFAState<char>, char>();
+            var lastDfa = MakeRegexDfa(regexCategories[0], 1).Minimized<RegExDfa<char>, DFAState<char>, char>();
             DfaUtils.DfaStatesConcpetCheck<char>.CheckDfaStates(lastDfa);
             for (uint i = 1; i < regexCategories.Length; ++i)
             {
                 lastDfa =
                     DfaUtils
                         .MakeMinimizedProductDfa
-                        <//DfaUtils.MinimizedDfa<char>, DfaUtils.MinimizedDfaState<char>, RegExDfa<char>, DFAState<char>,
+                        <DfaUtils.MinimizedDfa<char>, DfaUtils.MinimizedDfaState<char>, RegExDfa<char>, DFAState<char>,
                             char>(lastDfa, MakeRegexDfa(regexCategories[i], i + 1), GetProductAccepting);
             }
             _dfa = lastDfa;
@@ -119,7 +118,7 @@ namespace Nicodem.Lexer
                 var dfaState = _dfa.Start;
                 var lastAcceptedDfaState = dfaState;
                 TMemento lastAcceptingReaderState;
-                if (dfaState.IsAccepting</*DfaUtils.MinimizedDfaState<char>,*/ char>())
+                if (dfaState.IsAccepting<DfaUtils.MinimizedDfaState<char>, char>())
                 {
                     lastAcceptingReaderState = sourceReader.MakeMemento();
                     succeed = true;
@@ -134,8 +133,8 @@ namespace Nicodem.Lexer
                 {
                     //Debug.Assert(dfaState.IsDead() == dfaState.IsPseudoDead()); 
                     var c = sourceReader.CurrentCharacter;
-                    dfaState = FindTransition(dfaState.Transitions.ToArray(), c);
-                    if (dfaState.IsAccepting</*DfaUtils.MinimizedDfaState<char>,*/ char>())
+                    dfaState = FindTransition(dfaState.Transitions, c);
+                    if (dfaState.IsAccepting<DfaUtils.MinimizedDfaState<char>, char>())
                     {
                         lastAcceptingReaderState = sourceReader.MakeMemento();
                         lastAcceptedDfaState = dfaState;
@@ -181,12 +180,13 @@ namespace Nicodem.Lexer
 
         #region CategoryDecompression
 
-        private IEnumerable<int> GetCategoriesFromState(IDfaState<char> dfaState)
+        private IEnumerable<int> GetCategoriesFromState<T>(T dfaState) where T : AbstractDfaState<T, char>
         {
             return new CategoryEnumerable(this, dfaState.Accepting);
         }
 
-        private static IDfaState<char> FindTransition(KeyValuePair<char, IDfaState<char>>[] transitions, char c)
+        private static T FindTransition<T>(KeyValuePair<char, T>[] transitions, char c)
+            where T : AbstractDfaState<T, char>
         {
             var i = Array.FindLastIndex(transitions, pair => pair.Key <= c);
             Debug.Assert(transitions[i].Key <= c);
