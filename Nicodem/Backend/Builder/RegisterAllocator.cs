@@ -117,14 +117,32 @@ namespace Nicodem.Backend.Builder
 					if (RegistersColoring.ContainsKey (neigh.Register)) {
 						forbidden.Add (RegistersColoring [neigh.Register]);
 					}
+
+				var occurs = new Dictionary<HardwareRegisterNode,int> ();
+
+				foreach (Vertex neigh in vertex.CopyNeighbors)
+					if (RegistersColoring.ContainsKey (neigh.Register)) {
+						if (!occurs.ContainsKey (RegistersColoring [neigh.Register]))
+							occurs [RegistersColoring [neigh.Register]] = 1;
+						else
+							occurs [RegistersColoring [neigh.Register]]++;
+					}
+
 				if (forbidden.Count >= registers.Count)
 					SpilledRegisters.Add (vertex.Register);
 				else {
+					int mostOccurs = 0;
+					HardwareRegisterNode choice = null;
+
 					foreach (HardwareRegisterNode reg in registers)
 						if (!forbidden.Contains (reg)) {
-							RegistersColoring [vertex.Register] = reg;
-							break;
+							var tmp = occurs.ContainsKey(reg) ? occurs[reg] : 0;
+							if(tmp >= mostOccurs){
+								mostOccurs = tmp;
+								choice = reg;
+							}
 						}
+					RegistersColoring [vertex.Register] = choice;
 				}
 			}
 		}
