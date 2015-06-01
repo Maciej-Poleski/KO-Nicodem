@@ -14,7 +14,7 @@ namespace Nicodem.Semantics.AST
 
         public override void BuildNode<TSymbol>(IParseTree<TSymbol> parseTree)
         {
-            // Block -> "{" Expression* "}"
+            // Block -> "{" (Expression ";")* "}"
             var childs = ASTBuilder.ChildrenEnumerator(parseTree);
             childs.MoveNext(); // go to "{"
             Debug.Assert(childs.MoveNext()); // enter the brackets
@@ -22,6 +22,8 @@ namespace Nicodem.Semantics.AST
             while (!ASTBuilder.EatSymbol("}", childs)) // collect expressions until closing "}"
             {
                 elems.Add(ExpressionNode.GetExpressionNode(childs.Current));
+                childs.MoveNext(); // go to the next symbol
+                Debug.Assert(ASTBuilder.EatSymbol(";", childs)); // it must be ";"
             }
             Elements = elems;
         }
