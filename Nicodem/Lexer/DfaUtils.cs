@@ -4,9 +4,32 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Nicodem.Core;
+using System.Runtime.CompilerServices;
 
 namespace Nicodem.Lexer
 {
+	public static class IdGenerator
+	{
+		class Id
+		{
+			private static long nextValue = 0;
+
+			public long Value;
+
+			public Id()
+			{
+				Value = nextValue++;
+			}
+		}
+
+		private static ConditionalWeakTable<object,Id> cache = new ConditionalWeakTable<object, Id>();
+
+		public static long GetId(this object o)
+		{
+			return cache.GetOrCreateValue (o).Value;
+		}
+	}
+
     public static class DfaUtils
     {
         #region MinimizedDfa
@@ -76,6 +99,7 @@ namespace Nicodem.Lexer
 
 			foreach (var oldState in stateList) {
 				var set = partition [oldState];
+				Debug.Assert(set.Count != 0);
 
 				if (!setToState.ContainsKey (set)) {
 					var newSimpleState = new SimpleState<TSymbol>();
@@ -98,8 +122,7 @@ namespace Nicodem.Lexer
 						stateA.Edges [transtion.Key] = stateB;
 				}
 			}
-
-
+				
 			foreach (var statePair in simpleStateToMinimizedState) {
 				var simpleState = statePair.Key;
 				var minimizedState = statePair.Value;
@@ -179,9 +202,11 @@ namespace Nicodem.Lexer
 
 			if (L == array.Length || array [L].Key.CompareTo(c) != 0)
 				L--;
-
+				
             return L;
         }
+
+
 
 		private static MinimizedDfa<TSymbol> HopcroftAlgorithm<TDfa, TDfaState, TSymbol> (TDfa dfa) 
 			where TDfa : AbstractDfa<TDfaState, TSymbol> where TDfaState : AbstractDfaState<TDfaState, TSymbol> where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
@@ -202,14 +227,18 @@ namespace Nicodem.Lexer
             ISet<LinkedList<TDfaState>> queue = new HashSet<LinkedList<TDfaState>>();
 
             foreach (var state in stateList) {
+				//Console.WriteLine (state.GetId () + " " + state.Transitions[0].Value.GetId() + " " + state.Transitions[1].Value.GetId());
                 var set = partition[state];
                 if (state.Accepting != 0 && !queue.Contains(set))
 					queue.Add (set);
 			}
- 
+				
 			while (queue.Count > 0) {
-				var mainSet = queue.First();
-				queue.Remove (mainSet);
+				var mainSet = new LinkedList<TDfaState> ();
+				foreach (var elem in queue.First()) {
+					mainSet.AddLast (elem);
+				}
+				queue.Remove (queue.First());
 
 				foreach (TSymbol c in alphabet)
 				{
@@ -217,11 +246,14 @@ namespace Nicodem.Lexer
 
 					foreach (var state in stateList) {
                         var deltaState = state.Transitions[SimpleBinarySearch<TDfaState, TSymbol> (state.Transitions, c)].Value; //or upperbound?
-
-                        if(partition[deltaState] == mainSet) 
+						//if(partition[deltaState] == mainSet) 
+						if(mainSet.Contains(deltaState))
                             prevSet.AddFirst(state);
 					}
-						
+
+					if (prevSet.Count == 0)
+						continue;
+
 					var setsPartition = partition.Refine (prevSet);
 
 					foreach (var setPartition in setsPartition) {
@@ -242,6 +274,7 @@ namespace Nicodem.Lexer
 
 				}
 			}
+				
                 
 			var newDfa = BuildNewDfa<TDfa, TDfaState, TSymbol>(dfa, partition, stateList);
 
