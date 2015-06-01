@@ -1,0 +1,10 @@
+f() -> bool
+{
+    if true
+	    false
+	else if true
+		false
+	else
+		false;	`We are in block - semicolon is required
+}
+

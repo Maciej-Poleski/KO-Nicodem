@@ -9,7 +9,9 @@ using Nicodem.Semantics.ExpressionGraph;
 
 namespace Nicodem.Semantics.AST
 {
-    // TODO: when to use this class?
+    /// <summary>
+    /// Atom node. Use this class to represent basic literals: int, char, bool constants.
+    /// </summary>
     class AtomNode : ConstNode
     {
 
@@ -17,7 +19,10 @@ namespace Nicodem.Semantics.AST
 
         public override void BuildNode<TSymbol>(IParseTree<TSymbol> parseTree)
         {
-            throw new System.NotImplementedException();
+            // DecimalNumberLiteral ->  DecimalNumberLiteralToken
+            // CharacterLiteral -> CharacterLiteralToken
+            // BooleanLiteral -> BooleanLiteralToken
+            Value = ASTBuilder.FirstChild(parseTree).Fragment.GetOriginText(); // fill only value - type was set during construction
         }
 
         #endregion

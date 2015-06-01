@@ -1,0 +1,5 @@
+f(int a, int b) -> void
+{
+    if if true true true; `NOTE: This is not semantically correct as (if true true) is a value of type void
+}
+

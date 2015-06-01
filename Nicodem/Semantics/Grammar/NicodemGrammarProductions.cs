@@ -188,7 +188,7 @@ namespace Nicodem.Semantics.Grammar
         #region ExplicitTokens
 
         private const string OperatorsPool =
-            @"\( \) \-> , mutable \[ \] = \+= \-= \*= /= %= <<= >>= \&= \^= \|= \|\| \&\& \| \^ \& == != < <= > >= << >> \+ \- \* / % \+\+ \-\- ! ~ \.\. { } if else while break continue";
+			@"\( \) \-> , mutable \[ \] = \+= ; \-= \*= /= %= <<= >>= \&= \^= \|= \|\| \&\& \| \^ \& == != < <= > >= << >> \+ \- \* / % \+\+ \-\- ! ~ \.\. { } if else while break continue";
 
         private static readonly string[] PreparedOperators = OperatorsPool.Split(' ');
 
@@ -758,7 +758,7 @@ namespace Nicodem.Semantics.Grammar
                 WhileExpression +
                 LoopControlExpression
                 );
-            BlockExpression.SetProduction("{" * Expression.Star * "}");   // No left-recursion thanks to '{'
+			BlockExpression.SetProduction("{" * (Expression * ";").Star * "}");   // No left-recursion thanks to '{'
             ObjectDefinitionExpression.SetProduction(TypeSpecifier * ObjectName * "=" * Expression);  // NOTE: "=" is _not_ an assignment operator here
             ArrayLiteralExpression.SetProduction("[" * (Expression * ",").Star * Expression.Optional * "]");
             ObjectUseExpression.SetProduction(ObjectName + Literals);

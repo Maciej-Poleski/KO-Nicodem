@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using Nicodem.Semantics.Visitors;
 
-namespace Semantics.Tests
+namespace Semantics.Tests.Visitors
 {
 	[TestFixture]
 	public class NameResolutionVisitorTests

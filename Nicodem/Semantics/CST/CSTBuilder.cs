@@ -17,12 +17,8 @@ namespace Nicodem.Semantics.CST
 
 			// Assume every list from tupple is of size 1 !!!
 			var leafs = sanitizedTokens.Select(r => {
-				//Debug.Assert(r.Item2.Count() == 1);
-                if (r.Item2.Count() != 1)
-                {
-                    Console.WriteLine("Warning: Token >" + r.Item1.GetOriginText() + "< has categories [" + string.Join(", ", r.Item2) + "]");
-                }
-				return new ParseLeaf<Symbol>(r.Item1, new Symbol(r.Item2.Max()));
+				Debug.Assert(r.Item2.Count() == 1);
+				return new ParseLeaf<Symbol>(r.Item1, new Symbol(r.Item2.ElementAt(0)));
 			});
 
             var grammar = new Grammar<Symbol>(
@@ -35,14 +31,7 @@ namespace Nicodem.Semantics.CST
 				return (parseRes as OK<Symbol>).Tree;
 			} else {
 				var err = parseRes as Error<Symbol>;
-				Console.WriteLine(String.Format("Cannot parse symbol {0} at:", err.Symbol));
-				Console.WriteLine(String.Format("Begin line - {0}, char - {1}, end line - {2}, char - {3}", 
-					err.Fragment.GetBeginOriginPosition().LineNumber,
-					err.Fragment.GetBeginOriginPosition().CharNumber,
-					err.Fragment.GetEndOriginPosition().LineNumber,
-					err.Fragment.GetEndOriginPosition().CharNumber
-				));
-				Console.WriteLine(err.Fragment.GetOriginText());
+				Console.WriteLine(ParserUtils<Symbol>.PrepareErrorMessage(err));
 				return null;
 			}
         }

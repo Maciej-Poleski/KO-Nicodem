@@ -3,7 +3,7 @@ using NUnit.Framework;
 using Nicodem.Semantics.Visitors;
 using Nicodem.Semantics.AST;
 
-namespace Semantics.Tests
+namespace Semantics.Tests.Visitors
 {
 	[TestFixture]
 	public class TypeCheckVisitorTests

@@ -10,6 +10,7 @@ namespace Semantics.Tests
     using ParseTree = IParseTree<Symbol>;
     using P = NicodemGrammarProductions;
     using UniversalSymbol = NicodemGrammarProductions.UniversalSymbol;
+    using Nicodem.Core;
 
     [TestFixture()]
     public class ASTBuilderTests
@@ -67,6 +68,8 @@ namespace Semantics.Tests
         [TestFixtureSetUp]
         public void Init()
         {
+            TestsTraceListener.Setup();
+
             builder = new ASTBuilder();
             grammar = new Grammar<Symbol>(
                            NicodemGrammarProductions.StartSymbol(),
@@ -215,7 +218,10 @@ namespace Semantics.Tests
 
         private ParseTree FunctionProgram(ParseTree functionTree)
         {
-            return Wrap(P.Program, new ParseTree[] { functionTree });
+            return Wrap(P.Program, new ParseTree[] { 
+                functionTree,
+                Leaf(P.Eof, "")
+            });
         }
 
         private ParseTree NumberFunction()
@@ -249,7 +255,8 @@ namespace Semantics.Tests
         { 
             var tree = Wrap(P.Program, new ParseTree[] { 
                 NumberFunction(),
-                NumberFunction()
+                NumberFunction(),
+                Leaf(P.Eof, "")
             });
             ProgramNode result = builder.BuildAST<Symbol>(tree);
             // TODO(guspiel): When it becomes clear what AST to expect, write an AssertEquals here.

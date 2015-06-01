@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using Nicodem.Semantics.Visitors;
 using Nicodem.Parser;
 using Nicodem.Semantics.ExpressionGraph;
@@ -26,12 +27,13 @@ namespace Nicodem.Semantics.AST
                 
         #region implemented abstract members of Node
 
+        // Program -> Function* Eof
         public override void BuildNode<TSymbol>(IParseTree<TSymbol> parseTree)
         {
-            var node = ASTBuilder.AsBranch(parseTree);
-            foreach(IParseTree<TSymbol> ch in node.Children){
+            var childs = ASTBuilder.ChildrenArray(parseTree);
+            for (int i=0; i<childs.Length-1; i++) { // skip last child - it is EOF
                 var funNode = new FunctionDefinitionNode();
-                funNode.BuildNode(ch);
+                funNode.BuildNode(childs[i]);
                 functions.AddLast(funNode);
             }
         }
