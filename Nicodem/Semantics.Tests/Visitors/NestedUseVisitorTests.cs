@@ -1,30 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using Nicodem.Semantics.AST;
+﻿using Nicodem.Semantics.AST;
 using Nicodem.Semantics.Visitors;
 using NUnit.Framework;
-using Nicodem.Core;
 
 namespace Semantics.Tests.Visitors
 {
-    internal class NestedUseVisitorTests
+	[TestFixture]
+    public class NestedUseVisitorTests
     {
-        private const PrimitiveType Int = PrimitiveType.Int;
-        private const PrimitiveType Byte = PrimitiveType.Byte;
-        private const PrimitiveType Char = PrimitiveType.Char;
-        private const PrimitiveType Bool = PrimitiveType.Bool;
-        private const PrimitiveType Void = PrimitiveType.Void;
-        private const Mutablitity Constant = Mutablitity.Constant;
-        private const Mutablitity Mutable = Mutablitity.Mutable;
-
-        [TestFixtureSetUp]
-        public void init()
-        {
-            // We don't want message boxes in testing.
-            TestsTraceListener.Setup();
-        }
-
-        [Test, Timeout(1000)]
+        [Test]
         public void NoNestedUses()
         {
             /* f(int mutable a, int mutable b) -> int
@@ -47,123 +30,56 @@ namespace Semantics.Tests.Visitors
              */
 
             // function g
-            var gParamA = new VariableDeclNode
-            {
-                Name = "a",
-                Type = MakePrimitiveType(Char, Mutable)
-            };
-            var gParamE = new VariableDeclNode
-            {
-                Name = "e",
-                Type = MakePrimitiveType(Bool, Mutable)
-            };
-            var gBodyEx1 = new VariableDefNode
-            {
-                Name = "f",
-                Type = MakePrimitiveType(Int, Mutable),
-                Value = IntLiteral(5)
-            };
-            var gBodyEx2 = new OperatorNode
-            {
-                Operator = OperatorType.ASSIGN,
-                Arguments = new ExpressionNode[] {gParamA.Use(), CharLiteral('a')}
-            };
-            var gBodyEx3 = new OperatorNode
-            {
-                Operator = OperatorType.ASSIGN,
-                Arguments = new ExpressionNode[] {gParamE.Use(), BoolLiteral(false)}
-            };
-            var gBodyEx4 = new OperatorNode
-            {
-                Operator = OperatorType.ASSIGN,
-                Arguments = new ExpressionNode[] {gBodyEx1.Use(), IntLiteral(3)}
-            };
-            var gBody = new BlockExpressionNode
-            {
-                Elements = new ExpressionNode[] {gBodyEx1, gBodyEx2, gBodyEx3, gBodyEx4}
-            };
-            var gFunction = new FunctionDefinitionNode
-            {
-                Name = "g",
-                Parameters = new[] {gParamA, gParamE},
-                ResultType = MakePrimitiveType(Void),
-                Body = gBody
-            };
+			var gParamA = Utils.DeclareChar ("a");
+			var gParamE = Utils.DeclareBool ("e");
+			var gBodyEx1 = Utils.DefineInt ("f", 5);
+			var gParamAuse = Utils.Usage (gParamA);
+			var gParamEuse = Utils.Usage (gParamE);
+			var gBodyEx1use = Utils.Usage (gBodyEx1);
+			var gBodyEx2 = Utils.Assignment (gParamAuse, Utils.CharLiteral ('a'));
+			var gBodyEx3 = Utils.Assignment (gParamEuse, Utils.BoolLiteral (false));
+			var gBodyEx4 = Utils.Assignment (gBodyEx1use, Utils.IntLiteral (3));
+			var gFunction = Utils.FunctionDef ("g",
+				Utils.parameters (gParamA, gParamE),
+				Utils.MakeConstantVoid (),
+			    Utils.body (gBodyEx1, gBodyEx2, gBodyEx3, gBodyEx4)
+			);
 
             // function f
-            var fParamA = new VariableDeclNode
-            {
-                Name = "a",
-                Type = MakePrimitiveType(Int, Mutable)
-            };
-            var fParamB = new VariableDeclNode
-            {
-                Name = "b",
-                Type = MakePrimitiveType(Int, Mutable)
-            };
-            var fBodyEx1 = new VariableDefNode
-            {
-                Name = "c",
-                Type = MakePrimitiveType(Int, Mutable),
-                Value = IntLiteral(-1)
-            };
-            var fBodyEx2 = new VariableDefNode
-            {
-                Name = "d",
-                Type = MakePrimitiveType(Byte, Mutable),
-                Value = ByteLiteral(0)
-            };
-            var fBodyEx3 = gFunction;
-            var fBodyEx4 = new OperatorNode
-            {
-                Operator = OperatorType.ASSIGN,
-                Arguments = new ExpressionNode[] {fParamA.Use(), IntLiteral(1)}
-            };
-            var fBodyEx5 = new OperatorNode
-            {
-                Operator = OperatorType.ASSIGN,
-                Arguments = new ExpressionNode[] {fParamB.Use(), IntLiteral(2)}
-            };
-            var fBodyEx6 = new OperatorNode
-            {
-                Operator = OperatorType.ASSIGN,
-                Arguments = new ExpressionNode[] {fBodyEx1.Use(), IntLiteral(3)}
-            };
-            var fBodyEx7 = new OperatorNode
-            {
-                Operator = OperatorType.ASSIGN,
-                Arguments = new ExpressionNode[] {fBodyEx2.Use(), ByteLiteral(4)}
-            };
-            var fBodyEx8 = fParamB.Use();
-            var fBody = new BlockExpressionNode
-            {
-                Elements =
-                    new ExpressionNode[]
-                    {fBodyEx1, fBodyEx2, fBodyEx3, fBodyEx4, fBodyEx5, fBodyEx6, fBodyEx7, fBodyEx8}
-            };
-            var fFunction = new FunctionDefinitionNode
-            {
-                Name = "f",
-                Parameters = new[] {fParamA, fParamB},
-                ResultType = MakePrimitiveType(Int),
-                Body = fBody
-            };
+			var fParamA = Utils.DeclareInt ("a");
+			var fParamB = Utils.DeclareInt ("b");
+			var fBodyEx1 = Utils.DefineInt ("c", -1);
+			var fBodyEx2 = Utils.DefineByte ("d", 0);
+			var fParamAuse = Utils.Usage (fParamA);
+			var fParamBuse = Utils.Usage (fParamB);
+			var fBodyEx1use = Utils.Usage (fBodyEx1);
+			var fBodyEx2use = Utils.Usage (fBodyEx2);
+			var fBodyEx3 = gFunction;
+			var fBodyEx4 = Utils.Assignment (fParamAuse, Utils.IntLiteral (1));
+			var fBodyEx5 = Utils.Assignment (fParamBuse, Utils.IntLiteral (2));
+			var fBodyEx6 = Utils.Assignment (fBodyEx1use, Utils.IntLiteral (3));
+			var fBodyEx7 = Utils.Assignment (fBodyEx2use, Utils.IntLiteral (4));
+            var fBodyEx8 = fParamBuse;
+			var fFunction = Utils.FunctionDef ("f",
+				Utils.parameters (fParamA, fParamB),
+				Utils.MakeConstantInt (),
+				Utils.body (fBodyEx1, fBodyEx2, fBodyEx3, fBodyEx4, fBodyEx5, fBodyEx6, fBodyEx7, fBodyEx8)
+			);
 
-            // Program
-            var program = new ProgramNode(new LinkedList<FunctionDefinitionNode>(new[] {fFunction}));
+			var program = Utils.Program (fFunction);
 
             program.FillInNestedUseFlag();
 
-            Assert.False(gParamA.NestedUse);
-            Assert.False(gParamE.NestedUse);
-            Assert.False(gBodyEx1.NestedUse);
-            Assert.False(fParamA.NestedUse);
-            Assert.False(fParamB.NestedUse);
-            Assert.False(fBodyEx1.NestedUse);
-            Assert.False(fBodyEx2.NestedUse);
+			Assert.False (gParamA.NestedUse);
+			Assert.False (gParamE.NestedUse);
+			Assert.False (gBodyEx1.NestedUse);
+			Assert.False (fParamA.NestedUse);
+			Assert.False (fParamB.NestedUse);
+			Assert.False (fBodyEx1.NestedUse);
+			Assert.False (fBodyEx2.NestedUse);
         }
 
-        [Test, Timeout(1000)]
+        [Test]
         public void SimpleNestedUses()
         {
             /* f(int mutable a, int mutable b) -> int
@@ -186,204 +102,57 @@ namespace Semantics.Tests.Visitors
              * }
              */
 
-            var fParamA = new VariableDeclNode
-            {
-                Name = "a",
-                Type = MakePrimitiveType(Int, Mutable)
-            };
-            var fParamB = new VariableDeclNode
-            {
-                Name = "b",
-                Type = MakePrimitiveType(Int, Mutable)
-            };
-            var fVarC = new VariableDefNode
-            {
-                Name = "c",
-                Type = MakePrimitiveType(Int, Mutable),
-                Value = IntLiteral(-1)
-            };
-            var fVarD = new VariableDefNode
-            {
-                Name = "d",
-                Type = MakePrimitiveType(Byte, Mutable),
-                Value = ByteLiteral(0)
-            };
+			var fParamA = Utils.DeclareInt ("a");
+			var fParamB = Utils.DeclareInt ("b");
+			var fVarC = Utils.DefineInt ("c", -1);
+			var fVarD = Utils.DefineByte ("d", 0);
+			var fParamAuse = Utils.Usage (fParamA);
+			var fParamBuse = Utils.Usage (fParamB);
+			var fVarCuse = Utils.Usage (fVarC);
+			var fVarDuse = Utils.Usage (fVarD);
 
             // function g
-            var gParamG = new VariableDeclNode
-            {
-                Name = "g",
-                Type = MakePrimitiveType(Char)
-            };
-            var gParamE = new VariableDeclNode
-            {
-                Name = "e",
-                Type = MakePrimitiveType(Bool)
-            };
-            var gBodyEx1 = new VariableDefNode
-            {
-                Name = "f",
-                Type = MakePrimitiveType(Int, Mutable),
-                Value = IntLiteral(5)
-            };
-            var gBodyEx2 = new OperatorNode
-            {
-                Operator = OperatorType.ASSIGN,
-                Arguments = new ExpressionNode[] {fParamA.Use(), IntLiteral(1)}
-            };
-            var gBodyEx3 = new OperatorNode
-            {
-                Operator = OperatorType.ASSIGN,
-                Arguments = new ExpressionNode[] {gParamE.Use(), BoolLiteral(false)}
-            };
-            var gBodyEx4 = new OperatorNode
-            {
-                Operator = OperatorType.ASSIGN,
-                Arguments = new ExpressionNode[] {gBodyEx1.Use(), IntLiteral(3)}
-            };
-            var gBodeEx5 = new OperatorNode
-            {
-                Operator = OperatorType.ASSIGN,
-                Arguments = new ExpressionNode[] {fVarD.Use(), IntLiteral(2)}
-            };
-            var gBody = new BlockExpressionNode
-            {
-                Elements = new ExpressionNode[] {gBodyEx1, gBodyEx2, gBodyEx3, gBodyEx4, gBodeEx5}
-            };
-            var gFunction = new FunctionDefinitionNode
-            {
-                Name = "g",
-                Parameters = new[] {gParamG, gParamE},
-                ResultType = MakePrimitiveType(Void),
-                Body = gBody
-            };
+			var gParamG = Utils.DeclareChar ("g");
+			var gParamE = Utils.DeclareBool ("e");
+			var gBodyEx1 = Utils.DefineInt ("f", 5);
+			var gParamEuse = Utils.Usage (gParamE);
+			var gBodyEx1use = Utils.Usage (gBodyEx1);
+			var gBodyEx2 = Utils.Assignment (fParamAuse, Utils.IntLiteral (1));
+			var gBodyEx3 = Utils.Assignment (gParamEuse, Utils.BoolLiteral (false));
+			var gBodyEx4 = Utils.Assignment (gBodyEx1use, Utils.IntLiteral (3));
+			var gBodeEx5 = Utils.Assignment (fVarDuse, Utils.IntLiteral (2));
+			var gFunction = Utils.FunctionDef ("g",
+				Utils.parameters (gParamG, gParamE),
+				Utils.MakeConstantVoid (),
+				Utils.body (gBodyEx1, gBodyEx2, gBodyEx3, gBodyEx4, gBodeEx5)
+			);
 
             // function f
             var fBodyEx1 = fVarC;
             var fBodyEx2 = fVarD;
             var fBodyEx3 = gFunction;
-            var fBodyEx4 = new OperatorNode
-            {
-                Operator = OperatorType.ASSIGN,
-                Arguments = new ExpressionNode[] {fParamA.Use(), IntLiteral(1)}
-            };
-            var fBodyEx5 = new OperatorNode
-            {
-                Operator = OperatorType.ASSIGN,
-                Arguments = new ExpressionNode[] {fParamB.Use(), IntLiteral(2)}
-            };
-            var fBodyEx6 = new OperatorNode
-            {
-                Operator = OperatorType.ASSIGN,
-                Arguments = new ExpressionNode[] {fBodyEx1.Use(), IntLiteral(3)}
-            };
-            var fBodyEx7 = new OperatorNode
-            {
-                Operator = OperatorType.ASSIGN,
-                Arguments = new ExpressionNode[] {fBodyEx2.Use(), ByteLiteral(4)}
-            };
-            var fBodyEx8 = fParamB.Use();
-            var fBody = new BlockExpressionNode
-            {
-                Elements =
-                    new ExpressionNode[]
-                    {fBodyEx1, fBodyEx2, fBodyEx3, fBodyEx4, fBodyEx5, fBodyEx6, fBodyEx7, fBodyEx8}
-            };
-            var fFunction = new FunctionDefinitionNode
-            {
-                Name = "f",
-                Parameters = new[] {fParamA, fParamB},
-                ResultType = MakePrimitiveType(Int),
-                Body = fBody
-            };
+			var fBodyEx4 = Utils.Assignment (fParamAuse, Utils.IntLiteral (1));
+			var fBodyEx5 = Utils.Assignment (fParamBuse, Utils.IntLiteral (2));
+			var fBodyEx6 = Utils.Assignment (fVarCuse, Utils.IntLiteral (3));
+			var fBodyEx7 = Utils.Assignment (fVarDuse, Utils.ByteLiteral (4));
+			var fBodyEx8 = fParamBuse;
+			var fFunction = Utils.FunctionDef ("f",
+				Utils.parameters (fParamA, fParamB),
+				Utils.MakeConstantInt (),
+				Utils.body (fBodyEx1, fBodyEx2, fBodyEx3, fBodyEx4, fBodyEx5, fBodyEx6, fBodyEx7, fBodyEx8)
+			);
 
-            // Program
-            var program = new ProgramNode(new LinkedList<FunctionDefinitionNode>(new[] {fFunction}));
+			var program = Utils.Program (fFunction);
 
             program.FillInNestedUseFlag();
 
-            Assert.False(gParamG.NestedUse);
-            Assert.False(gParamE.NestedUse);
-            Assert.False(gBodyEx1.NestedUse);
-            Assert.True(fParamA.NestedUse);
-            Assert.False(fParamB.NestedUse);
-            Assert.False(fVarC.NestedUse);
-            Assert.True(fVarD.NestedUse);
+			Assert.False (gParamG.NestedUse);
+			Assert.False (gParamE.NestedUse);
+			Assert.False (gBodyEx1.NestedUse);
+			Assert.True (fParamA.NestedUse);
+			Assert.False (fParamB.NestedUse);
+			Assert.False (fVarC.NestedUse);
+			Assert.True (fVarD.NestedUse);
         }
-
-        private static NamedTypeNode MakePrimitiveType(PrimitiveType type, Mutablitity isConstant = Mutablitity.Constant)
-        {
-            NamedTypeNode result = null;
-            switch (type)
-            {
-                case PrimitiveType.Int:
-                    result = NamedTypeNode.IntType();
-                    break;
-                case PrimitiveType.Byte:
-                    result = NamedTypeNode.ByteType();
-                    break;
-                case PrimitiveType.Char:
-                    result = NamedTypeNode.CharType();
-                    break;
-                case PrimitiveType.Bool:
-                    result = NamedTypeNode.BoolType();
-                    break;
-                case PrimitiveType.Void:
-                    result = NamedTypeNode.VoidType();
-                    break;
-                default:
-                    Debug.Assert(false);
-                    break;
-            }
-            result.IsConstant = isConstant == Mutablitity.Constant;
-            return result;
-        }
-
-        private static AtomNode IntLiteral(int value)
-        {
-            return new AtomNode(MakePrimitiveType(Int)) {Value = value.ToString()};
-        }
-
-        private static AtomNode CharLiteral(char value)
-        {
-            return new AtomNode(MakePrimitiveType(Char)) {Value = "'" + value + "'"};
-        }
-
-        private static AtomNode BoolLiteral(bool value)
-        {
-            return new AtomNode(MakePrimitiveType(Bool)) {Value = value ? "true" : "false"};
-        }
-
-        private static AtomNode ByteLiteral(int value)
-        {
-            return new AtomNode(MakePrimitiveType(Void)) {Value = value.ToString()};
-        }
-
-        private enum PrimitiveType
-        {
-            Int,
-            Byte,
-            Char,
-            Bool,
-            Void
-        }
-
-        private enum Mutablitity
-        {
-            Constant,
-            Mutable
-        }
-    }
-
-    internal static class Extensions
-    {
-        internal static VariableUseNode Use(this VariableDeclNode node)
-        {
-            return new VariableUseNode
-            {
-                Name = node.Name,
-                Declaration = node
-            };
-        }
-    }
+	}
 }
