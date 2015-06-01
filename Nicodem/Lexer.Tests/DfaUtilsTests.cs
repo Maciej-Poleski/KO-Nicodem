@@ -79,7 +79,7 @@ namespace Lexer.Tests
             var fifthState = new DfaUtils. MinimizedDfaState<char>();
             fifthState._accepting = 1;
             var sixthState = new DfaUtils. MinimizedDfaState<char>();
-            sixthState._accepting = 1;
+            sixthState._accepting = 2;
 
             firstState._transitions = new KeyValuePair<char, DfaUtils.MinimizedDfaState<char>>[2]
             {new KeyValuePair<char, DfaUtils. MinimizedDfaState<char>>('a', secondState),
@@ -107,7 +107,7 @@ namespace Lexer.Tests
 
 
             var stateList = DfaUtils.PrepareStateList<DfaUtils.MinimizedDfa<char>, DfaUtils.MinimizedDfaState<char>, char >(dfa);
-            Assert.AreEqual(stateList.Count, 4);
+            Assert.AreEqual(stateList.Count, 6);
         }
 
         [Test]

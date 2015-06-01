@@ -2,6 +2,7 @@
 using Nicodem.Core;
 using NUnit.Framework;
 using System.Linq;
+using System;
 
 namespace Core.Tests
 {
@@ -99,6 +100,25 @@ namespace Core.Tests
 				Assert.AreSame (secondIntersect, pr [el]);
 			foreach (var el in secondDiff)
 				Assert.AreSame (secondDiff, pr [el]);
+		}
+
+		[Test]
+		public void Multiple_Refines_Test()
+		{
+			var pr = new PartitionRefinement<int> (new List<LinkedList<int>>{
+				new LinkedListWithInit<int>{ 1, 2, 3 },
+				new LinkedListWithInit<int>{ 4, 5 },
+				new LinkedListWithInit<int>{ 6 }
+			});
+			var res1 = pr.Refine(new List<int>{ 4 });
+			Assert.AreEqual(4, pr.Partition.Count);
+			foreach(var s in pr.Partition) {
+				foreach(var el in s) {
+					Console.Write(el + ", ");
+					Assert.AreSame(s, pr[el]);
+				}
+				Console.WriteLine();
+			}
 		}
 	}
 }
