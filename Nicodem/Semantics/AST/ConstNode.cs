@@ -1,28 +1,51 @@
+using System;
 using Nicodem.Semantics.Visitors;
 using Nicodem.Parser;
 using Nicodem.Semantics.ExpressionGraph;
 
 namespace Nicodem.Semantics.AST
 {
-    // TODO - is this class needed?
+    /// <summary>
+    /// Const node - parent class for ArrayNode and AtomNode.
+    /// </summary>
 	abstract class ConstNode : ExpressionNode
 	{
 		public TypeNode VariableType { get; private set; }
 
-		// TODO value field
-		public string Value { get; set; }
+        /// <value>Value of this constant.</value> 
+        public string Value { get; set; } // TODO: store it as string?
 
-		/// <summary>
-		/// The only way to construct this node.
-		/// Type cannot be unspecified.
-		/// </summary>
+        /// <summary>The only way to construct this node. Type cannot be unspecified.</summary>
 		/// <param name="type">Type.</param>
-		public ConstNode( TypeNode type )
+		public ConstNode(TypeNode type)
 		{
 			this.VariableType = type;
 		}
         
         #region implemented abstract members of Node
+
+        public static ConstNode GetConstNode<TSymbol>(IParseTree<TSymbol> parseTree) where TSymbol:ISymbol<TSymbol>
+        {
+            // Literals -> DecimalNumberLiteral | CharacterLiteral | StringLiteral | BooleanLiteral
+            TypeNode type;
+            switch (ASTBuilder.GetName(parseTree.Symbol))
+            {
+                case "DecimalNumberLiteral":
+                    type = NamedTypeNode.IntType();
+                    break;
+                case "CharacterLiteral":
+                    type = NamedTypeNode.CharType();
+                    break;
+                case "StringLiteral":
+                    throw new NotImplementedException(); // TODO: how to represent strings?
+                case "BooleanLiteral":
+                    type = NamedTypeNode.BoolType();
+                    break;
+                default:
+                    throw new System.ArgumentException();
+            }
+            return new AtomNode(type);
+        }
 
         public override void BuildNode<TSymbol>(IParseTree<TSymbol> parseTree)
         {

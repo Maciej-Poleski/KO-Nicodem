@@ -114,7 +114,7 @@ namespace Nicodem.Semantics.AST
                 var node = ASTBuilder.FirstChild(op1); // Operator1Expression -> Operator0Expression
                 // Operator0Expression -> AtomicExpression | "(" Expression ")";
                 var childs = ASTBuilder.ChildrenEnumerator(node);
-                Debug.Assert(!childs.MoveNext()); // assert or not?
+                Debug.Assert(childs.MoveNext());
                 if (ASTBuilder.EatSymbol("(", childs))
                 {
                     return GetExpressionNode(childs.Current); // Expression
@@ -144,7 +144,12 @@ namespace Nicodem.Semantics.AST
                 case "ArrayLiteralExpression":
                     throw new System.NotImplementedException(); // TODO: yet!
                 case "ObjectUseExpression":
-                    atomic = new VariableUseNode();
+                    // ObjectUseExpression -> ObjectName | Literals
+                    if (parseTree.Symbol.IsTerminal) { // ObjectName
+                        atomic = new VariableUseNode();
+                    } else { // Literals
+                        atomic = ConstNode.GetConstNode(node);
+                    }
                     break;
                 case "IfExpression":
                     atomic = new IfNode();
@@ -156,7 +161,6 @@ namespace Nicodem.Semantics.AST
                     atomic = new LoopControlNode();
                     break;
                 default:
-                    Debug.Assert(false);
                     throw new System.ArgumentException();
             }
             atomic.BuildNode(node);
@@ -218,4 +222,3 @@ namespace Nicodem.Semantics.AST
         }
 	}
 }
-

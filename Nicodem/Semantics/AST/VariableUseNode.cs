@@ -13,7 +13,6 @@ namespace Nicodem.Semantics.AST
 
         public override void BuildNode<TSymbol>(IParseTree<TSymbol> parseTree)
         {
-            // ObjectUseExpression -> ObjectName
             Name = parseTree.Fragment.GetOriginText();
         }
 
@@ -30,4 +29,3 @@ namespace Nicodem.Semantics.AST
         }
 	}
 }
-

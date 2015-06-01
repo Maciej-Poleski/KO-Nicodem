@@ -218,7 +218,10 @@ namespace Semantics.Tests
 
         private ParseTree FunctionProgram(ParseTree functionTree)
         {
-            return Wrap(P.Program, new ParseTree[] { functionTree });
+            return Wrap(P.Program, new ParseTree[] { 
+                functionTree,
+                Leaf(P.Eof, "")
+            });
         }
 
         private ParseTree NumberFunction()
@@ -252,7 +255,8 @@ namespace Semantics.Tests
         { 
             var tree = Wrap(P.Program, new ParseTree[] { 
                 NumberFunction(),
-                NumberFunction()
+                NumberFunction(),
+                Leaf(P.Eof, "")
             });
             ProgramNode result = builder.BuildAST<Symbol>(tree);
             // TODO(guspiel): When it becomes clear what AST to expect, write an AssertEquals here.

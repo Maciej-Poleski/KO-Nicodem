@@ -49,7 +49,6 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AST\AtomNode.cs" />
     <Compile Include="ExpressionGraph\ReturnVertex.cs" />
     <Compile Include="ExpressionGraph\ConditionalJumpVertex.cs" />
     <Compile Include="ExpressionGraph\OneJumpVertex.cs" />
@@ -105,6 +104,7 @@
     <Compile Include="Backend\BackendBuilder.cs" />
     <Compile Include="Backend\NodeBuilder.cs" />
     <Compile Include="Frontend.cs" />
+    <Compile Include="AST\AtomNode.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
