@@ -57,7 +57,9 @@ namespace Nicodem.Parser
 					var parsedChildren = children.ToList();
 					parsedChildren.Reverse();
 					var parsedTree = new ParseBranch<TSymbol>(
-						iterator != word.End ? GetFragmentRange(iterator.Current.Fragment, children.Peek().Fragment) : null,
+						iterator != word.End ? GetFragmentRange(
+							iterator.Current.Fragment, 
+							(children.Any() ? children.Peek().Fragment : iterator.Current.Fragment)) : null,
 						term, 
 						_grammar.WhichProduction[node.Accepting], 
 						parsedChildren);
