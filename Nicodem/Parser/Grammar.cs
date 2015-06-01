@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Nicodem.Lexer;
+using System;
 using System.Collections.Generic;
 
 namespace Nicodem.Parser
@@ -65,7 +66,7 @@ namespace Nicodem.Parser
 			uint productionMarker = 1;
 			foreach (var symbolProductions in Productions)
 			{
-				var automatons = new List<Lexer.DfaUtils.MinimizedDfa<TSymbol>>();
+				var automatons = new List<IDfa<TSymbol>>();
 				foreach (var production in symbolProductions.Value)
 				{
 					automatons.Add(Dfa<TSymbol>.RegexDfa(production.Rhs, productionMarker));
