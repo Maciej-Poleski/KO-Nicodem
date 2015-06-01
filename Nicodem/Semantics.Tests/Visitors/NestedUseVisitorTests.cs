@@ -7,6 +7,75 @@ namespace Semantics.Tests.Visitors
 	[TestFixture]
     public class NestedUseVisitorTests
     {
+		[Test]
+		public void MultipleTimesNestedFunction()
+		{
+			/* f(int mutable a) -> int
+             * {
+             *   g(int mutable b) -> int
+             *   {
+             *     h(int mutable c) -> int
+             *     {
+             *       i(int mutable d) -> int
+             *       {
+             *         a = c
+             *       }
+             *       c
+             *     }
+             *     a
+             *     b
+             *   }
+             *   a
+             * }
+             */
+
+			var fParam = Utils.DeclareInt ("a");
+			var gParam = Utils.DeclareInt ("b");
+			var hParam = Utils.DeclareInt ("c");
+			var iParam = Utils.DeclareInt ("d");
+			var fParamuse = Utils.Usage (fParam);
+			var gParamuse = Utils.Usage (gParam);
+			var hParamuse = Utils.Usage (hParam);
+
+			// function i
+			var iBody1 = Utils.Assignment (fParamuse, hParamuse);
+			var iFunction = Utils.FunctionDef ("i",
+				Utils.parameters (iParam),
+				Utils.MakeConstantInt (),
+				Utils.body (iBody1)
+			);
+
+			// function h
+			var hFunction = Utils.FunctionDef ("h",
+				Utils.parameters (hParam),
+				Utils.MakeConstantInt (),
+				Utils.body (iFunction, hParamuse)
+			);
+
+			// function g
+			var gFunction = Utils.FunctionDef ("g",
+				Utils.parameters (gParam),
+				Utils.MakeConstantInt (),
+				Utils.body (hFunction, fParamuse, gParamuse)
+			);
+
+			// function f
+			var fFunction = Utils.FunctionDef ("f",
+				Utils.parameters (fParam),
+				Utils.MakeConstantInt (),
+				Utils.body (gFunction, fParamuse)
+			);
+
+			var program = Utils.Program (fFunction);
+
+			program.FillInNestedUseFlag();
+
+			Assert.True (fParam.NestedUse);
+			Assert.False (gParam.NestedUse);
+			Assert.True (hParam.NestedUse);
+			Assert.False (iParam.NestedUse);
+		}
+
         [Test]
         public void NoNestedUses()
         {
