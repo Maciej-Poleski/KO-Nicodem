@@ -1,4 +1,4 @@
 main(int x) -> void
 {
-  print("Hello, World!\n")
+  print("Hello, World!\n");
 }
