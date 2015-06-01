@@ -10,6 +10,7 @@ namespace Semantics.Tests
     using ParseTree = IParseTree<Symbol>;
     using P = NicodemGrammarProductions;
     using UniversalSymbol = NicodemGrammarProductions.UniversalSymbol;
+    using Nicodem.Core;
 
     [TestFixture()]
     public class ASTBuilderTests
@@ -67,6 +68,8 @@ namespace Semantics.Tests
         [TestFixtureSetUp]
         public void Init()
         {
+            TestsTraceListener.Setup();
+
             builder = new ASTBuilder();
             grammar = new Grammar<Symbol>(
                            NicodemGrammarProductions.StartSymbol(),
