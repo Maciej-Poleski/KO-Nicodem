@@ -7,10 +7,23 @@ using Nicodem.Backend.Representation;
 
 namespace Nicodem.Backend
 {
+    /// <summary>
+    /// This is main back-end class. Use it to go through back-end compilation phase.
+    /// </summary>
     public class Backend
     {
         private static int MAX_ALLOC_TRY = 3;
 
+        /// <summary>
+        /// Construct trace for each function and then in a loop:
+        ///     - generate the whole body of the function
+        ///     - select instructions
+        ///     - analyze liveness
+        ///     - allocate registers.
+        /// Loop untill success or MAX_ALLOC_TRY. After success - generate nasm.
+        /// </summary>
+        /// <returns>sequence of nasm instructions</returns>
+        /// <param name="funcList">List of backend functions created by frontend.</param>
         IEnumerable<string> FromFunctionsToNasm(IEnumerable<Function> funcList)
         {
             foreach (var f in funcList) {
