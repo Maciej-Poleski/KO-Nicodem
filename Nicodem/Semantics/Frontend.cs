@@ -22,13 +22,13 @@ namespace Nicodem.Semantics
         ///     Apply type checking.
         ///     Fill nested use flag (for variables inside nested functinsn).
         ///     Create backend function objects for each function.
-        ///     Split AST into functions.
+        ///     Get all functions from AST.
         ///     Extract controlflow.
         ///     Extract small controlflow (side effects).
         ///     Build backend trees.
         /// </summary>
         /// <param name="parseTree">Parse tree returned by parser.</param>
-        /// <returns>List of pairs: (function, backend tree).</returns>
+        /// <returns>List of backend functions.</returns>
         public IEnumerable<Backend.Function>
             FromParseTreeToBackend<TSymbol> (IParseTree<TSymbol> parseTree) where TSymbol:ISymbol<TSymbol>
         {
@@ -39,7 +39,7 @@ namespace Nicodem.Semantics
             ast.Accept(new TypeCheckVisitor());
             ast.FillInNestedUseFlag();
             ast.Accept(new FunctionLocalVisitor(new Backend.Target())); // create backend function objects
-            // split into functions
+            // get all functions from AST
             IEnumerable<FunctionDefinitionNode> funcList = ast.GetAllFunctionDefinitions();
 
             // for each function -> extract controlflow (controlflow graph = expression graph)
