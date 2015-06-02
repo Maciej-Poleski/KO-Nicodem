@@ -8,8 +8,8 @@ namespace Nicodem.Semantics.AST
 {
     class OperatorNode : ExpressionNode
 	{
-		public OperatorType Operator { get; set; }
-        public IEnumerable<ExpressionNode> Arguments { get; set; }
+        public OperatorType Operator { get; set; } // set during AST construction
+        public IEnumerable<ExpressionNode> Arguments { get; set; } // set during AST construction
 
         #region implemented abstract members of Node
 

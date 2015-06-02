@@ -5,7 +5,7 @@ using Nicodem.Semantics.ExpressionGraph;
 
 namespace Nicodem.Semantics.AST
 {
-    // TODO: how to use this?
+    // TODO: arrays implementation (how to use this?)
 	class ArrayNode : ConstNode
 	{
 		public IEnumerable<ExpressionNode> Elements { get; set; }

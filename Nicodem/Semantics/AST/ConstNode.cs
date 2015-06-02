@@ -10,10 +10,10 @@ namespace Nicodem.Semantics.AST
     /// </summary>
 	abstract class ConstNode : ExpressionNode
 	{
-		public TypeNode VariableType { get; private set; }
+        public TypeNode VariableType { get; private set; } // set during AST construction (in constructor)
 
         /// <value>Value of this constant.</value> 
-        public string Value { get; set; } // TODO: store it as string?
+        public string Value { get; set; } // set during AST construction TODO: store it as string?
 
         /// <summary>The only way to construct this node. Type cannot be unspecified.</summary>
 		/// <param name="type">Type.</param>
@@ -37,7 +37,7 @@ namespace Nicodem.Semantics.AST
                     type = NamedTypeNode.CharType();
                     break;
                 case "StringLiteral":
-                    throw new NotImplementedException(); // TODO: how to represent strings?
+                    throw new NotImplementedException(); // TODO: strings implementation
                 case "BooleanLiteral":
                     type = NamedTypeNode.BoolType();
                     break;

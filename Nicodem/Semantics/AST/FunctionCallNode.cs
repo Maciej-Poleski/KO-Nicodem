@@ -7,8 +7,8 @@ namespace Nicodem.Semantics.AST
 {
 	class FunctionCallNode : ExpressionNode
 	{
-		public string Name { get; set; }
-		public IReadOnlyList<ExpressionNode> Arguments { get; set; }
+        public string Name { get; set; }  // set during AST construction
+        public IReadOnlyList<ExpressionNode> Arguments { get; set; }  // set during AST construction
         public FunctionDefinitionNode Definition { get; set; }
 
         #region implemented abstract members of Node

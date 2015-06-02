@@ -9,9 +9,9 @@ namespace Nicodem.Semantics.AST
         // type of elements of this arrays
         public TypeNode ElementType { get; set; } // set during AST construction
 
-        // TODO: currently all arrays are initialized as dynamic (not fixed sized)
+        // TODO: arrays implementation - currently all arrays are initialized as dynamic (not fixed sized)
         public bool IsFixedSize { get; set; } // set during AST construction
-		//public int Length { get; set; } // TODO: currently lengths of arrays are not defined
+        //public int Length { get; set; } // TODO: arrays implementation - currently lengths of arrays are not defined
         // there is only expression which can represent length
         public ExpressionNode LengthExpression { get; set; } // set during AST construction
 

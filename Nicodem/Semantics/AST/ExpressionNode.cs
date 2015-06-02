@@ -79,7 +79,7 @@ namespace Nicodem.Semantics.AST
                         var args = new LinkedList<ExpressionNode>();
                         while (!ASTBuilder.EatSymbol("(", opExpr))
                         {
-                            ASTBuilder.EatSymbol(",", opExpr); // eat ',' before arg - remember f(x,y,z,) case
+                            ASTBuilder.EatSymbol(",", opExpr); // eat ',' before arg - f(x,y,z,) is also possible
                             args.AddFirst(GetExpressionNode(opExpr.Current));
                             opExpr.MoveNext(); // move to next param with ','
                         }
@@ -142,15 +142,14 @@ namespace Nicodem.Semantics.AST
                     atomic = new VariableDefNode();
                     break;
                 case "ArrayLiteralExpression":
-                    throw new System.NotImplementedException(); // TODO: yet!
+                    throw new System.NotImplementedException(); // TODO: arrays implementation
                 case "ObjectUseExpression":
                     // ObjectUseExpression -> ObjectName | Literals
                     node = ASTBuilder.FirstChild(node);
                     if (node.Symbol.IsTerminal) { // ObjectName
                         atomic = new VariableUseNode();
                     } else { // Literals
-                        // Literals -> one of available literals
-                        node = ASTBuilder.FirstChild(node);
+                        node = ASTBuilder.FirstChild(node); // Literals -> one of available literals
                         atomic = ConstNode.GetConstNode(node);
                     }
                     break;
@@ -201,8 +200,6 @@ namespace Nicodem.Semantics.AST
             node = ASTBuilder.FirstChild(node); // OperatorExpression -> Operator17Expression
             node = ASTBuilder.FirstChild(node); // Operator17Expression -> Operator16Expression
             node = ASTBuilder.FirstChild(node); // Operator16Expression -> Operator15Expression
-
-            // TODO: what about operator "="? variable def?
             return ResolveOperatorExpression(node, 15); // node is operator 15
         }
 
