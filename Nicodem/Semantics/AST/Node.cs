@@ -2,6 +2,7 @@ using Nicodem.Source;
 using Nicodem.Parser;
 using Nicodem.Semantics.Visitors;
 using Nicodem.Semantics.ExpressionGraph;
+using System;
 
 namespace Nicodem.Semantics.AST
 {
@@ -20,6 +21,24 @@ namespace Nicodem.Semantics.AST
         {
             return visitor.Visit(this);
         }
+        
+        /* Not implemented yet.
+        // Ignores Fragments.
+        public override bool Equals(object obj)
+        {
+            return Compare(obj);
+        }
+
+        protected bool Compare(Node rhs)
+        {
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            throw new NotImplementedException();
+        }
+         * */
 	}
 }
 
