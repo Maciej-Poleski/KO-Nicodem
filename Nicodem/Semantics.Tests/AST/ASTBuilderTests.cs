@@ -199,8 +199,8 @@ namespace Semantics.Tests
             return 
                 Wrap(P.Expression,
                 Wrap(P.OperatorExpression,
-                Operators(17, 6, new ParseTree[] {  
-                    NumberAtomicExpression(),
+                Operators(17, 6, new ParseTree[] {
+                    Operators(5, 0, NumberAtomicExpression()),
                     Str("+"),
                     Wrap(P.Operator5Expression, new ParseTree[] {
                         Operators(4, 0, NumberAtomicExpression()),
