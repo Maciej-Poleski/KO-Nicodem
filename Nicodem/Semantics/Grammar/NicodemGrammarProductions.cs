@@ -208,13 +208,13 @@ namespace Nicodem.Semantics.Grammar
         private static readonly string NameWithoutOperators = NameBase.RemoveInfixes(PreparedOperators);
 
         // Literal values (atomic expression)
-        private static readonly TokenCategory DecimalNumberLiteralToken = "[:digit:]+"; // Only decimal number literals for now
-        private static readonly TokenCategory CharacterLiteralToken = "'(\\\\[:print:])|[^']'";
-        private static readonly TokenCategory StringLiteralToken = "\"((\\\\.)|[^\"])*\"";
+        internal static readonly TokenCategory DecimalNumberLiteralToken = "[:digit:]+"; // Only decimal number literals for now
+        internal static readonly TokenCategory CharacterLiteralToken = "'(\\\\[:print:])|[^']'";
+        internal static readonly TokenCategory StringLiteralToken = "\"((\\\\.)|[^\"])*\"";
         // String literal is delimited by not escaped " character
-        private static readonly TokenCategory BooleanLiteralToken = "true|false";
+        internal static readonly TokenCategory BooleanLiteralToken = "true|false";
 
-        private static readonly TokenCategory[] LiteralTokens =
+        internal static readonly TokenCategory[] LiteralTokens =
         {
             DecimalNumberLiteralToken, CharacterLiteralToken, StringLiteralToken,
             BooleanLiteralToken

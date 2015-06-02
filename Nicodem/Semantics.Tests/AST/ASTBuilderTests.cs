@@ -135,6 +135,11 @@ namespace Semantics.Tests
             return new ParseBranch<Symbol>(dummyFrag, Cast(symbol), dummyProd, wrapped);
         }
 
+        private ParseTree Wrap(UniversalSymbol symbol, string code, ParseTree wrapped)
+        {
+            return new ParseBranch<Symbol>(new DummyFragment(code), Cast(symbol), dummyProd, new ParseTree[] { wrapped });
+        }
+
         private ParseTree Leaf(UniversalSymbol symbol, string code)
         {
             return new ParseLeaf<Symbol>(new DummyFragment(code), Cast(symbol));
@@ -164,7 +169,9 @@ namespace Semantics.Tests
             return
                 Wrap(P.AtomicExpression,
                 Wrap(P.ObjectUseExpression,
-                Leaf(P.Literals, "42")));
+                Wrap(P.Literals,
+                Wrap(P.DecimalNumberLiteral, "DecimalNumberLiteral",
+                Leaf(P.DecimalNumberLiteralToken, "")))));
         }
 
         private ParseTree NumberExpression()
