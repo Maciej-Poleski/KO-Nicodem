@@ -13,23 +13,23 @@ namespace Nicodem.Semantics.AST
 
         #region implemented abstract members of Node
 
-        public static OperatorNode BuildUnaryOperator(string op, ExpressionNode arg)
+        public static OperatorNode BuildUnaryOperator(int level, string op, ExpressionNode arg)
         {
             var opNode = new OperatorNode();
             var args = new LinkedList<ExpressionNode>();
             args.AddLast(arg);
             opNode.Arguments = args;
-            opNode.Operator = OperatorTypeHelper.GetOperatorType(op);
+            opNode.Operator = OperatorTypeHelper.GetOperatorType(level, op);
             return opNode;
         }
 
-        public static OperatorNode BuildBinaryOperator(string op, ExpressionNode left, ExpressionNode right){
+        public static OperatorNode BuildBinaryOperator(int level, string op, ExpressionNode left, ExpressionNode right){
             var opNode = new OperatorNode();
             var args = new LinkedList<ExpressionNode>();
             args.AddLast(left);
             args.AddLast(right);
             opNode.Arguments = args;
-            opNode.Operator = OperatorTypeHelper.GetOperatorType(op);
+            opNode.Operator = OperatorTypeHelper.GetOperatorType(level, op);
             return opNode;
         }
 

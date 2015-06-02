@@ -20,21 +20,21 @@ namespace Nicodem.Semantics.AST
         /// positioned before first operator.
         /// </summary>
         /// <returns>Expression precedes with given operators.</returns>
-        public static ExpressionNode AddPrefixOperators<TSymbol>(ExpressionNode expr, IEnumerator<IParseTree<TSymbol>> operators) 
+        public static ExpressionNode AddPrefixOperators<TSymbol>(int opLevel, ExpressionNode expr, IEnumerator<IParseTree<TSymbol>> operators) 
             where TSymbol : ISymbol<TSymbol>
         {
             ExpressionNode lastNode = expr;
             while (operators.MoveNext())
             {
                 string opText = operators.Current.Fragment.GetOriginText();
-                lastNode = OperatorNode.BuildUnaryOperator(opText, lastNode);
+                lastNode = OperatorNode.BuildUnaryOperator(opLevel, opText, lastNode);
             }
             return lastNode;
         }
 
         /// <summary>
-        /// Parse one line expression with opLevel-expressions and binary operators (between them). If you want to parse leftToRight
-        /// operator - provide enumerator with reversed order of arguments.
+        /// Parse one line expression with opLevel-expressions and binary operators (from one level above) between them. 
+        /// If you want to parse leftToRight operator - provide enumerator with reversed order of arguments.
         /// </summary>
         public static ExpressionNode ParseBinOperator<TSymbol>(IEnumerator<IParseTree<TSymbol>> opExpr, int opLevel, bool leftToRight) 
             where TSymbol:ISymbol<TSymbol>
@@ -49,8 +49,8 @@ namespace Nicodem.Semantics.AST
                 var rightArg = ParseBinOperator(opExpr, opLevel, leftToRight);
                 // build and return binary operator
                 return leftToRight ?
-                    OperatorNode.BuildBinaryOperator(opText, rightArg, leftArg) : // if left-to-right, reversed arguments
-                    OperatorNode.BuildBinaryOperator(opText, leftArg, rightArg); // right-to-left, normal order
+                    OperatorNode.BuildBinaryOperator(opLevel+1, opText, rightArg, leftArg) : // if left-to-right, reversed arguments
+                    OperatorNode.BuildBinaryOperator(opLevel+1, opText, leftArg, rightArg); // right-to-left, normal order
             } else { // last arg - just return it
                 return leftArg;
             }
@@ -74,7 +74,7 @@ namespace Nicodem.Semantics.AST
                 {
                     case "++":
                     case "--":
-                        return OperatorNode.BuildUnaryOperator(curText, ParseOperator2(opExpr));
+                        return OperatorNode.BuildUnaryOperator(2, curText, ParseOperator2(opExpr));
                     case ")":
                         var args = new LinkedList<ExpressionNode>();
                         while (!ASTBuilder.EatSymbol("(", opExpr))
@@ -145,9 +145,12 @@ namespace Nicodem.Semantics.AST
                     throw new System.NotImplementedException(); // TODO: yet!
                 case "ObjectUseExpression":
                     // ObjectUseExpression -> ObjectName | Literals
-                    if (parseTree.Symbol.IsTerminal) { // ObjectName
+                    node = ASTBuilder.FirstChild(node);
+                    if (node.Symbol.IsTerminal) { // ObjectName
                         atomic = new VariableUseNode();
                     } else { // Literals
+                        // Literals -> one of available literals
+                        node = ASTBuilder.FirstChild(node);
                         atomic = ConstNode.GetConstNode(node);
                     }
                     break;
@@ -182,12 +185,13 @@ namespace Nicodem.Semantics.AST
                 // continue parsing lower level expressions
                 Debug.Assert(opLevel == OP_BOTTOM_LEVEL); // op level must be 4
                 var node = ASTBuilder.FirstChild(parseTree); // Operator4Expression -> Operator3Expression
+                // Operator3Expression -> (prefix_operator)* Operator2Expression
                 var childs = ASTBuilder.Children(node).Reverse().GetEnumerator();
                 Debug.Assert(childs.MoveNext());
                 var op2 = childs.Current; // last child -> Operator2Expression
                 var op2Childs = ASTBuilder.RevChildrenEnumerator(op2);
                 Debug.Assert(op2Childs.MoveNext());
-                return AddPrefixOperators(ParseOperator2(op2Childs), childs);
+                return AddPrefixOperators(3, ParseOperator2(op2Childs), childs);
             }
         }
 

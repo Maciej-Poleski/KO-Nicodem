@@ -26,7 +26,7 @@ namespace Nicodem.Semantics.AST
 
         public static ConstNode GetConstNode<TSymbol>(IParseTree<TSymbol> parseTree) where TSymbol:ISymbol<TSymbol>
         {
-            // Literals -> DecimalNumberLiteral | CharacterLiteral | StringLiteral | BooleanLiteral
+            // one of: DecimalNumberLiteral | CharacterLiteral | StringLiteral | BooleanLiteral
             TypeNode type;
             switch (ASTBuilder.GetName(parseTree.Symbol))
             {

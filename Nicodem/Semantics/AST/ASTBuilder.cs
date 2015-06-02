@@ -64,8 +64,8 @@ namespace Nicodem.Semantics.AST
 
         public static string GetInformation<TSymbol>(ISymbol<TSymbol> symbol)
         {
-            Console.WriteLine("GET: " + symbol.Description+ " -> " + string.Join(",", symbol.Description.Split(new char[] { '-' }, 2)));
-            return symbol.Description.Split(new char[] { '-' }, 2)[1];
+            var splitted = symbol.Description.Split(new char[] { '-' }, 2);
+            return (splitted.Length > 1) ? splitted[1] : "";
         }
 
         public static bool IsLeftOperator<TSymbol>(ISymbol<TSymbol> symbol)
