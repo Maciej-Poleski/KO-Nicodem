@@ -14,7 +14,8 @@ namespace Semantics.Tests.Extractors
     class ControlFlowExtractorTests
     {
 
-        private OperatorNode MakeOperator(OperatorType _operator, params ExpressionNode[] _arguments){
+        private OperatorNode MakeOperator(OperatorType _operator, params ExpressionNode[] _arguments)
+        {
             OperatorNode made_one = new OperatorNode();
             made_one.Arguments = new List<ExpressionNode>(_arguments);
             made_one.Operator = _operator;
@@ -41,15 +42,15 @@ namespace Semantics.Tests.Extractors
             //a+(if(a>3){a+2;}else{a+5;})+5;
             //]
 
-            OperatorNode first_statement = MakeOperator(OperatorType.PLUS, Var("a"), Var("2"));
+            OperatorNode first_statement = Utils.Add(Var("a"), Var("2"));
             OperatorNode _a_gret_3 = MakeOperator(OperatorType.GREATER, Var("a"),  Var("3"));
-            OperatorNode _a_plus_2 = MakeOperator(OperatorType.PLUS,  Var("a"),  Var("2"));
-            OperatorNode _a_plus_5 = MakeOperator(OperatorType.PLUS,  Var("a"),  Var("5"));
+            OperatorNode _a_plus_2 = Utils.Add(Var("a"),  Var("2"));
+            OperatorNode _a_plus_5 = Utils.Add(Var("a"),  Var("5"));
             IfNode _if = new IfNode();
             _if.Condition = _a_gret_3;
             _if.Then = _a_plus_2;
             _if.Else = _a_plus_5;
-            OperatorNode second_statement = MakeOperator(OperatorType.PLUS,  Var("a"), MakeOperator(OperatorType.PLUS, _if,  Var("5")));
+            OperatorNode second_statement = Utils.Add(Var("a"), Utils.Add(_if,  Var("5")));
             BlockExpressionNode _if_block = new BlockExpressionNode();
             _if_block.Elements = new List<ExpressionNode> { first_statement, second_statement };
 
@@ -76,13 +77,13 @@ namespace Semantics.Tests.Extractors
             //]
 
             OperatorNode a_less_3 = MakeOperator(OperatorType.LESS,  Var("a"), Var("3"));
-            OperatorNode a_plus_1 = MakeOperator(OperatorType.PLUS,  Var("a"), Var("1"));
-            OperatorNode a_plus_5 = MakeOperator(OperatorType.PLUS,  Var("a"), Var("5"));
+            OperatorNode a_plus_1 = Utils.Add(Var("a"), Var("1"));
+            OperatorNode a_plus_5 = Utils.Add(Var("a"), Var("5"));
             WhileNode _while = new WhileNode();
             _while.Condition = a_less_3;
             _while.Body = a_plus_1;
             _while.Else = a_plus_5;
-            OperatorNode _first_statement = MakeOperator(OperatorType.MINUS, Var("a"), MakeOperator(OperatorType.PLUS, _while, Var("5")));
+            OperatorNode _first_statement = Utils.Sub(Var("a"), Utils.Add(_while, Var("5")));
             
             OperatorNode _second_statement = MakeOperator(OperatorType.MUL, Var("a"), Var("2"));
 
