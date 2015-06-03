@@ -334,10 +334,14 @@ namespace Nicodem.Semantics.Visitors
 
             List<Vertex> while_graph_vertex = new List<Vertex>();
 
+            OperatorNode assign_body = new OperatorNode();
+            assign_body.Operator = OperatorType.ASSIGN;
+            assign_body.Arguments = new List<ExpressionNode> { t_use, node.Body };
+
             ConditionalJumpVertex condition_vertex = new ConditionalJumpVertex(null, null, node.Condition);
             while_graph_vertex.Add(condition_vertex);
 
-            OneJumpVertex body_vertex = new OneJumpVertex(condition_vertex, node.Body);
+            OneJumpVertex body_vertex = new OneJumpVertex(condition_vertex, assign_body);
             while_graph_vertex.Add(body_vertex);
 
             OneJumpVertex end_while_vertex = new OneJumpVertex(null, new BlockExpressionNode());
@@ -347,7 +351,11 @@ namespace Nicodem.Semantics.Visitors
 
             if (node.HasElse)
             {
-                OneJumpVertex else_vertex = new OneJumpVertex(end_while_vertex, node.Else);
+                OperatorNode assign_else = new OperatorNode();
+                assign_else.Operator = OperatorType.ASSIGN;
+                assign_else.Arguments = new List<ExpressionNode> { t_use, node.Else };
+
+                OneJumpVertex else_vertex = new OneJumpVertex(end_while_vertex, assign_else);
                 while_graph_vertex.Add(else_vertex);
                 condition_vertex.FalseJump = else_vertex;
             }
@@ -359,6 +367,9 @@ namespace Nicodem.Semantics.Visitors
             while_graph_vertex.Add(end_while_vertex);
 
             sub_graph = SubExpressionGraph.ConcatSubGraph(sub_graph, new SubExpressionGraph(condition_vertex, while_graph_vertex, end_while_vertex, true, new SubExpressionGraph()));
+
+            sub_graph.Temporary = t_use;
+            temporary_counter++;
 
             if (while_for_loop_control.ContainsKey(LoopControlMode.LCM_BREAK) && while_for_loop_control[LoopControlMode.LCM_BREAK].ContainsKey(node))
                 foreach (var loop_control_vertex in while_for_loop_control[LoopControlMode.LCM_BREAK][node])
