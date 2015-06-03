@@ -50,7 +50,7 @@ namespace Semantics.Tests.Visitors
          * 2. [1; "s"; 2] - Int
          */
         [Test]
-        public void TypeCheck_BlockExpressionEmpty_Tests()
+        public void TypeCheck_BlockExpressionEmpty_Test()
         {
             var _block_exp = Utils.body();
 
@@ -61,17 +61,58 @@ namespace Semantics.Tests.Visitors
         }
 
         [Test]
-        public void TypeCheck_BlockExpressionThreeElements_Tests()
+        public void TypeCheck_BlockExpressionThreeElements_Test()
         {
-            var _1 = Utils.Usage(Utils.Declaration("1", Utils.MakeConstantInt()));
-            var _s = Utils.Usage(Utils.Declaration("s", Utils.MakeConstantChar()));
-            var _2 = Utils.Usage(Utils.Declaration("2", Utils.MakeConstantInt()));
-            var _block_exp = Utils.body(_1, _s, _2);
+            var _block_exp = Utils.body(Utils.IntLiteral(1), Utils.CharLiteral('s'), Utils.IntLiteral(2));
 
             _block_exp.Accept(new TypeCheckVisitor());
 
             Assert.NotNull(_block_exp.ExpressionType);
             Assert.IsTrue(TypeNode.Compare(_block_exp.ExpressionType, Utils.MakeConstantInt()));
+        }
+
+        /*
+         * Atom
+         * 1. Int
+         * 2. Char
+         * 3. Byte
+         * 
+         */
+        [Test]
+        public void TypeCheck_AtomInt_Test()
+        {
+            var _atom_int = Utils.IntLiteral(1);
+
+            _atom_int.Accept(new TypeCheckVisitor());
+
+            Assert.NotNull(_atom_int.ExpressionType);
+            Assert.IsTrue(TypeNode.Compare(_atom_int.ExpressionType, Utils.MakeConstantInt()));
+        }
+
+
+        [Test]
+        public void TypeCheck_AtomChar_Test()
+        {
+            
+            var _atom_char = Utils.CharLiteral('s');
+
+            _atom_char.Accept(new TypeCheckVisitor());
+
+            Assert.NotNull(_atom_char.ExpressionType);
+            Assert.IsTrue(TypeNode.Compare(_atom_char.ExpressionType, Utils.MakeConstantChar()));
+        }
+
+
+        [Test]
+        public void TypeCheck_AtomByte_Test()
+        {
+            
+            var _atom_byte = Utils.ByteLiteral(1);
+
+            _atom_byte.Accept(new TypeCheckVisitor());
+
+            Assert.NotNull(_atom_byte.ExpressionType);
+            Assert.IsTrue(TypeNode.Compare(_atom_byte.ExpressionType, Utils.MakeConstantByte()));
         }
 	}
 }
