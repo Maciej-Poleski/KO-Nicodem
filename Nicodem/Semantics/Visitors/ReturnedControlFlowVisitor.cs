@@ -344,7 +344,7 @@ namespace Nicodem.Semantics.Visitors
             OneJumpVertex body_vertex = new OneJumpVertex(condition_vertex, assign_body);
             while_graph_vertex.Add(body_vertex);
 
-            OneJumpVertex end_while_vertex = new OneJumpVertex(null, new BlockExpressionNode());
+            OneJumpVertex end_while_vertex = new OneJumpVertex(null, t_use);
 
             condition_vertex.TrueJump = body_vertex;
             body_vertex.Jump = begin_while.Start;
