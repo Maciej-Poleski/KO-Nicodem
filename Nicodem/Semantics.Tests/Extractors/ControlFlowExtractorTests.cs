@@ -21,6 +21,13 @@ namespace Semantics.Tests.Extractors
             return made_one;
         }
 
+        private VariableUseNode Var(String s)
+        {
+            VariableUseNode _var = new VariableUseNode();
+            _var.Name = s;
+            return _var;
+        }
+
         [TestFixtureSetUp]
         public void InitAST()
         {
@@ -29,25 +36,20 @@ namespace Semantics.Tests.Extractors
         [Test]
         public void ControlFlowExtractorSimpleIfTest()
         {
-            VariableUseNode _a = new VariableUseNode();
-            _a.Name = "a";
-            VariableUseNode _2 = new VariableUseNode();
-            _2.Name = "2";
-            VariableUseNode _3 = new VariableUseNode();
-            _3.Name = "3";
-            VariableUseNode _5 = new VariableUseNode();
-            _5.Name = "5";
+            //[
+            //a+2; 
+            //a+(if(a>3){a+2;}else{a+5;})+5;
+            //]
 
-            //build simple ast for a+2; a+(if(a>3){a+2;}else{a+5;})+5;
-            OperatorNode first_statement = MakeOperator(OperatorType.PLUS, _a, _2);
-            OperatorNode _a_gret_3 = MakeOperator(OperatorType.GREATER, _a, _3);
-            OperatorNode _a_plus_2 = MakeOperator(OperatorType.PLUS, _a, _2);
-            OperatorNode _a_plus_5 = MakeOperator(OperatorType.PLUS, _a, _5);
+            OperatorNode first_statement = MakeOperator(OperatorType.PLUS, Var("a"), Var("2"));
+            OperatorNode _a_gret_3 = MakeOperator(OperatorType.GREATER, Var("a"),  Var("3"));
+            OperatorNode _a_plus_2 = MakeOperator(OperatorType.PLUS,  Var("a"),  Var("2"));
+            OperatorNode _a_plus_5 = MakeOperator(OperatorType.PLUS,  Var("a"),  Var("5"));
             IfNode _if = new IfNode();
             _if.Condition = _a_gret_3;
             _if.Then = _a_plus_2;
             _if.Else = _a_plus_5;
-            OperatorNode second_statement = MakeOperator(OperatorType.PLUS, _a, MakeOperator(OperatorType.PLUS, _if, _5));
+            OperatorNode second_statement = MakeOperator(OperatorType.PLUS,  Var("a"), MakeOperator(OperatorType.PLUS, _if,  Var("5")));
             BlockExpressionNode _if_block = new BlockExpressionNode();
             _if_block.Elements = new List<ExpressionNode> { first_statement, second_statement };
 
@@ -63,6 +65,45 @@ namespace Semantics.Tests.Extractors
             Assert.IsTrue(cf_graph[5].Expression is OperatorNode);
 
             Assert.IsTrue(cf_graph[1] is ConditionalJumpVertex);
+        }
+
+        [Test]
+        public void ControlFlowExtractorSimpleWhileTest()
+        {
+            //[
+            //a-while(a<3){a+1}else{a+3}+5;
+            //a*2;
+            //]
+
+            OperatorNode a_less_3 = MakeOperator(OperatorType.LESS,  Var("a"), Var("3"));
+            OperatorNode a_plus_1 = MakeOperator(OperatorType.PLUS,  Var("a"), Var("1"));
+            OperatorNode a_plus_5 = MakeOperator(OperatorType.PLUS,  Var("a"), Var("5"));
+            WhileNode _while = new WhileNode();
+            _while.Condition = a_less_3;
+            _while.Body = a_plus_1;
+            _while.Else = a_plus_5;
+            OperatorNode _first_statement = MakeOperator(OperatorType.MINUS, Var("a"), MakeOperator(OperatorType.PLUS, _while, Var("5")));
+            
+            OperatorNode _second_statement = MakeOperator(OperatorType.MUL, Var("a"), Var("2"));
+
+            BlockExpressionNode _while_block = new BlockExpressionNode();
+            _while_block.Elements = new List<ExpressionNode>{_first_statement, _second_statement};
+
+            List<Vertex> cf_graph = new List<Vertex>(new ControlFlowExtractor().Extract(_while_block));
+
+            Assert.AreEqual(6, cf_graph.Count);
+
+            Assert.IsTrue(cf_graph[0].Expression is OperatorNode);
+            Assert.IsTrue(cf_graph[1].Expression is OperatorNode);
+            Assert.IsTrue(cf_graph[2].Expression is OperatorNode);
+            Assert.IsTrue(cf_graph[3].Expression is VariableUseNode);
+            Assert.IsTrue(cf_graph[4].Expression is OperatorNode);
+            Assert.AreEqual(OperatorType.MINUS, ((OperatorNode)cf_graph[4].Expression).Operator);
+            Assert.IsTrue(cf_graph[5].Expression is OperatorNode);
+            Assert.AreEqual(OperatorType.MUL, ((OperatorNode)cf_graph[5].Expression).Operator);
+
+            Assert.IsTrue(cf_graph[0] is ConditionalJumpVertex);
+
         }
         
     }
