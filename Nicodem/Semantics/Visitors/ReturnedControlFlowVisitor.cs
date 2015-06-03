@@ -172,11 +172,13 @@ namespace Nicodem.Semantics.Visitors
                 node.Else = ProcessSingleNode(node.Else, ref sub_graph);
 
             VariableDefNode t = new VariableDefNode();
+            t.ExpressionType = node.ExpressionType;
             t.Name = "T" + temporary_counter;
-            AtomNode _0 = new AtomNode(NamedTypeNode.IntType());
-            _0.Value = "0";
+            AtomNode _0 = new AtomNode(node.ExpressionType);
+            _0.Value = "";
             t.Value = _0;
             VariableUseNode t_use = new VariableUseNode();
+            t_use.ExpressionType = node.ExpressionType;
             t_use.Declaration = t;
             t_use.Name = "T" + temporary_counter;
 
@@ -318,6 +320,17 @@ namespace Nicodem.Semantics.Visitors
 
             if (node.HasElse)
                 node.Else = ProcessSingleNode(node.Else, ref sub_graph);
+
+            VariableDefNode t = new VariableDefNode();
+            t.ExpressionType = node.ExpressionType;
+            t.Name = "T" + temporary_counter;
+            AtomNode _0 = new AtomNode(node.ExpressionType);
+            _0.Value = "";
+            t.Value = _0;
+            VariableUseNode t_use = new VariableUseNode();
+            t_use.ExpressionType = node.ExpressionType;
+            t_use.Declaration = t;
+            t_use.Name = "T" + temporary_counter;
 
             List<Vertex> while_graph_vertex = new List<Vertex>();
 
