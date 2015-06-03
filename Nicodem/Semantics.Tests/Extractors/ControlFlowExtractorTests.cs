@@ -34,7 +34,7 @@ namespace Semantics.Tests.Extractors
         }
 
         [Test]
-        public void ControlFlowExtractorSimpleIfTest()
+        public void ControlFlowExtractor_SimpleIfInBlockExpression_Test()
         {
             //[
             //a+2; 
@@ -68,7 +68,7 @@ namespace Semantics.Tests.Extractors
         }
 
         [Test]
-        public void ControlFlowExtractorSimpleWhileTest()
+        public void ControlFlowExtractor_SimpleWhileInBlockExrpession_Test()
         {
             //[
             //a-while(a<3){a+1}else{a+3}+5;
@@ -104,6 +104,27 @@ namespace Semantics.Tests.Extractors
 
             Assert.IsTrue(cf_graph[0] is ConditionalJumpVertex);
 
+        }
+
+        [Test]
+        public void ControlFlowExtractor_SimpleFunctionCallWithoutBlockExpression_Test()
+        {
+            //f(a, 2, [5, 3], 4, 5, b, a);
+            BlockExpressionNode _block_expression = new BlockExpressionNode();
+            _block_expression.Elements = new List<ExpressionNode>{Var("5"), Var("3")};
+            FunctionCallNode _function_call = new FunctionCallNode();
+            _function_call.Arguments = new List<ExpressionNode> { Var("a"), Var("2"), _block_expression, Var("4"), Var("5"), Var("b"), Var("a") };
+
+            List<Vertex> cf_graph = new List<Vertex>(new ControlFlowExtractor().Extract(_function_call));
+
+            Assert.AreEqual(3, cf_graph.Count);
+
+            Assert.IsTrue(cf_graph[0].Expression is VariableUseNode);
+            Assert.AreEqual("5", ((VariableUseNode)cf_graph[4].Expression).Name);
+            Assert.IsTrue(cf_graph[1].Expression is VariableUseNode);
+            Assert.AreEqual("3", ((VariableUseNode)cf_graph[4].Expression).Name);
+            Assert.IsTrue(cf_graph[2].Expression is FunctionCallNode);
+            Assert.IsTrue(((FunctionCallNode)cf_graph[2].Expression).Arguments[2] is VariableUseNode);
         }
         
     }
