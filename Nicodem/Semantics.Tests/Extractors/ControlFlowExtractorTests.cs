@@ -120,9 +120,9 @@ namespace Semantics.Tests.Extractors
             Assert.AreEqual(3, cf_graph.Count);
 
             Assert.IsTrue(cf_graph[0].Expression is VariableUseNode);
-            Assert.AreEqual("5", ((VariableUseNode)cf_graph[4].Expression).Name);
+            Assert.AreEqual("5", ((VariableUseNode)cf_graph[0].Expression).Name);
             Assert.IsTrue(cf_graph[1].Expression is VariableUseNode);
-            Assert.AreEqual("3", ((VariableUseNode)cf_graph[4].Expression).Name);
+            Assert.AreEqual("3", ((VariableUseNode)cf_graph[1].Expression).Name);
             Assert.IsTrue(cf_graph[2].Expression is FunctionCallNode);
             Assert.IsTrue(((FunctionCallNode)cf_graph[2].Expression).Arguments[2] is VariableUseNode);
         }
