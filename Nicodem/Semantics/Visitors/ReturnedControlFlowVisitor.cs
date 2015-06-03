@@ -16,17 +16,6 @@ namespace Nicodem.Semantics.Visitors
         private Dictionary<LoopControlMode, Dictionary<WhileNode, List<Vertex>>> while_for_loop_control = new Dictionary<LoopControlMode, Dictionary<WhileNode, List<Vertex>>>();
         
         /// <summary>
-        /// Create simply SubExpressionGraph with one Vertex.
-        /// </summary>
-        /// <param name="node">ExpressionNode which should be in vertex</param>
-        /// <returns>SubExpressionGraph</returns>
-        private SubExpressionGraph CreateOneVertexSubGraph(ExpressionNode node)
-        {
-            var vertex = new OneJumpVertex(null, node);
-            return new SubExpressionGraph(vertex, new List<Vertex>{vertex}, vertex, false, new SubExpressionGraph());
-        }
-        
-        /// <summary>
         /// Check if there is If node, and we should update Value of node by temporary variable
         /// </summary>
         /// <param name="child">ExpressionNode</param>
@@ -79,7 +68,7 @@ namespace Nicodem.Semantics.Visitors
                 node.Elements = elements.Value;
             }
 
-            sub_graph.LastNode = CreateOneVertexSubGraph(node);
+            sub_graph.LastNode = node;
                
             return sub_graph;
         }
@@ -88,7 +77,7 @@ namespace Nicodem.Semantics.Visitors
         public override SubExpressionGraph Visit(AtomNode node)
         {
             var sub_graph = new SubExpressionGraph();
-            sub_graph.LastNode = CreateOneVertexSubGraph(node);
+            sub_graph.LastNode = node;
             return sub_graph;
         }
 
@@ -98,8 +87,20 @@ namespace Nicodem.Semantics.Visitors
             var sub_graph = new SubExpressionGraph();
             var new_elements = new List<ExpressionNode>();
 
+            VariableDefNode t = new VariableDefNode();
+            t.ExpressionType = node.ExpressionType;
+            t.Name = "T" + temporary_counter;
+            AtomNode _0 = new AtomNode(node.ExpressionType);
+            _0.Value = "";
+            t.Value = _0;
+            VariableUseNode t_use = new VariableUseNode();
+            t_use.ExpressionType = node.ExpressionType;
+            t_use.Declaration = t;
+            t_use.Name = "T" + temporary_counter;
+
             if (!ReferenceEquals(node.Elements, null))
             {
+                int counter = 0;
                 foreach (var child in node.Elements)
                     if (!ReferenceEquals(child, null))
                     {
@@ -107,11 +108,22 @@ namespace Nicodem.Semantics.Visitors
                         if (child_graph == null)
                             throw new Exception("SubGraph of child is null");
                         new_elements.Add(GetUpdatedExpressionNodeValue(child, child_graph));
-                        child_graph = SubExpressionGraph.ConcatSubGraph(child_graph, child_graph.LastNode);
+                        if (counter == node.Elements.Count() - 1)
+                        {
+                            OperatorNode _temp_assing = new OperatorNode();
+                            _temp_assing.Operator = OperatorType.ASSIGN;
+                            _temp_assing.Arguments = new List<ExpressionNode> { t_use, child_graph.LastNode };
+                            child_graph.LastNode = _temp_assing;
+                        }
+                        child_graph = SubExpressionGraph.ConcatSubGraph(child_graph, SubExpressionGraph.CreateOneVertexSubGraph(child_graph.LastNode));
                         sub_graph = SubExpressionGraph.ConcatSubGraph(sub_graph, child_graph);
                     }
                 node.Elements = new_elements;
             }
+
+            sub_graph.ContainsExtracted = true;
+            sub_graph.Temporary = t_use;
+            temporary_counter++;
 
             return sub_graph;
         }
@@ -127,7 +139,7 @@ namespace Nicodem.Semantics.Visitors
             if (!ReferenceEquals(node.Array, null))
                 ProcessSingleNode(node.Array, ref sub_graph);
 
-            sub_graph.LastNode = CreateOneVertexSubGraph(node);
+            sub_graph.LastNode = node;
 
             return sub_graph;
         }
@@ -144,7 +156,7 @@ namespace Nicodem.Semantics.Visitors
                 sub_graph = arguments.Key;
             }
 
-            sub_graph.LastNode = CreateOneVertexSubGraph(node);
+            sub_graph.LastNode = node;
 
             return sub_graph;
         }
@@ -153,7 +165,7 @@ namespace Nicodem.Semantics.Visitors
         public override SubExpressionGraph Visit(FunctionDefinitionNode node)
         {
             var sub_graph = new SubExpressionGraph();
-            sub_graph.LastNode = CreateOneVertexSubGraph(new BlockExpressionNode());
+            sub_graph.LastNode = new BlockExpressionNode();
             return sub_graph;
         }
 
@@ -211,7 +223,7 @@ namespace Nicodem.Semantics.Visitors
 
             vertex_in_if.Add(end_if);
 
-            var if_sub_graph = new SubExpressionGraph(condition_vertex, vertex_in_if, end_if, true, new SubExpressionGraph());
+            var if_sub_graph = new SubExpressionGraph(condition_vertex, vertex_in_if, end_if, true, null);
             sub_graph = SubExpressionGraph.ConcatSubGraph(sub_graph, if_sub_graph);
 
             sub_graph.Temporary = t_use;
@@ -232,7 +244,7 @@ namespace Nicodem.Semantics.Visitors
                 throw new Exception("Not enough whiles on stack.");
             WhileNode loop_control_while = while_stack[while_stack.Count - node.Depth - 1];
 
-            SubExpressionGraph loop_control_graph = CreateOneVertexSubGraph(node.Value);
+            SubExpressionGraph loop_control_graph = SubExpressionGraph.CreateOneVertexSubGraph(node.Value);
             OneJumpVertex loop_control_vertex = (OneJumpVertex)loop_control_graph.Start;
 
             if (while_for_loop_control.ContainsKey(node.Mode) && while_for_loop_control[node.Mode].ContainsKey(loop_control_while))
@@ -258,7 +270,7 @@ namespace Nicodem.Semantics.Visitors
                 sub_graph = arguments.Key;
             }
 
-            sub_graph.LastNode = CreateOneVertexSubGraph(node);
+            sub_graph.LastNode = node;
 
             return sub_graph;
         }
@@ -277,7 +289,7 @@ namespace Nicodem.Semantics.Visitors
             if (!ReferenceEquals(node.Array, null))
                 ProcessSingleNode(node.Array, ref sub_graph);
 
-            sub_graph.LastNode = CreateOneVertexSubGraph(node);
+            sub_graph.LastNode = node;
 
             return sub_graph;
         }
@@ -290,7 +302,7 @@ namespace Nicodem.Semantics.Visitors
             if (!ReferenceEquals(node.Value, null))
                 node.Value = ProcessSingleNode(node.Value, ref sub_graph);
 
-            sub_graph.LastNode = CreateOneVertexSubGraph(node);
+            sub_graph.LastNode = node;
 
             return sub_graph;
         }
@@ -299,7 +311,7 @@ namespace Nicodem.Semantics.Visitors
         public override SubExpressionGraph Visit(VariableUseNode node)
         {
             var sub_graph = new SubExpressionGraph();
-            sub_graph.LastNode = CreateOneVertexSubGraph(node);
+            sub_graph.LastNode = node;
             return sub_graph;
         }
 
@@ -310,7 +322,7 @@ namespace Nicodem.Semantics.Visitors
 
             var sub_graph = new SubExpressionGraph();
 
-            var begin_while = CreateOneVertexSubGraph(new BlockExpressionNode());
+            var begin_while = SubExpressionGraph.CreateOneVertexSubGraph(new BlockExpressionNode());
 
             if (!ReferenceEquals(node.Condition, null))
                 node.Condition = ProcessSingleNode(node.Condition, ref sub_graph);
@@ -366,7 +378,7 @@ namespace Nicodem.Semantics.Visitors
 
             while_graph_vertex.Add(end_while_vertex);
 
-            sub_graph = SubExpressionGraph.ConcatSubGraph(sub_graph, new SubExpressionGraph(condition_vertex, while_graph_vertex, end_while_vertex, true, new SubExpressionGraph()));
+            sub_graph = SubExpressionGraph.ConcatSubGraph(sub_graph, new SubExpressionGraph(condition_vertex, while_graph_vertex, end_while_vertex, true, null));
 
             sub_graph.Temporary = t_use;
             temporary_counter++;

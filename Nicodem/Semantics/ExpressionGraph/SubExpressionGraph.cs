@@ -35,11 +35,11 @@ namespace Nicodem.Semantics.ExpressionGraph
         /// <summary>
         /// Last node added to graph.
         /// </summary>
-        public SubExpressionGraph LastNode = null;
+        public ExpressionNode LastNode = null;
 
         public SubExpressionGraph(){ }
 
-        public SubExpressionGraph(Vertex _start, List<Vertex> _graph, Vertex _end, bool _containsExtracted, SubExpressionGraph _lastNode)
+        public SubExpressionGraph(Vertex _start, List<Vertex> _graph, Vertex _end, bool _containsExtracted, ExpressionNode _lastNode)
         {
             Start = _start;
             Graph = _graph;
@@ -57,7 +57,7 @@ namespace Nicodem.Semantics.ExpressionGraph
             return new SubExpressionGraph(Start, Graph, End, ContainsExtracted, LastNode);
         }
 
-        public SubExpressionGraph SetLastNode(SubExpressionGraph _lastNode){
+        public SubExpressionGraph SetLastNode(ExpressionNode _lastNode){
             LastNode = _lastNode;
             return this;
         }
@@ -87,7 +87,20 @@ namespace Nicodem.Semantics.ExpressionGraph
                 throw new Exception("End Conditional Vertex");
             ((OneJumpVertex)current.End).Jump = next.Start;
             
-            return new SubExpressionGraph(current.Start, new List<Vertex>(current.Graph.Concat(next.Graph)), next.End, current.ContainsExtracted || next.ContainsExtracted, new SubExpressionGraph());
+            return new SubExpressionGraph(current.Start, new List<Vertex>(current.Graph.Concat(next.Graph)), next.End, current.ContainsExtracted || next.ContainsExtracted, null);
+        }
+
+        /// <summary>
+        /// Create simply SubExpressionGraph with one Vertex.
+        /// </summary>
+        /// <param name="node">ExpressionNode which should be in vertex</param>
+        /// <returns>SubExpressionGraph</returns>
+        public static SubExpressionGraph CreateOneVertexSubGraph(ExpressionNode node)
+        {
+            if (node == null)
+                return new SubExpressionGraph();
+            var vertex = new OneJumpVertex(null, node);
+            return new SubExpressionGraph(vertex, new List<Vertex> { vertex }, vertex, false, null);
         }
     }
 }

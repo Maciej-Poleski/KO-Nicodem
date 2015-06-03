@@ -24,7 +24,7 @@ namespace Nicodem.Semantics.Extractors
         {
             var visitor = new ReturnedControlFlowVisitor();
             var graph = root.Accept(visitor);
-            return SubExpressionGraph.ConcatSubGraph(graph, graph.LastNode).Graph;
+            return SubExpressionGraph.ConcatSubGraph(graph, SubExpressionGraph.CreateOneVertexSubGraph(graph.LastNode)).Graph;
         }
     }
 }
