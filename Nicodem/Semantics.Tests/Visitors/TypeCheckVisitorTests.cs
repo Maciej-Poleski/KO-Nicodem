@@ -43,6 +43,36 @@ namespace Semantics.Tests.Visitors
 			Assert.NotNull (ifst.ExpressionType);
 			Assert.IsTrue (TypeNode.Compare(ifst.ExpressionType, then.ExpressionType));
 		}
+
+        /*
+         * Block Expression 
+         * 1. [] - Void
+         * 2. [1; "s"; 2] - Int
+         */
+        [Test]
+        public void TypeCheck_BlockExpressionEmpty_Tests()
+        {
+            var _block_exp = Utils.body();
+
+            _block_exp.Accept(new TypeCheckVisitor());
+
+            Assert.NotNull(_block_exp.ExpressionType);
+            Assert.IsTrue(TypeNode.Compare(_block_exp.ExpressionType, Utils.MakeConstantVoid()));
+        }
+
+        [Test]
+        public void TypeCheck_BlockExpressionThreeElements_Tests()
+        {
+            var _1 = Utils.Usage(Utils.Declaration("1", Utils.MakeConstantInt()));
+            var _s = Utils.Usage(Utils.Declaration("s", Utils.MakeConstantChar()));
+            var _2 = Utils.Usage(Utils.Declaration("2", Utils.MakeConstantInt()));
+            var _block_exp = Utils.body(_1, _s, _2);
+
+            _block_exp.Accept(new TypeCheckVisitor());
+
+            Assert.NotNull(_block_exp.ExpressionType);
+            Assert.IsTrue(TypeNode.Compare(_block_exp.ExpressionType, Utils.MakeConstantInt()));
+        }
 	}
 }
 
