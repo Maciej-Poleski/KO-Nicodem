@@ -55,6 +55,39 @@ namespace Nicodem.Semantics.AST
             //ELemenent type + isFixedSize + Length Expression
             return this.ElementType.GetHashCode();
         }
+
+
+        public static ArrayTypeNode MakeType(TypeNode typeNode)
+        {
+            var _ret = new ArrayTypeNode();
+            _ret.ElementType = typeNode;
+            return _ret;
+        }
+
+        public static ArrayTypeNode BoolType()
+        {
+            return MakeType(NamedTypeNode.BoolType());
+        }
+
+        public static ArrayTypeNode ByteType()
+        {
+            return MakeType(NamedTypeNode.ByteType());
+        }
+
+        public static ArrayTypeNode CharType()
+        {
+            return MakeType(NamedTypeNode.CharType());
+        }
+
+        public static ArrayTypeNode IntType()
+        {
+            return MakeType(NamedTypeNode.IntType());
+        }
+
+        public static ArrayTypeNode VoidType()
+        {
+            return MakeType(NamedTypeNode.VoidType());
+        }
 	}
 }
 
