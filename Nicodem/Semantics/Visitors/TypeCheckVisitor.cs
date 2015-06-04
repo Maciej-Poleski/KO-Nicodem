@@ -47,7 +47,7 @@ namespace Nicodem.Semantics.Visitors
 				_set_of_types.Add (NamedTypeNode.IntType ());
 			}
             char out_char;
-            if (Char.TryParse(value, out out_char))
+            if (value.Length == 3 && Char.TryParse(value.Trim(new char[]{'\''}), out out_char))
                 _set_of_types.Add(NamedTypeNode.CharType());
             return _set_of_types;
         }
@@ -60,14 +60,7 @@ namespace Nicodem.Semantics.Visitors
 				throw new TypeCheckException ("Value is not set.");
 
             HashSet<TypeNode> deducedType = deduceType(node.Value);
-			bool contains = false;
-			foreach (var v in deducedType) {
-				if (v.Equals(node.VariableType)) {
-					contains = true;
-					break;
-				}
-			}
-			if (!contains)
+			if (!deducedType.Contains(node.VariableType))
 				throw new TypeCheckException ("Type of Const is not consistent with deduced Type.");
 
 			node.ExpressionType = node.VariableType;
