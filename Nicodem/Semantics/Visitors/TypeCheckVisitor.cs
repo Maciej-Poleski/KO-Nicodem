@@ -27,7 +27,7 @@ namespace Nicodem.Semantics.Visitors
             {
                 if (expression.ExpressionType == null)
                     throw new TypeCheckException("Array contains value with not specified type.");
-                if (!TypeNode.Compare(typeOfElementInArray,expression.ExpressionType))
+                if (!typeOfElementInArray.Equals(expression.ExpressionType))
                     throw new TypeCheckException("Improper Type of element in array.");
             }
             node.ExpressionType = node.VariableType;
@@ -62,7 +62,7 @@ namespace Nicodem.Semantics.Visitors
             HashSet<TypeNode> deducedType = deduceType(node.Value);
 			bool contains = false;
 			foreach (var v in deducedType) {
-				if (TypeNode.Compare (v, node.VariableType)) {
+				if (v.Equals(node.VariableType)) {
 					contains = true;
 					break;
 				}
