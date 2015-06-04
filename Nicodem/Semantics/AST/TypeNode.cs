@@ -63,25 +63,25 @@ namespace Nicodem.Semantics.AST
             return visitor.Visit(this);
         }
 
-        public static bool Compare(TypeNode a, TypeNode b){
-            if (a == null) 
-                return false;
-            if (b == null) 
-                return false;
-            if (!a.GetType().Equals(b.GetType()))
-                return false;
-            if (a is ArrayTypeNode && b is ArrayTypeNode)
-            {
-                if (TypeNode.Compare(((ArrayTypeNode)a).ElementType, ((ArrayTypeNode)b).ElementType))
-                    return true;
-            }
-            if (a is NamedTypeNode && b is NamedTypeNode)
-            {
-                if (((NamedTypeNode)a).Name.Equals(((NamedTypeNode)b).Name))
-                    return true;
-            }
-            return false;
-        }
+        //public static bool Compare(TypeNode a, TypeNode b){
+        //    if (a == null) 
+        //        return false;
+        //    if (b == null) 
+        //        return false;
+        //    if (!a.GetType().Equals(b.GetType()))
+        //        return false;
+        //    if (a is ArrayTypeNode && b is ArrayTypeNode)
+        //    {
+        //        if (TypeNode.Compare(((ArrayTypeNode)a).ElementType, ((ArrayTypeNode)b).ElementType))
+        //            return true;
+        //    }
+        //    if (a is NamedTypeNode && b is NamedTypeNode)
+        //    {
+        //        if (((NamedTypeNode)a).Name.Equals(((NamedTypeNode)b).Name))
+        //            return true;
+        //    }
+        //    return false;
+        //}
 	}
 }
 
