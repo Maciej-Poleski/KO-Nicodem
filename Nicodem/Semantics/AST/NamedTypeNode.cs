@@ -75,7 +75,7 @@ namespace Nicodem.Semantics.AST
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return this.Name.GetHashCode();
         }
 	}
 }
