@@ -44,7 +44,7 @@ namespace Nicodem.Semantics.AST
                 return false;
             if (obj is ArrayTypeNode)
             {
-                if (this.ElementType.Equals(((ArrayTypeNode)obj).ElementType))
+                if (TypeNode.Compare(this.ElementType, ((ArrayTypeNode)obj).ElementType))
                     return true;
             }
             return false;
