@@ -710,6 +710,8 @@ namespace Nicodem.Semantics.Grammar
         internal static UniversalSymbol Operator15Expression = NewNonterminal(RightToLeft);         // = += -= *= /= %= <<= >>= &= ^= |=
         internal static UniversalSymbol Operator16Expression = NewNonterminal(RightToLeft);         // throw (unimplemented)
         internal static UniversalSymbol Operator17Expression = NewNonterminal(LeftToRight);         // , (N/A)
+        internal static UniversalSymbol Operator18Expression = NewNonterminal(RightToLeft);         // if, while
+        internal static UniversalSymbol Operator19Expression = NewNonterminal(RightToLeft);         // Object definition
         internal static UniversalSymbol OperatorExpression = NewNonterminal();           // OperationNode
         internal static UniversalSymbol Expression = NewNonterminal();
         internal static UniversalSymbol ParametersList = NewNonterminal();               // NOTE: There is no such node in AST, flatten this
@@ -730,7 +732,12 @@ namespace Nicodem.Semantics.Grammar
             ObjectDeclaration.SetProduction(TypeSpecifier * ObjectName);
             TypeSpecifier.SetProduction(TypeName * ("mutable".Optional() * "[" * Expression.Optional * "]").Star * "mutable".Optional());
             Expression.SetProduction(OperatorExpression);
-            OperatorExpression.SetProduction(Operator17Expression);
+            OperatorExpression.SetProduction(Operator19Expression);
+            Operator19Expression.SetProduction(ObjectDefinitionExpression + Operator18Expression);
+            ObjectDefinitionExpression.SetProduction(TypeSpecifier * ObjectName * "=" * Expression);  // NOTE: "=" is _not_ an assignment operator here
+            Operator18Expression.SetProduction(IfExpression + WhileExpression + Operator17Expression);
+            IfExpression.SetProduction("if" * Expression * Expression * ("else" * Expression).Optional);
+            WhileExpression.SetProduction("while" * Expression * Expression * ("else" * Expression).Optional);
             Operator17Expression.SetProduction(Operator16Expression);
             Operator16Expression.SetProduction(Operator15Expression);
             Operator15Expression.SetProduction(MakeInfixOperatorExpressionRegex(Operator14Expression, "= += -= *= /= %= <<= >>= &= ^= |=".Split(' ')));
@@ -751,19 +758,13 @@ namespace Nicodem.Semantics.Grammar
             Operator0Expression.SetProduction(AtomicExpression + ("(" * Expression * ")"));
             AtomicExpression.SetProduction(
                 BlockExpression +
-                ObjectDefinitionExpression +
                 ArrayLiteralExpression +
                 ObjectUseExpression +
-                IfExpression +
-                WhileExpression +
                 LoopControlExpression
                 );
 			BlockExpression.SetProduction("{" * (Expression * ";").Star * "}");   // No left-recursion thanks to '{'
-            ObjectDefinitionExpression.SetProduction(TypeSpecifier * ObjectName * "=" * Expression);  // NOTE: "=" is _not_ an assignment operator here
             ArrayLiteralExpression.SetProduction("[" * (Expression * ",").Star * Expression.Optional * "]");
             ObjectUseExpression.SetProduction(ObjectName + Literals);
-            IfExpression.SetProduction("if" * Expression * Expression * ("else" * Expression).Optional);  // FIXME: if should be an operator
-            WhileExpression.SetProduction("while" * Expression * Expression * ("else" * Expression).Optional);    // the same here?
             LoopControlExpression.SetProduction(("break".Token() + "continue") * (Expression * DecimalNumberLiteral.Optional).Optional);
         }
 
