@@ -14,8 +14,12 @@ namespace Nicodem.Backend.Cover
 			IEnumerable<RegisterNode> defined)
 		{
 			instructionBuilder = builder;
-			RegistersUsed = used;
-			RegistersDefined = defined;
+			RegistersUsed = new HashSet<RegisterNode> ();
+			foreach (var node in used)
+				RegistersUsed.Add (node);
+			RegistersDefined = new HashSet<RegisterNode> ();
+			foreach(var node in defined)
+				RegistersDefined.Add(node);
 			IsCopyInstruction = false;
 			IsJumpInstruction = false;
 			IsLabel = false;
@@ -49,12 +53,13 @@ namespace Nicodem.Backend.Cover
 			{ IsLabel = true, Label = label };
 		}
 
-		public IEnumerable<RegisterNode> RegistersUsed { get; private set; }
-		public IEnumerable<RegisterNode> RegistersDefined { get; private set; }
+		public ICollection<RegisterNode> RegistersUsed { get; private set; }
+		public ICollection<RegisterNode> RegistersDefined { get; private set; }
 		public bool IsCopyInstruction { get; private set; }
 		public bool IsJumpInstruction { get; private set; }
 		public bool IsLabel { get; private set; }
 		public string Label { get; private set; }
+		internal ICollection<Instruction> PrevInstructions { get; set; }
 
 		public string ToString(IReadOnlyDictionary<RegisterNode, HardwareRegisterNode> registerMapping) {
 			var str = instructionBuilder (registerMapping);
