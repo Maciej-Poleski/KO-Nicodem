@@ -216,11 +216,46 @@ namespace Semantics.Tests
 			};
 		}
 
-		internal static IfNode If(ExpressionNode cond, ExpressionNode then, ExpressionNode _else) {
+		internal static OperatorNode Less(ExpressionNode node1, ExpressionNode node2) {
+			return new OperatorNode{
+				Operator = OperatorType.LESS,
+				Arguments = new [] {node1, node2}
+			};
+		}
+
+		internal static OperatorNode Greater(ExpressionNode node1, ExpressionNode node2) {
+			return new OperatorNode{
+				Operator = OperatorType.GREATER,
+				Arguments = new [] {node1, node2}
+			};
+		}
+
+		internal static OperatorNode Modulo(ExpressionNode node1, ExpressionNode node2) {
+			return new OperatorNode{
+				Operator = OperatorType.MOD,
+				Arguments = new [] {node1, node2}
+			};
+		}
+
+		internal static IfNode If(ExpressionNode cond, ExpressionNode then) {
+			return new IfNode {
+				Condition = cond,
+				Then = then,
+			};
+		}
+
+		internal static IfNode IfElse(ExpressionNode cond, ExpressionNode then, ExpressionNode _else) {
 			return new IfNode {
 				Condition = cond,
 				Then = then,
 				Else = _else
+			};
+		}
+
+		internal static WhileNode While(ExpressionNode cond, ExpressionNode body) {
+			return new WhileNode {
+				Condition = cond,
+				Body = body
 			};
 		}
 

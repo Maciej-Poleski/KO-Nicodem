@@ -220,16 +220,18 @@ namespace Nicodem.Semantics.Visitors
                     node.ExpressionType = NamedTypeNode.BoolType();
                     break;
                 // ==!= < <= > >=
-                case OperatorType.EQUAL:
-                case OperatorType.NOT_EQUAL:
-                case OperatorType.LESS:
-                case OperatorType.LESS_EQUAL:
-                case OperatorType.GREATER:
-                case OperatorType.GREATER_EQUAL:
-                    if (arguments_list.Count() != 2)
-                        throw new TypeCheckException("Inproper numbers of arguments.");
-                    if (!NamedTypeNode.IntType().Equals(arguments_list[0].ExpressionType) || !NamedTypeNode.IntType().Equals(arguments_list[1].ExpressionType))
-                        throw new TypeCheckException("Wrong argument type.");
+				case OperatorType.EQUAL:
+				case OperatorType.NOT_EQUAL:
+				case OperatorType.LESS:
+				case OperatorType.LESS_EQUAL:
+				case OperatorType.GREATER:
+				case OperatorType.GREATER_EQUAL:
+					if (arguments_list.Count () != 2)
+						throw new TypeCheckException ("Inproper numbers of arguments.");
+					if (!NamedTypeNode.IntType ().Equals (arguments_list [0].ExpressionType) || !NamedTypeNode.IntType ().Equals (arguments_list [1].ExpressionType)) {
+						Console.WriteLine ("ERROR: First arg type =  {" + arguments_list [0].ExpressionType + "} Second arg type = {" + arguments_list [1].ExpressionType + "}");    
+						throw new TypeCheckException ("Wrong argument type.");
+					}
                     node.ExpressionType = NamedTypeNode.BoolType();
                     break;
                 // PRE ++ -- + - POST ++ --
