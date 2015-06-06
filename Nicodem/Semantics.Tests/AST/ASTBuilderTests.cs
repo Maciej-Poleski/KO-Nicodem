@@ -11,6 +11,7 @@ namespace Semantics.Tests
     using P = NicodemGrammarProductions;
     using UniversalSymbol = NicodemGrammarProductions.UniversalSymbol;
     using Nicodem.Core;
+    using System.Collections.Generic;
 
     [TestFixture()]
     public class ASTBuilderTests
@@ -171,7 +172,7 @@ namespace Semantics.Tests
                 Wrap(P.ObjectUseExpression,
                 Wrap(P.Literals,
                 Wrap(P.DecimalNumberLiteral, "DecimalNumberLiteral",
-                Leaf(P.DecimalNumberLiteralToken, "")))));
+                Leaf(P.DecimalNumberLiteralToken, "42")))));
         }
 
         private ParseTree NumberExpression()
@@ -245,8 +246,9 @@ namespace Semantics.Tests
         public void EmptyProgramTest()
         {
             var tree = Wrap(P.Program, Leaf(P.Eof, ""));
-            ProgramNode result = builder.BuildAST<Symbol>(tree);
-            // TODO(guspiel): When it becomes clear what AST to expect, write an AssertEquals here.
+            ProgramNode received = builder.BuildAST<Symbol>(tree);
+            var expected = new ProgramNode(new LinkedList<FunctionDefinitionNode>());
+            Assert.AreEqual(expected, received);
         }
 
         [Test()]
@@ -254,7 +256,15 @@ namespace Semantics.Tests
         { 
             var tree = ExpressionProgram(NumberExpression());
             ProgramNode result = builder.BuildAST<Symbol>(tree);
-            // TODO(guspiel): When it becomes clear what AST to expect, write an AssertEquals here.
+            var expected = new ProgramNode(new LinkedList<FunctionDefinitionNode>(new FunctionDefinitionNode[]{
+                new FunctionDefinitionNode(
+                    "MyFunc",
+                    new LinkedList<VariableDeclNode>(),
+                    NamedTypeNode.IntType(true),
+                    new AtomNode(NamedTypeNode.IntType(), "42")
+                )
+            }));
+            Assert.AreEqual(expected, result);
         }
 
         [Test()]

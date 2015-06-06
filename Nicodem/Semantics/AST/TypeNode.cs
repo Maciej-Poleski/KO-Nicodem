@@ -82,6 +82,19 @@ namespace Nicodem.Semantics.AST
             }
             return false;
         }
+
+        protected override bool Compare(object rhs_)
+        {
+            var rhs = (TypeNode)rhs_;
+            return base.Compare(rhs) &&
+                IsConstant.Equals(rhs.IsConstant);
+        }
+
+        protected override string PrintElements(string prefix)
+        {
+            return base.PrintElements(prefix) +
+                PrintVar(prefix, "IsConstant", IsConstant);
+        }
 	}
 }
 

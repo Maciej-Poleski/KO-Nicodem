@@ -63,6 +63,21 @@ namespace Nicodem.Semantics.AST
         {
             return visitor.Visit(this);
         }
+
+        protected override bool Compare(object rhs_)
+        {
+            var rhs = (ConstNode)rhs_;
+            return base.Compare(rhs) &&
+                object.Equals(VariableType, rhs.VariableType) &&
+                object.Equals(Value, rhs.Value);
+        }
+
+        protected override string PrintElements(string prefix)
+        {
+            return base.PrintElements(prefix) +
+                PrintVar(prefix, "VariableType", VariableType) +
+                PrintVar(prefix, "Value", Value);
+        }
 	}
 }
 

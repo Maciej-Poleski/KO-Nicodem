@@ -29,6 +29,11 @@ namespace Nicodem.Semantics.AST
 
         public AtomNode(TypeNode type) : base(type) { }
 
+        public AtomNode(TypeNode type, string value) : base(type)
+        {
+            this.Value = value;
+        }
+
         public override void Accept(AbstractVisitor visitor)
         {
             visitor.Visit(this);
@@ -37,6 +42,17 @@ namespace Nicodem.Semantics.AST
         public override T Accept<T>(ReturnedAbstractVisitor<T> visitor)
         {
             return visitor.Visit(this);
+        }
+
+        protected override bool Compare(object rhs_)
+        {
+            var rhs = (AtomNode)rhs_;
+            return base.Compare(rhs);
+        }
+
+        protected override string PrintElements(string prefix)
+        {
+            return base.PrintElements(prefix);
         }
     }
 }

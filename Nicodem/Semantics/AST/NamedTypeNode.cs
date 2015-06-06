@@ -21,10 +21,11 @@ namespace Nicodem.Semantics.AST
             return node;
         }
 
-        public static NamedTypeNode IntType()
+        public static NamedTypeNode IntType(bool isConstant=false)
         {
             NamedTypeNode node = new NamedTypeNode();
             node.Name = "int";
+            node.IsConstant = isConstant;
             return node;
         }
 
@@ -59,6 +60,19 @@ namespace Nicodem.Semantics.AST
         public override T Accept<T>(ReturnedAbstractVisitor<T> visitor)
         {
             return visitor.Visit(this);
+        }
+
+        protected override bool Compare(object rhs_)
+        {
+            var rhs = (NamedTypeNode)rhs_;
+            return base.Compare(rhs) &&
+                object.Equals(Name, rhs.Name);
+        }
+
+        protected override string PrintElements(string prefix)
+        {
+            return base.PrintElements(prefix) +
+                PrintVar(prefix, "Name", Name);
         }
 	}
 }

@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using Nicodem.Semantics.Visitors;
 using Nicodem.Parser;
 using Nicodem.Semantics.ExpressionGraph;
+using System;
+using System.Linq;
 
 namespace Nicodem.Semantics.AST
 {
@@ -29,6 +31,13 @@ namespace Nicodem.Semantics.AST
         public override T Accept<T>(ReturnedAbstractVisitor<T> visitor)
         {
             return visitor.Visit(this);
+        }
+
+        protected override bool Compare(object rhs_)
+        {
+            var rhs = (ArrayNode)rhs_;
+            return base.Compare(rhs) &&
+                SequenceEqual(Elements, rhs.Elements);
         }
 	}
 }

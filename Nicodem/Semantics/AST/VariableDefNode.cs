@@ -35,6 +35,14 @@ namespace Nicodem.Semantics.AST
         {
             return visitor.Visit(this);
         }
+
+        protected override bool Compare(object rhs_)
+        {
+            var rhs = (VariableDefNode)rhs_;
+            return base.Compare(rhs) &&
+                object.Equals(Value, rhs.Value) &&
+                object.Equals(VariableLocation, rhs.VariableLocation);
+        }
 	}
 }
 
