@@ -30,26 +30,68 @@ namespace Nicodem.Backend.Builder
 			return registers;
 		}
 
-		private void DFS(Instruction instruction, RegisterNode register) {
+		private ICollection<Instruction> DFS(Instruction instruction, RegisterNode register, Dictionary<RegisterNode, Vertex> registerToVertex, ICollection<Instruction> visited) {
+			visited.Add (instruction);
+
+			if (instruction.RegistersDefined.Contains (register))
+				return visited;
+
+			foreach (var reg in instruction.RegistersDefined) {
+				if(instruction.IsCopyInstruction) {
+					registerToVertex [reg].CopyNeighbors.Add (registerToVertex [register]);
+					registerToVertex [register].CopyNeighbors.Add (registerToVertex [reg]);
+				} else {
+					registerToVertex [reg].NonCopyNeighbors.Add (registerToVertex [register]);
+					registerToVertex [register].NonCopyNeighbors.Add (registerToVertex [reg]);
+				}
+			}
+
+			foreach (var ins in instruction.PrevInstructions) {
+				if (!visited.Contains (ins))
+					visited = DFS (ins, register, registerToVertex, visited);
+			}
+
+			return visited;
 		}
 
 		private void AnalyzeRegister(RegisterNode register, Dictionary<RegisterNode, Vertex> registerToVertex, IEnumerable<Instruction> instructions) {
 			ISet<Instruction> whereUsed = new HashSet<Instruction> ();
 
 			foreach (var instruction in instructions) {
-				foreach(var tempRegister in instruction.RegistersUsed ) {
-					if (register == tempRegister) {
+				if(instruction.RegistersUsed.Contains(register))
 						whereUsed.Add (instruction);
-					}
-				}
 			}
 
+			ICollection<Instruction> visited = new HashSet<Instruction> ();
+
 			foreach (var instruction in whereUsed) {
-				DFS (instruction, register);
+				visited = DFS (instruction, register, registerToVertex, visited);
+			}
+		}
+
+		void prepareInstructions(IEnumerable<Instruction> instructions) {
+			Dictionary<String, Instruction> names = new Dictionary<string, Instruction> ();
+
+			Instruction prev = null;
+			foreach (var ins in instructions) {
+				if (ins.IsLabel)
+					names.Add (ins.Label, ins);
+
+				if (prev != null)
+					ins.PrevInstructions.Add (prev);
+				prev = ins;
+
+			}
+
+			foreach (var ins in instructions) {
+				if (ins.IsJumpInstruction)
+					names [ins.Label].PrevInstructions.Add (ins);
 			}
 		}
 
 		public InterferenceGraph AnalyzeLiveness(IEnumerable<Instruction> instructions) {
+			prepareInstructions (instructions);
+
 			ISet<Vertex> vertices = new HashSet<Vertex> ();
 
 			ISet<RegisterNode> registers = findRegisters (instructions);
@@ -66,7 +108,12 @@ namespace Nicodem.Backend.Builder
 				AnalyzeRegister (register, registerToVertex, instructions);
 			}
 
-			throw new NotImplementedException();
+			List<Vertex> result = new List<Vertex> ();
+
+			foreach (var vertex in registerToVertex.Values)
+				result.Add (vertex);
+
+			return new InterferenceGraph (result);
 		}
 			
 	}
