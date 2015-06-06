@@ -1,0 +1,16 @@
+f() -> bool
+{
+    int x=2+2*2;
+	int mutable i =0;
+	while i<x
+	{
+		int y = x-i;
+		i++;
+	}
+	else
+		i=x;	`while ... is an expression
+	
+	if i==0 false else true;
+	
+}
+

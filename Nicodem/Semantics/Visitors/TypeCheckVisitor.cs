@@ -27,7 +27,7 @@ namespace Nicodem.Semantics.Visitors
             {
                 if (expression.ExpressionType == null)
                     throw new TypeCheckException("Array contains value with not specified type.");
-                if (!TypeNode.Compare(typeOfElementInArray,expression.ExpressionType))
+                if (!typeOfElementInArray.Equals(expression.ExpressionType))
                     throw new TypeCheckException("Improper Type of element in array.");
             }
             node.ExpressionType = node.VariableType;
@@ -47,7 +47,7 @@ namespace Nicodem.Semantics.Visitors
 				_set_of_types.Add (NamedTypeNode.IntType ());
 			}
             char out_char;
-            if (Char.TryParse(value, out out_char))
+            if (value.Length == 3 && Char.TryParse(value.Trim(new char[]{'\''}), out out_char))
                 _set_of_types.Add(NamedTypeNode.CharType());
             return _set_of_types;
         }
@@ -60,14 +60,7 @@ namespace Nicodem.Semantics.Visitors
 				throw new TypeCheckException ("Value is not set.");
 
             HashSet<TypeNode> deducedType = deduceType(node.Value);
-			bool contains = false;
-			foreach (var v in deducedType) {
-				if (TypeNode.Compare (v, node.VariableType)) {
-					contains = true;
-					break;
-				}
-			}
-			if (!contains)
+			if (!deducedType.Contains(node.VariableType))
 				throw new TypeCheckException ("Type of Const is not consistent with deduced Type.");
 
 			node.ExpressionType = node.VariableType;
@@ -87,7 +80,7 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(ElementNode node)
         {
             base.Visit(node);
-            if (!TypeNode.Compare(NamedTypeNode.IntType(),node.Index.ExpressionType))
+            if (!NamedTypeNode.IntType().Equals(node.Index.ExpressionType))
                 throw new TypeCheckException("Index is not integer type.");
             node.ExpressionType = node.Array.ExpressionType;
         }
@@ -108,7 +101,7 @@ namespace Nicodem.Semantics.Visitors
             
             for (int i = 0; i < listOfFunctionArguments.Count; i++)
             {
-                if (!TypeNode.Compare(listOfFunctionArguments[i].Type,listOfFunctionCallArguments[i].ExpressionType))
+                if (!listOfFunctionArguments[i].Type.Equals(listOfFunctionCallArguments[i].ExpressionType))
                     throw new Exception(String.Format("Argument {0} has improper type.", i));
             }
 
@@ -119,7 +112,7 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(FunctionDefinitionNode node)
         {
             base.Visit(node);
-			if (!TypeNode.Compare (node.ResultType, node.Body.ExpressionType))
+			if (!node.ResultType.Equals(node.Body.ExpressionType))
 				throw new TypeCheckException ("Body doesn't return the same type as set type.");
             node.ExpressionType = NamedTypeNode.VoidType();
         }
@@ -128,9 +121,9 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(IfNode node)
         {
             base.Visit(node);
-            if(!TypeNode.Compare(NamedTypeNode.BoolType(), node.Condition.ExpressionType))
+            if(!NamedTypeNode.BoolType().Equals(node.Condition.ExpressionType))
                 throw new Exception("Improper type in if condition");
-            if(!node.HasElse || !TypeNode.Compare(node.Then.ExpressionType, node.Else.ExpressionType))
+            if(!node.HasElse || !node.Then.ExpressionType.Equals(node.Else.ExpressionType))
                 node.ExpressionType = NamedTypeNode.VoidType();
             else
                 node.ExpressionType = node.Then.ExpressionType;
@@ -148,7 +141,7 @@ namespace Nicodem.Semantics.Visitors
             if (while_elem.ExpressionType == null)
                 while_elem.ExpressionType = node.Value.ExpressionType;
             else
-                if (!TypeNode.Compare(while_elem.ExpressionType, node.Value.ExpressionType))
+                if (!while_elem.ExpressionType.Equals(node.Value.ExpressionType))
                     throw new TypeCheckException("Value Type is not correct for returned while type.");
             node.ExpressionType = node.Value.ExpressionType;
         }
@@ -164,7 +157,7 @@ namespace Nicodem.Semantics.Visitors
                 case OperatorType.ASSIGN:
                     if (arguments_list.Count() != 2)
                         throw new TypeCheckException("Inproper numbers of arguments.");
-                    if (!TypeNode.Compare(arguments_list[0].ExpressionType, arguments_list[1].ExpressionType))
+                    if (!arguments_list[0].ExpressionType.Equals(arguments_list[1].ExpressionType))
                         throw new TypeCheckException("Wrong argument type.");
                     node.ExpressionType = arguments_list[0].ExpressionType;
                     break;
@@ -181,9 +174,9 @@ namespace Nicodem.Semantics.Visitors
                 case OperatorType.MOD_ASSIGN:
                     if (arguments_list.Count() != 2)
                         throw new TypeCheckException("Inproper numbers of arguments.");
-                    if (TypeNode.Compare(arguments_list[0].ExpressionType, NamedTypeNode.IntType()) && TypeNode.Compare(arguments_list[1].ExpressionType, NamedTypeNode.IntType()))
+                    if (NamedTypeNode.IntType().Equals(arguments_list[0].ExpressionType) && NamedTypeNode.IntType().Equals(arguments_list[1].ExpressionType))
                         node.ExpressionType = NamedTypeNode.IntType();
-                    else if (TypeNode.Compare(arguments_list[0].ExpressionType, NamedTypeNode.ByteType()) && TypeNode.Compare(arguments_list[1].ExpressionType, NamedTypeNode.ByteType()))
+                    else if ( NamedTypeNode.ByteType().Equals(arguments_list[0].ExpressionType) && NamedTypeNode.ByteType().Equals(arguments_list[1].ExpressionType))
                         node.ExpressionType = NamedTypeNode.IntType();
                     else
                         throw new TypeCheckException("Wrong argument type.");
@@ -195,7 +188,7 @@ namespace Nicodem.Semantics.Visitors
                 case OperatorType.BIT_SHIFT_DOWN_ASSIGN:
                     if (arguments_list.Count() != 2)
                         throw new TypeCheckException("Inproper numbers of arguments.");
-                    if (!TypeNode.Compare(arguments_list[0].ExpressionType, NamedTypeNode.ByteType()) || !TypeNode.Compare(arguments_list[1].ExpressionType, NamedTypeNode.IntType()))
+                    if (!NamedTypeNode.ByteType().Equals(arguments_list[0].ExpressionType) || !NamedTypeNode.IntType().Equals(arguments_list[1].ExpressionType) )
                         throw new TypeCheckException("Wrong argument type.");
                     node.ExpressionType = NamedTypeNode.ByteType();
                     break;
@@ -204,7 +197,7 @@ namespace Nicodem.Semantics.Visitors
                 case OperatorType.BIT_XOR:
                 case OperatorType.BIT_AND:
                     foreach (var argument in node.Arguments)
-                        if (!TypeNode.Compare(argument.ExpressionType, NamedTypeNode.ByteType()))
+                        if (!NamedTypeNode.ByteType().Equals(argument.ExpressionType))
                             throw new TypeCheckException("Wrong argument type.");
                     node.ExpressionType = NamedTypeNode.ByteType();
                     break;
@@ -214,7 +207,7 @@ namespace Nicodem.Semantics.Visitors
                 case OperatorType.BIT_OR_ASSIGN:
                     if (arguments_list.Count() != 2)
                         throw new TypeCheckException("Inproper numbers of arguments.");
-                    if (!TypeNode.Compare(arguments_list[0].ExpressionType, NamedTypeNode.ByteType()) || !TypeNode.Compare(arguments_list[1].ExpressionType, NamedTypeNode.ByteType()))
+                    if (!NamedTypeNode.ByteType().Equals(arguments_list[0].ExpressionType) || !NamedTypeNode.ByteType().Equals(arguments_list[1].ExpressionType))
                         throw new TypeCheckException("Wrong argument type.");
                     node.ExpressionType = NamedTypeNode.ByteType();
                     break;
@@ -222,7 +215,7 @@ namespace Nicodem.Semantics.Visitors
                 case OperatorType.OR:
                 case OperatorType.AND:
                     foreach (var argument in node.Arguments)
-                        if (!TypeNode.Compare(argument.ExpressionType, NamedTypeNode.BoolType()))
+                        if (!NamedTypeNode.BoolType().Equals(argument.ExpressionType))
                             throw new TypeCheckException("Wrong argument type.");
                     node.ExpressionType = NamedTypeNode.BoolType();
                     break;
@@ -235,7 +228,7 @@ namespace Nicodem.Semantics.Visitors
                 case OperatorType.GREATER_EQUAL:
                     if (arguments_list.Count() != 2)
                         throw new TypeCheckException("Inproper numbers of arguments.");
-                    if (!TypeNode.Compare(arguments_list[0].ExpressionType, NamedTypeNode.IntType()) || !TypeNode.Compare(arguments_list[1].ExpressionType, NamedTypeNode.IntType()))
+                    if (!NamedTypeNode.IntType().Equals(arguments_list[0].ExpressionType) || !NamedTypeNode.IntType().Equals(arguments_list[1].ExpressionType))
                         throw new TypeCheckException("Wrong argument type.");
                     node.ExpressionType = NamedTypeNode.BoolType();
                     break;
@@ -248,9 +241,9 @@ namespace Nicodem.Semantics.Visitors
                 case OperatorType.POST_DECREMENT:
                     if (arguments_list.Count() != 1)
                         throw new TypeCheckException("Inproper numbers of arguments.");
-                    if (TypeNode.Compare(arguments_list[0].ExpressionType, NamedTypeNode.IntType()))
+                    if (NamedTypeNode.IntType().Equals(arguments_list[0].ExpressionType))
                         node.ExpressionType = NamedTypeNode.IntType();
-                    else if (TypeNode.Compare(arguments_list[0].ExpressionType, NamedTypeNode.ByteType()))
+                    else if (NamedTypeNode.ByteType().Equals(arguments_list[0].ExpressionType))
                         node.ExpressionType = NamedTypeNode.ByteType();
                     else
                         throw new TypeCheckException("Wrong argument type.");
@@ -260,7 +253,7 @@ namespace Nicodem.Semantics.Visitors
                 case OperatorType.BIT_NOT:
                     if (arguments_list.Count() != 1)
                         throw new TypeCheckException("Inproper numbers of arguments.");
-                    if (!TypeNode.Compare(arguments_list[0].ExpressionType, NamedTypeNode.ByteType()))
+                    if (!NamedTypeNode.ByteType().Equals(arguments_list[0].ExpressionType))
                         throw new TypeCheckException("Wrong argument type.");
                     node.ExpressionType = NamedTypeNode.ByteType();
                     break;
@@ -271,9 +264,9 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(SliceNode node)
         {
             base.Visit(node);
-            if (!TypeNode.Compare(NamedTypeNode.IntType(), node.Left.ExpressionType))
+            if (!NamedTypeNode.IntType().Equals(node.Left.ExpressionType))
                 throw new TypeCheckException("Left is not int value.");
-            if (!TypeNode.Compare(NamedTypeNode.IntType(), node.Right.ExpressionType))
+            if (!NamedTypeNode.IntType().Equals(node.Right.ExpressionType))
                 throw new TypeCheckException("Right is not int value.");
             node.ExpressionType = node.Array.ExpressionType;
             ((ArrayTypeNode)node.ExpressionType).IsFixedSize = false;
@@ -289,7 +282,7 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(VariableDefNode node)
         {
             base.Visit(node);
-            if (!TypeNode.Compare(node.Value.ExpressionType, node.Type))
+            if (!node.Value.ExpressionType.Equals(node.Type))
                 throw new TypeCheckException("Value type not agree with VariableType");
             node.ExpressionType = node.Type;
         }
@@ -308,16 +301,16 @@ namespace Nicodem.Semantics.Visitors
             base.Visit(node);
             _stack_of_while_node.Remove(node);
             TypeNode _type_to_set;
-            if(!TypeNode.Compare(NamedTypeNode.BoolType(), node.Condition.ExpressionType))
+            if(!NamedTypeNode.BoolType().Equals(node.Condition.ExpressionType))
                 throw new Exception("Inpropper type in if condition");
-            if(!node.HasElse || !TypeNode.Compare(node.Body.ExpressionType, node.Else.ExpressionType))
+            if(!node.HasElse || !node.Body.ExpressionType.Equals(node.Else.ExpressionType))
                 _type_to_set = NamedTypeNode.VoidType();
             else
                 _type_to_set = node.Body.ExpressionType;
             if (node.ExpressionType == null)
                 node.ExpressionType = _type_to_set;
             else
-                if (!TypeNode.Compare(node.ExpressionType, _type_to_set))
+                if (!node.ExpressionType.Equals(_type_to_set))
                     throw new Exception("Type of Body and Else is not correct with set type.");
                 else
                     node.ExpressionType = _type_to_set;

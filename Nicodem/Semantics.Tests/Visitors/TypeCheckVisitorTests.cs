@@ -25,7 +25,7 @@ namespace Semantics.Tests.Visitors
 			Assert.NotNull (fParamA.ExpressionType);
 			Assert.NotNull (fBody.ExpressionType);
 			Assert.NotNull (fFunction.ExpressionType);
-			Assert.IsTrue (TypeNode.Compare(fBody.ExpressionType, fParamA.ExpressionType));
+			Assert.IsTrue (fBody.ExpressionType.Equals(fParamA.ExpressionType));
 		}
 
 		/*
@@ -41,7 +41,7 @@ namespace Semantics.Tests.Visitors
 			var ifst = Utils.If (Utils.BoolLiteral (true), then, Utils.IntLiteral (2));
 			ifst.Accept (new TypeCheckVisitor ());
 			Assert.NotNull (ifst.ExpressionType);
-			Assert.IsTrue (TypeNode.Compare(ifst.ExpressionType, then.ExpressionType));
+			Assert.IsTrue (ifst.ExpressionType.Equals(then.ExpressionType));
 		}
 
         /*
@@ -57,7 +57,7 @@ namespace Semantics.Tests.Visitors
             _block_exp.Accept(new TypeCheckVisitor());
 
             Assert.NotNull(_block_exp.ExpressionType);
-            Assert.IsTrue(TypeNode.Compare(_block_exp.ExpressionType, Utils.MakeConstantVoid()));
+            Assert.IsTrue(_block_exp.ExpressionType.Equals(Utils.MakeConstantVoid()));
         }
 
         [Test]
@@ -68,7 +68,7 @@ namespace Semantics.Tests.Visitors
             _block_exp.Accept(new TypeCheckVisitor());
 
             Assert.NotNull(_block_exp.ExpressionType);
-            Assert.IsTrue(TypeNode.Compare(_block_exp.ExpressionType, Utils.MakeConstantInt()));
+            Assert.IsTrue(_block_exp.ExpressionType.Equals(Utils.MakeConstantInt()));
         }
 
         /*
@@ -86,7 +86,7 @@ namespace Semantics.Tests.Visitors
             _atom_int.Accept(new TypeCheckVisitor());
 
             Assert.NotNull(_atom_int.ExpressionType);
-            Assert.IsTrue(TypeNode.Compare(_atom_int.ExpressionType, Utils.MakeConstantInt()));
+            Assert.IsTrue(_atom_int.ExpressionType.Equals(Utils.MakeConstantInt()));
         }
 
 
@@ -99,7 +99,7 @@ namespace Semantics.Tests.Visitors
             _atom_char.Accept(new TypeCheckVisitor());
 
             Assert.NotNull(_atom_char.ExpressionType);
-            Assert.IsTrue(TypeNode.Compare(_atom_char.ExpressionType, Utils.MakeConstantChar()));
+            Assert.IsTrue(_atom_char.ExpressionType.Equals(Utils.MakeConstantChar()));
         }
 
 
@@ -112,7 +112,7 @@ namespace Semantics.Tests.Visitors
             _atom_byte.Accept(new TypeCheckVisitor());
 
             Assert.NotNull(_atom_byte.ExpressionType);
-            Assert.IsTrue(TypeNode.Compare(_atom_byte.ExpressionType, Utils.MakeConstantByte()));
+            Assert.IsTrue(_atom_byte.ExpressionType.Equals(Utils.MakeConstantByte()));
         }
 	}
 }

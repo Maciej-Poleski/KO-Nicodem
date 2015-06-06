@@ -62,6 +62,23 @@ namespace Nicodem.Semantics.AST
             return visitor.Visit(this);
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+                return false;
+            if (obj is NamedTypeNode)
+            {
+                if (this.Name.Equals(((NamedTypeNode)obj).Name))
+                    return true;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Name.GetHashCode();
+        }
+
         protected override bool Compare(object rhs_)
         {
             var rhs = (NamedTypeNode)rhs_;
