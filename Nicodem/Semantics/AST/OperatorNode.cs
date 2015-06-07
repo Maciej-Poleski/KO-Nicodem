@@ -57,6 +57,13 @@ namespace Nicodem.Semantics.AST
                 object.Equals(Operator, rhs.Operator) &&
                 SequenceEqual(Arguments, rhs.Arguments);
         }
+
+        protected override string PrintElements(string prefix)
+        {
+            return base.PrintElements(prefix)
+                + PrintVar(prefix, "Operator", Operator)
+                + PrintVar(prefix, "Arguments", Arguments);
+        }
 	}
 }
 

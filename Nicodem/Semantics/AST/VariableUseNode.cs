@@ -35,5 +35,12 @@ namespace Nicodem.Semantics.AST
                 object.Equals(Name, rhs.Name) &&
                 object.Equals(Declaration, rhs.Declaration);
         }
+
+        protected override string PrintElements(string prefix)
+        {
+            return base.PrintElements(prefix)
+                + PrintVar(prefix, "Name", Name)
+                + PrintVar(prefix, "Declaration", Declaration);
+        }
 	}
 }

@@ -43,6 +43,13 @@ namespace Nicodem.Semantics.AST
                 object.Equals(Value, rhs.Value) &&
                 object.Equals(VariableLocation, rhs.VariableLocation);
         }
+
+        protected override string PrintElements(string prefix)
+        {
+            return base.PrintElements(prefix)
+                + PrintVar(prefix, "Value", Value)
+                + PrintVar(prefix, "VariableLocation", VariableLocation);
+        }
 	}
 }
 

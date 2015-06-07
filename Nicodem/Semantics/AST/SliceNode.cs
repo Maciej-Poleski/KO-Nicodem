@@ -49,6 +49,14 @@ namespace Nicodem.Semantics.AST
                 object.Equals(Left, rhs.Left) &&
                 object.Equals(Right, rhs.Right);
         }
+
+        protected override string PrintElements(string prefix)
+        {
+            return base.PrintElements(prefix)
+                + PrintVar(prefix, "Array", Array)
+                + PrintVar(prefix, "Left", Left)
+                + PrintVar(prefix, "Right", Right);
+        }
 	}
 }
 

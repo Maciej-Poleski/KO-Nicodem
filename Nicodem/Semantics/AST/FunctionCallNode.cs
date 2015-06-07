@@ -39,6 +39,14 @@ namespace Nicodem.Semantics.AST
                 SequenceEqual(Arguments, rhs.Arguments) &&
                 object.Equals(Definition, rhs.Definition);
         }
+
+        protected override string PrintElements(string prefix)
+        {
+            return base.PrintElements(prefix)
+                + PrintVar(prefix, "Name", Name)
+                + PrintVar(prefix, "Arguments", Arguments)
+                + PrintVar(prefix, "Definition", Definition);
+        }
 	}
 }
 

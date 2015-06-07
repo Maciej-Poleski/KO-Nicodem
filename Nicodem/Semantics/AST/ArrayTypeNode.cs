@@ -97,6 +97,14 @@ namespace Nicodem.Semantics.AST
                 object.Equals(IsFixedSize, rhs.IsFixedSize) &&
                 object.Equals(LengthExpression, rhs.LengthExpression);
         }
+
+        protected override string PrintElements(string prefix)
+        {
+            return base.PrintElements(prefix)
+                + PrintVar(prefix, "ElementType", ElementType)
+                + PrintVar(prefix, "IsFixedSize", IsFixedSize)
+                + PrintVar(prefix, "LengthExpression", LengthExpression);
+        }
 	}
 }
 

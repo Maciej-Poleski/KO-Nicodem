@@ -46,6 +46,14 @@ namespace Nicodem.Semantics.AST
                 object.Equals(Type, rhs.Type) &&
                 object.Equals(NestedUse, rhs.NestedUse);
         }
+
+        protected override string PrintElements(string prefix)
+        {
+            return base.PrintElements(prefix)
+                + PrintVar(prefix, "Name", Name)
+                + PrintVar(prefix, "Type", Type)
+                + PrintVar(prefix, "NestedUse", NestedUse);
+        }
 	}
 }
 

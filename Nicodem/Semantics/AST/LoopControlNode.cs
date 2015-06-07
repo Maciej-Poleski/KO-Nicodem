@@ -63,6 +63,14 @@ namespace Nicodem.Semantics.AST
                 object.Equals(Depth, rhs.Depth) &&
                 object.Equals(Value, rhs.Value);
         }
+
+        protected override string PrintElements(string prefix)
+        {
+            return base.PrintElements(prefix)
+                + PrintVar(prefix, "Mode", Mode)
+                + PrintVar(prefix, "Depth", Depth)
+                + PrintVar(prefix, "Value", Value);
+        }
 	}
 }
 

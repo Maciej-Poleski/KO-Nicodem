@@ -48,6 +48,14 @@ namespace Nicodem.Semantics.AST
                 object.Equals(Body, rhs.Body) &&
                 object.Equals(Else, rhs.Else);
         }
+
+        protected override string PrintElements(string prefix)
+        {
+            return base.PrintElements(prefix)
+                + PrintVar(prefix, "Condition", Condition)
+                + PrintVar(prefix, "Body", Body)
+                + PrintVar(prefix, "Else", Else);
+        }
 	}
 }
 
