@@ -88,7 +88,7 @@ namespace Nicodem.Semantics.AST
         protected static string PrintVar<T>(string prefix1, string label, IEnumerable<T> field)
             where T : Node
         {
-            string result = prefix1 + label + ":\n";
+            string result = prefix1 + label + " (n=" + field.Count() + "):\n";
             string prefix2 = prefix1 + "| ";
             string prefix3 = prefix2 + "| ";
             foreach (var i in field) result += prefix2 + i.Print(prefix3);

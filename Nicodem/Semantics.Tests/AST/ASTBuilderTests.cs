@@ -65,6 +65,7 @@ namespace Semantics.Tests
         private DummyFragment dummyFrag;
         private IProduction<Symbol> dummyProd;
         private UniversalSymbol[] operatorSymbol;
+        private int operatorExpressionGoesTo = 17;
 
         [TestFixtureSetUp]
         public void Init()
@@ -95,7 +96,9 @@ namespace Semantics.Tests
                 P.Operator14Expression,
                 P.Operator15Expression,
                 P.Operator16Expression,
-                P.Operator17Expression
+                P.Operator17Expression,
+                P.Operator18Expression,
+                P.Operator19Expression
             };
         }
 
@@ -165,22 +168,22 @@ namespace Semantics.Tests
             return result;
         }
 
-        private ParseTree NumberAtomicExpression()
+        private ParseTree NumberAtomicExpression(int number=42)
         {
             return
                 Wrap(P.AtomicExpression,
                 Wrap(P.ObjectUseExpression,
                 Wrap(P.Literals,
                 Wrap(P.DecimalNumberLiteral, "DecimalNumberLiteral",
-                Leaf(P.DecimalNumberLiteralToken, "42")))));
+                Leaf(P.DecimalNumberLiteralToken, number.ToString())))));
         }
 
-        private ParseTree NumberExpression()
+        private ParseTree NumberExpression(int number=42)
         {
             return Wrap(P.Expression, 
-                Wrap(P.OperatorExpression, 
-                Operators(17, 0, 
-                NumberAtomicExpression())));
+                Wrap(P.OperatorExpression,
+                Operators(operatorExpressionGoesTo, 0, 
+                NumberAtomicExpression(number))));
         }
 
         private ParseTree MulExpression()
@@ -188,10 +191,10 @@ namespace Semantics.Tests
             return
                 Wrap(P.Expression,
                 Wrap(P.OperatorExpression,
-                Operators(17, 5, new ParseTree[] { 
-                    Operators(4, 0, NumberAtomicExpression()),
+                Operators(operatorExpressionGoesTo, 5, new ParseTree[] { 
+                    Operators(4, 0, NumberAtomicExpression(42)),
                     Str("*"),
-                    Operators(4, 0, NumberAtomicExpression())
+                    Operators(4, 0, NumberAtomicExpression(43))
                 })));
         }
 
@@ -200,13 +203,13 @@ namespace Semantics.Tests
             return 
                 Wrap(P.Expression,
                 Wrap(P.OperatorExpression,
-                Operators(17, 6, new ParseTree[] {
-                    Operators(5, 0, NumberAtomicExpression()),
+                Operators(operatorExpressionGoesTo, 6, new ParseTree[] {
+                    Operators(5, 0, NumberAtomicExpression(1)),
                     Str("+"),
                     Wrap(P.Operator5Expression, new ParseTree[] {
-                        Operators(4, 0, NumberAtomicExpression()),
+                        Operators(4, 0, NumberAtomicExpression(2)),
                         Str("*"),
-                        Operators(4, 0, NumberAtomicExpression())
+                        Operators(4, 0, NumberAtomicExpression(3))
                     })
                 })));
         }
@@ -242,20 +245,27 @@ namespace Semantics.Tests
             return FunctionProgram(ExpressionFunction(expressionTree));
         }
 
+        private void ConductTest(ParseTree tree, Node expected)
+        {
+            Console.Write("\ntree:\n" + tree.ToString());
+            Console.Write("\nexpected:\n" + expected.ToString());
+            ProgramNode result = builder.BuildAST<Symbol>(tree);
+            Console.Write("\nresult:\n" + result.ToString() + "\n");
+            Assert.AreEqual(expected, result);
+        }
+
         [Test()]
         public void EmptyProgramTest()
         {
             var tree = Wrap(P.Program, Leaf(P.Eof, ""));
-            ProgramNode received = builder.BuildAST<Symbol>(tree);
             var expected = new ProgramNode(new LinkedList<FunctionDefinitionNode>());
-            Assert.AreEqual(expected, received);
+            ConductTest(tree, expected);
         }
 
         [Test()]
         public void ProgramWithTheSimplestFunction()
-        { 
+        {
             var tree = ExpressionProgram(NumberExpression());
-            ProgramNode result = builder.BuildAST<Symbol>(tree);
             var expected = new ProgramNode(new LinkedList<FunctionDefinitionNode>(new FunctionDefinitionNode[]{
                 new FunctionDefinitionNode(
                     "MyFunc",
@@ -264,7 +274,7 @@ namespace Semantics.Tests
                     new AtomNode(NamedTypeNode.IntType(), "42")
                 )
             }));
-            Assert.AreEqual(expected, result);
+            ConductTest(tree, expected);
         }
 
         [Test()]
@@ -275,24 +285,69 @@ namespace Semantics.Tests
                 NumberFunction(),
                 Leaf(P.Eof, "")
             });
-            ProgramNode result = builder.BuildAST<Symbol>(tree);
-            // TODO(guspiel): When it becomes clear what AST to expect, write an AssertEquals here.
+            var expected = new ProgramNode(new LinkedList<FunctionDefinitionNode>(new FunctionDefinitionNode[]{
+                new FunctionDefinitionNode(
+                    "MyFunc",
+                    new LinkedList<VariableDeclNode>(),
+                    NamedTypeNode.IntType(true),
+                    new AtomNode(NamedTypeNode.IntType(), "42")
+                ),
+                new FunctionDefinitionNode(
+                    "MyFunc",
+                    new LinkedList<VariableDeclNode>(),
+                    NamedTypeNode.IntType(true),
+                    new AtomNode(NamedTypeNode.IntType(), "42")
+                )
+            }));
+            ConductTest(tree, expected);
         }
 
         [Test()]
         public void ProgramWithMultiplication()
         {
             var tree = ExpressionProgram(MulExpression());
-            ProgramNode result = builder.BuildAST<Symbol>(tree);
-            // TODO(guspiel): When it becomes clear what AST to expect, write an AssertEquals here.
+            var expected = new ProgramNode(new LinkedList<FunctionDefinitionNode>(new FunctionDefinitionNode[]{
+                new FunctionDefinitionNode(
+                    "MyFunc",
+                    new LinkedList<VariableDeclNode>(),
+                    NamedTypeNode.IntType(true),
+                    new OperatorNode(
+                        OperatorType.MUL,
+                        new ExpressionNode[] {
+                            new AtomNode(NamedTypeNode.IntType(), "42"),
+                            new AtomNode(NamedTypeNode.IntType(), "43"),
+                        }
+                    )
+                )
+            }));
+            ConductTest(tree, expected);
         }
 
         [Test()]
         public void ProgramWithAdditionAndMultiplication()
         {
             var tree = ExpressionProgram(AddMulExpression());
-            ProgramNode result = builder.BuildAST<Symbol>(tree);
-            // TODO(guspiel): When it becomes clear what AST to expect, write an AssertEquals here.
+            var expected = new ProgramNode(new LinkedList<FunctionDefinitionNode>(new FunctionDefinitionNode[]{
+                new FunctionDefinitionNode(
+                    "MyFunc",
+                    new LinkedList<VariableDeclNode>(),
+                    NamedTypeNode.IntType(true),
+                    new OperatorNode(
+                        OperatorType.PLUS,
+                        new ExpressionNode[] {
+                            new AtomNode(NamedTypeNode.IntType(), "1"),
+                            new OperatorNode(
+                                OperatorType.MUL,
+                                new ExpressionNode[] {
+                                    new AtomNode(NamedTypeNode.IntType(), "2"),
+                                    new AtomNode(NamedTypeNode.IntType(), "3"),
+                                }
+                            )
+                        }
+                    )                    
+                )
+            }));
+            ConductTest(tree, expected);
         }
     }
 }
