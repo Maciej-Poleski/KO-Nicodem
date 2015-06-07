@@ -38,6 +38,12 @@ namespace Nicodem.Parser
 		public static string PrepareErrorMessage(Error<TSymbol> err)
 		{
 			var sb = new StringBuilder();
+			// check if EOF
+			if(err.Fragment == null) {
+				sb.Append(String.Format("Could not parse symbol: {0} at the End of File\n", err.Symbol));
+				return sb.ToString();
+			}
+
 			sb.Append(String.Format("Could not parse symbol: {0} in {1}\n", err.Symbol, err.Fragment.Origin));
 			var orig = err.Fragment.Origin;
 
