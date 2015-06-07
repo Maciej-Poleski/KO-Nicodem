@@ -59,11 +59,14 @@ namespace Semantics.Tests.Visitors
 			var whileBody = Utils.body (whileExp1);
 			var whileSt = Utils.While (whileCond, whileBody);
 
+            a.Accept(new TypeCheckVisitor());
 			whileSt.Accept (new TypeCheckVisitor ());
-			Assert.IsTrue (minus.ExpressionType.Equals (Utils.MakeConstantBool ()));
+			Assert.IsFalse (minus.ExpressionType.Equals (Utils.MakeConstantBool ()));
+            Assert.IsTrue(minus.ExpressionType.Equals(Utils.MakeConstantInt()));
 			Assert.NotNull (whileSt.ExpressionType);
 			Assert.IsTrue (whileBody.ExpressionType.Equals (whileExp1.ExpressionType));
-			Assert.IsTrue (whileSt.ExpressionType.Equals (whileBody.ExpressionType));
+			Assert.IsFalse (whileSt.ExpressionType.Equals (whileBody.ExpressionType));
+            Assert.IsTrue (whileSt.ExpressionType.Equals (Utils.MakeConstantVoid()));
 		}
 
 		/* main() -> int

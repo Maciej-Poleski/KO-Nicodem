@@ -229,7 +229,6 @@ namespace Nicodem.Semantics.Visitors
 					if (arguments_list.Count () != 2)
 						throw new TypeCheckException ("Inproper numbers of arguments.");
 					if (!NamedTypeNode.IntType ().Equals (arguments_list [0].ExpressionType) || !NamedTypeNode.IntType ().Equals (arguments_list [1].ExpressionType)) {
-						Console.WriteLine ("ERROR: First arg type =  {" + arguments_list [0].ExpressionType + "} Second arg type = {" + arguments_list [1].ExpressionType + "}");    
 						throw new TypeCheckException ("Wrong argument type.");
 					}
                     node.ExpressionType = NamedTypeNode.BoolType();
