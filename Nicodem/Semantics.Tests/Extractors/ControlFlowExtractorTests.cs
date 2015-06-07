@@ -51,14 +51,15 @@ namespace Semantics.Tests.Extractors
 		[Test]
 		public void ControlFlowExtractor_NestedWhiles_Test ()
 		{
-			// while(a<b){a+=while(c<b){c+=c}}else{a}
+			// while(a<b){a+=(while(c<b){c+=c}{c})}else{a}
 
 			var cond1 = MakeOperator (OperatorType.LESS, Var ("a"), Var ("b"));
 			var cond2 = MakeOperator (OperatorType.LESS, Var ("c"), Var ("b"));
 			var body1 = MakeOperator (OperatorType.ASSIGN, Var ("c"), Utils.Add (Var ("c"), Var ("c")));
 
-			var innerWhile = new WhileNode{ Condition = cond2, Body = body1 };
-			var outerWhile = new WhileNode{ Condition = cond1, Body = innerWhile, Else = Var ("a") };
+			var innerWhile = new WhileNode{ Condition = cond2, Body = body1, Else = Var ("c") };
+			var body2 = MakeOperator (OperatorType.ASSIGN, Var ("a"), Utils.Add (Var ("a"), innerWhile));
+			var outerWhile = new WhileNode{ Condition = cond1, Body = body2, Else = Var ("a") };
 			
 			var cf_graph = new List<Vertex> (new ControlFlowExtractor ().Extract (outerWhile));
 		}
@@ -66,12 +67,13 @@ namespace Semantics.Tests.Extractors
 		[Test]
 		public void ControlFlowExtractor_WhileWithComplexCondition_Test ()
 		{
-			// while((if(a<b) {a} else {b})<c){a}
+			// while((if(a<b) {a} else {b})<c){a+=a}else{a}
 		
 			var cond1 = MakeOperator (OperatorType.LESS, Var ("a"), Var ("b"));
 			var _if = new IfNode{ Condition = cond1, Then = Var ("a"), Else = Var ("b") };
 			var cond2 = MakeOperator (OperatorType.LESS, _if, Var ("c"));
-			var expr = new WhileNode{ Condition = cond2, Body = Var ("a") };
+			var body = MakeOperator (OperatorType.ASSIGN, Var ("a"), Utils.Add (Var ("a"), Var ("a")));
+			var expr = new WhileNode{ Condition = cond2, Body = body, Else = Var ("a") };
 
 			var cf_graph = new List<Vertex> (new ControlFlowExtractor ().Extract (expr));			
 		}
