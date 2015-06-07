@@ -18,6 +18,14 @@ namespace Nicodem.Semantics.AST
 
         #endregion
 
+        public VariableUseNode() { }
+
+        public VariableUseNode(string name, VariableDeclNode declaration)
+        {
+            this.Name = name;
+            this.Declaration = declaration;
+        }
+
 		public override void Accept (AbstractVisitor visitor)
 		{
 			visitor.Visit (this);

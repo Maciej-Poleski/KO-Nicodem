@@ -168,6 +168,33 @@ namespace Semantics.Tests
             return result;
         }
 
+        private ParseTree OperatorsExpression(int first, ParseTree wrapped)
+        {
+            return 
+                Wrap(P.Expression,
+                    Wrap(P.OperatorExpression,
+                    Operators(operatorExpressionGoesTo, first, wrapped)
+                ));
+        }
+
+        private ParseTree OperatorsExpression(int first, ParseTree[] wrapped)
+        {
+            return
+                Wrap(P.Expression,
+                    Wrap(P.OperatorExpression,
+                    Operators(operatorExpressionGoesTo, first, wrapped)
+                ));
+        }
+
+        private ParseTree VariableUseOperators(int last, string name)
+        {
+            return Operators(last, 0, 
+                Wrap(P.AtomicExpression,
+                Wrap(P.ObjectUseExpression,
+                Leaf(P.ObjectName, name)
+            )));
+        }
+
         private ParseTree NumberAtomicExpression(int number=42)
         {
             return
@@ -345,6 +372,139 @@ namespace Semantics.Tests
                             )
                         }
                     )                    
+                )
+            }));
+            ConductTest(tree, expected);
+        }
+
+        [Test()]
+        public void ProgramWithRecursiveFunctionCalls()
+        {
+            /*
+                int g(int n, int k, bool nothing) 0
+                void f(int n) {
+	                g(n, n, true);
+                    f(n - 1);
+                }
+             */
+            var tree = Wrap(P.Program, new ParseTree[] { 
+                Wrap(P.Function, new ParseTree[] {
+                    Leaf(P.ObjectName, "g"),
+                    Str("("),
+                    Wrap(P.ParametersList, new ParseTree[] {
+                        Wrap(P.ObjectDeclaration, new ParseTree[] {
+                            Wrap(P.TypeSpecifier, new ParseTree[] { Leaf(P.TypeName, "int") }),
+                            Leaf(P.ObjectName, "n")
+                        }),
+                        Str(","),
+                        Wrap(P.ObjectDeclaration, new ParseTree[] {
+                            Wrap(P.TypeSpecifier, new ParseTree[] { Leaf(P.TypeName, "int") }),
+                            Leaf(P.ObjectName, "k")
+                        }),
+                        Str(","),
+                        Wrap(P.ObjectDeclaration, new ParseTree[] {
+                            Wrap(P.TypeSpecifier, new ParseTree[] { Leaf(P.TypeName, "bool") }),
+                            Leaf(P.ObjectName, "nothing")
+                        })
+                    }),
+                    Str(")"),
+                    Str("->"),
+                    Wrap(P.TypeSpecifier, Leaf(P.TypeName, "int")),
+                    NumberExpression(0)
+                }),
+                Wrap(P.Function, new ParseTree[] {
+                    Leaf(P.ObjectName, "f"),
+                    Str("("),
+                    Wrap(P.ParametersList, new ParseTree[] {
+                        Wrap(P.ObjectDeclaration, new ParseTree[] {
+                            Wrap(P.TypeSpecifier, new ParseTree[] { Leaf(P.TypeName, "int") }),
+                            Leaf(P.ObjectName, "n")
+                        })
+                    }),
+                    Str(")"),
+                    Str("->"),
+                    Wrap(P.TypeSpecifier, Leaf(P.TypeName, "void")),
+                    OperatorsExpression(0,
+                        Wrap(P.AtomicExpression,
+                        Wrap(P.BlockExpression, new ParseTree[] {
+                            Str("{"),
+                                OperatorsExpression(2, new ParseTree[] {
+                                    VariableUseOperators(1, "g"),
+                                    Str("("),
+                                    OperatorsExpression(1, VariableUseOperators(0, "n")),
+                                    Str(","),
+                                    OperatorsExpression(1, VariableUseOperators(0, "n")),
+                                    Str(","),
+                                    OperatorsExpression(0,
+                                        Wrap(P.AtomicExpression,
+                                        Wrap(P.ObjectUseExpression,
+                                        Wrap(P.Literals, 
+                                        Wrap(P.BooleanLiteral,
+                                        Leaf(P.BooleanLiteralToken, "true")
+                                    ))))),
+                                    Str(")")
+                                }),
+                                Str(";"),
+                                OperatorsExpression(2, new ParseTree[] {
+                                    VariableUseOperators(1, "f"),
+                                    Str("("),
+                                    OperatorsExpression(6, new ParseTree[] {
+                                        VariableUseOperators(5, "n"),
+                                        Str("-"),
+                                        Operators(5, 0, NumberAtomicExpression(1))
+                                    }),
+                                    Str(")")
+                                }),
+                                Str(";"),
+                            Str("}")
+                        })
+                    ))
+                }),
+                Leaf(P.Eof, "")
+            });
+            var expected = new ProgramNode(new LinkedList<FunctionDefinitionNode>(new FunctionDefinitionNode[]{
+                new FunctionDefinitionNode(
+                    "g",
+                    new LinkedList<VariableDeclNode>(new VariableDeclNode[]{
+                        new VariableDeclNode("n", NamedTypeNode.IntType(), false),
+                        new VariableDeclNode("k", NamedTypeNode.IntType(), false),
+                        new VariableDeclNode("nothing", NamedTypeNode.BoolType(), false),
+                    }),
+                    NamedTypeNode.IntType(true),
+                    new AtomNode(NamedTypeNode.IntType(), "0")                   
+                ),
+                new FunctionDefinitionNode(
+                    "f",
+                    new LinkedList<VariableDeclNode>(new VariableDeclNode[]{
+                        new VariableDeclNode("n", NamedTypeNode.IntType(), false),
+                    }),
+                    NamedTypeNode.VoidType(),
+                    new BlockExpressionNode(
+                        new ExpressionNode[] {
+                            new FunctionCallNode(
+                                "g", 
+                                new ExpressionNode[] {
+                                    new VariableUseNode("n", null),
+                                    new VariableUseNode("n", null),
+                                    new AtomNode(NamedTypeNode.BoolType(), "true")
+                                },
+                                null
+                            ),
+                            new FunctionCallNode(
+                                "f", 
+                                new ExpressionNode[] {
+                                    new OperatorNode(
+                                        OperatorType.MINUS,
+                                        new ExpressionNode[] {
+                                            new VariableUseNode("n", null),
+                                            new AtomNode(NamedTypeNode.IntType(), "1")
+                                        }
+                                    )
+                                },
+                                null
+                            )
+                        }
+                    )                 
                 )
             }));
             ConductTest(tree, expected);

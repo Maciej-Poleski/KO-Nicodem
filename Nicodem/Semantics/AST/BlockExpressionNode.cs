@@ -31,6 +31,13 @@ namespace Nicodem.Semantics.AST
 
         #endregion
 
+        public BlockExpressionNode() { }
+
+        public BlockExpressionNode(IEnumerable<ExpressionNode> elements)
+        {
+            this.Elements = elements;
+        }
+
 		public override void Accept (AbstractVisitor visitor)
 		{
 			visitor.Visit (this);

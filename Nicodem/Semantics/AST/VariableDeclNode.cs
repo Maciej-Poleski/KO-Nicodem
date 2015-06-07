@@ -28,6 +28,15 @@ namespace Nicodem.Semantics.AST
 
         #endregion
 
+        public VariableDeclNode() { }
+
+        public VariableDeclNode(string name, TypeNode type, bool nestedUse)
+        {
+            this.Name = name;
+            this.Type = type;
+            this.NestedUse = nestedUse;
+        }
+
 		public override void Accept (AbstractVisitor visitor)
 		{
 			visitor.Visit (this);

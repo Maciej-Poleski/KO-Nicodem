@@ -21,6 +21,15 @@ namespace Nicodem.Semantics.AST
 
         #endregion
 
+        public FunctionCallNode() { }
+
+        public FunctionCallNode(string name, IReadOnlyList<ExpressionNode> arguments, FunctionDefinitionNode definition)
+        {
+            this.Name = name;
+            this.Arguments = arguments;
+            this.Definition = definition;
+        }
+
 		public override void Accept (AbstractVisitor visitor)
 		{
 			visitor.Visit (this);
