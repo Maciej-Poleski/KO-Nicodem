@@ -40,6 +40,14 @@ namespace Nicodem.Semantics.AST
 
         #endregion
 
+        public OperatorNode() {}
+
+        public OperatorNode(OperatorType operator_, IEnumerable<ExpressionNode> arguments)
+        {
+            this.Operator = operator_;
+            this.Arguments = arguments;
+        }
+
 		public override void Accept (AbstractVisitor visitor)
 		{
 			visitor.Visit (this);
