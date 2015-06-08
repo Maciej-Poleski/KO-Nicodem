@@ -125,9 +125,10 @@ namespace Semantics.Tests.Visitors
 		 *     int mutable c = 2
 		 *     int mutable d = 3
 		 *     d = a + b
+		 *     c = c
 		 *   }
 		 *   a = 1
-		 *   c = c
+		 *   
 		 * }
 		 */
 		[Test]
@@ -149,13 +150,13 @@ namespace Semantics.Tests.Visitors
 			var gFunction = Utils.FunctionDef("g",
 				Utils.parameters (gParam),
 				Utils.MakeConstantInt (),
-				Utils.body (fVarC, fVarD, fAssignD)
+				Utils.body (fVarC, fVarD, fAssignD, fAssignC)
 			);
 
 			var fFunction = Utils.FunctionDef ("f",
 				Utils.parameters (fParam),
 				Utils.MakeConstantInt (),
-				Utils.body (fVarB, fAssignB, gFunction, fAssignC, fAssignA)
+				Utils.body (fVarB, fAssignB, gFunction, fAssignA)
 			);
 
 			Assert.IsNull (useA.Declaration);
