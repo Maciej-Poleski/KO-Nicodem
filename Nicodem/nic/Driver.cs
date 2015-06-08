@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using Nicodem.Semantics.CST;
+using Nicodem.Semantics;
 using Nicodem.Source;
 
 namespace Nicodem.Compiler
@@ -25,6 +26,8 @@ namespace Nicodem.Compiler
             {
                 var parseTree = CSTBuilder.Build(inputFile);
                 Console.WriteLine(parseTree.ToString());
+
+				var backendFunctions = new Frontend().FromParseTreeToBackend(parseTree);
             }
             catch (CSTBuilder.LexerFailure ex)
             {
