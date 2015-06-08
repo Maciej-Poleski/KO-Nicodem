@@ -15,7 +15,8 @@ namespace Semantics.Tests.Visitors
 		 * }
 		 */
 		[Test]
-		public void TestUtilsSimpleFunction() {
+        public void TypeCheck_TestUtilsSimpleFunction()
+        {
 			var fParamA = Utils.DeclareInt ("a");
 			var fBody = Utils.Assignment (fParamA, Utils.IntLiteral (1));
 			var fFunction = Utils.FunctionDef ("f", Utils.parameters (fParamA), Utils.MakeConstantInt (), Utils.body (fBody));
@@ -36,7 +37,8 @@ namespace Semantics.Tests.Visitors
 		 * 		}
 		 */
 		[Test]
-		public void TestIf1() {
+        public void TypeCheck_TestIf1()
+        {
 			var then = Utils.IntLiteral (1);
 			var ifst = Utils.IfElse (Utils.BoolLiteral (true), then, Utils.IntLiteral (2));
 			ifst.Accept (new TypeCheckVisitor ());
@@ -51,7 +53,8 @@ namespace Semantics.Tests.Visitors
 		 * }
 		 */
 		[Test]
-		public void TestWhile() {
+        public void TypeCheck_TestWhile()
+        {
 			var a = Utils.DefineInt ("a", 5);
 			var minus = Utils.Sub (a, Utils.IntLiteral (1));
 			var whileExp1 = Utils.Definition (a, minus); 
@@ -94,7 +97,8 @@ namespace Semantics.Tests.Visitors
 		 */
 		// if the last if-statement is executed, main's body will have type INT, otherwise the type will be VOID ? Can't be...
 		[Test]
-		public void TestLarge() {
+        public void TypeCheck_TestLarge()
+        {
 
 			// gcd:
 				// args
