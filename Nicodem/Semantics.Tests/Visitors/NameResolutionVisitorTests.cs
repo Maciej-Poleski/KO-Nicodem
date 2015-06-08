@@ -175,14 +175,14 @@ namespace Semantics.Tests.Visitors
 		/*
 		 * f(int mutable a) -> int
 		 * {
-		 *   int mutable c
+		 *   int mutable c = 1
 		 *   g(byte mutable b) -> byte
 		 *   {
 		 *     c = 12
 		 *     4
 		 *   }
-		 *   int mutable a
-		 *   int mutable b
+		 *   int mutable a = 2
+		 *   int mutable b = 3
 		 *   g(12)
 		 *   h(int mutable b) -> int
 		 *   {
@@ -197,9 +197,9 @@ namespace Semantics.Tests.Visitors
 		 */
 		[Test]
 		public void Complex() {
-			var fVarC = Utils.DeclareInt ("c");
-			var fVarA = Utils.DeclareInt ("a");
-			var fVarB = Utils.DeclareInt ("b");
+			var fVarC = Utils.DefineInt ("c", 1);
+			var fVarA = Utils.DefineInt ("a", 2);
+			var fVarB = Utils.DefineInt ("b", 3);
 
 			// function g
 			var gArg = Utils.DeclareByte ("b");
