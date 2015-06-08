@@ -66,11 +66,11 @@ namespace Nicodem.Semantics.AST
         {
             return visitor.Visit(this);
         }
-        
-        protected override bool Compare(object rhs_)
+
+        protected override bool Compare(object rhs_, bool compareIsConstant)
         {
             var rhs = (NamedTypeNode)rhs_;
-            return base.Compare(rhs) &&
+            return base.Compare(rhs, compareIsConstant) &&
                 object.Equals(Name, rhs.Name);
         }
 

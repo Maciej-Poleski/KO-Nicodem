@@ -62,12 +62,23 @@ namespace Nicodem.Semantics.AST
         {
             return visitor.Visit(this);
         }
+
+        public bool Equals(object rhs, bool compareIsConstant)
+        {
+            return rhs != null && GetType() == rhs.GetType() &&
+                Compare(rhs, compareIsConstant);
+        }
+
+        protected sealed override bool Compare(object rhs_)
+        {
+            return Compare(rhs_, true);
+        }
         
-        protected override bool Compare(object rhs_)
+        protected virtual bool Compare(object rhs_, bool compareIsConstant)
         {
             var rhs = (TypeNode)rhs_;
             return base.Compare(rhs) &&
-                IsConstant.Equals(rhs.IsConstant);
+                (!compareIsConstant || IsConstant.Equals(rhs.IsConstant));
         }
 
         protected override string PrintElements(string prefix)

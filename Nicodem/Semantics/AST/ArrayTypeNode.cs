@@ -66,11 +66,11 @@ namespace Nicodem.Semantics.AST
         {
             return MakeType(NamedTypeNode.VoidType());
         }
-        
-        protected override bool Compare(object rhs_)
+
+        protected override bool Compare(object rhs_, bool compareIsConstant)
         {
             var rhs = (ArrayTypeNode)rhs_;
-            return base.Compare(rhs) &&
+            return base.Compare(rhs, compareIsConstant) &&
                 object.Equals(ElementType, rhs.ElementType) &&
                 object.Equals(IsFixedSize, rhs.IsFixedSize) &&
                 object.Equals(LengthExpression, rhs.LengthExpression);
