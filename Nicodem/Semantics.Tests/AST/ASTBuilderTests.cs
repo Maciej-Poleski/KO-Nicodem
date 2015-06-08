@@ -129,14 +129,34 @@ namespace Semantics.Tests
             return (Symbol)(NicodemGrammarProductions.UniversalSymbol)symbol;
         }
 
+        private string GetCode(IParseTree<Symbol> tree)
+        {
+            if (tree is ParseBranch<Symbol>) {
+                string result = "";
+                foreach (var child in ((ParseBranch<Symbol>)tree).Children) {
+                    result += GetCode(child);
+                }
+                return result;
+            } else {
+                return ((ParseLeaf<Symbol>)tree).Fragment.GetOriginText();
+            }
+        }
+
+        private string GetCode(IParseTree<Symbol>[] trees)
+        {
+            string result = "";
+            foreach (var tree in trees) result += GetCode(tree);
+            return result;
+        }
+
         private ParseTree Wrap(UniversalSymbol symbol, ParseTree wrapped)
         {
-            return new ParseBranch<Symbol>(dummyFrag, Cast(symbol), dummyProd, new ParseTree[] { wrapped });
+            return new ParseBranch<Symbol>(new DummyFragment(GetCode(wrapped)), Cast(symbol), dummyProd, new ParseTree[] { wrapped });
         }
 
         private ParseTree Wrap(UniversalSymbol symbol, ParseTree[] wrapped)
         {
-            return new ParseBranch<Symbol>(dummyFrag, Cast(symbol), dummyProd, wrapped);
+            return new ParseBranch<Symbol>(new DummyFragment(GetCode(wrapped)), Cast(symbol), dummyProd, wrapped);
         }
 
         private ParseTree Wrap(UniversalSymbol symbol, string code, ParseTree wrapped)
