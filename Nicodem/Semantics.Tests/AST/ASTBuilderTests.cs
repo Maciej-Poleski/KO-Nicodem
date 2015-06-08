@@ -65,7 +65,7 @@ namespace Semantics.Tests
         private DummyFragment dummyFrag;
         private IProduction<Symbol> dummyProd;
         private UniversalSymbol[] operatorSymbol;
-        private int operatorExpressionGoesTo = 17;
+        private int operatorExpressionGoesTo = 19;
 
         [TestFixtureSetUp]
         public void Init()
