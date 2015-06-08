@@ -139,9 +139,6 @@ namespace Nicodem.Semantics.AST
                 case "BlockExpression":
                     atomic = new BlockExpressionNode();
                     break;
-                case "ObjectDefinitionExpression":
-                    atomic = new VariableDefNode();
-                    break;
                 case "ArrayLiteralExpression":
                     throw new System.NotImplementedException(); // TODO: arrays implementation
                 case "ObjectUseExpression":
@@ -153,12 +150,6 @@ namespace Nicodem.Semantics.AST
                         node = ASTBuilder.FirstChild(node); // Literals -> one of available literals
                         atomic = ConstNode.GetConstNode(node);
                     }
-                    break;
-                case "IfExpression":
-                    atomic = new IfNode();
-                    break;
-                case "WhileExpression":
-                    atomic = new WhileNode();
                     break;
                 case "LoopControlExpression":
                     atomic = new LoopControlNode();
@@ -195,10 +186,34 @@ namespace Nicodem.Semantics.AST
             }
         }
 
+        /// <summary>
+        /// Resolve Expression from ParseTree. Main method.
+        /// </summary>
         public static ExpressionNode GetExpressionNode<TSymbol>(IParseTree<TSymbol> parseTree) where TSymbol:ISymbol<TSymbol>
         {
             var node = ASTBuilder.FirstChild(parseTree); // Expression -> OperatorExpression
-            node = ASTBuilder.FirstChild(node); // OperatorExpression -> Operator17Expression
+            node = ASTBuilder.FirstChild(node); // OperatorExpression -> Operator19Expression
+            node = ASTBuilder.FirstChild(node); // Operator19Expression -> ObjectDefinitionExpression | Operator18Expression
+            if (ASTBuilder.GetName(node.Symbol) == "ObjectDefinitionExpression") { // ObjectDefinition
+                var defNode = new VariableDefNode();
+                defNode.BuildNode(node);
+                return defNode;
+            } 
+            // Operator18Expression
+            node = ASTBuilder.FirstChild(node); // IfExpression | WhileExpression | Operator17Expression
+            switch (ASTBuilder.GetName(node.Symbol))
+            {
+                case "IfExpression":
+                    var ifNode = new IfNode();
+                    ifNode.BuildNode(node);
+                    return ifNode;
+                case "WhileExpression":
+                    var whileNode = new WhileNode();
+                    whileNode.BuildNode(node);
+                    return whileNode;
+                default: // default - Operator17Expression
+                    break;
+            }
             node = ASTBuilder.FirstChild(node); // Operator17Expression -> Operator16Expression
             node = ASTBuilder.FirstChild(node); // Operator16Expression -> Operator15Expression
             return ResolveOperatorExpression(node, 15); // node is operator 15
