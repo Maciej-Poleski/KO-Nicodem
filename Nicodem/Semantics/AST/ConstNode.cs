@@ -31,15 +31,15 @@ namespace Nicodem.Semantics.AST
             switch (ASTBuilder.GetName(parseTree.Symbol))
             {
                 case "DecimalNumberLiteral":
-                    type = NamedTypeNode.IntType();
+                    type = NamedTypeNode.IntType(true);
                     break;
                 case "CharacterLiteral":
-                    type = NamedTypeNode.CharType();
+                    type = NamedTypeNode.CharType(true);
                     break;
                 case "StringLiteral":
                     throw new NotImplementedException(); // TODO: strings implementation
                 case "BooleanLiteral":
-                    type = NamedTypeNode.BoolType();
+                    type = NamedTypeNode.BoolType(true);
                     break;
                 default:
                     throw new System.ArgumentException();
