@@ -22,20 +22,20 @@ namespace Nicodem.Semantics.AST
             return visitor.Visit(this);
         }
 
-        public override bool Equals(object obj)
+        // New classes should override method Compare. The implementation of Compare
+        // should call Compare in the base class.
+        public sealed override bool Equals(object obj)
         {
             if (GetType() != obj.GetType()) return false;
             return Compare(obj);
         }
 
-        public override int GetHashCode()
+        public sealed override int GetHashCode()
         {
             return 1;
         }
 
-        /* Compare assumes that this and rhs are of the same type. It then checks equality of fields
-         * defined in current class and calls Compare of the base class.
-         */
+        // Compare may assume that this and rhs are of the same type.
         protected virtual bool Compare(object rhs)
         {
             return true;
@@ -48,23 +48,26 @@ namespace Nicodem.Semantics.AST
             else return first == null && second == null;
         }
         
-        // In VisualStudio, in ImmediateView, type:
-        // node.ToString(),nq
-        // to print new lines.
-        public override string ToString()
+        // New classes should just override PrintElements.
+        //
+        // If your ToString() string is displayed in one line, in VisualStudio, 
+        // in ImmediateView, type node.ToString(),nq
+        // to make newlines visible.
+        public sealed override string ToString()
         {
             return Print("");
-        }
-
-        // Skips prefix for first line.
-        public string Print(string prefix)
-        {
-            return GetType().Name + "\n" + PrintElements(prefix + "| ");
         }
 
         protected virtual string PrintElements(string prefix)
         {
             return "";
+        }
+
+        #region Printing helpers
+        // Skips prefix for first line.
+        protected string Print(string prefix)
+        {
+            return GetType().Name + "\n" + PrintElements(prefix + "| ");
         }
 
         protected static string PrintVar(string prefix, string label, Node obj)
@@ -94,6 +97,7 @@ namespace Nicodem.Semantics.AST
             foreach (var i in field) result += prefix2 + i.Print(prefix3);
             return result;
         }
+        #endregion
     }
 }
 
