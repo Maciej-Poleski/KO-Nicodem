@@ -437,7 +437,7 @@ namespace Nicodem.Parser
 
             foreach (var transition in state.Transitions)
             {
-				if (IsPseudoDead(transition.Value))
+                if (IsDead(transition.Value))
                     continue;
                 //for nullable keys go on the same automata
                 if (nullable.Contains(transition.Key))
@@ -498,36 +498,11 @@ namespace Nicodem.Parser
             return null;
         }
 
-//        internal static bool IsPsuedoDead(DfaState<TSymbol> state)
-//        {
-//            var deadTransition = new[] { new KeyValuePair<TSymbol, DfaState<TSymbol>>(RegExDfa<TSymbol>.MinSymbol<TSymbol>(), state) };
-//            return state.Accepting == 0 && state.Transitions.Count == 1 && state.Transitions[0].Equals(deadTransition[0]);
-//        }
-
-		static bool FindAcceptingState(DfaState<TSymbol> state, Dictionary<DfaState<TSymbol>, int> color)
-		{
-			if (state.Accepting != 0)
-				return true;
-			color[state] = 1;
-
-			foreach (var transition in state.Transitions)
-			{
-				if (!color.ContainsKey(transition.Value))
-				if (FindAcceptingState(transition.Value, color))
-					return true;
-			}
-
-			color[state] = 2;
-			return false;
-		}
-
-		internal static bool IsPseudoDead(DfaState<TSymbol> state)
-		{
-			Dictionary<DfaState<TSymbol>, int> color = new Dictionary<DfaState<TSymbol>, int>();
-			if (!FindAcceptingState(state, color))
-				return true;
-			return false;
-		}
+        internal static bool IsDead(DfaState<TSymbol> state)
+        {
+            var deadTransition = new[] { new KeyValuePair<TSymbol, DfaState<TSymbol>>(RegExDfa<TSymbol>.MinSymbol<TSymbol>(), state) };
+            return state.Accepting == 0 && state.Transitions.Count == 1 && state.Transitions[0].Equals(deadTransition[0]);
+        }
 	}
 }
 

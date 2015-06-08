@@ -18,7 +18,7 @@ namespace Nicodem.Semantics.CST
 			// Assume every list from tupple is of size 1 !!!
 			var leafs = sanitizedTokens.Select(r => {
 				Debug.Assert(r.Item2.Count() == 1);
-				return new ParseLeaf<Symbol>(r.Item1, new Symbol(r.Item2.ElementAt(0)));
+				return new ParseLeaf<Symbol>(r.Item1, new Symbol(r.Item2.First()));
 			});
 
             var grammar = new Grammar<Symbol>(

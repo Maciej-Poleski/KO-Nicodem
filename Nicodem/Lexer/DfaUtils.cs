@@ -309,7 +309,7 @@ namespace Nicodem.Lexer
             return result;
         }
 
-        public static IDfa<TSymbol> MakeMinimizedProductDfa
+        public static MinimizedDfa<TSymbol> MakeMinimizedProductDfa
             <TLastDfa, TLastDfaState, TNewDfa, TNewDfaState, TSymbol>(TLastDfa lastDfa, TNewDfa newDfa,
                 AmbiguityHandler handler)
             where TLastDfa : AbstractDfa<TLastDfaState, TSymbol>
@@ -319,8 +319,8 @@ namespace Nicodem.Lexer
             where TSymbol : IComparable<TSymbol>, IEquatable<TSymbol>
         {
             var result =
-                MakeProductDfa<TLastDfa, TLastDfaState, TNewDfa, TNewDfaState, TSymbol>(lastDfa, newDfa, handler);
-                    //.Minimized<ProductDfa<TSymbol>, ProductDfaState<TSymbol>, TSymbol>();
+                MakeProductDfa<TLastDfa, TLastDfaState, TNewDfa, TNewDfaState, TSymbol>(lastDfa, newDfa, handler)
+                    .Minimized<ProductDfa<TSymbol>, ProductDfaState<TSymbol>, TSymbol>();
             DfaStatesConcpetCheck<TSymbol>.CheckDfaStates(result);
             return result;
         }
