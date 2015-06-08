@@ -51,8 +51,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Parser\Parser.csproj">
-      <Project>{dc9385d6-c37e-441f-8baa-3b7eaec2da39}</Project>
-      <Name>Parser %28Parser\Parser%29</Name>
+      <Project>{DC9385D6-C37E-441F-8BAA-3B7EAEC2DA39}</Project>
+      <Name>Parser</Name>
     </ProjectReference>
     <ProjectReference Include="..\Semantics\Semantics.csproj">
       <Project>{B0BC59FC-D28F-42B9-A4CC-5470287924B2}</Project>
@@ -61,6 +61,10 @@
     <ProjectReference Include="..\Source\Source.csproj">
       <Project>{6078FFE3-28C8-4169-831D-E1D1AAFDD72F}</Project>
       <Name>Source</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Backend\Backend.csproj">
+      <Project>{493808C4-AFCD-4D86-B72C-BABAA51F88C4}</Project>
+      <Name>Backend</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

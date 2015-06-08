@@ -30,7 +30,7 @@ namespace Nicodem.Semantics.AST
 
         public override int GetHashCode()
         {
-            throw new NotImplementedException();
+            return 1;
         }
 
         /* Compare assumes that this and rhs are of the same type. It then checks equality of fields
