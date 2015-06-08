@@ -71,10 +71,10 @@ namespace Semantics.Tests.Visitors
 		/*
 		 * f(int mutable a) -> int
 		 * {
-		 *   int mutable b
+		 *   int mutable b = 1
 		 *   b = a + a
-		 *   int mutable c
-		 *   int mutable d
+		 *   int mutable c = 2
+		 *   int mutable d = 3
 		 *   d = a + b
 		 *   a = 1
 		 *   c = c
@@ -83,9 +83,9 @@ namespace Semantics.Tests.Visitors
 		[Test]
 		public void VariableUse() {
 			var fParam = Utils.DeclareInt ("a");
-			var fVarB = Utils.DeclareInt ("b");
-			var fVarC = Utils.DeclareInt ("c");
-			var fVarD = Utils.DeclareInt ("d");
+			var fVarB = Utils.DefineInt ("b", 1);
+			var fVarC = Utils.DefineInt ("c", 2);
+			var fVarD = Utils.DefineInt ("d", 3);
 			var useA = Utils.Usage (fParam, false);
 			var useB = Utils.Usage (fVarB, false);
 			var useC = Utils.Usage (fVarC, false);
@@ -118,12 +118,12 @@ namespace Semantics.Tests.Visitors
 		/*
 		 * f(int mutable a) -> int
 		 * {
-		 *   int mutable b
+		 *   int mutable b = 1
 		 *   b = a + a
 		 *   g(int mutable x) -> int
 		 *   {
-		 *     int mutable c
-		 *     int mutable d
+		 *     int mutable c = 2
+		 *     int mutable d = 3
 		 *     d = a + b
 		 *   }
 		 *   a = 1
@@ -133,9 +133,9 @@ namespace Semantics.Tests.Visitors
 		[Test]
 		public void VariableUseInNestedFunction() {
 			var fParam = Utils.DeclareInt ("a");
-			var fVarB = Utils.DeclareInt ("b");
-			var fVarC = Utils.DeclareInt ("c");
-			var fVarD = Utils.DeclareInt ("d");
+			var fVarB = Utils.DefineInt ("b", 1);
+			var fVarC = Utils.DefineInt ("c", 2);
+			var fVarD = Utils.DefineInt ("d", 3);
 			var useA = Utils.Usage (fParam, false);
 			var useB = Utils.Usage (fVarB, false);
 			var useC = Utils.Usage (fVarC, false);
