@@ -298,7 +298,7 @@ namespace Semantics.Tests
                     "MyFunc",
                     new LinkedList<VariableDeclNode>(),
                     NamedTypeNode.IntType(true),
-                    new AtomNode(NamedTypeNode.IntType(), "42")
+                    new AtomNode(NamedTypeNode.IntType(true), "42")
                 )
             }));
             ConductTest(tree, expected);
@@ -317,13 +317,13 @@ namespace Semantics.Tests
                     "MyFunc",
                     new LinkedList<VariableDeclNode>(),
                     NamedTypeNode.IntType(true),
-                    new AtomNode(NamedTypeNode.IntType(), "42")
+                    new AtomNode(NamedTypeNode.IntType(true), "42")
                 ),
                 new FunctionDefinitionNode(
                     "MyFunc",
                     new LinkedList<VariableDeclNode>(),
                     NamedTypeNode.IntType(true),
-                    new AtomNode(NamedTypeNode.IntType(), "42")
+                    new AtomNode(NamedTypeNode.IntType(true), "42")
                 )
             }));
             ConductTest(tree, expected);
@@ -341,8 +341,8 @@ namespace Semantics.Tests
                     new OperatorNode(
                         OperatorType.MUL,
                         new ExpressionNode[] {
-                            new AtomNode(NamedTypeNode.IntType(), "42"),
-                            new AtomNode(NamedTypeNode.IntType(), "43"),
+                            new AtomNode(NamedTypeNode.IntType(true), "42"),
+                            new AtomNode(NamedTypeNode.IntType(true), "43"),
                         }
                     )
                 )
@@ -362,12 +362,12 @@ namespace Semantics.Tests
                     new OperatorNode(
                         OperatorType.PLUS,
                         new ExpressionNode[] {
-                            new AtomNode(NamedTypeNode.IntType(), "1"),
+                            new AtomNode(NamedTypeNode.IntType(true), "1"),
                             new OperatorNode(
                                 OperatorType.MUL,
                                 new ExpressionNode[] {
-                                    new AtomNode(NamedTypeNode.IntType(), "2"),
-                                    new AtomNode(NamedTypeNode.IntType(), "3"),
+                                    new AtomNode(NamedTypeNode.IntType(true), "2"),
+                                    new AtomNode(NamedTypeNode.IntType(true), "3"),
                                 }
                             )
                         }
@@ -466,19 +466,19 @@ namespace Semantics.Tests
                 new FunctionDefinitionNode(
                     "g",
                     new LinkedList<VariableDeclNode>(new VariableDeclNode[]{
-                        new VariableDeclNode("n", NamedTypeNode.IntType(), false),
-                        new VariableDeclNode("k", NamedTypeNode.IntType(), false),
-                        new VariableDeclNode("nothing", NamedTypeNode.BoolType(), false),
+                        new VariableDeclNode("n", NamedTypeNode.IntType(true), false),
+                        new VariableDeclNode("k", NamedTypeNode.IntType(true), false),
+                        new VariableDeclNode("nothing", NamedTypeNode.BoolType(true), false),
                     }),
                     NamedTypeNode.IntType(true),
-                    new AtomNode(NamedTypeNode.IntType(), "0")                   
+                    new AtomNode(NamedTypeNode.IntType(true), "0")                   
                 ),
                 new FunctionDefinitionNode(
                     "f",
                     new LinkedList<VariableDeclNode>(new VariableDeclNode[]{
-                        new VariableDeclNode("n", NamedTypeNode.IntType(), false),
+                        new VariableDeclNode("n", NamedTypeNode.IntType(true), false),
                     }),
-                    NamedTypeNode.VoidType(),
+                    NamedTypeNode.VoidType(true),
                     new BlockExpressionNode(
                         new ExpressionNode[] {
                             new FunctionCallNode(
@@ -486,7 +486,7 @@ namespace Semantics.Tests
                                 new ExpressionNode[] {
                                     new VariableUseNode("n", null),
                                     new VariableUseNode("n", null),
-                                    new AtomNode(NamedTypeNode.BoolType(), "true")
+                                    new AtomNode(NamedTypeNode.BoolType(true), "true")
                                 },
                                 null
                             ),
@@ -497,7 +497,7 @@ namespace Semantics.Tests
                                         OperatorType.MINUS,
                                         new ExpressionNode[] {
                                             new VariableUseNode("n", null),
-                                            new AtomNode(NamedTypeNode.IntType(), "1")
+                                            new AtomNode(NamedTypeNode.IntType(true), "1")
                                         }
                                     )
                                 },

@@ -8,16 +8,19 @@ namespace Nicodem.Semantics.AST
 	{
         public string Name { get; set; } // set during AST construction
 
-        public static NamedTypeNode VoidType(){
+        public static NamedTypeNode VoidType(bool isConstant = false)
+        {
             NamedTypeNode node = new NamedTypeNode();
             node.Name = "void";
+            node.IsConstant = isConstant;
             return node;
         }
 
-        public static NamedTypeNode BoolType()
+        public static NamedTypeNode BoolType(bool isConstant=false)
         {
             NamedTypeNode node = new NamedTypeNode();
             node.Name = "bool";
+            node.IsConstant = isConstant;
             return node;
         }
 
@@ -29,17 +32,19 @@ namespace Nicodem.Semantics.AST
             return node;
         }
 
-        public static NamedTypeNode CharType()
+        public static NamedTypeNode CharType(bool isConstant = false)
         {
             NamedTypeNode node = new NamedTypeNode();
             node.Name = "char";
+            node.IsConstant = isConstant;
             return node;
         }
 
-        public static NamedTypeNode ByteType()
+        public static NamedTypeNode ByteType(bool isConstant = false)
         {
             NamedTypeNode node = new NamedTypeNode();
             node.Name = "byte";
+            node.IsConstant = isConstant;
             return node;
         }
 
