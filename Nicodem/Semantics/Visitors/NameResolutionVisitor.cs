@@ -23,14 +23,16 @@ namespace Nicodem.Semantics.Visitors
             functionSymbolTable.CloseBlock ();
 		}
 
-		public override void Visit (VariableDefNode node)
+		public override void Visit (VariableDeclNode node)
 		{
             variableSymbolTable.Insert (node.Name, node);
+			Console.WriteLine ("DeclNode: " + node.Name);
 			base.Visit (node);
 		}
 
 		public override void Visit (VariableUseNode node)
 		{
+			Console.WriteLine ("UseNode: " + node.Name);
             node.Declaration = variableSymbolTable.LookUp (node.Name);
 			base.Visit (node);
 		}
