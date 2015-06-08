@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text;
 using System.Diagnostics;
 using System.Collections.Generic;
 using Nicodem.Backend.Representation;
@@ -80,6 +81,16 @@ namespace Nicodem.Backend
             }
             _enclosedIn = enclosedInFunction;
             CalleeSavedRegLocations = new LocationNode[CalleeSavedRegisters.Length];
+        }
+
+        public override string ToString()
+        {
+            var s = new StringBuilder();
+            s.AppendFormat("Function: {0} (enclosed in {1})\n", Label, (EnclosedIn == null) ? "null" : EnclosedIn.Label);
+            foreach (var node in Body) {
+                s.AppendFormat(" - {0}\n", node.GetType());
+            }
+            return s.ToString();
         }
 
         // ------------------- internal methods -------------------

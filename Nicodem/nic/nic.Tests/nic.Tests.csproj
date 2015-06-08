@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>12.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7E12945F-5A0C-4C73-8CB9-35D3C3949B09}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>nic.Tests</RootNamespace>
+    <AssemblyName>nic.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="nunit.framework">
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="SamplesTests.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\Semantics\Semantics.csproj">
+      <Project>{B0BC59FC-D28F-42B9-A4CC-5470287924B2}</Project>
+      <Name>Semantics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Source\Source.csproj">
+      <Project>{6078FFE3-28C8-4169-831D-E1D1AAFDD72F}</Project>
+      <Name>Source</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Backend\Backend.csproj">
+      <Project>{493808C4-AFCD-4D86-B72C-BABAA51F88C4}</Project>
+      <Name>Backend</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Parser\Parser.csproj">
+      <Project>{DC9385D6-C37E-441F-8BAA-3B7EAEC2DA39}</Project>
+      <Name>Parser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Lexer\Lexer.csproj">
+      <Project>{3A107436-1EC7-48E3-BF42-5E5E50C259E7}</Project>
+      <Name>Lexer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Core\Core.csproj">
+      <Project>{5E967501-0A63-4196-A29B-B8B148785048}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-VisualStudioVersion = 12.0.31101.0
-MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{BDE96647-252C-4DAB-AE41-A02F7214C647}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Source", "Source\Source.csproj", "{6078FFE3-28C8-4169-831D-E1D1AAFDD72F}"
@@ -50,6 +48,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nic", "nic", "{18D72BF7-B6C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nic", "nic\nic.csproj", "{83A530DD-F625-4AF3-9C19-E311B2A2C6F2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nic.Tests", "nic\nic.Tests\nic.Tests.csproj", "{7E12945F-5A0C-4C73-8CB9-35D3C3949B09}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -96,6 +96,10 @@ Global
 		{746D247C-6E5D-41D2-88E3-3A51D2DAC0B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{746D247C-6E5D-41D2-88E3-3A51D2DAC0B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{746D247C-6E5D-41D2-88E3-3A51D2DAC0B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E12945F-5A0C-4C73-8CB9-35D3C3949B09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E12945F-5A0C-4C73-8CB9-35D3C3949B09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E12945F-5A0C-4C73-8CB9-35D3C3949B09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E12945F-5A0C-4C73-8CB9-35D3C3949B09}.Release|Any CPU.Build.0 = Release|Any CPU
 		{83A530DD-F625-4AF3-9C19-E311B2A2C6F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{83A530DD-F625-4AF3-9C19-E311B2A2C6F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83A530DD-F625-4AF3-9C19-E311B2A2C6F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -127,8 +131,10 @@ Global
 		{493808C4-AFCD-4D86-B72C-BABAA51F88C4} = {03321013-8C3F-4627-8DDA-19E8F3AC7FD5}
 		{4C37FB6A-05DF-4D9A-9E54-9008E5962F7F} = {03321013-8C3F-4627-8DDA-19E8F3AC7FD5}
 		{83A530DD-F625-4AF3-9C19-E311B2A2C6F2} = {18D72BF7-B6CF-4CDF-8182-FA3EEE912202}
+		{7E12945F-5A0C-4C73-8CB9-35D3C3949B09} = {18D72BF7-B6CF-4CDF-8182-FA3EEE912202}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Source\Source.csproj
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = None
