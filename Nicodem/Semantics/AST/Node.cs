@@ -94,8 +94,7 @@ namespace Nicodem.Semantics.AST
         {
             string result = prefix1 + label + " (n=" + field.Count() + "):\n";
             string prefix2 = prefix1 + "| ";
-            string prefix3 = prefix2 + "| ";
-            foreach (var i in field) result += prefix2 + i.Print(prefix3);
+            foreach (var i in field) result += prefix2 + i.Print(prefix2);
             return result;
         }
         #endregion
