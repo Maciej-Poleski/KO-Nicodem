@@ -24,7 +24,7 @@ namespace Nicodem.Backend
         /// </summary>
         /// <returns>sequence of nasm instructions</returns>
         /// <param name="funcList">List of backend functions created by frontend.</param>
-        IEnumerable<string> FromFunctionsToNasm(IEnumerable<Function> funcList)
+        public IEnumerable<string> FromFunctionsToNasm(IEnumerable<Function> funcList)
         {
             foreach (var f in funcList) {
                 f.Body = TraceBuilder.BuildTrace(f.Body.First());
