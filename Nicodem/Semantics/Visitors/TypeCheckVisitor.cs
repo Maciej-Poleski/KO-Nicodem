@@ -80,7 +80,7 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(ElementNode node)
         {
             base.Visit(node);
-            if (!NamedTypeNode.IntType().Equals(node.Index.ExpressionType))
+            if (!NamedTypeNode.IntType().Equals(node.Index.ExpressionType, false))
                 throw new TypeCheckException("Index is not integer type.");
             node.ExpressionType = node.Array.ExpressionType;
         }
@@ -101,7 +101,7 @@ namespace Nicodem.Semantics.Visitors
             
             for (int i = 0; i < listOfFunctionArguments.Count; i++)
             {
-                if (!listOfFunctionArguments[i].Type.Equals(listOfFunctionCallArguments[i].ExpressionType))
+                if (!listOfFunctionArguments[i].Type.Equals(listOfFunctionCallArguments[i].ExpressionType, false))
                     throw new Exception(String.Format("Argument {0} has improper type.", i));
             }
 
@@ -112,7 +112,7 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(FunctionDefinitionNode node)
         {
             base.Visit(node);
-			if (!node.ResultType.Equals(node.Body.ExpressionType))
+			if (!node.ResultType.Equals(node.Body.ExpressionType, false))
 				throw new TypeCheckException ("Body doesn't return the same type as set type.");
             node.ExpressionType = NamedTypeNode.VoidType();
         }
@@ -295,9 +295,9 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(SliceNode node)
         {
             base.Visit(node);
-            if (!NamedTypeNode.IntType().Equals(node.Left.ExpressionType))
+            if (!NamedTypeNode.IntType().Equals(node.Left.ExpressionType, false))
                 throw new TypeCheckException("Left is not int value.");
-            if (!NamedTypeNode.IntType().Equals(node.Right.ExpressionType))
+            if (!NamedTypeNode.IntType().Equals(node.Right.ExpressionType, false))
                 throw new TypeCheckException("Right is not int value.");
             node.ExpressionType = node.Array.ExpressionType;
             ((ArrayTypeNode)node.ExpressionType).IsFixedSize = false;
@@ -313,7 +313,7 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(VariableDefNode node)
         {
             base.Visit(node);
-            if (!node.Value.ExpressionType.Equals(node.Type))
+            if (!node.Value.ExpressionType.Equals(node.Type, false))
                 throw new TypeCheckException("Value type not agree with VariableType");
             node.ExpressionType = node.Type;
         }
@@ -332,7 +332,7 @@ namespace Nicodem.Semantics.Visitors
             base.Visit(node);
             _stack_of_while_node.Remove(node);
             TypeNode _type_to_set;
-            if(!NamedTypeNode.BoolType().Equals(node.Condition.ExpressionType))
+            if(!NamedTypeNode.BoolType().Equals(node.Condition.ExpressionType, false))
                 throw new Exception("Inpropper type in if condition");
             if(!node.HasElse || !node.Body.ExpressionType.Equals(node.Else.ExpressionType))
                 _type_to_set = NamedTypeNode.VoidType();
