@@ -157,16 +157,13 @@ namespace Nicodem.Semantics.Visitors
                 case OperatorType.ASSIGN:
                     if (arguments_list.Count() != 2)
                         throw new TypeCheckException("Inproper numbers of arguments.");
-                    if (!arguments_list[0].ExpressionType.Equals(arguments_list[1].ExpressionType))
+                    if (arguments_list[0].ExpressionType.IsConstant)
+                        throw new TypeCheckException("Variable to assign is constant.");
+                    if (!arguments_list[0].ExpressionType.Equals(arguments_list[1].ExpressionType, false))
                         throw new TypeCheckException("Wrong argument type.");
                     node.ExpressionType = arguments_list[0].ExpressionType;
                     break;
-                // + - * / % += -= *= /= %= 
-                case OperatorType.PLUS:
-                case OperatorType.MINUS:
-                case OperatorType.MUL:
-                case OperatorType.DIV:
-                case OperatorType.MOD:
+                //+= -= *= /= %= 
                 case OperatorType.PLUS_ASSIGN:
                 case OperatorType.MINUS_ASSIGN:
                 case OperatorType.MUL_ASSIGN:
@@ -174,21 +171,47 @@ namespace Nicodem.Semantics.Visitors
                 case OperatorType.MOD_ASSIGN:
                     if (arguments_list.Count() != 2)
                         throw new TypeCheckException("Inproper numbers of arguments.");
-                    if (NamedTypeNode.IntType().Equals(arguments_list[0].ExpressionType) && NamedTypeNode.IntType().Equals(arguments_list[1].ExpressionType))
+                    if (arguments_list.Count() >= 1 && arguments_list[0].ExpressionType.IsConstant)
+                        throw new TypeCheckException("Variable to assign is constant.");
+                    if (NamedTypeNode.IntType().Equals(arguments_list[0].ExpressionType, false) && NamedTypeNode.IntType().Equals(arguments_list[1].ExpressionType, false))
                         node.ExpressionType = NamedTypeNode.IntType();
-                    else if ( NamedTypeNode.ByteType().Equals(arguments_list[0].ExpressionType) && NamedTypeNode.ByteType().Equals(arguments_list[1].ExpressionType))
-                        node.ExpressionType = NamedTypeNode.IntType();
+                    else if ( NamedTypeNode.ByteType().Equals(arguments_list[0].ExpressionType, false) && NamedTypeNode.ByteType().Equals(arguments_list[1].ExpressionType, false))
+                        node.ExpressionType = NamedTypeNode.ByteType();
                     else
                         throw new TypeCheckException("Wrong argument type.");
                     break;
-                // << >> <<= >>= 
+                //+ - * / % 
+                case OperatorType.PLUS:
+                case OperatorType.MINUS:
+                case OperatorType.MUL:
+                case OperatorType.DIV:
+                case OperatorType.MOD:
+                    if (arguments_list.Count() != 2)
+                        throw new TypeCheckException("Inproper numbers of arguments.");
+                    if (NamedTypeNode.IntType().Equals(arguments_list[0].ExpressionType, false) && NamedTypeNode.IntType().Equals(arguments_list[1].ExpressionType, false))
+                        node.ExpressionType = NamedTypeNode.IntType();
+                    else if (NamedTypeNode.ByteType().Equals(arguments_list[0].ExpressionType, false) && NamedTypeNode.ByteType().Equals(arguments_list[1].ExpressionType, false))
+                        node.ExpressionType = NamedTypeNode.ByteType();
+                    else
+                        throw new TypeCheckException("Wrong argument type.");
+                    break;
+                // << >>
                 case OperatorType.BIT_SHIFT_UP:
                 case OperatorType.BIT_SHIFT_DOWN:
+                    if (arguments_list.Count() != 2)
+                        throw new TypeCheckException("Inproper numbers of arguments.");
+                    if (!NamedTypeNode.ByteType().Equals(arguments_list[0].ExpressionType, false) || !NamedTypeNode.IntType().Equals(arguments_list[1].ExpressionType, false))
+                        throw new TypeCheckException("Wrong argument type.");
+                    node.ExpressionType = NamedTypeNode.ByteType();
+                    break;
+                // <<= >>= 
                 case OperatorType.BIT_SHIFT_UP_ASSIGN:
                 case OperatorType.BIT_SHIFT_DOWN_ASSIGN:
                     if (arguments_list.Count() != 2)
                         throw new TypeCheckException("Inproper numbers of arguments.");
-                    if (!NamedTypeNode.ByteType().Equals(arguments_list[0].ExpressionType) || !NamedTypeNode.IntType().Equals(arguments_list[1].ExpressionType) )
+                    if (arguments_list[0].ExpressionType.IsConstant)
+                        throw new TypeCheckException("Variable to assign is constant.");
+                    if (!NamedTypeNode.ByteType().Equals(arguments_list[0].ExpressionType, false) || !NamedTypeNode.IntType().Equals(arguments_list[1].ExpressionType, false))
                         throw new TypeCheckException("Wrong argument type.");
                     node.ExpressionType = NamedTypeNode.ByteType();
                     break;
@@ -197,7 +220,7 @@ namespace Nicodem.Semantics.Visitors
                 case OperatorType.BIT_XOR:
                 case OperatorType.BIT_AND:
                     foreach (var argument in node.Arguments)
-                        if (!NamedTypeNode.ByteType().Equals(argument.ExpressionType))
+                        if (!NamedTypeNode.ByteType().Equals(argument.ExpressionType, false))
                             throw new TypeCheckException("Wrong argument type.");
                     node.ExpressionType = NamedTypeNode.ByteType();
                     break;
@@ -207,7 +230,9 @@ namespace Nicodem.Semantics.Visitors
                 case OperatorType.BIT_OR_ASSIGN:
                     if (arguments_list.Count() != 2)
                         throw new TypeCheckException("Inproper numbers of arguments.");
-                    if (!NamedTypeNode.ByteType().Equals(arguments_list[0].ExpressionType) || !NamedTypeNode.ByteType().Equals(arguments_list[1].ExpressionType))
+                    if (arguments_list[0].ExpressionType.IsConstant)
+                        throw new TypeCheckException("Variable to assign is constant.");
+                    if (!NamedTypeNode.ByteType().Equals(arguments_list[0].ExpressionType, false) || !NamedTypeNode.ByteType().Equals(arguments_list[1].ExpressionType, false))
                         throw new TypeCheckException("Wrong argument type.");
                     node.ExpressionType = NamedTypeNode.ByteType();
                     break;
@@ -215,11 +240,11 @@ namespace Nicodem.Semantics.Visitors
                 case OperatorType.OR:
                 case OperatorType.AND:
                     foreach (var argument in node.Arguments)
-                        if (!NamedTypeNode.BoolType().Equals(argument.ExpressionType))
+                        if (!NamedTypeNode.BoolType().Equals(argument.ExpressionType, false))
                             throw new TypeCheckException("Wrong argument type.");
                     node.ExpressionType = NamedTypeNode.BoolType();
                     break;
-                // ==!= < <= > >=
+                // == != < <= > >=
 				case OperatorType.EQUAL:
 				case OperatorType.NOT_EQUAL:
 				case OperatorType.LESS:
@@ -228,7 +253,8 @@ namespace Nicodem.Semantics.Visitors
 				case OperatorType.GREATER_EQUAL:
 					if (arguments_list.Count () != 2)
 						throw new TypeCheckException ("Inproper numbers of arguments.");
-					if (!NamedTypeNode.IntType ().Equals (arguments_list [0].ExpressionType) || !NamedTypeNode.IntType ().Equals (arguments_list [1].ExpressionType)) {
+                    if (!NamedTypeNode.IntType().Equals(arguments_list[0].ExpressionType, false) || !NamedTypeNode.IntType().Equals(arguments_list[1].ExpressionType, false))
+                    {
 						throw new TypeCheckException ("Wrong argument type.");
 					}
                     node.ExpressionType = NamedTypeNode.BoolType();
@@ -242,6 +268,8 @@ namespace Nicodem.Semantics.Visitors
                 case OperatorType.POST_DECREMENT:
                     if (arguments_list.Count() != 1)
                         throw new TypeCheckException("Inproper numbers of arguments.");
+                    if (arguments_list[0].ExpressionType.IsConstant)
+                        throw new TypeCheckException("Variable to assign is constant.");
                     if (NamedTypeNode.IntType().Equals(arguments_list[0].ExpressionType))
                         node.ExpressionType = NamedTypeNode.IntType();
                     else if (NamedTypeNode.ByteType().Equals(arguments_list[0].ExpressionType))
@@ -254,6 +282,8 @@ namespace Nicodem.Semantics.Visitors
                 case OperatorType.BIT_NOT:
                     if (arguments_list.Count() != 1)
                         throw new TypeCheckException("Inproper numbers of arguments.");
+                    if (arguments_list[0].ExpressionType.IsConstant)
+                        throw new TypeCheckException("Variable to assign is constant.");
                     if (!NamedTypeNode.ByteType().Equals(arguments_list[0].ExpressionType))
                         throw new TypeCheckException("Wrong argument type.");
                     node.ExpressionType = NamedTypeNode.ByteType();

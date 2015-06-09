@@ -29,6 +29,43 @@ namespace Semantics.Tests.Visitors
 			Assert.IsTrue (fBody.ExpressionType.Equals(fParamA.ExpressionType));
 		}
 
+        /*
+         * [
+         * int a = 3;
+         * a = a + 1;
+         * ]
+         */
+        [Test]
+        [ExpectedException(typeof(TypeCheckException), ExpectedMessage = "Variable to assign is constant.")]
+        public void TypeCheck_immutableTryAssingSum_Test()
+        {
+            var a = Utils.DefineConstantInt("a", 3);
+            var a_use = Utils.Usage(a);
+            var _a_plus_1 = Utils.Add(a_use, Utils.IntLiteral(1));
+            var a_assign = Utils.Assignment(a_use, _a_plus_1);
+            var be = Utils.body(new ExpressionNode[] { a, a_assign });
+
+            be.Accept(new TypeCheckVisitor());
+        }
+
+        /*
+         * [
+         * int a = 3;
+         * a = 1;
+         * ]
+         */
+        [Test]
+        [ExpectedException(typeof(TypeCheckException), ExpectedMessage = "Variable to assign is constant.")]
+        public void TypeCheck_immutableTryAssingLiteral_Test()
+        {
+            var a = Utils.DefineConstantInt("a", 3);
+            var a_use = Utils.Usage(a);
+            var a_assign = Utils.Assignment(a_use, Utils.IntLiteral(1));
+            var be = Utils.body(new ExpressionNode[] { a, a_assign });
+
+            be.Accept(new TypeCheckVisitor());
+        }
+
 		/*
 		 * 		if (true) {
 		 * 			1
@@ -166,7 +203,7 @@ namespace Semantics.Tests.Visitors
             _block_exp.Accept(new TypeCheckVisitor());
 
             Assert.NotNull(_block_exp.ExpressionType);
-            Assert.IsTrue(_block_exp.ExpressionType.Equals(Utils.MakeConstantVoid()));
+            Assert.IsTrue(_block_exp.ExpressionType.Equals(Utils.MakeConstantVoid(), false));
         }
 
         [Test]

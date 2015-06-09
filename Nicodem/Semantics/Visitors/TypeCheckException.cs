@@ -9,6 +9,6 @@ namespace Nicodem.Semantics.Visitors
     class TypeCheckException : Exception
     {
         public TypeCheckException() { }
-        public TypeCheckException(string message) { }
+        public TypeCheckException(string message) : base(message) { }
     }
 }
