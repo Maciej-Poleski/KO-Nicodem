@@ -64,12 +64,11 @@ namespace Semantics.Tests.Visitors
 
             a.Accept(new TypeCheckVisitor());
 			whileSt.Accept (new TypeCheckVisitor ());
-			Assert.IsFalse (minus.ExpressionType.Equals (Utils.MakeConstantBool ()));
-            Assert.IsTrue(minus.ExpressionType.Equals(Utils.MakeConstantInt()));
+			Assert.IsTrue(minus.ExpressionType.Equals(Utils.MakeConstantInt(), false));
 			Assert.NotNull (whileSt.ExpressionType);
 			Assert.IsTrue (whileBody.ExpressionType.Equals (whileExp1.ExpressionType));
 			Assert.IsFalse (whileSt.ExpressionType.Equals (whileBody.ExpressionType));
-            Assert.IsTrue (whileSt.ExpressionType.Equals (Utils.MakeConstantVoid()));
+			Assert.IsTrue (whileSt.ExpressionType.Equals (Utils.MakeConstantVoid(), false));
 		}
 
 		/* main() -> int

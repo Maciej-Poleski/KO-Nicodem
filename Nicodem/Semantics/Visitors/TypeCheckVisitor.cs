@@ -38,17 +38,17 @@ namespace Nicodem.Semantics.Visitors
             HashSet<TypeNode> _set_of_types = new HashSet<TypeNode>();
             bool out_bool;
             if (Boolean.TryParse(value, out out_bool))
-                _set_of_types.Add(NamedTypeNode.BoolType());
+                _set_of_types.Add(NamedTypeNode.BoolType(true));
             byte out_byte;
             if (Byte.TryParse(value, out out_byte))
-                _set_of_types.Add(NamedTypeNode.ByteType());
+                _set_of_types.Add(NamedTypeNode.ByteType(true));
             int out_int;
 			if (Int32.TryParse (value, out out_int)) {
-				_set_of_types.Add (NamedTypeNode.IntType ());
+				_set_of_types.Add (NamedTypeNode.IntType (true));
 			}
             char out_char;
             if (value.Length == 3 && Char.TryParse(value.Trim(new char[]{'\''}), out out_char))
-                _set_of_types.Add(NamedTypeNode.CharType());
+                _set_of_types.Add(NamedTypeNode.CharType(true));
             return _set_of_types;
         }
 
@@ -121,7 +121,7 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(IfNode node)
         {
             base.Visit(node);
-            if(!NamedTypeNode.BoolType().Equals(node.Condition.ExpressionType))
+            if(!NamedTypeNode.BoolType().Equals(node.Condition.ExpressionType, false))
                 throw new Exception("Improper type in if condition");
             if(!node.HasElse || !node.Then.ExpressionType.Equals(node.Else.ExpressionType))
                 node.ExpressionType = NamedTypeNode.VoidType();
