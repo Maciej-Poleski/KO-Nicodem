@@ -9,17 +9,17 @@ namespace Semantics.Tests.Visitors
 	public class TypeCheckVisitorTests
 	{
 		/*
-		 * f (mutable int a) -> int
+		 * f (mutable int a) -> mutable int
 		 * {
 		 * 		a = 1
 		 * }
 		 */
 		[Test]
-        public void TypeCheck_TestUtilsSimpleFunction()
+        public void TypeCheck_TestSimpleFunction()
         {
 			var fParamA = Utils.DeclareInt ("a");
 			var fBody = Utils.Assignment (fParamA, Utils.IntLiteral (1));
-			var fFunction = Utils.FunctionDef ("f", Utils.parameters (fParamA), Utils.MakeConstantInt (), Utils.body (fBody));
+			var fFunction = Utils.FunctionDef ("f", Utils.parameters (fParamA), Utils.MakeMutableInt (), Utils.body (fBody));
 			var program = Utils.Program (fFunction);
 			program.Accept (new TypeCheckVisitor ());
 
@@ -108,9 +108,21 @@ namespace Semantics.Tests.Visitors
 			Assert.IsTrue (whileSt.ExpressionType.Equals (Utils.MakeConstantVoid(), false));
 		}
 
-		/* main() -> int
+		/*
+		 * int c = 1;
+		 * int b = c;
+		 */
+		[Test]
+		public void test_def() {
+			var c = Utils.DefineInt ("c", 1);
+			var b = Utils.Definition (Utils.DeclareInt("b"), Utils.Usage (c));
+			b.Accept (new TypeCheckVisitor ());
+			Assert.NotNull (b.Value.ExpressionType);
+		}
+
+		/* main() -> void
 		 * {
-		 * 	gcd(mutable int a, mutable int b) -> int 
+		 * 	gcd(mutable int a, mutable int b) -> mutable int 
 		 * 	{
 		 * 		if a<b {
 		 * 			mutable int c = a
@@ -128,7 +140,7 @@ namespace Semantics.Tests.Visitors
 		 * 		mutable int a = 20
 		 * 		mutable int b = 10
 		 * 		gcd(a,b) > 1
-		 * 		} a
+		 * 		} 1
 		 * }
 		 */
 		// if the last if-statement is executed, main's body will have type INT, otherwise the type will be VOID ? Can't be...
@@ -140,12 +152,13 @@ namespace Semantics.Tests.Visitors
 				// args
 				var a = Utils.DeclareInt ("a");
 				var b = Utils.DeclareInt ("b");
-
+				
 				// if
 				var ifC = Utils.DeclareInt("c");
 				var ifExp1 = Utils.Definition (ifC, Utils.Usage (a));  
-				var ifExp2 = Utils.Definition (a, Utils.Usage (b));
-				var ifExp3 = Utils.Definition (b, Utils.Usage (ifC));
+				var ifExp2 = Utils.Assignment (Utils.Usage(a), Utils.Usage(b));
+				var ifExp3 = Utils.Assignment (Utils.Usage(b), Utils.Usage (ifC));
+
 				var ifCond = Utils.Less (Utils.Usage (a), Utils.Usage (b));
 				var ifThen = Utils.body (ifExp1, ifExp2, ifExp3);
 				var ifst = Utils.If (ifCond, ifThen);
@@ -161,7 +174,7 @@ namespace Semantics.Tests.Visitors
 				var whileSt = Utils.While (whileCond, whileBody);
 
 			var gcdBody = Utils.body (ifst, whileSt, Utils.Usage (a));
-			var gcdFuncDef = Utils.FunctionDef ("gcd", Utils.parameters (a, b), Utils.MakeConstantInt (), gcdBody);
+			var gcdFuncDef = Utils.FunctionDef ("gcd", Utils.parameters (a, b), Utils.MakeMutableInt (), gcdBody);
 
 			// main
 				// gcd - above
@@ -170,24 +183,19 @@ namespace Semantics.Tests.Visitors
 				b = Utils.DefineInt ("b", 10);
 				var gcdCall = Utils.FunctionCall ("gcd", a, b);
 				var mainIfCond = Utils.Greater (gcdCall, Utils.IntLiteral(1));
-				var mainIf = Utils.If (mainIfCond, Utils.Usage (a));
+			var mainIf = Utils.If (mainIfCond, Utils.IntLiteral(1));
 
 			var mainBody = Utils.body (gcdFuncDef, mainIf);
-			var mainFuncDef = Utils.FunctionDef("main", Utils.parameters(), Utils.MakeConstantInt(), mainBody);
-		
+			var mainFuncDef = Utils.FunctionDef("main", Utils.parameters(), Utils.MakeConstantVoid(), mainBody);
+
+			mainFuncDef.Accept (new NameResolutionVisitor ());
 			mainFuncDef.Accept (new TypeCheckVisitor ());
 			Assert.NotNull (gcdBody.ExpressionType);
 			Assert.NotNull (gcdFuncDef.ExpressionType);
 			Assert.NotNull (gcdCall.ExpressionType);
-			Assert.IsTrue (gcdBody.ExpressionType.Equals (whileSt.ExpressionType));
-			Assert.IsTrue (gcdFuncDef.ExpressionType.Equals (gcdBody.ExpressionType));
-			Assert.IsTrue (gcdFuncDef.ExpressionType.Equals (Utils.MakeConstantInt ()));
-			Assert.IsTrue (gcdCall.ExpressionType.Equals (gcdFuncDef.ExpressionType));
-
+			Assert.IsTrue (gcdCall.ExpressionType.Equals (gcdFuncDef.ResultType));
 			Assert.NotNull (mainFuncDef.ExpressionType);
 			Assert.IsTrue (mainBody.ExpressionType.Equals (mainIf.ExpressionType));
-			Assert.IsTrue (mainBody.ExpressionType.Equals (Utils.MakeConstantInt())); // What if the if condition doesn't hold?
-
 		}
 
         /*

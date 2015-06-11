@@ -112,7 +112,7 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(FunctionDefinitionNode node)
         {
             base.Visit(node);
-			if (!node.ResultType.Equals(node.Body.ExpressionType))
+			if (!node.ResultType.Equals(node.Body.ExpressionType, false))
 				throw new TypeCheckException ("Body doesn't return the same type as set type.");
             node.ExpressionType = NamedTypeNode.VoidType();
         }
@@ -313,7 +313,7 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(VariableDefNode node)
         {
             base.Visit(node);
-            if (!node.Value.ExpressionType.Equals(node.Type))
+            if (!node.Value.ExpressionType.Equals(node.Type, false))
                 throw new TypeCheckException("Value type not agree with VariableType");
             node.ExpressionType = node.Type;
         }
