@@ -43,6 +43,29 @@ namespace Nicodem.Backend
             R14,
             R15,
         };
+
+        public static readonly HardwareRegisterNode[] HardwareRegistersOrder =
+        {
+            Target.RDI,
+            Target.RSI,
+            Target.RDX,
+            Target.RCX,
+            Target.R8,
+            Target.R9
+        };
+
+        public static readonly HardwareRegisterNode[] CallerSavedRegisters = 
+        {
+            Target.RAX,
+            Target.RCX,
+            Target.RDX,
+            Target.R8,
+            Target.R9,
+            Target.R10,
+            Target.R11
+        };
+
+        public static readonly HardwareRegisterNode[] CalleeSavedRegisters = { };
 	}
 }
 
