@@ -7,14 +7,16 @@ using Nicodem.Backend.Representation;
 
 namespace Nicodem.Backend
 {
-    // This is convention is based on IA64 ABI
     public class Function
     {
-        private readonly Function _enclosedIn;
+        // ---------------- private fields ----------------
+
         // Function with not null _enclosedIn have additional variable on stack just below old RBP - pointer to nearest enclosing Function stack frame
-        private int _stackFrameSize;
+        private readonly Function _enclosedIn;
+
         // RBP - this stack frame
         // (optional) RBP-8 - address of stack frame of nearest enclosing Function (NOTE: space will be alocated in preamble)
+        private int _stackFrameSize;
 
         /// <value>Locations of function arguments.</value>
         private Location[] ArgsLocations; // used inside constructor
