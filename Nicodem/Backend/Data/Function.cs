@@ -83,6 +83,8 @@ namespace Nicodem.Backend
             CalleeSavedRegLocations = new LocationNode[CalleeSavedRegisters.Length];
         }
 
+        // ------------------- printing -------------------
+
         public override string ToString()
         {
             var s = new StringBuilder();

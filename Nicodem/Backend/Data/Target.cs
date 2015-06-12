@@ -25,15 +25,6 @@ namespace Nicodem.Backend
 		public static readonly HardwareRegisterNode R14 = new HardwareRegisterNode ("r14");
 		public static readonly HardwareRegisterNode R15 = new HardwareRegisterNode ("r15");
 
-		public Target () {
-		}
-
-		public Function CreateFunction() {
-            throw new NotImplementedException();
-			// return new Function();
-            // FIXME You must provide local/temporary variables bitmap
-		}
-
         public static readonly HardwareRegisterNode[] AllHardwareRegisters = new HardwareRegisterNode[] {
             RAX,
             RBX,

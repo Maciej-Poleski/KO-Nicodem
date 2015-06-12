@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Nicodem.Semantics.AST;
 using Nicodem.Backend;
 using Brep = Nicodem.Backend.Representation;
@@ -8,20 +9,17 @@ namespace Nicodem.Semantics.Visitors
 {
 	internal class FunctionLocalVisitor : AbstractRecursiveVisitor
 	{
-		private readonly Target target;
 		private Stack<Function> functions = new Stack<Function> ();
-
-		internal FunctionLocalVisitor(Target target) {
-			this.target = target;
-		}
 
 		public override void Visit(FunctionDefinitionNode node)
 		{
-			node.BackendFunction = target.CreateFunction ();
-			functions.Push (node.BackendFunction);
-
-			base.Visit(node);
-
+            // create this function backend object
+            var parametersBitmap = node.Parameters.Select(p => p.NestedUse).ToArray();
+            var enclosedIn = (functions.Count > 0) ? functions.Peek() : null; // peek od stack - parent function
+            node.BackendFunction = new Function(node.Name, parametersBitmap, enclosedIn);  // no name mangling for now - no function name overloading
+			// continue visiting, place this function on stack, remove it when le
+            functions.Push (node.BackendFunction);
+            base.Visit(node);
 			functions.Pop ();
 		}
 

@@ -38,7 +38,7 @@ namespace Nicodem.Semantics
             ast.Accept(new NameResolutionVisitor());
             ast.Accept(new TypeCheckVisitor());
             ast.FillInNestedUseFlag();
-            ast.Accept(new FunctionLocalVisitor(new Backend.Target())); // create backend function objects
+            ast.Accept(new FunctionLocalVisitor()); // create backend function objects
             // get all functions from AST
             IEnumerable<FunctionDefinitionNode> funcList = ast.GetAllFunctionDefinitions();
 
