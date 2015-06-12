@@ -14,6 +14,13 @@
 			return new Node[]{ Address };
 		}
 
+        #region Printing
+        protected override string PrintElements(string prefix)
+        {
+            return PrintChild(prefix, "address", Address);
+        }
+        #endregion
+
         #region implemented ReplaceRegisterWithLocal
         internal override Node ReplaceRegisterWithLocal(
             System.Collections.Generic.IReadOnlyDictionary<RegisterNode, Local> map, 

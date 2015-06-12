@@ -10,5 +10,12 @@ namespace Nicodem.Backend.Representation
 		{
 			Label = label;
 		}
+
+        #region Printing
+        protected override string Print()
+        {
+            return Label;
+        }
+        #endregion
 	}
 }

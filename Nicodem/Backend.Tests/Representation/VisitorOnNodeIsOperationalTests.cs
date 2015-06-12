@@ -12,6 +12,7 @@ namespace Nicodem.Backend.Tests.Representation
             // 2+2*2
             var simpleExpression = new AddOperatorNode(new ConstantNode<int>(2),
                 new MulOperatorNode(new ConstantNode<int>(2), new ConstantNode<int>(2)));
+            System.Console.WriteLine(simpleExpression);
 
             var printer = new BinaryOperatorPrinter();
             simpleExpression.Accept(printer);

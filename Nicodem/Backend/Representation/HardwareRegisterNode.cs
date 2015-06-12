@@ -9,9 +9,6 @@
 
 		public string Name { get; private set; }
 
-		public override string ToString ()
-		{
-			return string.Format ("Hardware Register <{0}>", Name);
-		}
+        public override string Id { get {return Name;} }
 	}
 }

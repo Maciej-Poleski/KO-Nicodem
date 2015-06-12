@@ -11,5 +11,12 @@ namespace Nicodem.Backend.Representation
 
         // Function type depends on architecture. Adjust when Target will be in shape.
         public Function Function { get; private set; }
+
+        #region Printing
+        protected override string Print()
+        {
+            return "call " + Function.Label;
+        }
+        #endregion
     }
 }

@@ -12,5 +12,12 @@
 		public override Node[] GetChildren() {
 			return new Node[]{ NextNode };
 		}
+
+        #region Printing
+        protected override string PrintElements(string prefix)
+        {
+            return PrintChild(prefix, "jump_to", NextNode);
+        }
+        #endregion
 	}
 }
