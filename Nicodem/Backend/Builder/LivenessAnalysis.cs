@@ -74,6 +74,8 @@ namespace Nicodem.Backend.Builder
 
 			Instruction prev = null;
 			foreach (var ins in instructions) {
+				ins.PrevInstructions = new HashSet<Instruction> ();
+
 				if (ins.IsLabel)
 					names.Add (ins.Label, ins);
 

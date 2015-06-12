@@ -59,7 +59,7 @@ namespace Nicodem.Backend.Cover
 		public bool IsJumpInstruction { get; private set; }
 		public bool IsLabel { get; private set; }
 		public string Label { get; private set; }
-		internal ICollection<Instruction> PrevInstructions { get; set; }
+		public ICollection<Instruction> PrevInstructions { get; set; }
 
 		public string ToString(IReadOnlyDictionary<RegisterNode, HardwareRegisterNode> registerMapping) {
 			var str = instructionBuilder (registerMapping);
