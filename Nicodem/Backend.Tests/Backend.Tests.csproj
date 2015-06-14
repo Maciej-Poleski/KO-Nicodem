@@ -54,7 +54,6 @@
     <Compile Include="Cover\InstructionFactoryTests.cs" />
     <Compile Include="InstructionSelection\CompareNodeWithTileTests.cs" />
     <Compile Include="Builder\RegisterAllocatorTest.cs" />
-    <Compile Include="Builder\FindUnionTest.cs" />
     <Compile Include="Trace\TraceBuilder.cs" />
     <Compile Include="Builder\LivenessAnalysisTest.cs" />
   </ItemGroup>
