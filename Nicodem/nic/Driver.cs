@@ -32,8 +32,8 @@ namespace Nicodem.Compiler
             Console.WriteLine("NIcodem Compiler driver\n");
             Console.WriteLine("{0} [options] <input file>", args[0]);
             Console.WriteLine();
-            Console.WriteLine(" -s\tcompile only (generate assembly)");
-            Console.WriteLine(" -o <name>\toutput file name");
+            Console.WriteLine(" -s        -- compile only (generate assembly)");
+            Console.WriteLine(" -o <name> -- output file name");
         }
 
         private static void unknownParameter(string param)
