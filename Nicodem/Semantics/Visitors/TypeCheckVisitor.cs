@@ -313,7 +313,7 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(VariableDefNode node)
         {
             base.Visit(node);
-            if (!node.Value.ExpressionType.Equals(node.Type, false))
+            if (node.Value.ExpressionType != null && !node.Value.ExpressionType.Equals(node.Type, false))
                 throw new TypeCheckException("Value type not agree with VariableType");
             node.ExpressionType = node.Type;
         }
