@@ -123,7 +123,7 @@ namespace Nicodem.Semantics.Visitors
             base.Visit(node);
             if(!NamedTypeNode.BoolType().Equals(node.Condition.ExpressionType, false))
                 throw new Exception("Improper type in if condition");
-            if(!node.HasElse || !node.Then.ExpressionType.Equals(node.Else.ExpressionType))
+            if(!node.HasElse || !node.Then.ExpressionType.Equals(node.Else.ExpressionType, false))
                 node.ExpressionType = NamedTypeNode.VoidType();
             else
                 node.ExpressionType = node.Then.ExpressionType;

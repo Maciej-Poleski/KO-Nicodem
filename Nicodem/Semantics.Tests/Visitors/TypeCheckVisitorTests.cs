@@ -268,6 +268,23 @@ namespace Semantics.Tests.Visitors
             Assert.NotNull(_atom_byte.ExpressionType);
             Assert.IsTrue(_atom_byte.ExpressionType.Equals(Utils.MakeConstantByte()));
         }
+
+        /*
+         * int x = if true 5 else 2-3
+         */
+        [Test]
+        public void TypeCheck_AssignIf_Test()
+        {
+            var _2_sub_3 = Utils.Sub(Utils.IntLiteral(2), Utils.IntLiteral(3));
+            var _if = Utils.IfElse(Utils.BoolLiteral(true), Utils.IntLiteral(5), _2_sub_3);
+
+            var _decl = Utils.Declaration("x", NamedTypeNode.IntType());
+            var _def = Utils.Definition(_decl, _if);
+
+            _def.Accept(new TypeCheckVisitor());
+
+            Assert.IsTrue(NamedTypeNode.IntType().Equals(_def.ExpressionType));
+        }
 	}
 }
 
