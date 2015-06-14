@@ -25,6 +25,34 @@ namespace Nicodem.Backend.Representation
 
         public Action<AbstractVisitor> Accept { get; private set; }
 
+        public override string ToString()
+        {
+            return PrintRec("");
+        }
+
+        #region Printing
+        // print one line info about this object
+        protected virtual string Print() { return ""; }
+        // print childs
+        protected virtual string PrintElements(string prefix) { return ""; }
+        // print this node result register
+        protected string PrintReg(RegisterNode reg){
+            if (reg == null) return "_";
+            return reg.Id;
+        }
+        // recursively print subtree of this node
+        protected string PrintRec(string prefix, bool rec=true)
+        {
+            return String.Format("{0} (_reg: {1}) {2}", GetType().Name, PrintReg(_register), Print()) + 
+                (rec ? "\n" + PrintElements(prefix + "|") : " ...    //not-in-tree\n");
+        }
+        // use for printing childs
+        protected static string PrintChild(string prefix, string label, Node obj, bool rec=true)
+        {
+            return prefix + "-" + label + ": " + ((obj==null) ? "null" : obj.PrintRec(prefix + " ", rec));
+        }
+        #endregion
+
         #region implemented ReplaceRegisterWithLocal
         /// <summary>
         /// Called during moving some reister to memory. Update childs and then check if this node contains

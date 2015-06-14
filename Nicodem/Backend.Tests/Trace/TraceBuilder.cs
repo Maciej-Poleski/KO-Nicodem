@@ -18,12 +18,13 @@ namespace Nicodem.Backend.Tests.Representation
 			nodes.Add (new TemporaryNode ());
 			nodes.Add (new TemporaryNode ());
 			nodes.Add (new TemporaryNode ());
+			
+            var node = new ConditionalJumpNode (nodes [0], new ConditionalJumpNode (nodes [1], nodes [2], nodes [3]), nodes [4]);
+            Console.WriteLine(node);
 
-			var node = new ConditionalJumpNode (nodes [0], new ConditionalJumpNode (nodes [1], nodes [2], nodes [3]), nodes [4]);
-			var trace = new HashSet<Node> (TraceBuilder.BuildTrace (node));
+    		var trace = new HashSet<Node> (TraceBuilder.BuildTrace (node));
 
 			bool fine = true;
-
 			foreach (Node n in trace)
 				fine &= !(n is ConditionalJumpNode);
 
@@ -31,7 +32,7 @@ namespace Nicodem.Backend.Tests.Representation
 			fine &= trace.Contains (nodes [3]);
 			fine &= trace.Contains (nodes [4]);
 			
-			Assert.AreEqual (fine, true);
+			Assert.IsTrue(fine);
 		}
 	}
 }

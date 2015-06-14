@@ -212,14 +212,14 @@ namespace Nicodem.Backend.Cover
 		public static Instruction Call( FunctionCallNode function ) {
 			return new Instruction (
 				map => string.Format ("call {0}", function.Function.Label),
-				Function.CallerSavedRegisters, Function.CallerSavedRegisters);
+				Target.CallerSavedRegisters, Target.CallerSavedRegisters);
 		}
 
 		public static Instruction Call( RegisterNode reg ) {
 			return new Instruction (
 				map => string.Format ("call {0}", map [reg]),
-				join (Function.CallerSavedRegisters, reg),
-				Function.CallerSavedRegisters);
+				join (Target.CallerSavedRegisters, reg),
+				Target.CallerSavedRegisters);
 		}
 
 		public static Instruction Ret() {

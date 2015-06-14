@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -50,6 +51,17 @@ namespace Nicodem.Backend.Representation
 				nodes [i++] = node;
 			return nodes;
 		}
+
+        #region Printing
+        protected override string PrintElements(string prefix)
+        {
+            var sb = new StringBuilder();
+            foreach(var node in Sequence){
+                sb.Append(PrintChild(prefix, "seq", node));
+            }
+            return sb.ToString();
+        }
+        #endregion
 
         #region implemented ReplaceRegisterWithLocal
         internal override Node ReplaceRegisterWithLocal(

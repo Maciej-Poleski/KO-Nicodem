@@ -122,7 +122,8 @@ namespace Semantics.Tests
 		internal static VariableDeclNode Declaration(string name, NamedTypeNode type) {
 			return new VariableDeclNode {
 				Name = name,
-				Type = type
+				Type = type,
+				ExpressionType = type
 			};
 		}
 
@@ -150,6 +151,7 @@ namespace Semantics.Tests
 			return new VariableDefNode {
 				Name = decl.Name,
 				Type = decl.Type,
+				ExpressionType = decl.ExpressionType,
 				Value = value
 			};
 		}
@@ -191,6 +193,7 @@ namespace Semantics.Tests
 		internal static VariableUseNode Usage(VariableDeclNode def, bool inherit_decl = true) {
 			return new VariableUseNode {
 				Name = def.Name,
+				ExpressionType = def.ExpressionType,
 				Declaration = inherit_decl ? def : null
 			};
 		}

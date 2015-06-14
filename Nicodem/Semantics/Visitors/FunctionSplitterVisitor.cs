@@ -22,28 +22,6 @@ namespace Nicodem.Semantics.Visitors
         }
     }
 
-    internal class FunctionSplitter2Visitor : AbstractRecursiveVisitor
-    {
-        private readonly List<Function> _functions = new List<Function>();
-        private Function _currentFunction;
-
-        internal IReadOnlyList<Function> Functions
-        {
-            get { return _functions; }
-        }
-
-        public override void Visit(FunctionDefinitionNode node)
-        {
-            var oldFunction = _currentFunction;
-            var parametersBitmap = node.Parameters.Select(p => p.NestedUse).ToArray();
-            _currentFunction = new Function(node.Name, parametersBitmap, oldFunction);  // no name mangling for now - no function name overloading
-            node.BackendFunction = _currentFunction;
-            _functions.Add(_currentFunction);
-            base.Visit(node);
-            _currentFunction = oldFunction;
-        }
-    }
-
     public static partial class Extensions
     {
         /// <summary>

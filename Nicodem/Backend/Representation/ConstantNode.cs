@@ -9,5 +9,12 @@
 
         // Value representation depends on architecture (and kind). Adjust when Target will be in shape.
         public TConstant Value { get; private set; }
+
+        #region Printing
+        protected override string Print()
+        {
+            return "value " + Value;
+        }
+        #endregion
 	}
 }

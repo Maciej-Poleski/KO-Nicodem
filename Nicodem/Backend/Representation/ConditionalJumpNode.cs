@@ -52,6 +52,15 @@ namespace Nicodem.Backend.Representation
 			return new Node[]{ Condition, NextNodeIfTrue, NextNodeIfFalse };
 		}
 
+        #region Printing
+        protected override string PrintElements(string prefix)
+        {
+            return PrintChild(prefix, "condition", Condition) 
+                + PrintChild(prefix, "true", NextNodeIfTrue, false)
+                + PrintChild(prefix, "false", NextNodeIfFalse, false);
+        }
+        #endregion
+
         #region implemented ReplaceRegisterWithLocal
         internal override Node ReplaceRegisterWithLocal(
             System.Collections.Generic.IReadOnlyDictionary<RegisterNode, Local> map, 

@@ -15,6 +15,14 @@
 			return new Node[]{ LeftOperand, RightOperand };
 		}
 
+        #region Printing
+        protected override string PrintElements(string prefix)
+        {
+            return PrintChild(prefix, "lhs_op", LeftOperand)
+                + PrintChild(prefix, "rhs_op", RightOperand);
+        }
+        #endregion
+
         #region implemented ReplaceRegisterWithLocal
         internal override Node ReplaceRegisterWithLocal(
             System.Collections.Generic.IReadOnlyDictionary<RegisterNode, Local> map, 

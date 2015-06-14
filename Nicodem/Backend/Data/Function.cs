@@ -7,37 +7,16 @@ using Nicodem.Backend.Representation;
 
 namespace Nicodem.Backend
 {
-    // This is convention is based on IA64 ABI
     public class Function
     {
-        private static readonly HardwareRegisterNode[] HardwareRegistersOrder =
-        {
-            Target.RDI,
-            Target.RSI,
-            Target.RDX,
-            Target.RCX,
-            Target.R8,
-            Target.R9
-        };
+        // ---------------- private fields ----------------
 
-		public static readonly HardwareRegisterNode[] CallerSavedRegisters = 
-		{
-			Target.RAX,
-			Target.RCX,
-			Target.RDX,
-			Target.R8,
-			Target.R9,
-			Target.R10,
-			Target.R11
-		};
-
-		public static readonly HardwareRegisterNode[] CalleeSavedRegisters = { };
-
-        private readonly Function _enclosedIn;
         // Function with not null _enclosedIn have additional variable on stack just below old RBP - pointer to nearest enclosing Function stack frame
-        private int _stackFrameSize;
+        private readonly Function _enclosedIn;
+
         // RBP - this stack frame
         // (optional) RBP-8 - address of stack frame of nearest enclosing Function (NOTE: space will be alocated in preamble)
+        private int _stackFrameSize;
 
         /// <value>Locations of function arguments.</value>
         private Location[] ArgsLocations; // used inside constructor
@@ -80,8 +59,10 @@ namespace Nicodem.Backend
                 ind++;
             }
             _enclosedIn = enclosedInFunction;
-            CalleeSavedRegLocations = new LocationNode[CalleeSavedRegisters.Length];
+            CalleeSavedRegLocations = new LocationNode[Target.CalleeSavedRegisters.Length];
         }
+
+        // ------------------- printing -------------------
 
         public override string ToString()
         {
@@ -155,16 +136,16 @@ namespace Nicodem.Backend
         public SequenceNode FunctionCall(Function from, Node[] args, RegisterNode result, out Action<Node> nextNodeSetter)
         {
             var pl = _enclosedIn == null ? 0 : 1; // space for enclosing function stack frame address
-            var seq = new Node[args.Length + Math.Max(0, args.Length - HardwareRegistersOrder.Length) + 3 + pl];
+            var seq = new Node[args.Length + Math.Max(0, args.Length - Target.HardwareRegistersOrder.Length) + 3 + pl];
             // params in registers, params on stack, call, result, cleanup stack
             if (pl == 1)
             {
-                seq[0] = new AssignmentNode(HardwareRegistersOrder[0], from.ComputationOfStackFrameAddress(this));
+                seq[0] = new AssignmentNode(Target.HardwareRegistersOrder[0], from.ComputationOfStackFrameAddress(this));
             }
             var i = 0;
-            for (; i < HardwareRegistersOrder.Length && i < args.Length; ++i)
+            for (; i < Target.HardwareRegistersOrder.Length && i < args.Length; ++i)
             {
-                seq[i + pl] = new AssignmentNode(HardwareRegistersOrder[i], args[i]);
+                seq[i + pl] = new AssignmentNode(Target.HardwareRegistersOrder[i], args[i]);
             }
             var ptr = i + pl;
             for (; i < args.Length; ++i)
@@ -251,12 +232,12 @@ namespace Nicodem.Backend
 
             // move arguments from hardware registers to LocationNodes in ArgsLocations
 			for (int i = 0; i < ArgsCount; i++) {
-                prologue.Add (new AssignmentNode (GetArgLocationNode(i), HardwareRegistersOrder [i]));
+                prologue.Add (new AssignmentNode (GetArgLocationNode(i), Target.HardwareRegistersOrder [i]));
 			}
 
 			// save callee-saved registers
-			for (int i = 0; i < CalleeSavedRegisters.Length; i++) {
-				prologue.Add (new AssignmentNode (CalleeSavedRegLocations [i], CalleeSavedRegisters [i]));
+            for (int i = 0; i < Target.CalleeSavedRegisters.Length; i++) {
+                prologue.Add (new AssignmentNode (CalleeSavedRegLocations [i], Target.CalleeSavedRegisters [i]));
 			}
 
 			return prologue;
@@ -268,8 +249,8 @@ namespace Nicodem.Backend
             // function result in Result -> mov it to RAX
 			epilogue.Add (new AssignmentNode (Target.RAX, Result));
 			// restore callee-saved registers
-			for (int i = 0; i < CalleeSavedRegisters.Length; i++) {
-				epilogue.Add (new AssignmentNode (CalleeSavedRegisters [i], CalleeSavedRegLocations [i]));
+            for (int i = 0; i < Target.CalleeSavedRegisters.Length; i++) {
+                epilogue.Add (new AssignmentNode (Target.CalleeSavedRegisters [i], CalleeSavedRegLocations [i]));
 			}
 			// mov rsp, rbp
 			epilogue.Add(new AssignmentNode (Target.RSP, Target.RBP));
