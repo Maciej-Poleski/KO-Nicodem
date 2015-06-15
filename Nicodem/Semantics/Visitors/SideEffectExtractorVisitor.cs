@@ -16,14 +16,55 @@ namespace Nicodem.Semantics.Visitors
         public IEnumerable<ExpressionNode> Trees { get { return trees; } }
 
         // HasSideEffects must remain defined for all ExpressionNode types.
+        private bool HasSideEffects(ArrayNode node) { return false; }
+        private bool HasSideEffects(AtomNode node) { return false; }
         private bool HasSideEffects(ConstNode node) { return false; }
         private bool HasSideEffects(IfNode node) { return false; }
         private bool HasSideEffects(OperatorNode node)
         {
             switch (node.Operator) {
-                case OperatorType.ASSIGN: return true;
-                case OperatorType.PLUS: return false;
-                default: throw new NotImplementedException();
+                case OperatorType.PLUS_ASSIGN:
+                case OperatorType.MINUS_ASSIGN:
+                case OperatorType.MUL_ASSIGN:
+                case OperatorType.DIV_ASSIGN:
+                case OperatorType.MOD_ASSIGN:
+                case OperatorType.BIT_SHIFT_UP_ASSIGN:
+                case OperatorType.BIT_SHIFT_DOWN_ASSIGN:
+                case OperatorType.BIT_AND_ASSIGN:
+                case OperatorType.BIT_XOR_ASSIGN:
+                case OperatorType.BIT_OR_ASSIGN:
+                case OperatorType.PRE_INCREMENT:
+                case OperatorType.PRE_DECREMENT:
+                case OperatorType.POST_INCREMENT:
+                case OperatorType.POST_DECREMENT:
+                    return true;
+
+                case OperatorType.OR:
+                case OperatorType.AND:
+                case OperatorType.BIT_OR:
+                case OperatorType.BIT_XOR:
+                case OperatorType.BIT_AND:
+                case OperatorType.EQUAL:
+                case OperatorType.NOT_EQUAL:
+                case OperatorType.LESS:
+                case OperatorType.LESS_EQUAL:
+                case OperatorType.GREATER:
+                case OperatorType.GREATER_EQUAL:
+                case OperatorType.BIT_SHIFT_UP:
+                case OperatorType.BIT_SHIFT_DOWN:
+                case OperatorType.PLUS:
+                case OperatorType.MINUS:
+                case OperatorType.MUL:
+                case OperatorType.DIV:
+                case OperatorType.MOD:
+                case OperatorType.UNARY_PLUS:
+                case OperatorType.UNARY_MINUS:
+                case OperatorType.NOT:
+                case OperatorType.BIT_NOT:
+                    return false;
+
+                default: 
+                    throw new NotImplementedException();
             }
         }
         private bool HasSideEffects(ElementNode node) { return false; }
@@ -39,6 +80,7 @@ namespace Nicodem.Semantics.Visitors
         private bool HasSideEffects(WhileNode node) { return false; }
         // HasSideEffects should NOT be implemented for ExpressionNode. 
         // This notifies the programmer to implement the code for new node types.
+        // UWAGA! Wiadomo co tu jest zle. Jct prosze pisac do mnie (G. Guspiel) lub dzwonic 607083266.
         private bool HasSideEffects(ExpressionNode node) { throw new NotImplementedException(); } 
 
         override public void Visit(OperatorNode node)
@@ -46,9 +88,28 @@ namespace Nicodem.Semantics.Visitors
             base.Visit(node);
 
             switch (node.Operator) {
+                case OperatorType.OR:
+                case OperatorType.AND:
+                case OperatorType.BIT_OR:
+                case OperatorType.BIT_XOR:
+                case OperatorType.BIT_AND:
+                case OperatorType.EQUAL:
+                case OperatorType.NOT_EQUAL:
+                case OperatorType.LESS:
+                case OperatorType.LESS_EQUAL:
+                case OperatorType.GREATER:
+                case OperatorType.GREATER_EQUAL:
+                case OperatorType.BIT_SHIFT_UP:
+                case OperatorType.BIT_SHIFT_DOWN:
                 case OperatorType.PLUS:
-                // case OperatorType.OT_MINUS:
-                // ... 
+                case OperatorType.MINUS:
+                case OperatorType.MUL:
+                case OperatorType.DIV:
+                case OperatorType.MOD:
+                case OperatorType.UNARY_PLUS:
+                case OperatorType.UNARY_MINUS:
+                case OperatorType.NOT:
+                case OperatorType.BIT_NOT:
                     var newArgs = new List<ExpressionNode>();
                     foreach (var arg in node.Arguments) {
                         if (HasSideEffects(arg)) {

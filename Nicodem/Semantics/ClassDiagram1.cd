@@ -1,0 +1,179 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Nicodem.Semantics.AST.ArrayNode" Collapsed="true">
+    <Position X="5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAgAAAAAAAAAAQAAAAAAAAAAAAAABAAAAAEAA=</HashCode>
+      <FileName>AST\ArrayNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nicodem.Semantics.AST.ArrayTypeNode" Collapsed="true">
+    <Position X="0.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BIAABAAAgQAAAgAQAAAAAEAgCAAAAAAAAABAAABAEAA=</HashCode>
+      <FileName>AST\ArrayTypeNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nicodem.Semantics.AST.ASTBuilder" Collapsed="true">
+    <Position X="36.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAgAAkAAAAAAAEEAAAAEAAAKAAAAIAAAEAABQA=</HashCode>
+      <FileName>AST\ASTBuilder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nicodem.Semantics.AST.AtomNode" Collapsed="true">
+    <Position X="7.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAEAA=</HashCode>
+      <FileName>AST\AtomNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nicodem.Semantics.AST.BlockExpressionNode" Collapsed="true">
+    <Position X="25.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAgAAAAAAAAAAQAAAAAAAAAAAAAABAAAAAEAA=</HashCode>
+      <FileName>AST\BlockExpressionNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nicodem.Semantics.AST.ConstNode" Collapsed="true">
+    <Position X="6.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAgAECAAAAAAAAAAAAAAAAAAAAAABgAAAAEAA=</HashCode>
+      <FileName>AST\ConstNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nicodem.Semantics.AST.ElementNode" Collapsed="true">
+    <Position X="14" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAgAAACAAAAAAAAAAAAAAAAEAAAAFAAAAAEAA=</HashCode>
+      <FileName>AST\ElementNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nicodem.Semantics.AST.ExpressionNode" Collapsed="true">
+    <Position X="18.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAgAAAAACAAAAAQIAAAAAIAAAAAIBBAQAAAoA=</HashCode>
+      <FileName>AST\ExpressionNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nicodem.Semantics.AST.FunctionCallNode" Collapsed="true">
+    <Position X="20.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAgAAACAAAAAAAAAQAAAAAAAAAIABAAAAAEAA=</HashCode>
+      <FileName>AST\FunctionCallNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nicodem.Semantics.AST.FunctionDefinitionNode" Collapsed="true">
+    <Position X="27.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAgAAAAAAAAAABAAQAABAAAAAAQIBAgAAAEAA=</HashCode>
+      <FileName>AST\FunctionDefinitionNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nicodem.Semantics.AST.IfNode" Collapsed="true">
+    <Position X="9.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAABAgACAAAAAAQAgAAAAAAAAAAAAAABAAAAAEAA=</HashCode>
+      <FileName>AST\IfNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nicodem.Semantics.AST.LoopControlNode" Collapsed="true">
+    <Position X="18.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAgIAAAAAAAAAAAAAAAAAAAAAgAABgAAAAEAA=</HashCode>
+      <FileName>AST\LoopControlNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nicodem.Semantics.AST.NamedTypeNode" Collapsed="true">
+    <Position X="2.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BIAAAAAAgQAAAgAAAAAAAAQACAAAAAAAAABAAABAEAA=</HashCode>
+      <FileName>AST\NamedTypeNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nicodem.Semantics.AST.Node" Collapsed="true">
+    <Position X="17.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAgAQAAAAEgAAAAAAAAAAAAIAAAABCAAAEEAA=</HashCode>
+      <FileName>AST\Node.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nicodem.Semantics.AST.OperatorNode" Collapsed="true">
+    <Position X="11.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIABAAAggAAAAAAAAAAAAAAAAAAAAAAAIABAAAAAMAA=</HashCode>
+      <FileName>AST\OperatorNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nicodem.Semantics.AST.OperatorTypeHelper" Collapsed="true">
+    <Position X="38.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>AST\OperatorType.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nicodem.Semantics.AST.ProgramNode" Collapsed="true">
+    <Position X="34.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAgAAAAAAAAgAAAAIAAAAAAAAAAABAAAAAEAA=</HashCode>
+      <FileName>AST\ProgramNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nicodem.Semantics.AST.SliceNode" Collapsed="true">
+    <Position X="29.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAQgAAACAAAQAAAAAQAAAAAAAAACADAAAAAEAA=</HashCode>
+      <FileName>AST\SliceNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nicodem.Semantics.AST.TypeNode" Collapsed="true">
+    <Position X="1.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAEAgAAAAAAAgAAAAAAQAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>AST\TypeNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nicodem.Semantics.AST.VariableDeclNode" Collapsed="true">
+    <Position X="16.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAgAAAAAAAAAAAAAQAAAEAAAAAAQBAAAAAEAA=</HashCode>
+      <FileName>AST\VariableDeclNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nicodem.Semantics.AST.VariableDefNode" Collapsed="true">
+    <Position X="16.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAgAAAAAAAAAAAAAAAAAAACAAAAABgAAAAEAA=</HashCode>
+      <FileName>AST\VariableDefNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nicodem.Semantics.AST.VariableUseNode" Collapsed="true">
+    <Position X="23" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAwAAAAAAAAAAAAAQAAAAAAAAAAABAAAAAEAA=</HashCode>
+      <FileName>AST\VariableUseNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nicodem.Semantics.AST.WhileNode" Collapsed="true">
+    <Position X="32" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAABAgACAAAAAAAAhAAAAAAAAAAAAAABAAAAAEAA=</HashCode>
+      <FileName>AST\WhileNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="Nicodem.Semantics.AST.LoopControlMode" Collapsed="true">
+    <Position X="36.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>AST\LoopControlNode.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Nicodem.Semantics.AST.OperatorType" Collapsed="true">
+    <Position X="38.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>DCAAAgAQACUFYJAAiAACAAASAAkNAIAGCAQCAEAAQBA=</HashCode>
+      <FileName>AST\OperatorType.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
