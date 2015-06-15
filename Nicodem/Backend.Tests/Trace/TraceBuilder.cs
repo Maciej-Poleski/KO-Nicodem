@@ -17,7 +17,7 @@ namespace Nicodem.Backend.Tests.Representation
 			nodes.Add (new TemporaryNode ());
 			nodes.Add (new TemporaryNode ());
 			nodes.Add (new TemporaryNode ());
-			nodes.Add (new TemporaryNode ());
+            nodes.Add (Target.R10);
 			
             var node = new ConditionalJumpNode (nodes [0], new ConditionalJumpNode (nodes [1], nodes [2], nodes [3]), nodes [4]);
             Console.WriteLine(node);

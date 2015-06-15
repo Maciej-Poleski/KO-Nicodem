@@ -10,5 +10,10 @@
 		public string Name { get; private set; }
 
         public override string Id { get {return Name;} }
+
+        public override string ToString ()
+        {
+            return string.Format("HardwareRegisterNode <{0}>", Name);
+        }
 	}
 }
