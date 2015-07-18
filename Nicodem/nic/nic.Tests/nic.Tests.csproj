@@ -3,8 +3,6 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>12.0.0</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{7E12945F-5A0C-4C73-8CB9-35D3C3949B09}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>nic.Tests</RootNamespace>

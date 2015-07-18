@@ -713,9 +713,15 @@ namespace Nicodem.Semantics.Grammar
         internal static UniversalSymbol Operator18Expression = NewNonterminal(RightToLeft);         // if, while
         internal static UniversalSymbol Operator19Expression = NewNonterminal(RightToLeft);         // Object definition
         internal static UniversalSymbol OperatorExpression = NewNonterminal();           // OperationNode
+		internal static UniversalSymbol RecordFieldAccessExpression = NewNonterminal();
         internal static UniversalSymbol Expression = NewNonterminal();
         internal static UniversalSymbol ParametersList = NewNonterminal();               // NOTE: There is no such node in AST, flatten this
         internal static UniversalSymbol Function = NewNonterminal();
+		internal static UniversalSymbol RecordInitializationList = NewNonterminal(); 
+		internal static UniversalSymbol RecordInitializationField = NewNonterminal();
+		internal static UniversalSymbol RecordVariableDefinitionExpression = NewNonterminal();
+		internal static UniversalSymbol RecordFieldDefinition = NewNonterminal();
+		internal static UniversalSymbol RecordDefinition = NewNonterminal();
         internal static UniversalSymbol Program = NewNonterminal();
 
         static NicodemGrammarProductions()
@@ -726,16 +732,22 @@ namespace Nicodem.Semantics.Grammar
             BooleanLiteral.SetProduction(BooleanLiteralToken);
             Literals.SetProduction(DecimalNumberLiteral + CharacterLiteral + StringLiteral + BooleanLiteral);
 
-            Program.SetProduction(Function.Star * Eof);
+			Program.SetProduction((Function + RecordDefinition).Star * Eof);
+			RecordDefinition.SetProduction(TypeSpecifier * "{" * RecordFieldDefinition.Star * RecordFieldDefinition * "}");
+			RecordFieldDefinition.SetProduction(ObjectDeclaration * ";");
             Function.SetProduction(ObjectName * "("  * ParametersList * ")" * "->" * TypeSpecifier * Expression);
             ParametersList.SetProduction(((ObjectDeclaration * ",").Star * ObjectDeclaration).Optional);
             ObjectDeclaration.SetProduction(TypeSpecifier * ObjectName);
             TypeSpecifier.SetProduction(TypeName * ("mutable".Optional() * "[" * Expression.Optional * "]").Star * "mutable".Optional());
-            Expression.SetProduction(OperatorExpression);
+			Expression.SetProduction(RecordFieldAccessExpression + OperatorExpression);
+			RecordFieldAccessExpression.SetProduction(ObjectName * "[" * ObjectName * "]");
             OperatorExpression.SetProduction(Operator19Expression);
-            Operator19Expression.SetProduction(ObjectDefinitionExpression + Operator18Expression);
+			Operator19Expression.SetProduction(ObjectDefinitionExpression + RecordVariableDefinitionExpression + Operator18Expression);
             ObjectDefinitionExpression.SetProduction(TypeSpecifier * ObjectName * "=" * Expression);  // NOTE: "=" is _not_ an assignment operator here
-            Operator18Expression.SetProduction(IfExpression + WhileExpression + Operator17Expression);
+			RecordVariableDefinitionExpression.SetProduction(TypeSpecifier * ObjectName * "{" * RecordInitializationList * "}");
+			RecordInitializationList.SetProduction((RecordInitializationField * ",").Star * RecordInitializationField);
+			RecordInitializationField.SetProduction(ObjectName * "=" * Expression);
+			Operator18Expression.SetProduction(IfExpression + WhileExpression + Operator17Expression);
             IfExpression.SetProduction("if" * Expression * Expression * ("else" * Expression).Optional);
             WhileExpression.SetProduction("while" * Expression * Expression * ("else" * Expression).Optional);
             Operator17Expression.SetProduction(Operator16Expression);

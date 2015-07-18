@@ -1,0 +1,7 @@
+f() -> void {}
+Date {
+	int year;
+	char month;
+	char day;
+}
+g() -> void {}

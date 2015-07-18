@@ -134,7 +134,6 @@ Global
 		{7E12945F-5A0C-4C73-8CB9-35D3C3949B09} = {18D72BF7-B6CF-4CDF-8182-FA3EEE912202}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Source\Source.csproj
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = None

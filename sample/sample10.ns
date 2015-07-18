@@ -1,0 +1,5 @@
+Date {
+	int year;
+	char month;
+	char day;
+}

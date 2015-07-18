@@ -1,0 +1,10 @@
+f() -> void {}
+Date {
+	int year;
+	char month;
+	char day;
+}
+g() -> int {
+	Date d { year = 2015, month = 7, day = 15 };
+	d[year];
+}
