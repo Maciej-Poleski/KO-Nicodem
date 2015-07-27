@@ -287,7 +287,7 @@ namespace Semantics.Tests
 		}
 
 		internal static ProgramNode Program(params FunctionDefinitionNode[] defs) {
-			return new ProgramNode (new LinkedList<FunctionDefinitionNode> (defs));
+			return new ProgramNode (new LinkedList<FunctionDefinitionNode> (defs), new LinkedList<RecordTypeDeclarationNode>());
 		}
 
 		/*

@@ -305,7 +305,7 @@ namespace Semantics.Tests
         public void EmptyProgramTest()
         {
             var tree = Wrap(P.Program, Leaf(P.Eof, ""));
-            var expected = new ProgramNode(new LinkedList<FunctionDefinitionNode>());
+			var expected = new ProgramNode(new LinkedList<FunctionDefinitionNode>(), new LinkedList<RecordTypeDeclarationNode>());
             ConductTest(tree, expected);
         }
 
@@ -320,7 +320,7 @@ namespace Semantics.Tests
                     NamedTypeNode.IntType(true),
                     new AtomNode(NamedTypeNode.IntType(true), "42")
                 )
-            }));
+			}), new LinkedList<RecordTypeDeclarationNode>());
             ConductTest(tree, expected);
         }
 
@@ -345,7 +345,7 @@ namespace Semantics.Tests
                     NamedTypeNode.IntType(true),
                     new AtomNode(NamedTypeNode.IntType(true), "42")
                 )
-            }));
+			}), new LinkedList<RecordTypeDeclarationNode>());
             ConductTest(tree, expected);
         }
 
@@ -366,7 +366,7 @@ namespace Semantics.Tests
                         }
                     )
                 )
-            }));
+			}), new LinkedList<RecordTypeDeclarationNode>());
             ConductTest(tree, expected);
         }
 
@@ -393,7 +393,7 @@ namespace Semantics.Tests
                         }
                     )                    
                 )
-            }));
+			}), new LinkedList<RecordTypeDeclarationNode>());
             ConductTest(tree, expected);
         }
 
@@ -526,7 +526,7 @@ namespace Semantics.Tests
                         }
                     )                 
                 )
-            }));
+			}), new LinkedList<RecordTypeDeclarationNode>());
             ConductTest(tree, expected);
         }
     }

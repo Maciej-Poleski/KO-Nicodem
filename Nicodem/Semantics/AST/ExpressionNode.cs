@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Linq;
 using Nicodem.Semantics.Visitors;
 using Nicodem.Parser;
-using Nicodem.Semantics.ExpressionGraph;
 using System;
 
 namespace Nicodem.Semantics.AST
@@ -190,8 +189,21 @@ namespace Nicodem.Semantics.AST
         /// Resolve Expression from ParseTree. Main method.
         /// </summary>
         public static ExpressionNode GetExpressionNode<TSymbol>(IParseTree<TSymbol> parseTree) where TSymbol:ISymbol<TSymbol>
-        {
-            var node = ASTBuilder.FirstChild(parseTree); // Expression -> OperatorExpression
+		{
+			var node = ASTBuilder.FirstChild(parseTree); // Expression -> RecordVariableDefinitionExpression | RecordFieldAccessExpression | OperatorExpression
+
+			if (ASTBuilder.GetName (node.Symbol) == "RecordVariableDefinitionExpression") {
+				var nod = new RecordVariableDefNode ();
+				nod.BuildNode (node);
+				return nod;
+			}
+
+			if (ASTBuilder.GetName (node.Symbol) == "RecordFieldAccessExpression") {
+				var nod = new RecordVariableFieldUseNode ();
+				nod.BuildNode (node);
+				return nod;
+			}
+
             node = ASTBuilder.FirstChild(node); // OperatorExpression -> Operator19Expression
             node = ASTBuilder.FirstChild(node); // Operator19Expression -> ObjectDefinitionExpression | Operator18Expression
             if (ASTBuilder.GetName(node.Symbol) == "ObjectDefinitionExpression") { // ObjectDefinition

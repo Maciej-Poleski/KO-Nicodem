@@ -103,6 +103,11 @@
     <Compile Include="Backend\NodeBuilder.cs" />
     <Compile Include="Frontend.cs" />
     <Compile Include="AST\AtomNode.cs" />
+    <Compile Include="AST\RecordTypeDeclarationNode.cs" />
+    <Compile Include="AST\RecordTypeFieldDeclarationNode.cs" />
+    <Compile Include="AST\RecordVariableDefNode.cs" />
+    <Compile Include="AST\RecordVariableFieldDefNode.cs" />
+    <Compile Include="AST\RecordVariableFieldUseNode.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
