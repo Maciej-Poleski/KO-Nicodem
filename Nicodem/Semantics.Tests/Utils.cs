@@ -69,6 +69,13 @@ namespace Semantics.Tests
 			return MakePrimitiveType (PrimitiveType.Void, Mutablitity.Mutable);
 		}
 
+		internal static NamedTypeNode MakeMutableRecordType(string typeName) {
+			return new NamedTypeNode {
+				Name = typeName,
+				IsConstant = false
+			};
+		}
+
 		#endregion
 
 		#region constant
@@ -91,6 +98,13 @@ namespace Semantics.Tests
 
 		internal static NamedTypeNode MakeConstantVoid() {
 			return MakePrimitiveType (PrimitiveType.Void, Mutablitity.Constant);
+		}
+
+		internal static NamedTypeNode MakeConstantRecordType(string typeName) {
+			return new NamedTypeNode {
+				Name = typeName,
+				IsConstant = true
+			};
 		}
 
 		#endregion
@@ -188,6 +202,29 @@ namespace Semantics.Tests
 			return Definition (Declaration (name, MakeConstantBool ()), BoolLiteral (val));
 		}
 
+		internal static RecordVariableDefNode DefineRecord(string typeName, string varName, params RecordVariableFieldDefNode[] fields) {
+			return new RecordVariableDefNode {
+				Type = MakeMutableRecordType(typeName),
+				Name = varName,
+				Fields = fields
+			};
+		}
+
+		internal static RecordVariableDefNode DefineConstantRecord(string typeName, string varName, params RecordVariableFieldDefNode[] fields) {
+			return new RecordVariableDefNode {
+				Type = MakeConstantRecordType(typeName),
+				Name = varName,
+				Fields = fields
+			};
+		}
+
+		internal static RecordVariableFieldDefNode field(string name, ExpressionNode value) {
+			return new RecordVariableFieldDefNode {
+				FieldName = name,
+				Value = value
+			};
+		}
+
 		#endregion
 
 		internal static VariableUseNode Usage(VariableDeclNode def, bool inherit_decl = true) {
@@ -195,6 +232,15 @@ namespace Semantics.Tests
 				Name = def.Name,
 				ExpressionType = def.ExpressionType,
 				Declaration = inherit_decl ? def : null
+			};
+		}
+
+		internal static RecordVariableFieldUseNode UsageField(RecordVariableDefNode def, string field, bool inherit_decl = true) {
+			return new RecordVariableFieldUseNode {
+				RecordName = def.Name,
+				Field = field,
+				ExpressionType = def.ExpressionType,
+				Definition = inherit_decl ? def : null
 			};
 		}
 

@@ -1,12 +1,11 @@
-﻿using System;
-using Nicodem.Semantics.AST;
+﻿using Nicodem.Semantics.AST;
 
 namespace Nicodem.Semantics.Visitors
 {
 	class NameResolutionVisitor : AbstractRecursiveVisitor
 	{
-        private SymbolTable<VariableDeclNode> variableSymbolTable;
-        private SymbolTable<FunctionDefinitionNode> functionSymbolTable;
+		readonly SymbolTable<VariableDeclNode> variableSymbolTable;
+		readonly SymbolTable<FunctionDefinitionNode> functionSymbolTable;
 
 		public NameResolutionVisitor ()
 		{
@@ -31,7 +30,13 @@ namespace Nicodem.Semantics.Visitors
 
 		public override void Visit (VariableUseNode node)
 		{
-            node.Declaration = variableSymbolTable.LookUp (node.Name);
+			node.Declaration = variableSymbolTable.LookUp<VariableDeclNode> (node.Name);
+			base.Visit (node);
+		}
+
+		public override void Visit (RecordVariableFieldUseNode node)
+		{
+			node.Definition = variableSymbolTable.LookUp<RecordVariableDefNode> (node.RecordName);
 			base.Visit (node);
 		}
 
@@ -47,7 +52,7 @@ namespace Nicodem.Semantics.Visitors
 
         public override void Visit (FunctionCallNode node)
         {
-            node.Definition = functionSymbolTable.LookUp (node.Name);
+			node.Definition = functionSymbolTable.LookUp<FunctionDefinitionNode> (node.Name);
             base.Visit (node);
         }
 	}

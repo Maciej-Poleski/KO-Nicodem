@@ -7,7 +7,7 @@ namespace Nicodem.Semantics.AST
 	{
 		public string RecordName { get; set; } // AST
 		public string Field { get; set; }  // AST
-		public RecordVariableFieldDefNode Definition { get; set; } // name resolution
+		public RecordVariableDefNode Definition { get; set; } // name resolution
 
 		#region implemented abstract members of Node
 

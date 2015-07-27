@@ -115,6 +115,81 @@ namespace Semantics.Tests.Visitors
 			Assert.AreEqual (fVarD, useD.Declaration);
 		}
 
+		/* f(int mutable q) -> int
+		 * {
+		 *   Data a { year = 2015, month = 7, day = 21 }
+		 *   a
+		 *   a[year]
+		 *   g(int mutable w) -> int
+		 *   {
+		 *     Data b { year = a[year] - 10, month = 8, day = 15 }
+		 *     Data a { year = 1992, month = 1, day = 1 }
+		 *     b[year] + a[year]
+		 *   }
+		 *   a[day]
+		 * }
+		 */
+		[Test]
+		public void RecordVariableInNestedUse() {
+			var fParam = Utils.DeclareInt ("q");
+			var fVarA = Utils.DefineRecord (
+				"Data", "a", 
+				Utils.field ("year", Utils.IntLiteral (2015)),
+				Utils.field ("month", Utils.IntLiteral (7)),
+				Utils.field ("day", Utils.IntLiteral (21))
+			);
+			var fUseA = Utils.Usage (fVarA, false);
+			var fUseAyear = Utils.UsageField (fVarA, "year", false);
+			var fUseAday = Utils.UsageField (fVarA, "day", false);
+
+			var gParam = Utils.DeclareInt ("w");
+			var gUseAyear1 = Utils.UsageField (fVarA, "year", false);
+			var gVarB = Utils.DefineRecord (
+				"Data", "b", 
+				Utils.field ("year", Utils.Sub(gUseAyear1, Utils.IntLiteral(10))),
+				Utils.field ("month", Utils.IntLiteral (8)),
+				Utils.field ("day", Utils.IntLiteral (15))
+			);
+			var gVarA = Utils.DefineRecord (
+				"Data", "a", 
+				Utils.field ("year", Utils.IntLiteral (1992)),
+				Utils.field ("month", Utils.IntLiteral (1)),
+				Utils.field ("day", Utils.IntLiteral (1))
+			);
+			var gUseAyear = Utils.UsageField (gVarA, "year", false);
+			var gUseByear = Utils.UsageField (gVarB, "year", false);
+			var gResult = Utils.Add (gUseByear, gUseAyear);
+
+			var gFunction = Utils.FunctionDef ("g",
+				Utils.parameters (gParam),
+				Utils.MakeConstantInt (),
+				Utils.body (gVarB, gVarA, gResult)
+			);
+
+			var fFunction = Utils.FunctionDef ("f",
+				Utils.parameters (fParam),
+				Utils.MakeConstantInt (),
+				Utils.body (fVarA, fUseA, fUseAyear, gFunction, fUseAday)
+			);
+
+			Assert.IsNull (fUseA.Declaration);
+			Assert.IsNull (fUseAyear.Definition);
+			Assert.IsNull (fUseAday.Definition);
+			Assert.IsNull (gUseAyear.Definition);
+			Assert.IsNull (gUseByear.Definition);
+			Assert.IsNull (gUseAyear1.Definition);
+
+			var program = Utils.Program (fFunction);
+			program.Accept (new NameResolutionVisitor ());
+
+			Assert.AreEqual (fVarA, fUseA.Declaration);
+			Assert.AreEqual (fVarA, fUseAyear.Definition);
+			Assert.AreEqual (fVarA, fUseAday.Definition);
+			Assert.AreEqual (gVarA, gUseAyear.Definition);
+			Assert.AreEqual (gVarB, gUseByear.Definition);
+			Assert.AreEqual (fVarA, gUseAyear1.Definition);
+		}
+
 		/*
 		 * f(int mutable a) -> int
 		 * {

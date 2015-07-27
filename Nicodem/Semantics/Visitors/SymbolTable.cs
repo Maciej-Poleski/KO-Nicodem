@@ -1,22 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using Nicodem.Semantics.AST;
 
 namespace Nicodem.Semantics
 {
     class SymbolTable<T> 
 	{
-        private Dictionary<String, Stack<T> > symbolTable = new Dictionary<string, Stack<T>>();
-		private Stack<int> blocks = new Stack<int>();
-		private Stack<String> variables = new Stack<String> ();
-		private int variableCounter = 0;
-
-		public SymbolTable ()
-		{
-		}
+		readonly Dictionary<String, Stack<T> > symbolTable = new Dictionary<string, Stack<T>>();
+		Stack<int> blocks = new Stack<int>();
+		Stack<String> variables = new Stack<String> ();
+		int variableCounter = 0;
 
 		public void OpenBlock() 
 		{
@@ -45,12 +37,16 @@ namespace Nicodem.Semantics
 			symbolTable [name].Push (variable);
 		}
 
-        public T LookUp (String name)
+		public S LookUp<S> (String name) where S : class, T
 		{
-			if( !symbolTable.ContainsKey(name) )
-				throw new DefinitionNotFoundException();
+			if (!symbolTable.ContainsKey (name))
+				throw new DefinitionNotFoundException ();
 
-			return symbolTable [name].Peek ();
+			var result = symbolTable [name].Peek () as S;
+			if (result == null)
+				throw new DefinitionNotFoundException ();
+
+			return result;
 		}
 	}
 }
