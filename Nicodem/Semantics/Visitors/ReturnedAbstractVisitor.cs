@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Nicodem.Semantics.AST;
+﻿using Nicodem.Semantics.AST;
 
 namespace Nicodem.Semantics.Visitors
 {
@@ -19,6 +14,21 @@ namespace Nicodem.Semantics.Visitors
         {
             return Visit(node as Node);
         }
+
+		public virtual T Visit(RecordTypeDeclarationNode node) 
+		{
+			return Visit(node as Node);
+		}
+
+		public virtual T Visit(RecordTypeFieldDeclarationNode node) 
+		{
+			return Visit(node as Node);
+		}
+
+		public virtual T Visit(RecordVariableFieldDefNode node) 
+		{
+			return Visit(node as Node);
+		}
 
         public virtual T Visit(TypeNode node)
         {
@@ -101,12 +111,26 @@ namespace Nicodem.Semantics.Visitors
            return Visit(node as VariableDeclNode);
         }
 
+		#region VariableDefNode direct children
+
+		public virtual T Visit(RecordVariableDefNode node)
+		{
+			return Visit(node as VariableDefNode);
+		}
+
+		#endregion
+
         #endregion
 
         public virtual T Visit(VariableUseNode node)
         {
            return Visit(node as ExpressionNode);
         }
+
+		public virtual T Visit(RecordVariableFieldUseNode node)
+		{
+			return Visit(node as ExpressionNode);
+		}
 
         public virtual T Visit(WhileNode node)
         {

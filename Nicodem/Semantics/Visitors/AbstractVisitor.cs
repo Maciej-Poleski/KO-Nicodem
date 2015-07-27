@@ -13,6 +13,18 @@ namespace Nicodem.Semantics.Visitors
 			Visit (node as Node);
 		}
 
+		public virtual void Visit(RecordTypeDeclarationNode node) {
+			Visit (node as Node);
+		}
+
+		public virtual void Visit(RecordTypeFieldDeclarationNode node) {
+			Visit (node as Node);
+		}
+
+		public virtual void Visit(RecordVariableFieldDefNode node) {
+			Visit (node as Node);
+		}
+
 		public virtual void Visit(TypeNode node) {
 			Visit (node as Node);
 		}
@@ -83,9 +95,22 @@ namespace Nicodem.Semantics.Visitors
             Visit(node as VariableDeclNode);
         }
 
+		#region VariableDefNode direct children
+
+		public virtual void Visit(RecordVariableDefNode node) 
+		{
+			Visit (node as VariableDefNode);
+		}
+
+		#endregion
+
 	    #endregion
 
 		public virtual void Visit(VariableUseNode node) {
+			Visit (node as ExpressionNode);
+		}
+
+		public virtual void Visit(RecordVariableFieldUseNode node) {
 			Visit (node as ExpressionNode);
 		}
 

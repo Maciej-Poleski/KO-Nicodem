@@ -9,10 +9,41 @@ namespace Nicodem.Semantics.Visitors
 		{
 			base.Visit (node);
 
+			if (!ReferenceEquals(node.Records, null))
+				foreach (var record in node.Records)
+					if (!ReferenceEquals(record, null))
+						record.Accept (this);
+
 			if (!ReferenceEquals(node.Functions, null))
 				foreach (var child in node.Functions)
 					if (!ReferenceEquals(child, null))
 						child.Accept (this);
+		}
+
+		public override void Visit(RecordTypeDeclarationNode node) 
+		{
+			base.Visit (node);
+
+			if (!ReferenceEquals (node.Fields, null))
+				foreach (var field in node.Fields)
+					if (!ReferenceEquals (field, null))
+						field.Accept (this);
+		}
+
+		public override void Visit(RecordTypeFieldDeclarationNode node) 
+		{
+			base.Visit (node);
+
+			if (!ReferenceEquals (node.Type, null))
+				node.Type.Accept (this);
+		}
+
+		public override void Visit (RecordVariableFieldDefNode node)
+		{
+			base.Visit (node);
+
+			if (!ReferenceEquals (node.Value, null))
+				node.Value.Accept (this);
 		}
 
 		public override void Visit(ExpressionNode node) 
@@ -158,6 +189,19 @@ namespace Nicodem.Semantics.Visitors
 			if (!ReferenceEquals(node.Value, null))
 				node.Value.Accept (this);
 		}
+
+		#region VariableDefNode direct children
+
+		public override void Visit(RecordVariableDefNode node)
+		{
+			base.Visit (node);
+			if (!ReferenceEquals (node.Fields, null))
+				foreach (var field in node.Fields)
+					if (!ReferenceEquals (field, null))
+						field.Accept (this);
+		}
+
+		#endregion
 
         #endregion
 
