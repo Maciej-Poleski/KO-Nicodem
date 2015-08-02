@@ -157,6 +157,20 @@ namespace Semantics.Tests
 			return Declaration (name, MakeMutableBool ());
 		}
 
+		internal static RecordTypeDeclarationNode DeclareRecordType(string typeName, params RecordTypeFieldDeclarationNode[] fields) {
+			return new RecordTypeDeclarationNode {
+				Name = new NamedTypeNode { Name = typeName, IsConstant = false },
+				Fields = fields
+			};
+		}
+
+		internal static RecordTypeFieldDeclarationNode DeclareField(TypeNode type, string fieldName) {
+			return new RecordTypeFieldDeclarationNode {
+				Type = type,
+				Name = fieldName
+			};
+		}
+
 		#endregion
 
 		#region definition
@@ -334,6 +348,10 @@ namespace Semantics.Tests
 
 		internal static ProgramNode Program(params FunctionDefinitionNode[] defs) {
 			return new ProgramNode (new LinkedList<FunctionDefinitionNode> (defs), new LinkedList<RecordTypeDeclarationNode>());
+		}
+
+		internal static ProgramNode Program(IEnumerable<FunctionDefinitionNode> defs, IEnumerable<RecordTypeDeclarationNode> records) {
+			return new ProgramNode (new LinkedList<FunctionDefinitionNode> (defs), new LinkedList<RecordTypeDeclarationNode>(records));
 		}
 
 		/*

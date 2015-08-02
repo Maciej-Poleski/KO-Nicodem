@@ -1,10 +1,11 @@
 ﻿using Nicodem.Semantics.Visitors;
 using Nicodem.Parser;
 using System.Diagnostics;
+using System;
 
 namespace Nicodem.Semantics.AST
 {
-	class RecordTypeFieldDeclarationNode : Node
+	class RecordTypeFieldDeclarationNode : Node, IComparable<RecordTypeFieldDeclarationNode>
 	{
 		public string Name { get; set; } // set during AST construction
 		public TypeNode Type { get; set; } // set during AST construction
@@ -40,6 +41,11 @@ namespace Nicodem.Semantics.AST
 		public override T Accept<T>(ReturnedAbstractVisitor<T> visitor)
 		{
 			return visitor.Visit(this);
+		}
+
+		public int CompareTo (RecordTypeFieldDeclarationNode other)
+		{
+			return Name.CompareTo (other.Name);
 		}
 
 		protected override bool Compare(object rhs_)

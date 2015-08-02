@@ -4,7 +4,7 @@ using Nicodem.Semantics.Visitors;
 
 namespace Nicodem.Semantics.AST
 {
-	class RecordVariableFieldDefNode : Node
+	class RecordVariableFieldDefNode : Node, IComparable<RecordVariableFieldDefNode>
 	{
 		public string FieldName { get; set; }
 		public ExpressionNode Value { get; set; }
@@ -28,6 +28,11 @@ namespace Nicodem.Semantics.AST
 		public override T Accept<T>(ReturnedAbstractVisitor<T> visitor)
 		{
 			return visitor.Visit(this);
+		}
+
+		public int CompareTo (RecordVariableFieldDefNode other)
+		{
+			return FieldName.CompareTo (other.FieldName);
 		}
 
 		protected override bool Compare(object rhs_)

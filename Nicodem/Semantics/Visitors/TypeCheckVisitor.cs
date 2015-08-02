@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Nicodem.Semantics.AST;
 
 namespace Nicodem.Semantics.Visitors
 {
     class TypeCheckVisitor: AbstractRecursiveVisitor
     {
-        List<WhileNode> _stack_of_while_node = new List<WhileNode>();
+        readonly List<WhileNode> _stack_of_while_node = new List<WhileNode>();
 
         //check if it is array type
         public override void Visit(ArrayNode node)
@@ -313,8 +311,12 @@ namespace Nicodem.Semantics.Visitors
         public override void Visit(VariableDefNode node)
         {
             base.Visit(node);
-            if (node.Value.ExpressionType != null && !node.Value.ExpressionType.Equals(node.Type, false))
-                throw new TypeCheckException("Value type not agree with VariableType");
+
+			if (!(node is RecordVariableDefNode)) {
+				if (node.Value.ExpressionType != null && !node.Value.ExpressionType.Equals (node.Type, false))
+					throw new TypeCheckException ("Value type not agree with VariableType");
+			}
+
             node.ExpressionType = node.Type;
         }
 
@@ -346,5 +348,89 @@ namespace Nicodem.Semantics.Visitors
                 else
                     node.ExpressionType = _type_to_set;
         }
+			
+		IEnumerable<RecordTypeDeclarationNode> _records = new List<RecordTypeDeclarationNode> ();
+
+		RecordTypeDeclarationNode LookupRecordDeclaration(TypeNode typeNode) {
+			var type = typeNode as NamedTypeNode;
+			if (type == null)
+				return null;
+			
+			foreach (var record in _records)
+				if (string.Equals(type.Name, (record.Name as NamedTypeNode).Name))
+					return record;
+			
+			return null;
+		}
+
+		public override void Visit (ProgramNode node)
+		{
+			this._records = node.Records;
+			base.Visit (node);
+		}
+
+		static void CheckRecordVariableFields(
+			IEnumerable<RecordTypeFieldDeclarationNode> declFields,
+			IEnumerable<RecordVariableFieldDefNode> varFields) 
+		{
+			var declArr = declFields.ToArray ();
+			var varArr = varFields.ToArray ();
+
+			if (declArr.Length != varArr.Length)
+				throw new TypeCheckException ("Wrong number of fields in record variable definition");
+
+			Array.Sort (declArr);
+			Array.Sort (varArr);
+
+			var count = declArr.Length;
+			for (var i = 0; i < count; ++i) {
+				var declItem = declArr [i];
+				var varItem = varArr [i];
+
+				// check if names match
+				if (declItem.Name != varItem.FieldName)
+					throw new TypeCheckException (
+						string.Format ("Record type wrong field name. Expected {0}, got {1}",
+							declItem.Name, varItem.FieldName));
+
+				// check if types match
+				var declType = declItem.Type as NamedTypeNode;
+				var varType = varItem.Value.ExpressionType as NamedTypeNode;
+				if (varType == null || declType.Name != varType.Name)
+					throw new TypeCheckException (
+						string.Format ("Record type wrong field type for field '{0}'", declItem.Name));
+			}
+		}
+
+		public override void Visit (RecordVariableDefNode node)
+		{
+			base.Visit (node);
+
+			// check if record name is known
+			var recDecl = LookupRecordDeclaration(node.Type);
+			if (recDecl == null)
+				throw new TypeCheckException ("Unknown record type");
+
+			// check if fields types matches with record type template
+			CheckRecordVariableFields(recDecl.Fields, node.Fields);
+		}
+
+		public override void Visit (RecordVariableFieldUseNode node)
+		{
+			base.Visit (node);
+
+			// lookup definition field
+			bool found = false;
+			foreach (var defField in node.Definition.Fields)
+				if (defField.FieldName == node.Field) {
+					node.ExpressionType = defField.Value.ExpressionType;
+					found = true;
+				}
+
+			if (!found)
+				throw new TypeCheckException (
+					string.Format ("Field '{0}' is not a part of '{1}' record type",
+						node.Field, (node.Definition.Type as NamedTypeNode).Name));
+		}
     }
 }

@@ -285,6 +285,184 @@ namespace Semantics.Tests.Visitors
 
             Assert.IsTrue(NamedTypeNode.IntType().Equals(_def.ExpressionType));
         }
+
+		/*
+		 * Date {
+		 *   int year;
+		 *   int month;
+		 *   int day;
+		 * }
+		 * f(int mutable a) -> int
+		 * {
+		 *   Date a { year = 2015, month = 7, day = 21 }
+		 *   a[year]
+		 *   a[month]
+		 *   a[day]
+		 * }
+		 */
+		[Test]
+		public void TypeCheck_RecordVariableFieldUse_Test() 
+		{
+			var def = Utils.DeclareRecordType ("Date",
+				Utils.DeclareField (Utils.MakeMutableInt (), "year"),
+				Utils.DeclareField (Utils.MakeMutableInt (), "month"),
+				Utils.DeclareField (Utils.MakeMutableInt (), "day"));
+
+			var fParam = Utils.DeclareInt ("q");
+			var fVarA = Utils.DefineRecord ("Date", "a", 
+				Utils.field ("year", Utils.IntLiteral (2015)),
+				Utils.field ("month", Utils.IntLiteral (7)),
+				Utils.field ("day", Utils.IntLiteral (21))
+			);
+			var fUseAyear = Utils.UsageField (fVarA, "year");
+			var fUseAmonth = Utils.UsageField (fVarA, "month");
+			var fUseAday = Utils.UsageField (fVarA, "day");
+
+			var fFunction = Utils.FunctionDef ("f",
+				Utils.parameters (fParam),
+				Utils.MakeConstantInt(),
+				Utils.body (fVarA, fUseAyear, fUseAmonth, fUseAday)
+			);
+
+			var program = Utils.Program (
+				new [] { fFunction }, 
+				new[] { def }
+			);
+
+			program.Accept (new TypeCheckVisitor ());
+
+			var intNamed = Utils.MakeConstantInt ();
+
+			Assert.AreEqual (def.Name, fVarA.ExpressionType);
+			Assert.AreEqual (intNamed, fUseAyear.ExpressionType);
+			Assert.AreEqual (intNamed, fUseAmonth.ExpressionType);
+			Assert.AreEqual (intNamed, fUseAday.ExpressionType);
+		}
+
+		/* Date {
+		 *   int year;
+		 *   int month;
+		 *   int day;
+		 * }
+		 * f(int mutable q) -> Date
+		 * {
+		 *   Date a { year = 2015, month = 7, day = 21 }
+		 *   a
+		 * }
+		 */
+	    [Test]
+		public void TypeCheck_RecordVariableDefinition_Test () {
+			var def = Utils.DeclareRecordType ("Date",
+				Utils.DeclareField (Utils.MakeMutableInt (), "year"),
+				Utils.DeclareField (Utils.MakeMutableInt (), "month"),
+				Utils.DeclareField (Utils.MakeMutableInt (), "day"));
+
+			var fParam = Utils.DeclareInt ("q");
+			var fVarA = Utils.DefineRecord ("Date", "a", 
+				Utils.field ("year", Utils.IntLiteral (2015)),
+				Utils.field ("month", Utils.IntLiteral (7)),
+				Utils.field ("day", Utils.IntLiteral (21))
+			);
+			var fUseA = Utils.Usage (fVarA);
+
+			var fFunction = Utils.FunctionDef ("f",
+				Utils.parameters (fParam),
+				Utils.MakeConstantRecordType("Date"),
+				Utils.body (fVarA, fUseA)
+			);
+
+			var program = Utils.Program (
+				new [] { fFunction }, 
+				new[] { def }
+			);
+			
+			program.Accept (new TypeCheckVisitor ());
+		 
+			Assert.AreEqual (def.Name, fVarA.ExpressionType);
+			Assert.AreEqual (def.Name, fUseA.ExpressionType);
+		}
+
+		/*
+		 * Date {
+		 *   int year;
+		 *   int month;
+		 *   int day;
+		 * }
+		 * f(int mutable a) -> int
+		 * {
+		 *   Date a { year = 2015, month = 7, day = 21 }
+		 *   a[invalid]
+		 * }
+		 */
+		[Test]
+		public void TypeCheck_RecordVariableFieldUse_WrongField_Test() 
+		{
+			var def = Utils.DeclareRecordType ("Date",
+				Utils.DeclareField (Utils.MakeMutableInt (), "year"),
+				Utils.DeclareField (Utils.MakeMutableInt (), "month"),
+				Utils.DeclareField (Utils.MakeMutableInt (), "day"));
+
+			var fParam = Utils.DeclareInt ("q");
+			var fVarA = Utils.DefineRecord ("Date", "a", 
+				Utils.field ("year", Utils.IntLiteral (2015)),
+				Utils.field ("month", Utils.IntLiteral (7)),
+				Utils.field ("day", Utils.IntLiteral (21))
+			);
+			var fUseAinvalid = Utils.UsageField (fVarA, "invalid");
+
+			var fFunction = Utils.FunctionDef ("f",
+				Utils.parameters (fParam),
+				Utils.MakeConstantInt(),
+				Utils.body (fVarA, fUseAinvalid)
+			);
+
+			var program = Utils.Program (
+				new [] { fFunction }, 
+				new[] { def }
+			);
+
+			Assert.Throws<TypeCheckException> (() => program.Accept (new TypeCheckVisitor ()));
+		}
+
+		/*
+		 * Date {
+		 *   int year;
+		 *   int month;
+		 *   int day;
+		 * }
+		 * f(int mutable a) -> int
+		 * {
+		 *   DateInvalid a { year = 2015, month = 7, day = 21 }
+		 * }
+		 */
+		[Test]
+		public void TypeCheck_RecordVariableDefinition_WrongName_Test() 
+		{
+			var def = Utils.DeclareRecordType ("Date",
+				Utils.DeclareField (Utils.MakeMutableInt (), "year"),
+				Utils.DeclareField (Utils.MakeMutableInt (), "month"),
+				Utils.DeclareField (Utils.MakeMutableInt (), "day"));
+
+			var fParam = Utils.DeclareInt ("q");
+			var fVarA = Utils.DefineRecord ("DateInvalid", "a", 
+				Utils.field ("year", Utils.IntLiteral (2015)),
+				Utils.field ("month", Utils.IntLiteral (7)),
+				Utils.field ("day", Utils.IntLiteral (21))
+			);
+
+			var fFunction = Utils.FunctionDef ("f",
+				Utils.parameters (fParam),
+				Utils.MakeConstantInt(),
+				Utils.body (fVarA)
+			);
+
+			var program = Utils.Program (
+				new [] { fFunction }, 
+				new[] { def }
+			);
+
+			Assert.Throws<TypeCheckException> (() => program.Accept (new TypeCheckVisitor ()));
+		}
 	}
 }
 
