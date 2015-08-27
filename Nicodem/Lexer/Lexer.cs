@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using IFragment = Nicodem.Source.IFragment;
 using ILocation = Nicodem.Source.ILocation;
 using IOriginReader = Nicodem.Source.IOriginReader;
@@ -28,6 +29,9 @@ namespace Nicodem.Lexer
         private readonly DfaUtils.MinimizedDfa<char> _dfa;
         private uint _nextCategory;
 
+        // Transient for now
+        private Assembly _compiledAssembly = null;
+
         /// <summary>
         ///     Tworzy lekser tokenizujący wejście przy użyciu podanych wyrażeń regularnych.
         /// </summary>
@@ -39,11 +43,12 @@ namespace Nicodem.Lexer
         /// </param>
         public Lexer(params RegEx<char>[] regexCategories)
         {
-            _atomicCategoryLimit = (uint) regexCategories.Length;
+            _atomicCategoryLimit = (uint)regexCategories.Length;
             _nextCategory = _atomicCategoryLimit + 1;
             if (regexCategories.Length == 0)
             {
                 _dfa = DfaUtils.MakeEmptyLanguageDfa<char>();
+                _compiledAssembly = LexerCompiler.getCompiledLexer<DfaUtils.MinimizedDfa<char>, DfaUtils.MinimizedDfaState<char>>(_dfa);
                 return;
             }
             var lastDfa = MakeRegexDfa(regexCategories[0], 1).Minimized<RegExDfa<char>, DFAState<char>, char>();
@@ -57,6 +62,8 @@ namespace Nicodem.Lexer
                             char>(lastDfa, MakeRegexDfa(regexCategories[i], i + 1), GetProductAccepting);
             }
             _dfa = lastDfa;
+
+            _compiledAssembly = LexerCompiler.getCompiledLexer<DfaUtils.MinimizedDfa<char>, DfaUtils.MinimizedDfaState<char>>(_dfa);
         }
 
         private uint GetProductAccepting(uint lastDfaAccepting, uint newDfaAccepting)
@@ -163,13 +170,18 @@ namespace Nicodem.Lexer
 
         public LexerResult Process(Source.IOrigin origin)
         {
-            var result = Process<BareOrigin, ILocation, BareLocation, BareFragment>(new BareOrigin(origin));
-            return new LexerResult(
-                from tuple in result.Tokens
-                select new Tuple<IFragment, IEnumerable<int>>(tuple.Item1.Fragment, tuple.Item2),
-                result.LastParsedLocation._location,
-                result.FailedAtLocation._location
-                );
+            var impl = _compiledAssembly.GetType("Nicodem.Lexer.Compiled.Lexer");
+            return (LexerResult)impl.InvokeMember(
+                "Process",
+                BindingFlags.Public | BindingFlags.Static | BindingFlags.InvokeMethod, null, null, new object[] {origin});
+
+//            var result = Process<BareOrigin, ILocation, BareLocation, BareFragment>(new BareOrigin(origin));
+//            return new LexerResult(
+//                from tuple in result.Tokens
+//                select new Tuple<IFragment, IEnumerable<int>>(tuple.Item1.Fragment, tuple.Item2),
+//                result.LastParsedLocation._location,
+//                result.FailedAtLocation._location
+//                );
         }
 
         [Obsolete]
@@ -258,9 +270,9 @@ namespace Nicodem.Lexer
                     {
                         if (_currentCategory <= _lexer._atomicCategoryLimit)
                         {
-                            return (int) (_currentCategory - 1);
+                            return (int)(_currentCategory - 1);
                         }
-                        return (int) (_lexer._decompressionMapping[_currentCategory].Item2 - 1);
+                        return (int)(_lexer._decompressionMapping[_currentCategory].Item2 - 1);
                     }
                 }
 
