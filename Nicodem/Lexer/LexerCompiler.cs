@@ -13,10 +13,67 @@ namespace Nicodem.Lexer
 {
     internal class LexerCompiler
     {
-        internal static Assembly getCompiledLexer<TDfa, TDfaState>(TDfa dfa)
+        public static ProxyLexer GetCompiledLexer(string lexerName, IReadOnlyCollection<string> regexes)
+        {
+            Assembly assembly;
+            try
+            {
+                assembly = Assembly.LoadFile(GetAssemblyName(lexerName));
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            if (assembly == null)
+            {
+                return null;
+            }
+            var lexerType = GetLexerType(assembly);
+            if (lexerType == null)
+            {
+                return null;
+            }
+            var compiledCompilerVersion = (string) lexerType.GetField("CompilerVersion").GetValue(null);
+            if (compiledCompilerVersion != GetCompilerVersion())
+            {
+                return null;
+            }
+            var compiledLexerSource = (string) lexerType.GetField("LexerSource").GetValue(null);
+            if (compiledLexerSource != ToLexerSource(regexes))
+            {
+                return null;
+            }
+            return GetProxyLexer(lexerType);
+        }
+
+        private static ProxyLexer GetProxyLexer(Type lexerType)
+        {
+            var method = lexerType.GetMethod("Process", BindingFlags.Public | BindingFlags.Static);
+            var processDelegate = (ProxyLexer.ProcessImpl) method.CreateDelegate(typeof (ProxyLexer.ProcessImpl));
+            return new ProxyLexer(processDelegate);
+        }
+
+        private static Type GetLexerType(Assembly assembly)
+        {
+            return assembly.GetType("Nicodem.Lexer.Compiled.Lexer", false);
+        }
+
+        private static string ToLexerSource(IReadOnlyCollection<string> regexes)
+        {
+            if (regexes == null)
+            {
+                return null;
+            }
+            return "" + regexes.Count + "#" +
+                   string.Join("", from regex in regexes select "" + regex.Length + regex);
+        }
+
+        internal static ProxyLexer CompileLexer<TDfa, TDfaState>(TDfa dfa, string lexerName,
+            IReadOnlyCollection<string> regexes)
             where TDfa : AbstractDfa<TDfaState, char>
             where TDfaState : AbstractDfaState<TDfaState, char>
         {
+            var lexerSource = ToLexerSource(regexes);
             var compileUnit = new CodeCompileUnit();
             var implementationNamespace = new CodeNamespace("Nicodem.Lexer.Compiled");
             compileUnit.Namespaces.Add(implementationNamespace);
@@ -25,14 +82,33 @@ namespace Nicodem.Lexer
             implementationNamespace.Imports.Add(new CodeNamespaceImport("Nicodem.Source")); // for input
             var compiledLexerClass = new CodeTypeDeclaration("Lexer");
             implementationNamespace.Types.Add(compiledLexerClass);
+
+            var compilerVersionField = new CodeMemberField(typeof (string), "CompilerVersion");
+            compiledLexerClass.Members.Add(compilerVersionField);
+            var compilerVersion = GetCompilerVersion();
+            compilerVersionField.InitExpression = new CodePrimitiveExpression(compilerVersion);
+            compilerVersionField.Attributes = MemberAttributes.Public | MemberAttributes.Const;
+
+            var lexerSourceField = new CodeMemberField(typeof (string), "LexerSource");
+            compiledLexerClass.Members.Add(lexerSourceField);
+            lexerSourceField.InitExpression = new CodePrimitiveExpression(lexerSource);
+            lexerSourceField.Attributes = MemberAttributes.Public | MemberAttributes.Static;
+
             var processMethod = GenerateProcessMethod<TDfa, TDfaState>(dfa);
             compiledLexerClass.Members.Add(processMethod);
 
             var codeProvider = new CSharpCodeProvider();
             var compilerParams = new CompilerParameters();
             compilerParams.GenerateExecutable = false;
-            compilerParams.GenerateInMemory = true;
-            compilerParams.IncludeDebugInformation = true;
+            if (lexerName == null)
+            {
+                compilerParams.GenerateInMemory = true;
+            }
+            else
+            {
+                compilerParams.GenerateInMemory = false;
+                compilerParams.OutputAssembly = GetAssemblyName(lexerName);
+            }
             compilerParams.ReferencedAssemblies.Add("System.dll");
             compilerParams.ReferencedAssemblies.Add(Assembly.GetAssembly(typeof (Lexer)).Location);
             compilerParams.ReferencedAssemblies.Add(Assembly.GetAssembly(typeof (IOrigin)).Location);
@@ -46,7 +122,25 @@ namespace Nicodem.Lexer
                 }
                 return null;
             }
-            return compileResult.CompiledAssembly;
+            Console.WriteLine("Compiled lexer {0} to assembly {1}", lexerName, compileResult.PathToAssembly);
+            return GetProxyLexer(GetLexerType(compileResult.CompiledAssembly));
+        }
+
+        private static string GetCompilerVersion()
+        {
+            return Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        }
+
+        private static string GetAssemblyName(string lexerName)
+        {
+            if (lexerName == null)
+            {
+                return null;
+            }
+            var mainAssemblyName = Assembly.GetEntryAssembly().Location;
+            var lexerAssemblyName = Assembly.GetExecutingAssembly().Location;
+            return Path.GetDirectoryName(mainAssemblyName) + Path.DirectorySeparatorChar + lexerName +
+                   Path.GetExtension(lexerAssemblyName);
         }
 
         private static CodeMemberMethod GenerateProcessMethod<TDfa, TDfaState>(TDfa dfa)
@@ -168,6 +262,23 @@ namespace Nicodem.Lexer
                     impl);
             }
         }
+    }
+
+    public class ProxyLexer
+    {
+        private readonly ProcessImpl _implementation;
+
+        internal ProxyLexer(ProcessImpl processMethod)
+        {
+            _implementation = processMethod;
+        }
+
+        public LexerResult Process(IOrigin origin)
+        {
+            return _implementation(origin);
+        }
+
+        internal delegate LexerResult ProcessImpl(IOrigin origin);
     }
 
     // Embedded into Compiled Lexer - shorter implementation

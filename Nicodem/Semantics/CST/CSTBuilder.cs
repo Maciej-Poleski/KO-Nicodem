@@ -47,9 +47,7 @@ namespace Nicodem.Semantics.CST
                 if (whiteSpaceCategories.Contains(categories[i]))
                     forbidden.Add(i);
 
-            var regExCategories = categories.Select(c => RegExParser.Parse(c));
-
-            var lexer = new Lexer.Lexer(regExCategories.ToArray());
+            var lexer = Lexer.Lexer.GetCompiledLexer("NicodemLexer", categories);
 
             var tokenizerResult = lexer.Process(origin);
             // TODO improve error handling

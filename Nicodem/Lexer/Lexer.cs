@@ -28,9 +28,10 @@ namespace Nicodem.Lexer
 
         private readonly DfaUtils.MinimizedDfa<char> _dfa;
         private uint _nextCategory;
+        private bool _canBeCompiled = true;
 
-        // Transient for now
-        private Assembly _compiledAssembly = null;
+        private readonly ProxyLexer _engine;
+        // invariant: (_engine==null) != (_dfa==null)
 
         /// <summary>
         ///     Tworzy lekser tokenizujący wejście przy użyciu podanych wyrażeń regularnych.
@@ -41,29 +42,75 @@ namespace Nicodem.Lexer
         ///     będą oznaczane kategorią
         ///     <code>i</code>
         /// </param>
-        public Lexer(params RegEx<char>[] regexCategories)
+        public Lexer(params RegEx<char>[] regexCategories) : this(regexCategories, null, null)
+        {
+        }
+
+        private Lexer(RegEx<char>[] regexCategories, string lexerName, IReadOnlyCollection<string> regexes)
         {
             _atomicCategoryLimit = (uint)regexCategories.Length;
             _nextCategory = _atomicCategoryLimit + 1;
             if (regexCategories.Length == 0)
             {
-                _dfa = DfaUtils.MakeEmptyLanguageDfa<char>();
-                _compiledAssembly = LexerCompiler.getCompiledLexer<DfaUtils.MinimizedDfa<char>, DfaUtils.MinimizedDfaState<char>>(_dfa);
+                var dfa = DfaUtils.MakeEmptyLanguageDfa<char>();
+                _engine = CompileLexer(dfa, lexerName, regexes);
+                if (_engine == null)
+                {
+                    _dfa = dfa;
+                }
                 return;
             }
             var lastDfa = MakeRegexDfa(regexCategories[0], 1).Minimized<RegExDfa<char>, DFAState<char>, char>();
             DfaUtils.DfaStatesConcpetCheck<char>.CheckDfaStates(lastDfa);
+            var handler = lexerName == null ? (DfaUtils.AmbiguityHandler) GetProductAccepting : GetCompiledAccepting;
             for (uint i = 1; i < regexCategories.Length; ++i)
             {
                 lastDfa =
                     DfaUtils
                         .MakeMinimizedProductDfa
                         <DfaUtils.MinimizedDfa<char>, DfaUtils.MinimizedDfaState<char>, RegExDfa<char>, DFAState<char>,
-                            char>(lastDfa, MakeRegexDfa(regexCategories[i], i + 1), GetProductAccepting);
+                            char>(lastDfa, MakeRegexDfa(regexCategories[i], i + 1), handler);
             }
-            _dfa = lastDfa;
+            if (_canBeCompiled)
+            {
+                _engine = CompileLexer(lastDfa, lexerName, regexes);
+            }
+            if (_engine == null)
+            {
+                _dfa = lastDfa;
+            }
+        }
 
-            _compiledAssembly = LexerCompiler.getCompiledLexer<DfaUtils.MinimizedDfa<char>, DfaUtils.MinimizedDfaState<char>>(_dfa);
+        public static ProxyLexer GetCompiledLexer(string lexerName, IReadOnlyCollection<string> regexes)
+        {
+            var result = LexerCompiler.GetCompiledLexer(lexerName, regexes);
+            if (result != null)
+            {
+                return result;
+            }
+            var lexer = new Lexer((from regex in regexes select RegExParser.Parse(regex)).ToArray(), lexerName, regexes);
+            return lexer._engine ?? new ProxyLexer(lexer.Process);
+            // If compilation failed or was impossible fallback to DFA based Process
+        }
+
+        private static ProxyLexer CompileLexer(DfaUtils.MinimizedDfa<char> dfa, string lexerName,
+            IReadOnlyCollection<string> regexes)
+        {
+            return LexerCompiler.CompileLexer<DfaUtils.MinimizedDfa<char>, DfaUtils.MinimizedDfaState<char>>(dfa,
+                lexerName, regexes);
+        }
+
+        private static uint GetCompiledAccepting(uint lastDfaAccepting, uint newDfaAccepting)
+        {
+            if (lastDfaAccepting == 0)
+            {
+                return newDfaAccepting;
+            }
+            if (newDfaAccepting == 0)
+            {
+                return lastDfaAccepting;
+            }
+            return Math.Min(lastDfaAccepting, newDfaAccepting);
         }
 
         private uint GetProductAccepting(uint lastDfaAccepting, uint newDfaAccepting)
@@ -76,6 +123,7 @@ namespace Nicodem.Lexer
             {
                 return lastDfaAccepting;
             }
+            _canBeCompiled = false;
             var pack = new Tuple<uint, uint>(lastDfaAccepting, newDfaAccepting);
             if (_compressionMapping.ContainsKey(pack))
             {
@@ -170,18 +218,18 @@ namespace Nicodem.Lexer
 
         public LexerResult Process(Source.IOrigin origin)
         {
-            var impl = _compiledAssembly.GetType("Nicodem.Lexer.Compiled.Lexer");
-            return (LexerResult)impl.InvokeMember(
-                "Process",
-                BindingFlags.Public | BindingFlags.Static | BindingFlags.InvokeMethod, null, null, new object[] {origin});
-
-//            var result = Process<BareOrigin, ILocation, BareLocation, BareFragment>(new BareOrigin(origin));
-//            return new LexerResult(
-//                from tuple in result.Tokens
-//                select new Tuple<IFragment, IEnumerable<int>>(tuple.Item1.Fragment, tuple.Item2),
-//                result.LastParsedLocation._location,
-//                result.FailedAtLocation._location
-//                );
+            if (_engine != null)
+            {
+                return _engine.Process(origin);
+            }
+            // fallback
+            var result = Process<BareOrigin, ILocation, BareLocation, BareFragment>(new BareOrigin(origin));
+            return new LexerResult(
+                from tuple in result.Tokens
+                select new Tuple<IFragment, IEnumerable<int>>(tuple.Item1.Fragment, tuple.Item2),
+                result.LastParsedLocation._location,
+                result.FailedAtLocation._location
+                );
         }
 
         [Obsolete]
