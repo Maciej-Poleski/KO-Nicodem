@@ -105,37 +105,38 @@ namespace Nicodem.Lexer
                 _switchStatements.Add(new CodeSnippetStatement("case " + stateId + ":"));
                 var dfaState = _nativeStateToDfaState[stateId];
                 Debug.Assert(dfaState.Transitions[0].Key == '\0', "Missing transition in DFA");
-                _switchStatements.Add(GenerateBranchingForState(lexerStateVariable, 0, dfaState.Transitions));
+                _switchStatements.Add(
+                    GenerateBranchingForState(lexerStateVariable, 0, dfaState.Transitions.Length, dfaState.Transitions));
                 _switchStatements.Add(new CodeSnippetStatement("break;"));
             }
 
             private CodeStatement GenerateBranchingForState(CodeVariableReferenceExpression lexerStateVariable,
-                int shift, KeyValuePair<char, TDfaState>[] transitions)
+                int from, int to, KeyValuePair<char, TDfaState>[] transitions)
             {
-                CodeStatement code;
-                // there is no dead DFA state - workaround - use pseudo dead
-                if (transitions[shift].Value.IsPseudoDead())
+                if (from + 1 == to)
                 {
-                    code = new CodeExpressionStatement(
-                        new CodeMethodInvokeExpression(lexerStateVariable, "EnterDeadState"));
-                }
-                else
-                {
-                    code = new CodeExpressionStatement(
-                        new CodeMethodInvokeExpression(lexerStateVariable, "EnterState",
-                            new CodePrimitiveExpression(_dfaStateToNativeState[transitions[shift].Value]),
-                            new CodePrimitiveExpression(transitions[shift].Value.Accepting)));
-                }
-                if (shift + 1 == transitions.Length)
-                {
+                    CodeStatement code;
+                    // there is no dead DFA state - workaround - use pseudo dead
+                    if (transitions[from].Value.IsPseudoDead())
+                    {
+                        code = new CodeExpressionStatement(
+                            new CodeMethodInvokeExpression(lexerStateVariable, "EnterDeadState"));
+                    }
+                    else
+                    {
+                        code = new CodeExpressionStatement(
+                            new CodeMethodInvokeExpression(lexerStateVariable, "EnterState",
+                                new CodePrimitiveExpression(_dfaStateToNativeState[transitions[from].Value]),
+                                new CodePrimitiveExpression(transitions[from].Value.Accepting)));
+                    }
                     return code;
                 }
                 var currentCharExpr = new CodePropertyReferenceExpression(lexerStateVariable, "CurrentChar");
-                // could generate binary search branching instead...
+                var part = (to + from)/2;
                 return new CodeConditionStatement(new CodeBinaryOperatorExpression(currentCharExpr,
-                    CodeBinaryOperatorType.LessThan, new CodePrimitiveExpression(transitions[shift + 1].Key)),
-                    new[] {code},
-                    new[] {GenerateBranchingForState(lexerStateVariable, shift + 1, transitions)});
+                    CodeBinaryOperatorType.LessThan, new CodePrimitiveExpression(transitions[part].Key)),
+                    new[] {GenerateBranchingForState(lexerStateVariable, from, part, transitions)},
+                    new[] {GenerateBranchingForState(lexerStateVariable, part, to, transitions)});
             }
 
             // DFA serialization strategy.
