@@ -92,7 +92,7 @@ namespace Nicodem.Lexer
             var lexerSourceField = new CodeMemberField(typeof (string), "LexerSource");
             compiledLexerClass.Members.Add(lexerSourceField);
             lexerSourceField.InitExpression = new CodePrimitiveExpression(lexerSource);
-            lexerSourceField.Attributes = MemberAttributes.Public | MemberAttributes.Static;
+            lexerSourceField.Attributes = MemberAttributes.Public | MemberAttributes.Const;
 
             var processMethod = GenerateProcessMethod<TDfa, TDfaState>(dfa);
             compiledLexerClass.Members.Add(processMethod);
